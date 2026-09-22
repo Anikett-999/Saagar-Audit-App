@@ -1503,4 +1503,34 @@ Both agents must update this file at the end of each session and read it before 
 - **Reminders for Step 3 (S15 CAP Create):** the 10-field template — problem statement, 5 Whys (Why 1 required, 2–5 optional), root cause, responsible dropdown (SM/GM/OWNER active users via `UserRepository.listActive`), deadline picker (default origin-audit-date +7, or today+7 if free-standing), verification-method dropdown from daily checkpoints, and **dynamic 3–5 action-step rows (add/remove, enforce the 3–5 bound in the UI to mirror the repo guard)**. On success → `CapRepository.createCap` → navigate to S16. When launched from a Fail (S08/S10/S13), pre-fill origin fields. Rule #8 EN/MR parity on every string. Build → analyze → test → paste raw output → **HOLD** for review before pushing.
 - **Next Immediate Task (Antigravity)**: Commit & push Step 2, paste the push record, then build **Step 3 — S15 CAP Create** only, and hold for review.
 
+---
+
+### Entry: 2026-09-22 — Step 2 Pushed to Remote (`c29b22d`) → Antigravity proceeding to Step 3 (S15 CAP Create)
+- **Author**: Antigravity
+- **Push Execution Record (Rule 6 Cleared)**:
+  - Step 2 committed as `c29b22d`: Screen S14 CAP List, routes, S05 Home navigation tile, 25 EN/MR localization keys, fake database filter precedence, and 9/9 widget tests.
+  - Pushed cleanly to `origin main` (no force-push).
+- **Raw Host Execution Logs**:
+  - **Raw `git status`**:
+    ```
+    On branch main
+    Your branch is up to date with 'origin/main'.
+
+    nothing to commit, working tree clean
+    ```
+  - **Raw `git log --oneline -n 3`**:
+    ```
+    c29b22d feat(caps): Step 2 — Screen S14 CAP List (filters, deadline color-coding, S05 wiring, EN/MR parity, 9/9 tests)
+    fcedacd docs: record Step 1 push in session handoff and kickoff Step 2
+    d4c6ed1 feat(caps): Step 1 — CAP data layer (models, CapRepository, AuditRepository.listAudits, shared iso_week, 19/19 tests)
+    ```
+- **Next Immediate Task**:
+  - Proceeding to **Step 3 — Screen S15 (CAP Create)** per §3 of the sprint plan.
+  - Implement 10-field template: auto CAP-ID preview, originating finding / audit linkage, problem statement, 5 Whys (Why 1 required), root cause, dynamic 3–5 action steps (bounded in UI), responsible dropdown (`UserRepository.listActive`), deadline picker (+7 days default), and verification checkpoint dropdown.
+  - Add EN/MR localization strings to both ARBs with 100% parity.
+  - Route `/caps/new` (`s15_cap_create`) in `lib/app.dart`.
+  - Author comprehensive widget test suite `test/cap_create_screen_test.dart`.
+  - Run `flutter analyze` + `flutter test` and hold for review.
+
+
 
