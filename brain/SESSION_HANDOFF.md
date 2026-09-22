@@ -1066,13 +1066,92 @@ Both agents must update this file at the end of each session and read it before 
   7. **Report back in the handoff:** the remote URL, the first commit hash, the branch, confirmation the repo is Private, and the raw `git status` (should be clean) + `git log --oneline` output.
 - After this lands, the standing rule is **commit + push after every screen/sprint** so we never again have un-backed-up work. Claude will design the **CAPs Workflow (S12–S17)** sprint plan as the next feature sprint once the repo is live.
 
+---
 
+### Entry: 2026-09-22 — Git Initialization, Root .gitignore, Safety Check & Baseline Commit
+- **Author**: Antigravity
+- **Actions Completed**:
+  1. **Git Root Initialized**:
+     - Initialized repository at root: `E:\projects\Saagar Audit App` (NOT inside `phase-1/`).
+     - Default branch renamed to `main` via `git branch -M main`.
+     - Confirmed root location: `git rev-parse --show-toplevel` $\rightarrow$ `E:/projects/Saagar Audit App`.
+  2. **Root `.gitignore` Created**:
+     - Preserves `brain/` as tracked source of truth.
+     - Strictly ignores Flutter/Dart build artifacts (`phase-1/build/`, `phase-1/.dart_tool/`, `phase-1/.flutter-plugins`, `phase-1/.flutter-plugins-dependencies`, `phase-1/.packages`, `phase-1/.pub-cache/`, `phase-1/.pub/`).
+     - Ignores platform build caches (`phase-1/android/.gradle/`, `phase-1/android/local.properties`, `phase-1/android/key.properties`, `phase-1/android/.cxx/`, `phase-1/ios/Pods/`, `phase-1/ios/.symlinks/`).
+     - Ignores OS & tooling noise (`**/.DS_Store`, `Thumbs.db`, `desktop.ini`, `*.log`, `**/.kotlin/`, `**/Microsoft/`, `**/ModuleAnalysisCache`).
+     - Strictly ignores secrets (`*.keystore`, `*.jks`, `*.p12`, `*.env`, `.env`, `.env.*`, `**/google-services.json`, `**/firebase_options.dart`).
+     - Strictly ignores runtime databases (`*.db`, `*.sqlite`, `*.sqlite3`).
+  3. **`pubspec.lock` Un-ignored & Tracked**:
+     - Removed `pubspec.lock` from `phase-1/.gitignore` so dependencies are pinned for reproducible builds.
+  4. **Safety Check Executed Before Commit**:
+     - Verified staged files:
+       - **0** `.db` or `.sqlite` files
+       - **0** keystores, `.jks`, `.p12`, `.env`, `google-services.json`, or `firebase_options.dart`
+       - **0** `build/` or `.dart_tool/` files
+     - All 226 tracked files verified clean: `brain/` docs + modular spec, `phase-1/lib`, `phase-1/test`, `phase-1/assets`, `phase-1/pubspec.yaml`, `phase-1/pubspec.lock`, configuration files, `AGENTS.md`, and `CLAUDE.md`.
+  5. **Initial Commit Created**:
+     - Hash: `e7ecded`
+     - Commit message: `"chore: initial commit — Phase 1 (S01–S11 audit foundation + S27–S32 settings sprint), brain/ docs, 89 passing tests"`
+     - Total: 226 files, 40,455 insertions.
+  6. **Mandatory Operating Protocol Updated (Rule 6)**:
+     - Enforced Rule 6 in both `AGENTS.md` and `CLAUDE.md`: *"Commit & push after every screen or sprint: Never sit un-backed-up; commit code, brain updates, and test records after every milestone and push to remote."*
+     - Committed: `220e202 docs: add rule 6 to Mandatory Operating Protocol (commit & push after every screen/sprint)`.
+  7. **Remote Configured**:
+     - Configured remote origin:
+       ```
+       origin  https://github.com/Aniket-999/Saagar-Audit-App.git (fetch)
+       origin  https://github.com/Aniket-999/Saagar-Audit-App.git (push)
+       ```
+     - Note: `gh` CLI is not available in this Windows environment. Remote push requires the private repository to be created on GitHub web UI.
+  8. **Baseline Execution Health**:
+     - `flutter analyze`: **0 issues found** (clean baseline).
+     - `flutter test test/score_engine_test.dart`: **12/12 passed** (all invariants green).
 
+- **Raw Host Execution Logs**:
+  - **Raw `git rev-parse --show-toplevel`**:
+    ```
+    E:/projects/Saagar Audit App
+    ```
+  - **Raw `git status`**:
+    ```
+    On branch main
+    nothing to commit, working tree clean
+    ```
+  - **Raw `git log -n 2 --oneline`**:
+    ```
+    220e202 docs: add rule 6 to Mandatory Operating Protocol (commit & push after every screen/sprint)
+    e7ecded chore: initial commit — Phase 1 (S01–S11 audit foundation + S27–S32 settings sprint), brain/ docs, 89 passing tests
+    ```
+  - **Raw `flutter analyze`**:
+    ```
+    Analyzing phase-1...
+    No issues found! (ran in 9.1s)
+    ```
+  - **Raw `flutter test test/score_engine_test.dart`**:
+    ```
+    00:00 +0: loading E:/projects/Saagar Audit App/phase-1/test/score_engine_test.dart
+    00:00 +0: Band boundaries (Spec §6.2) ≥95.0 is excellent
+    00:00 +1: Band boundaries (Spec §6.2) 94.9 is good (not excellent)
+    00:00 +2: Band boundaries (Spec §6.2) ≥90.0 is good
+    00:00 +3: Band boundaries (Spec §6.2) 89.9 is fair (the most-missed boundary per Workbook §1.5)
+    00:00 +4: Band boundaries (Spec §6.2) ≥85.0 is fair
+    00:00 +5: Band boundaries (Spec §6.2) 84.9 is poor
+    00:00 +6: Band boundaries (Spec §6.2) ≥80.0 is poor
+    00:00 +7: Band boundaries (Spec §6.2) 79.9 is critical
+    00:00 +8: Band boundaries (Spec §6.2) below 80 is critical
+    00:00 +9: NA handling (Spec §6.4) 5 NAs at weight 2 reduce max by 10
+    00:00 +10: NA handling (Spec §6.4) Adding NA does not change the percentage
+    00:00 +11: Workbook §5.1 canonical daily test (MUST equal 81/90 = 90.0% Good) produces 81/90 = 90.0% Good exactly
+    00:00 +12: All tests passed!
+    ```
 
-
-
-
-
-
-
-
+- **Next Immediate Task**:
+  - **User**: Create the **PRIVATE** GitHub repository `Saagar-Audit-App` on GitHub:
+    - URL: https://github.com/new
+    - Owner: `Aniket-999`
+    - Repository name: `Saagar-Audit-App`
+    - Visibility: **Private** (Crucial: client business data references and bcrypt security hashes)
+    - Do NOT initialize with README, .gitignore, or license.
+    - Run `git push -u origin main` from terminal (or let Antigravity push once created).
+  - **Claude (Team Lead)**: Author sprint plan for **CAPs Workflow (Screens S12–S17)**.
