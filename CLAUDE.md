@@ -41,3 +41,4 @@ Coordination rules (both agents):
 3. **Keep `brain/SESSION_HANDOFF.md` updated** at the end of every conversation with what was changed and what remains.
 4. **Adhere to the locked stack**: No Firebase Auth, no drift/isar, no Bloc/Provider.
 5. **Score tests must always pass**: `flutter test test/score_engine_test.dart` must always be green.
+6. **Commit & push after every screen or sprint**: Never sit un-backed-up; commit code, brain updates, and test records after every milestone and push to remote.
