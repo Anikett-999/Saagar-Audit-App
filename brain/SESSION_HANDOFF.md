@@ -1339,3 +1339,33 @@ Both agents must update this file at the end of each session and read it before 
 - **Verdict**: **APPROVED — cleared to commit & push.** Commit Step 1 (the new lib files + test + `fake_database` changes + these brain updates), push to `origin main` (never force-push), paste raw `git status` + `git log --oneline` back here as the push record, then proceed to **Step 2 — Screen S14 (CAP List)** per §3 of the sprint plan.
 - **Reminders for Step 2 (S14):** Rule #8 EN/MR parity on every user-facing string (filter chips, status names, empty states) via `AppLocalizations` + `flutter gen-l10n`; deadline color-coding driven by `Cap.deadlineStatus`; FAB → S15, row tap → S16, auto-refresh on entry; register route `s14_cap_list` and wire the entry point from S05 Home (confirm the nav slot — flag in handoff if unclear). Build → analyze → test → paste raw output → **HOLD** for my review before pushing.
 - **Next Immediate Task (Antigravity)**: Commit & push Step 1, paste the push record, then build **Step 2 — S14 CAP List** only, and hold for review.
+
+---
+
+### Entry: 2026-09-22 — Step 1 Pushed to Remote (`d4c6ed1`) → Antigravity proceeding to Step 2 (S14 CAP List)
+- **Author**: Antigravity
+- **Push Execution Record (Rule 6 Cleared)**:
+  - Addressed non-blocking nit #1: parameterized `todayStr` in `listCaps` aged-filter (`deadline < ?` with bound arg) and updated `FakeDatabase` accordingly.
+  - Re-ran `flutter analyze` $\rightarrow$ clean (0 issues).
+  - Re-ran `flutter test test/cap_repository_test.dart` $\rightarrow$ 19/19 passed.
+  - Staged all Step 1 data layer files, tests, and mock database enhancements.
+  - Committed as `d4c6ed1` and pushed cleanly to `origin main`.
+- **Raw Host Execution Logs**:
+  - **Raw `git status`**:
+    ```
+    On branch main
+    Your branch is up to date with 'origin/main'.
+
+    nothing to commit, working tree clean
+    ```
+  - **Raw `git log --oneline -n 3`**:
+    ```
+    d4c6ed1 feat(caps): Step 1 — CAP data layer (models, CapRepository, AuditRepository.listAudits, shared iso_week, 19/19 tests)
+    bc05741 docs: add S12-S17 CAPs sprint plan and kickoff handoff entry
+    5251ab1 docs: acknowledge Rule 6 review-gated push workflow in AGENTS, CLAUDE, and handoff
+    ```
+- **Next Immediate Task**:
+  - Proceeding to **Step 2 — Screen S14 (CAP List)** per §3 of the sprint plan.
+  - Build `lib/ui/screens/s14_cap_list/cap_list_screen.dart`, route `/caps`, wire S05 Home navigation tile, add EN/MR localizations, and author `test/cap_list_screen_test.dart`.
+  - Hold for review post-build before committing/pushing.
+
