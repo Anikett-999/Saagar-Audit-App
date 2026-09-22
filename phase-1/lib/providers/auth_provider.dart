@@ -18,6 +18,10 @@ class AuthUser {
   final String name;
   final String role; // 'SM' | 'GM' | 'OWNER'
   final String languagePref;
+
+  bool get isOwner => role == 'OWNER';
+  bool get isGm => role == 'GM';
+  bool get isSm => role == 'SM';
 }
 
 class AuthState {

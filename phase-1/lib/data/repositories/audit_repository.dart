@@ -1,11 +1,20 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../domain/iso_week.dart';
+import '../../providers/auth_provider.dart';
 import '../db/database.dart';
 import '../device_service.dart';
 import '../models/audit.dart';
 import '../models/audit_result.dart';
 import '../models/photo.dart';
+
+/// Filter for audit history listing (Spec §5 S12).
+enum AuditHistoryFilter {
+  all,
+  daily,
+  unverified,
+}
 
 /// CRUD for audits, audit_results, photos. No business logic — the score
 /// engine lives in `domain/score_engine.dart`.
@@ -46,7 +55,7 @@ class AuditRepository {
       'id': id,
       'audit_type': auditType,
       'audit_date': date,
-      'week_number': _isoWeek(parsed),
+      'week_number': isoWeek(parsed),
       'month_number': parsed.month,
       'year': parsed.year,
       'auditor_id': auditorId,
@@ -197,26 +206,43 @@ class AuditRepository {
     return Photo.fromMap(row);
   }
 
-  /// ISO 8601 week number — matches Spec §15.5 commit message format and
-  /// CAP IDs (`CAP-YYYY-Wxx-NN`).
-  int _isoWeek(DateTime date) {
-    // Algorithm: Thursday in the same week is in the year that owns the week.
-    final dayOfYear = int.parse(_dayOfYearStr(date));
-    final dow = date.weekday; // 1=Mon..7=Sun
-    final week = ((dayOfYear - dow + 10) ~/ 7);
-    if (week < 1) {
-      return _isoWeek(DateTime(date.year - 1, 12, 31));
-    }
-    if (week > 52) {
-      final jan4 = DateTime(date.year + 1, 1, 4);
-      final daysToJan4 = jan4.difference(date).inDays;
-      if (daysToJan4 <= 3) return 1;
-    }
-    return week;
-  }
+  /// Lists submitted and verified audits (never draft or hidden) for S12 history.
+  /// Role-scoped: SM only sees audits they authored; GM and OWNER see all.
+  /// Ordered by submitted_at DESC.
+  Future<List<Audit>> listAudits({
+    required AuthUser viewer,
+    AuditHistoryFilter filter = AuditHistoryFilter.all,
+    int limit = 30,
+    int offset = 0,
+  }) async {
+    final whereClauses = <String>["status IN ('submitted', 'verified')"];
+    final whereArgs = <Object?>[];
 
-  String _dayOfYearStr(DateTime d) {
-    final firstDay = DateTime(d.year, 1, 1);
-    return (d.difference(firstDay).inDays + 1).toString();
+    if (viewer.isSm) {
+      whereClauses.add('auditor_id = ?');
+      whereArgs.add(viewer.id);
+    }
+
+    switch (filter) {
+      case AuditHistoryFilter.daily:
+        whereClauses.add("audit_type = 'daily'");
+        break;
+      case AuditHistoryFilter.unverified:
+        whereClauses.add("status = 'submitted'");
+        break;
+      case AuditHistoryFilter.all:
+        break;
+    }
+
+    final rows = await AppDatabase.instance.db.query(
+      'audits',
+      where: whereClauses.join(' AND '),
+      whereArgs: whereArgs.isEmpty ? null : whereArgs,
+      orderBy: 'submitted_at DESC',
+      limit: limit,
+      offset: offset,
+    );
+
+    return rows.map(Audit.fromMap).toList();
   }
 }
