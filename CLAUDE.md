@@ -41,4 +41,9 @@ Coordination rules (both agents):
 3. **Keep `brain/SESSION_HANDOFF.md` updated** at the end of every conversation with what was changed and what remains.
 4. **Adhere to the locked stack**: No Firebase Auth, no drift/isar, no Bloc/Provider.
 5. **Score tests must always pass**: `flutter test test/score_engine_test.dart` must always be green.
-6. **Commit & push after every screen or sprint**: Never sit un-backed-up; commit code, brain updates, and test records after every milestone and push to remote.
+6. **Review-gated push after every screen or sprint**: Never sit un-backed-up — but pushing is gated on Claude's approval. The flow is fixed:
+   1. Antigravity builds the screen/milestone, runs `flutter analyze` + `flutter test`, and pastes raw output into `SESSION_HANDOFF.md`. **Antigravity does NOT commit or push yet.**
+   2. **Claude reviews** the code and the raw test output and either requests changes or writes an explicit **"APPROVED — cleared to commit & push"** line in the handoff.
+   3. Only **after** Claude's written approval does Antigravity `git add` the reviewed files + brain updates, commit with a descriptive message, and `git push origin main`.
+   4. Antigravity then pastes the raw `git status` + `git log --oneline` back into the handoff as the push record.
+   Rationale: Claude is Team Lead and quality gate; nothing enters the permanent history without a review. **Never force-push.** The only exception is a pure `brain/`-docs/handoff commit (no app code), which Antigravity may push without a code review since there is nothing to review.
