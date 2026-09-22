@@ -1,0 +1,893 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Marathi (`mr`).
+class AppLocalizationsMr extends AppLocalizations {
+  AppLocalizationsMr([String locale = 'mr']) : super(locale);
+
+  @override
+  String get appTitle => 'सागर ऑडिट';
+
+  @override
+  String get navHome => 'मुख्यपृष्ठ';
+
+  @override
+  String get navAudits => 'ऑडिट्स';
+
+  @override
+  String get navCaps => 'सीएपी (CAPs)';
+
+  @override
+  String get navReference => 'संदर्भ';
+
+  @override
+  String get navSettings => 'सेटिंग्ज';
+
+  @override
+  String get navReports => 'अहवाल';
+
+  @override
+  String get btnStartAudit => 'ऑडिट सुरू करा';
+
+  @override
+  String get btnSubmit => 'सादर करा';
+
+  @override
+  String get btnSaveDraft => 'मसुदा जतन करा';
+
+  @override
+  String get btnCancel => 'रद्द करा';
+
+  @override
+  String get btnContinue => 'पुढे चालू ठेवा';
+
+  @override
+  String get btnBack => 'मागे';
+
+  @override
+  String get btnNext => 'पुढे';
+
+  @override
+  String get btnPrevious => 'मागील';
+
+  @override
+  String get btnPass => 'पास';
+
+  @override
+  String get btnFail => 'नापास';
+
+  @override
+  String get btnNa => 'लागू नाही';
+
+  @override
+  String get btnAddPhoto => 'फोटो जोडा';
+
+  @override
+  String get btnRetake => 'पुन्हा फोटो घ्या';
+
+  @override
+  String get btnUsePhoto => 'फोटो वापरा';
+
+  @override
+  String get btnCreateCap => 'CAP तयार करा';
+
+  @override
+  String get btnMarkDone => 'पूर्ण झाले';
+
+  @override
+  String get btnVerify => 'पडताळणी करा';
+
+  @override
+  String get btnCloseCap => 'CAP बंद करा';
+
+  @override
+  String get btnReopen => 'पुन्हा उघडा';
+
+  @override
+  String get btnExtend => 'मुदत वाढवा';
+
+  @override
+  String get btnEscalate => 'वरिष्ठांकडे पाठवा';
+
+  @override
+  String get btnExportPdf => 'PDF एक्सपोर्ट करा';
+
+  @override
+  String get btnShareWhatsapp => 'व्हॉट्सॲपवर पाठवा';
+
+  @override
+  String get btnLogin => 'लॉगिन';
+
+  @override
+  String get btnLogout => 'लॉगआउट';
+
+  @override
+  String get btnChangePin => 'पिन बदला';
+
+  @override
+  String get btnAdd => 'जोडा';
+
+  @override
+  String get btnEdit => 'संपादित करा';
+
+  @override
+  String get btnDelete => 'हटवा';
+
+  @override
+  String get btnDeactivate => 'निष्क्रिय करा';
+
+  @override
+  String get bandExcellent => 'उत्कृष्ट';
+
+  @override
+  String get bandGood => 'चांगले';
+
+  @override
+  String get bandFair => 'समाधानकारक';
+
+  @override
+  String get bandPoor => 'खराब';
+
+  @override
+  String get bandCritical => 'गंभीर';
+
+  @override
+  String get capStatusOpen => 'उघडे';
+
+  @override
+  String get capStatusDone => 'पूर्ण';
+
+  @override
+  String get capStatusVerified => 'पडताळलेले';
+
+  @override
+  String get capStatusClosed => 'बंद';
+
+  @override
+  String get capStatusAged => 'मुदत संपलेले';
+
+  @override
+  String get capStatusReopened => 'पुन्हा उघडलेले';
+
+  @override
+  String get auditStatusDraft => 'मसुदा';
+
+  @override
+  String get auditStatusSubmitted => 'सादर केले';
+
+  @override
+  String get auditStatusVerified => 'पडताळलेले';
+
+  @override
+  String get auditStatusHidden => 'लपवलेले';
+
+  @override
+  String get errWrongPin => 'चुकीचा पिन. कृपया पुन्हा प्रयत्न करा.';
+
+  @override
+  String errLocked(int seconds) {
+    return 'अनेक चुकीचे प्रयत्न. $seconds सेकंदात पुन्हा प्रयत्न करा.';
+  }
+
+  @override
+  String get errRequiredField => 'हे भरणे अनिवार्य आहे.';
+
+  @override
+  String get errFutureDate => 'ऑडिट तारीख भविष्यातील असू शकत नाही.';
+
+  @override
+  String get errPhotoRequired =>
+      'कॅश आणि इन्व्हेंटरी दोषांसाठी फोटो पुरावा अनिवार्य आहे.';
+
+  @override
+  String get errFindingRequired => 'कृपया दोषाचे वर्णन करा (कमाल २०० अक्षरे).';
+
+  @override
+  String get errNoInternet =>
+      'इंटरनेट नाही — स्थानिक पातळीवर जतन केले. पुन्हा कनेक्ट झाल्यावर सिंक होईल.';
+
+  @override
+  String get errCapDeadlinePassed => 'CAP ची मुदत संपली आहे. वाढवता येत नाही.';
+
+  @override
+  String get errCannotEditSubmitted =>
+      'सादर केलेले ऑडिट संपादित करता येत नाही.';
+
+  @override
+  String get okAuditSubmitted => 'ऑडिट यशस्वीरित्या सादर केले.';
+
+  @override
+  String get okCapCreated => 'CAP तयार केले.';
+
+  @override
+  String get okCapMarkedDone => 'CAP पूर्ण म्हणून चिन्हांकित केले.';
+
+  @override
+  String get okCapVerified => 'CAP पडताळले गेले.';
+
+  @override
+  String get okCapClosed => 'CAP बंद केले.';
+
+  @override
+  String get okPinChanged => 'पिन बदलला गेला.';
+
+  @override
+  String get okSynced => 'क्लाउडसह सिंक झाले.';
+
+  @override
+  String get s02Title => 'तुमची भाषा निवडा';
+
+  @override
+  String get s02ChooseEnglish => 'English';
+
+  @override
+  String get s02ChooseMarathi => 'मराठी';
+
+  @override
+  String get s02Note => 'तुम्ही हे नंतर सेटिंग्जमधून बदलू शकता.';
+
+  @override
+  String get s03Title => 'पहिली वेळ सेटअप';
+
+  @override
+  String get s03Subtitle => 'स्वागत आहे. चला तुमचे ओनर खाते तयार करूया.';
+
+  @override
+  String get s03OwnerName => 'ओनरचे नाव';
+
+  @override
+  String get s03OwnerPin => '४-अंकी पिन निवडा';
+
+  @override
+  String get s03ReenterPin => 'तुमचा पिन पुन्हा टाका';
+
+  @override
+  String get s03ConfirmPin => 'पिन पुष्टी करा';
+
+  @override
+  String get s03PinsMismatch => 'पिन जुळत नाहीत. नवीन पिन निवडा.';
+
+  @override
+  String get s03NameTooShort => 'कृपया तुमचे नाव प्रविष्ट करा (२+ अक्षरे).';
+
+  @override
+  String get s03AddTeamLater => 'मी माझी टीम नंतर जोडेन';
+
+  @override
+  String get s04SelectName => 'तुमचे नाव निवडा';
+
+  @override
+  String get s04EnterPin => 'तुमचा ४-अंकी पिन टाका';
+
+  @override
+  String get s04ForgotPin => 'पिन विसरलात?';
+
+  @override
+  String get s04ForgotPinHelp =>
+      'ओनरला सेटिंग्ज → वापरकर्ते मधून तुमचा पिन रीसेट करण्यास सांगा.';
+
+  @override
+  String s04LockedCountdown(int seconds) {
+    return 'खाते लॉक झाले. $seconds सेकंदात पुन्हा प्रयत्न करा.';
+  }
+
+  @override
+  String s04WrongPinAttemptsLeft(int attempts) {
+    return 'चुकीचा पिन. $attempts प्रयत्न शिल्लक आहेत.';
+  }
+
+  @override
+  String s04TooManyAttempts(int seconds) {
+    return 'अनेक चुकीचे प्रयत्न. $seconds सेकंदात पुन्हा प्रयत्न करा.';
+  }
+
+  @override
+  String s05Hello(String name) {
+    return 'नमस्ते, $name';
+  }
+
+  @override
+  String get s05RoleOwner => 'ओनर (OWNER)';
+
+  @override
+  String get s05RoleSm => 'स्टोअर मॅनेजर (SM)';
+
+  @override
+  String get s05RoleGm => 'जनरल मॅनेजर (GM)';
+
+  @override
+  String get s05TodayDailyAudit => 'आजचे दैनिक ऑडिट';
+
+  @override
+  String get s05NotStartedYet => 'तुम्ही आजचे ऑडिट अद्याप सुरू केलेले नाही.';
+
+  @override
+  String get s05NotStartedAdmin => 'आजचे दैनिक ऑडिट अद्याप सुरू झालेले नाही.';
+
+  @override
+  String get s05StartDailyAudit => 'दैनिक ऑडिट सुरू करा';
+
+  @override
+  String get s05ResumeDraft => 'मसुदा पुन्हा सुरू करा';
+
+  @override
+  String get s05DraftInProgress =>
+      'मसुदा ऑडिट सुरू आहे. तपासणी पुढे चालू ठेवण्यासाठी पुन्हा सुरू करा.';
+
+  @override
+  String get s05SubmittedStatus => 'सादर केले';
+
+  @override
+  String get s05DailyAuditsRunBySm =>
+      'दैनिक ऑडिट स्टोअर मॅनेजरद्वारे केले जाते.';
+
+  @override
+  String get s05StatusNotStarted => 'सुरू नाही';
+
+  @override
+  String get s05StatusInProgress => 'प्रगतीपथावर';
+
+  @override
+  String get s05StatusSubmitted => 'सादर केले';
+
+  @override
+  String get s05AuditHistoryTitle => 'ऑडिट इतिहास';
+
+  @override
+  String get s05AuditHistorySubtitle => 'मागील दैनिक ऑडिट पहा';
+
+  @override
+  String get s05CapsTitle => 'सीएपी (CAPs)';
+
+  @override
+  String get s05CapsSubtitle => 'सुधारात्मक कृती योजना';
+
+  @override
+  String get s05ReferenceTitle => 'संदर्भ माहिती';
+
+  @override
+  String get s05ReferenceSubtitle =>
+      'रेटिंग स्केल, एस्केलेशन ट्रिगर्स, शब्दकोश';
+
+  @override
+  String get s05SettingsTitle => 'सेटिंग्ज';
+
+  @override
+  String get s05SettingsSubtitle => 'कर्मचारी, वापरकर्ते, भाषा, बॅकअप';
+
+  @override
+  String s05ComingSoon(String feature) {
+    return '$feature ही सुविधा टप्पा १ आठवडा ३+ साठी नियोजित आहे. सध्या दैनिक ऑडिट (S06–S11) सक्रिय आहे.';
+  }
+
+  @override
+  String get s06Title => 'दैनिक ऑडिट सुरू करा';
+
+  @override
+  String get s06AuditDate => 'ऑडिट तारीख';
+
+  @override
+  String get s06StoreLabel => 'स्टोअर';
+
+  @override
+  String get s06CrosOnDuty => 'ड्युटीवरील कर्मचारी (CRO)';
+
+  @override
+  String get s06SelectAtLeastOneCro =>
+      'कृपया किमान एक ड्युटीवरील कर्मचारी निवडा.';
+
+  @override
+  String get s06BeginAudit => 'ऑडिट सुरू करा';
+
+  @override
+  String s07CheckpointNumber(int current, int total) {
+    return 'चेकपॉइंट $current / $total';
+  }
+
+  @override
+  String get s07Pass => 'पास';
+
+  @override
+  String get s07Fail => 'नापास';
+
+  @override
+  String get s07Na => 'लागू नाही';
+
+  @override
+  String get s07NaReasonPrompt => 'हा चेकपॉइंट का लागू नाही?';
+
+  @override
+  String get s07NaReasonHint => 'कारण प्रविष्ट करा (किमान ३ अक्षरे)...';
+
+  @override
+  String get s07Previous => 'मागे';
+
+  @override
+  String get s07Next => 'पुढे';
+
+  @override
+  String get s07FinishReview => 'पूर्ण करा आणि पुनरावलोकन';
+
+  @override
+  String get s08Title => 'नापास तपशील';
+
+  @override
+  String get s08FindingLabel => 'दोषाचे वर्णन';
+
+  @override
+  String get s08FindingHint => 'दोष किंवा त्रुटीचे वर्णन करा...';
+
+  @override
+  String get s08CroInvolved => 'संबंधित कर्मचारी (ऐच्छिक)';
+
+  @override
+  String get s08PhotoEvidence => 'फोटो पुरावा';
+
+  @override
+  String get s08PhotoRequiredNotice => 'या चेकपॉइंटसाठी फोटो अनिवार्य आहे.';
+
+  @override
+  String get s08SaveFail => 'दोष जतन करा';
+
+  @override
+  String get s10Title => 'पुनरावलोकन आणि सादर करा';
+
+  @override
+  String get s10ScoreCard => 'ऑडिट गुण';
+
+  @override
+  String get s10SopBreakdown => 'एसओपी (SOP) तपशील';
+
+  @override
+  String s10FailsTitle(int count) {
+    return 'आढळलेले दोष ($count)';
+  }
+
+  @override
+  String get s10NotesLabel => 'सामान्य टिप्पण्या (ऐच्छिक)';
+
+  @override
+  String get s10IncompleteWarning =>
+      'सादर करण्यापूर्वी सर्व ६८ चेकपॉइंट तपासणे आवश्यक आहे.';
+
+  @override
+  String get s10SubmitButton => 'ऑडिट सादर करा';
+
+  @override
+  String get s10MissingPhotoWarning =>
+      'अनिवार्य दोषांसाठी फोटो पुरावा जोडलेला नाही.';
+
+  @override
+  String get s11Title => 'ऑडिट सादर केले';
+
+  @override
+  String get s11ConfirmationMessage =>
+      'आजचे दैनिक ऑडिट यशस्वीरित्या नोंदवले गेले आहे.';
+
+  @override
+  String get s11ScoreLabel => 'अंतिम गुण';
+
+  @override
+  String get s11BandLabel => 'श्रेणी';
+
+  @override
+  String get s11OfflineSyncNotice => 'ऑनलाइन आल्यावर सिंक होईल';
+
+  @override
+  String get s11ReturnHome => 'मुख्यपृष्ठावर परत जा';
+
+  @override
+  String get s27Title => 'सेटिंग्ज';
+
+  @override
+  String get s27AccountSection => 'खाते';
+
+  @override
+  String get s27ManagementSection => 'व्यवस्थापन';
+
+  @override
+  String get s27PreferencesSection => 'प्राधान्ये आणि डेटा';
+
+  @override
+  String get s27ManageCrosTitle => 'सीआरओ व्यवस्थापन';
+
+  @override
+  String get s27ManageCrosSubtitle =>
+      'कर्मचारी पाहा, जोडा, संपादित करा आणि निष्क्रिय करा';
+
+  @override
+  String get s27ManageUsersTitle => 'वापरकर्ता व्यवस्थापन';
+
+  @override
+  String get s27ManageUsersSubtitle =>
+      'SM/GM जोडा, PIN रीसेट करा, प्रवेश नियंत्रित करा';
+
+  @override
+  String get s27ChangePinTitle => 'PIN बदला';
+
+  @override
+  String get s27ChangePinSubtitle => 'तुमचा ४-अंकी सुरक्षा PIN बदला';
+
+  @override
+  String get s27LanguageTitle => 'भाषा / Language';
+
+  @override
+  String get s27LanguageSubtitle => 'इंग्रजी किंवा मराठी निवडा';
+
+  @override
+  String get s27BackupExportTitle => 'बॅकअप व निर्यात';
+
+  @override
+  String get s27BackupExportSubtitle =>
+      'डेटाबेस JSON निर्यात आणि समक्रमण स्थिती';
+
+  @override
+  String get s27AboutTitle => 'अॅपबद्दल माहिती';
+
+  @override
+  String get s27AboutSubtitle => 'आवृत्ती, स्टोअर माहिती आणि एसओपी तपशील';
+
+  @override
+  String get s27AboutDialogTitle => 'प्राधान्य १ ऑडिटबद्दल';
+
+  @override
+  String get s27AboutDialogBody =>
+      'सागर ट्रेडर्स एसओपी ऑडिट अॅप्लिकेशन\nटायटन वर्ल्ड (WLMHW) आणि हेलिओस (HEMW)\nलातूर, महाराष्ट्र\nआवृत्ती १.०.० (टप्पा १)';
+
+  @override
+  String get s27CloseDialog => 'बंद करा';
+
+  @override
+  String get s27OwnerBadge => 'मालक';
+
+  @override
+  String get s27GmBadge => 'महाव्यवस्थापक';
+
+  @override
+  String get s27SmBadge => 'स्टोअर व्यवस्थापक';
+
+  @override
+  String get s28Title => 'सीआरओ व्यवस्थापन';
+
+  @override
+  String get s28EmptyState =>
+      'कोणतेही सीआरओ आढळले नाहीत. पहिला सीआरओ जोडण्यासाठी + टॅप करा.';
+
+  @override
+  String get s28StatusActive => 'सक्रिय';
+
+  @override
+  String get s28StatusInactive => 'निष्क्रिय';
+
+  @override
+  String get s28CounterLabel => 'काउंटर';
+
+  @override
+  String get s28CounterTitan => 'टायटन';
+
+  @override
+  String get s28CounterHelios => 'हेलिओस';
+
+  @override
+  String get s28ShiftLabel => 'शिफ्ट';
+
+  @override
+  String get s28ShiftMorning => 'सकाळ';
+
+  @override
+  String get s28ShiftAfternoon => 'दुपार';
+
+  @override
+  String get s28ShiftFlexible => 'लवचिक';
+
+  @override
+  String get s28AddCroTitle => 'नवीन सीआरओ जोडा';
+
+  @override
+  String get s28EditCroTitle => 'सीआरओ संपादित करा';
+
+  @override
+  String get s28NameLabel => 'सीआरओचे पूर्ण नाव';
+
+  @override
+  String get s28NameHint => 'उदा. राहुल शिंदे';
+
+  @override
+  String get s28NameRequired => 'कृपया वैध नाव प्रविष्ट करा (किमान २ अक्षरे)';
+
+  @override
+  String get s28StatusLabel => 'सक्रिय स्थिती';
+
+  @override
+  String get s28ActiveHelp => 'सक्रिय सीआरओ ऑडिट ड्रॉपडाउनमध्ये दिसतील';
+
+  @override
+  String get s28SaveButton => 'जतन करा';
+
+  @override
+  String get s28CancelButton => 'रद्द करा';
+
+  @override
+  String get s28EditAction => 'संपादित करा';
+
+  @override
+  String get s28DeactivateAction => 'निष्क्रिय करा';
+
+  @override
+  String get s28ReactivateAction => 'पुन्हा सक्रिय करा';
+
+  @override
+  String get s28DeactivateConfirmTitle => 'सीआरओ निष्क्रिय करायचा का?';
+
+  @override
+  String get s28DeactivateConfirmBody =>
+      'हा सीआरओ नवीन ऑडिटमधून लपवला जाईल, परंतु मागील ऑडिट नोंदी सुरक्षित राहतील.';
+
+  @override
+  String get s28CroAddedSuccess => 'सीआरओ यशस्वीरित्या जोडला';
+
+  @override
+  String get s28CroUpdatedSuccess => 'सीआरओ यशस्वीरित्या अद्यतनित केला';
+
+  @override
+  String get s28CroDeactivatedSuccess => 'सीआरओ निष्क्रिय केला';
+
+  @override
+  String get s28CroReactivatedSuccess => 'सीआरओ पुन्हा सक्रिय केला';
+
+  @override
+  String get s29Title => 'वापरकर्ता व्यवस्थापन';
+
+  @override
+  String get s29EmptyState => 'कोणतेही वापरकर्ते आढळले नाहीत.';
+
+  @override
+  String get s29AddUserTitle => 'नवीन वापरकर्ता जोडा';
+
+  @override
+  String get s29NameLabel => 'पूर्ण नाव';
+
+  @override
+  String get s29NameHint => 'उदा. सचिन जाधव';
+
+  @override
+  String get s29NameRequired => 'कृपया वैध नाव प्रविष्ट करा (२–५० अक्षरे)';
+
+  @override
+  String get s29RoleLabel => 'भूमिका';
+
+  @override
+  String get s29RoleSm => 'स्टोअर व्यवस्थापक (SM)';
+
+  @override
+  String get s29RoleGm => 'महाव्यवस्थापक (GM)';
+
+  @override
+  String get s29PhoneLabel => 'फोन नंबर (ऐच्छिक)';
+
+  @override
+  String get s29PhoneHint => '१०-अंकी मोबाइल नंबर';
+
+  @override
+  String get s29PinLabel => '४-अंकी PIN';
+
+  @override
+  String get s29PinConfirmLabel => '४-अंकी PIN ची पुष्टी करा';
+
+  @override
+  String get s29PinRequired => 'कृपया ४-अंकी संख्यात्मक PIN प्रविष्ट करा';
+
+  @override
+  String get s29PinMismatch => 'PIN जुळत नाहीत';
+
+  @override
+  String get s29SaveButton => 'जतन करा';
+
+  @override
+  String get s29CancelButton => 'रद्द करा';
+
+  @override
+  String get s29UserAddedSuccess => 'वापरकर्ता यशस्वीरित्या तयार केला';
+
+  @override
+  String get s29ResetPinAction => 'PIN रीसेट करा';
+
+  @override
+  String s29ResetPinTitle(String name) {
+    return '$name साठी PIN रीसेट करा';
+  }
+
+  @override
+  String get s29NewPinLabel => 'नवीन ४-अंकी PIN';
+
+  @override
+  String get s29ConfirmNewPinLabel => 'नवीन PIN ची पुष्टी करा';
+
+  @override
+  String get s29ResetPinSuccess => 'PIN यशस्वीरित्या रीसेट केला';
+
+  @override
+  String get s29DeactivateAction => 'निष्क्रिय करा';
+
+  @override
+  String get s29ReactivateAction => 'पुन्हा सक्रिय करा';
+
+  @override
+  String get s29DeactivateConfirmTitle => 'वापरकर्ता निष्क्रिय करायचा का?';
+
+  @override
+  String get s29DeactivateConfirmBody =>
+      'हा वापरकर्ता आता लॉग इन करू शकणार नाही, परंतु सर्व मागील ऑडिट नोंदी सुरक्षित राहतील.';
+
+  @override
+  String get s29CannotDeactivateOwner =>
+      'तपशील §S29 नुसार मालक खाते निष्क्रिय केले जाऊ शकत नाही.';
+
+  @override
+  String get s29UserDeactivatedSuccess => 'वापरकर्ता निष्क्रिय केला';
+
+  @override
+  String get s29UserReactivatedSuccess => 'वापरकर्ता पुन्हा सक्रिय केला';
+
+  @override
+  String get s29OwnerRestrictedAccess => 'फक्त मालकासाठी प्रवेश मर्यादित आहे.';
+
+  @override
+  String get s29StatusActive => 'सक्रिय';
+
+  @override
+  String get s29StatusInactive => 'निष्क्रिय';
+
+  @override
+  String get s30Title => 'PIN बदला';
+
+  @override
+  String get s30InstructionText =>
+      'तुमची ओळख पडताळण्यासाठी तुमचा सध्याचा PIN प्रविष्ट करा, नंतर तुमचा नवीन ४-अंकी सुरक्षा PIN प्रविष्ट करा आणि पुष्टी करा.';
+
+  @override
+  String get s30CurrentPinLabel => 'सध्याचा ४-अंकी PIN';
+
+  @override
+  String get s30CurrentPinHint => 'तुमचा सध्याचा PIN प्रविष्ट करा';
+
+  @override
+  String get s30CurrentPinRequired =>
+      'कृपया तुमचा सध्याचा ४-अंकी PIN प्रविष्ट करा';
+
+  @override
+  String get s30CurrentPinIncorrect => 'सध्याचा PIN चुकीचा आहे';
+
+  @override
+  String get s30NewPinLabel => 'नवीन ४-अंकी PIN';
+
+  @override
+  String get s30NewPinHint => 'नवीन ४-अंकी PIN प्रविष्ट करा';
+
+  @override
+  String get s30NewPinRequired => 'कृपया ४-अंकी संख्यात्मक PIN प्रविष्ट करा';
+
+  @override
+  String get s30NewPinSameAsCurrent =>
+      'नवीन PIN सध्याच्या PIN पेक्षा वेगळा असावा';
+
+  @override
+  String get s30ConfirmPinLabel => 'नवीन ४-अंकी PIN ची पुष्टी करा';
+
+  @override
+  String get s30ConfirmPinHint => 'नवीन ४-अंकी PIN पुन्हा प्रविष्ट करा';
+
+  @override
+  String get s30PinMismatch => 'नवीन PIN आणि पुष्टी जुळत नाहीत';
+
+  @override
+  String get s30SaveButton => 'PIN अपडेट करा';
+
+  @override
+  String get s30PinChangedSuccess => 'PIN यशस्वीरित्या बदलला';
+
+  @override
+  String get s31Title => 'भाषा / Language';
+
+  @override
+  String get s31Subtitle => 'तुमची पसंतीची अॅप भाषा निवडा';
+
+  @override
+  String get s31Instruction =>
+      'संपूर्ण अनुप्रयोगात वापरण्यासाठी भाषा निवडा. बदल त्वरित लागू होतात आणि तुमच्या प्रोफाइलवर जतन केले जातात.';
+
+  @override
+  String get s31EnglishTitle => 'English';
+
+  @override
+  String get s31EnglishSubtitle => 'डीफॉल्ट सिस्टम भाषा';
+
+  @override
+  String get s31MarathiTitle => 'मराठी (Marathi)';
+
+  @override
+  String get s31MarathiSubtitle => 'स्थानिक भाषा (प्रादेशिक भाषा)';
+
+  @override
+  String get s31CurrentLanguageBadge => 'सध्याची';
+
+  @override
+  String get s31LanguageUpdatedSuccess => 'भाषा पसंती जतन केली';
+
+  @override
+  String get s32Title => 'बॅकअप व निर्यात';
+
+  @override
+  String get s32Subtitle => 'स्थानिक SQLite डेटाबेस निर्यात आणि क्लाउड समक्रमण';
+
+  @override
+  String get s32ExportCardTitle => 'स्थानिक डेटाबेस निर्यात करा (JSON)';
+
+  @override
+  String get s32ExportCardDesc =>
+      'तुमच्या डिव्हाइसच्या Downloads डिरेक्टरीमध्ये सर्व १४ SQLite टेबल्स टाइमस्टॅम्प केलेल्या JSON फाईलमध्ये निर्यात करा. अॅप अपडेटपूर्वी मॅन्युअल बॅकअपसाठी उपयुक्त.';
+
+  @override
+  String get s32ExportSecurityNotice =>
+      'सुरक्षा सूचना: निर्यात केलेल्या बॅकअपमध्ये ऑडिट ट्रेल, निरीक्षणे आणि bcrypt सुरक्षा हॅशेस असतात. ही फाईल सुरक्षितपणे साठवा आणि ट्रान्सफर करा.';
+
+  @override
+  String get s32ExportButton => 'डेटाबेस JSON निर्यात करा';
+
+  @override
+  String get s32Exporting => 'डेटाबेस निर्यात होत आहे...';
+
+  @override
+  String get s32ExportSuccessTitle => 'निर्यात यशस्वी झाली';
+
+  @override
+  String s32ExportSuccessMessage(
+      int records, int tables, String fileName, String path) {
+    return 'बॅकअप यशस्वीरित्या जतन केला ($tables टेबल्समध्ये $records नोंदी).\n\nफाईल: $fileName\nमार्ग:\n$path';
+  }
+
+  @override
+  String s32ExportFailed(String error) {
+    return 'डेटाबेस निर्यात अयशस्वी: $error';
+  }
+
+  @override
+  String get s32CloudSyncTitle => 'क्लाउड समक्रमण (Firestore)';
+
+  @override
+  String get s32CloudSyncDesc =>
+      'Google Cloud Firestore द्वारे स्वयंचलित मल्टी-डिव्हाइस समक्रमण आणि क्लाउड डेटा संचयन.';
+
+  @override
+  String get s32CloudSyncStatusLabel =>
+      'स्थिती: ऑफलाइन-फर्स्ट मोड (स्थानिक SQLite)';
+
+  @override
+  String get s32CloudSyncPhase4Notice =>
+      'फेज ४ मध्ये उपलब्ध होईल. सर्व ऑर्डिट्स आणि सेटिंग्ज या डिव्हाइसवर सुरक्षितपणे स्थानिकरित्या साठवल्या आहेत.';
+
+  @override
+  String get s32CloudSyncComingSoonBadge => 'फेज ४ मध्ये येत आहे';
+
+  @override
+  String get s32ForceSyncButton => 'क्लाउड सिंक करा';
+
+  @override
+  String get s32AboutCardTitle => 'सागर ऑडिट अॅपबद्दल';
+
+  @override
+  String get s32AboutVersion => 'आवृत्ती: 0.1.0+1 (फेज १ बेसलाइन)';
+
+  @override
+  String get s32AboutStore =>
+      'दुकाने: टायटन वर्ल्ड (WLMHW) आणि हेलिओस (HEMW), लातूर';
+
+  @override
+  String get s32AboutSpec => 'तपशील: सागर P1 रिटेल ऑडिट स्पेक v1';
+
+  @override
+  String get s32OkButton => 'ठीक आहे';
+}
