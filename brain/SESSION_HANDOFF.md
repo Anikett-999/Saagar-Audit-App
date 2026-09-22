@@ -1215,4 +1215,15 @@ Both agents must update this file at the end of each session and read it before 
 - **Next Immediate Task**:
   - Stand by for Claude (Team Lead) to author and deliver the **CAPs Workflow (Screens S12–S17)** sprint design document.
 
+---
+
+### Entry: 2026-09-22 — CAPs Workflow (S12–S17) SPRINT PLAN DELIVERED → Antigravity cleared to start Step 1 (data layer)
+- **Author**: Claude (Senior Developer & Team Lead)
+- **Delivered**: `brain/SPRINT_S12_S17_CAPS.md` — full sprint design for the daily-audit → corrective-action loop. Read it in full before coding. I designed it against the real spec (`brain/spec/03_S12_S21_AUDITS_CAPS_REPORTS.md`) and the real schema (`caps`/`cap_actions`/`cap_log` in `schema.dart`), and against the existing repo patterns.
+- **Scope call**: S12, S13, S14, S15, S16, S17 are IN. **S18 Verify / S19 Close / Request-Extension / Reopen are OUT of this sprint — STUB only** (render for GM/Owner but disabled/"coming next"); they get their own mini-sprint right after. Push notifications = Phase 4 (`// TODO(phase4)` markers only, no dep). PDF/WhatsApp on S13 = Phase 2 (hide/disable, no PDF dep). Rationale + full detail in §1 of the plan. **If you think a deferred item is trivially includable, raise it in the handoff BEFORE building — do not silently expand scope.**
+- **Build in the order in §3.** Critically: **Step 1 is the data layer FIRST** — `Cap`/`CapAction`/`CapLogEntry` models, a shared `lib/domain/iso_week.dart` (extract the existing `_isoWeek` from `audit_repository.dart` so both repos share ONE implementation — do not duplicate it), `CapRepository`, and `AuditRepository.listAudits`. Every CAP state change writes a `cap_log` row **in the same transaction** as the status update (see §2.2). Ship Step 1 with `test/cap_repository_test.dart` (CAP-ID weekly sequencing, atomic createCap, markDone guard, role scoping) and HOLD for my review before any UI.
+- **Non-negotiables (§4):** locked stack (no new heavy deps), Rule #8 EN/MR parity on every string (the spec has Marathi for all labels — use it), role scoping exactly per spec (SM own/assigned; GM/OWNER all; CROs never responsible), submitted audits stay immutable (S13 is strictly read-only — `audit_immutability_test.dart` must stay green), and `score_engine_test.dart` must stay green.
+- **Workflow reminder (Rule 6):** build Step 1 → run `flutter analyze` + `flutter test` → paste RAW output here → **STOP and wait for my `APPROVED — cleared to commit & push`** → then commit + push that step → paste `git status`/`git log --oneline` → move to Step 2. One reviewable unit per step.
+- **Next Immediate Task (Antigravity)**: Read `brain/SPRINT_S12_S17_CAPS.md` end to end, then build **Step 1 (data layer + `cap_repository_test.dart`) ONLY**. Paste raw analyze/test output and hold for review. Do not start S14 UI until Step 1 is approved.
+
 
