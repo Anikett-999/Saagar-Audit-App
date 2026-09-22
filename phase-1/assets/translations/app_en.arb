@@ -324,5 +324,47 @@
   "s32AboutVersion": "Version: 0.1.0+1 (Phase 1 Baseline)",
   "s32AboutStore": "Stores: Titan World (WLMHW) & Helios (HEMW), Latur",
   "s32AboutSpec": "Specification: Saagar P1 Retail Audit Spec v1",
-  "s32OkButton": "OK"
+  "s32OkButton": "OK",
+
+  "s14Title": "Corrective Action Plans",
+  "s14Subtitle": "Track and resolve audit findings",
+  "s14SearchHint": "Search by problem statement or CAP ID...",
+  "s14FilterAll": "All",
+  "s14FilterOpen": "Open",
+  "s14FilterDone": "Done (pending verify)",
+  "s14FilterAged": "Aged ⚠",
+  "s14FilterClosed": "Closed",
+  "s14EmptyTitle": "No CAPs Found",
+  "s14EmptyDesc": "No corrective actions match the selected filter.",
+  "s14NewCapButton": "New CAP",
+  "s14StatusOpen": "Open",
+  "s14StatusDone": "Done",
+  "s14StatusVerified": "Verified",
+  "s14StatusClosed": "Closed",
+  "s14StatusAged": "Aged",
+  "s14StatusReopened": "Reopened",
+  "s14DeadlineOverdue": "Overdue ({date})",
+  "@s14DeadlineOverdue": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "s14DeadlineDueSoon": "Due Soon ({date})",
+  "@s14DeadlineDueSoon": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "s14DeadlineOk": "Due: {date}",
+  "@s14DeadlineOk": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "s14ResponsiblePrefix": "Responsible: {name}",
+  "@s14ResponsiblePrefix": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  }
 }

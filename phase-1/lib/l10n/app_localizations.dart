@@ -1760,6 +1760,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OK'**
   String get s32OkButton;
+
+  /// No description provided for @s14Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Corrective Action Plans'**
+  String get s14Title;
+
+  /// No description provided for @s14Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track and resolve audit findings'**
+  String get s14Subtitle;
+
+  /// No description provided for @s14SearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by problem statement or CAP ID...'**
+  String get s14SearchHint;
+
+  /// No description provided for @s14FilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get s14FilterAll;
+
+  /// No description provided for @s14FilterOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get s14FilterOpen;
+
+  /// No description provided for @s14FilterDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done (pending verify)'**
+  String get s14FilterDone;
+
+  /// No description provided for @s14FilterAged.
+  ///
+  /// In en, this message translates to:
+  /// **'Aged ⚠'**
+  String get s14FilterAged;
+
+  /// No description provided for @s14FilterClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get s14FilterClosed;
+
+  /// No description provided for @s14EmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No CAPs Found'**
+  String get s14EmptyTitle;
+
+  /// No description provided for @s14EmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'No corrective actions match the selected filter.'**
+  String get s14EmptyDesc;
+
+  /// No description provided for @s14NewCapButton.
+  ///
+  /// In en, this message translates to:
+  /// **'New CAP'**
+  String get s14NewCapButton;
+
+  /// No description provided for @s14StatusOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get s14StatusOpen;
+
+  /// No description provided for @s14StatusDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get s14StatusDone;
+
+  /// No description provided for @s14StatusVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get s14StatusVerified;
+
+  /// No description provided for @s14StatusClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get s14StatusClosed;
+
+  /// No description provided for @s14StatusAged.
+  ///
+  /// In en, this message translates to:
+  /// **'Aged'**
+  String get s14StatusAged;
+
+  /// No description provided for @s14StatusReopened.
+  ///
+  /// In en, this message translates to:
+  /// **'Reopened'**
+  String get s14StatusReopened;
+
+  /// No description provided for @s14DeadlineOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue ({date})'**
+  String s14DeadlineOverdue(String date);
+
+  /// No description provided for @s14DeadlineDueSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Due Soon ({date})'**
+  String s14DeadlineDueSoon(String date);
+
+  /// No description provided for @s14DeadlineOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Due: {date}'**
+  String s14DeadlineOk(String date);
+
+  /// No description provided for @s14ResponsiblePrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Responsible: {name}'**
+  String s14ResponsiblePrefix(String name);
 }
 
 class _AppLocalizationsDelegate

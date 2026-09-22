@@ -122,13 +122,7 @@ class FakeDatabase extends Fake implements Database, Transaction {
           }
 
           // Status filter
-          if (where.contains("status IN ('open', 'reopened')")) {
-            results = results
-                .where((r) => r['status'] == 'open' || r['status'] == 'reopened')
-                .toList();
-          } else if (where.contains("status = 'done'")) {
-            results = results.where((r) => r['status'] == 'done').toList();
-          } else if (where.contains("status = 'aged'")) {
+          if (where.contains("status = 'aged'")) {
             final nowStr = (whereArgs != null && argIdx < whereArgs.length)
                 ? (whereArgs[argIdx++] as String)
                 : DateTime.now().toIso8601String().substring(0, 10);
@@ -137,6 +131,12 @@ class FakeDatabase extends Fake implements Database, Transaction {
               final dl = r['deadline'] as String? ?? '';
               return st == 'aged' || ((st == 'open' || st == 'reopened') && dl.compareTo(nowStr) < 0);
             }).toList();
+          } else if (where.contains("status IN ('open', 'reopened')")) {
+            results = results
+                .where((r) => r['status'] == 'open' || r['status'] == 'reopened')
+                .toList();
+          } else if (where.contains("status = 'done'")) {
+            results = results.where((r) => r['status'] == 'done').toList();
           } else if (where.contains("status IN ('closed', 'verified')")) {
             results = results
                 .where((r) => r['status'] == 'closed' || r['status'] == 'verified')

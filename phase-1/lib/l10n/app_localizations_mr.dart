@@ -890,4 +890,76 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s32OkButton => 'ठीक आहे';
+
+  @override
+  String get s14Title => 'सुधारात्मक कृती योजना (CAP)';
+
+  @override
+  String get s14Subtitle => 'ऑडिट निष्कर्षांचा मागोवा आणि निराकरण';
+
+  @override
+  String get s14SearchHint => 'समस्या किंवा CAP आयडी शोधा...';
+
+  @override
+  String get s14FilterAll => 'सर्व';
+
+  @override
+  String get s14FilterOpen => 'उघडे';
+
+  @override
+  String get s14FilterDone => 'पूर्ण (पडताळणी प्रलंबित)';
+
+  @override
+  String get s14FilterAged => 'जुनी ⚠';
+
+  @override
+  String get s14FilterClosed => 'बंद';
+
+  @override
+  String get s14EmptyTitle => 'कोणतेही CAP सापडले नाही';
+
+  @override
+  String get s14EmptyDesc =>
+      'निवडलेल्या फिल्टरशी जुळणारी कोणतीही सुधारात्मक कृती नाही.';
+
+  @override
+  String get s14NewCapButton => 'नवीन CAP';
+
+  @override
+  String get s14StatusOpen => 'उघडे';
+
+  @override
+  String get s14StatusDone => 'पूर्ण';
+
+  @override
+  String get s14StatusVerified => 'पडताळलेले';
+
+  @override
+  String get s14StatusClosed => 'बंद';
+
+  @override
+  String get s14StatusAged => 'जुने';
+
+  @override
+  String get s14StatusReopened => 'पुन्हा उघडलेले';
+
+  @override
+  String s14DeadlineOverdue(String date) {
+    return 'मुदत संपली ($date)';
+  }
+
+  @override
+  String s14DeadlineDueSoon(String date) {
+    return 'लवकरच मुदत ($date)';
+  }
+
+  @override
+  String s14DeadlineOk(String date) {
+    return 'मुदत: $date';
+  }
+
+  @override
+  String s14ResponsiblePrefix(String name) {
+    return 'जबाबदार: $name';
+  }
 }

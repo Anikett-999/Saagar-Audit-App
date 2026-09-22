@@ -891,4 +891,75 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s32OkButton => 'OK';
+
+  @override
+  String get s14Title => 'Corrective Action Plans';
+
+  @override
+  String get s14Subtitle => 'Track and resolve audit findings';
+
+  @override
+  String get s14SearchHint => 'Search by problem statement or CAP ID...';
+
+  @override
+  String get s14FilterAll => 'All';
+
+  @override
+  String get s14FilterOpen => 'Open';
+
+  @override
+  String get s14FilterDone => 'Done (pending verify)';
+
+  @override
+  String get s14FilterAged => 'Aged ⚠';
+
+  @override
+  String get s14FilterClosed => 'Closed';
+
+  @override
+  String get s14EmptyTitle => 'No CAPs Found';
+
+  @override
+  String get s14EmptyDesc => 'No corrective actions match the selected filter.';
+
+  @override
+  String get s14NewCapButton => 'New CAP';
+
+  @override
+  String get s14StatusOpen => 'Open';
+
+  @override
+  String get s14StatusDone => 'Done';
+
+  @override
+  String get s14StatusVerified => 'Verified';
+
+  @override
+  String get s14StatusClosed => 'Closed';
+
+  @override
+  String get s14StatusAged => 'Aged';
+
+  @override
+  String get s14StatusReopened => 'Reopened';
+
+  @override
+  String s14DeadlineOverdue(String date) {
+    return 'Overdue ($date)';
+  }
+
+  @override
+  String s14DeadlineDueSoon(String date) {
+    return 'Due Soon ($date)';
+  }
+
+  @override
+  String s14DeadlineOk(String date) {
+    return 'Due: $date';
+  }
+
+  @override
+  String s14ResponsiblePrefix(String name) {
+    return 'Responsible: $name';
+  }
 }

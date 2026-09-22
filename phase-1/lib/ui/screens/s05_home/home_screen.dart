@@ -255,8 +255,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           icon: Icons.fact_check_outlined,
           title: l10n.s05CapsTitle,
           subtitle: l10n.s05CapsSubtitle,
-          enabled: false,
-          onTap: () => _showComingSoon(context, l10n, l10n.s05CapsTitle),
+          enabled: true,
+          onTap: () => context.pushNamed('s14_cap_list'),
         ),
         _navTile(
           icon: Icons.menu_book_outlined,

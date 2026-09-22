@@ -323,5 +323,47 @@
   "s32AboutVersion": "आवृत्ती: 0.1.0+1 (फेज १ बेसलाइन)",
   "s32AboutStore": "दुकाने: टायटन वर्ल्ड (WLMHW) आणि हेलिओस (HEMW), लातूर",
   "s32AboutSpec": "तपशील: सागर P1 रिटेल ऑडिट स्पेक v1",
-  "s32OkButton": "ठीक आहे"
+  "s32OkButton": "ठीक आहे",
+
+  "s14Title": "सुधारात्मक कृती योजना (CAP)",
+  "s14Subtitle": "ऑडिट निष्कर्षांचा मागोवा आणि निराकरण",
+  "s14SearchHint": "समस्या किंवा CAP आयडी शोधा...",
+  "s14FilterAll": "सर्व",
+  "s14FilterOpen": "उघडे",
+  "s14FilterDone": "पूर्ण (पडताळणी प्रलंबित)",
+  "s14FilterAged": "जुनी ⚠",
+  "s14FilterClosed": "बंद",
+  "s14EmptyTitle": "कोणतेही CAP सापडले नाही",
+  "s14EmptyDesc": "निवडलेल्या फिल्टरशी जुळणारी कोणतीही सुधारात्मक कृती नाही.",
+  "s14NewCapButton": "नवीन CAP",
+  "s14StatusOpen": "उघडे",
+  "s14StatusDone": "पूर्ण",
+  "s14StatusVerified": "पडताळलेले",
+  "s14StatusClosed": "बंद",
+  "s14StatusAged": "जुने",
+  "s14StatusReopened": "पुन्हा उघडलेले",
+  "s14DeadlineOverdue": "मुदत संपली ({date})",
+  "@s14DeadlineOverdue": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "s14DeadlineDueSoon": "लवकरच मुदत ({date})",
+  "@s14DeadlineDueSoon": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "s14DeadlineOk": "मुदत: {date}",
+  "@s14DeadlineOk": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "s14ResponsiblePrefix": "जबाबदार: {name}",
+  "@s14ResponsiblePrefix": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  }
 }

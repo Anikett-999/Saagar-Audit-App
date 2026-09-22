@@ -15,6 +15,7 @@ import 'ui/screens/s07_checkpoint/checkpoint_screen.dart';
 import 'ui/screens/s08_fail_detail/fail_detail_screen.dart';
 import 'ui/screens/s10_review/review_submit_screen.dart';
 import 'ui/screens/s11_submitted/submitted_screen.dart';
+import 'ui/screens/s14_cap_list/cap_list_screen.dart';
 import 'providers/auth_provider.dart';
 import 'ui/screens/s27_settings/settings_screen.dart';
 import 'ui/screens/s28_manage_cros/manage_cros_screen.dart';
@@ -79,6 +80,48 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/audit/submitted',
         name: 's11_submitted',
         builder: (_, __) => const SubmittedScreen(),
+      ),
+      GoRoute(
+        path: '/caps',
+        name: 's14_cap_list',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          return null;
+        },
+        builder: (_, __) => const CapListScreen(),
+      ),
+      GoRoute(
+        path: '/caps/new',
+        name: 's15_cap_create',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          return null;
+        },
+        builder: (_, __) => const Scaffold(
+          body: Center(child: Text('S15 CAP Create Placeholder')),
+        ),
+      ),
+      GoRoute(
+        path: '/caps/:id',
+        name: 's16_cap_detail',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          return null;
+        },
+        builder: (context, state) => Scaffold(
+          body: Center(
+            child: Text('S16 CAP Detail: ${state.pathParameters['id']}'),
+          ),
+        ),
       ),
       GoRoute(
         path: '/settings',

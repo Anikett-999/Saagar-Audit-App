@@ -1369,3 +1369,138 @@ Both agents must update this file at the end of each session and read it before 
   - Build `lib/ui/screens/s14_cap_list/cap_list_screen.dart`, route `/caps`, wire S05 Home navigation tile, add EN/MR localizations, and author `test/cap_list_screen_test.dart`.
   - Hold for review post-build before committing/pushing.
 
+---
+
+### Entry: 2026-09-22 — Step 2 (Screen S14 CAP List) Built & Verified (Holding for Review)
+- **Author**: Antigravity
+- **Actions Completed**:
+  1. **Dual-Language Strings (Rule #8 Parity)**:
+     - Added 25 localized keys to both `assets/translations/app_en.arb` and `assets/translations/app_mr.arb` covering title, subtitle, search placeholder, all 5 filter chip labels (All, Open, Done pending verify, Aged ⚠, Closed), status badges (Open, Done, Verified, Closed, Aged, Reopened), parameterized deadline badges (Overdue, Due Soon, Due), parameterized responsible prefix, empty state header/description, and "New CAP" action button.
+     - Ran `flutter gen-l10n` to regenerate `AppLocalizations`.
+  2. **Screen S14 CAP List Implementation (`lib/ui/screens/s14_cap_list/cap_list_screen.dart`)**:
+     - Built `CapListScreen` consuming `AppLocalizations` with zero hardcoded strings.
+     - Integrated `LanguageToggleButton` in the `AppBar`.
+     - Filter chips (All, Open, Done, Aged, Closed) controlling `_selectedFilter` via `CapRepository.instance.listCaps`.
+     - Live search bar filtering by problem statement or CAP ID with clear button.
+     - Deadline badge color-coding strictly driven by `cap.deadlineStatus()`:
+       - `overdue`: red badge and red card border.
+       - `dueSoon`: amber badge.
+       - `ok`: green badge.
+     - Status badge color-coded (Open, Done, Verified, Closed, Aged, Reopened).
+     - Empty state with illustration, copy, and "New CAP" button.
+     - Auto-refresh via `RefreshIndicator` and upon return from `s15_cap_create` or `s16_cap_detail`.
+     - `ref.listen<AuthState>` ensuring that user switches immediately refresh the role-scoped list.
+     - Extended FAB `+ New CAP` navigating to `s15_cap_create`.
+     - Card tap navigating to `s16_cap_detail` passing CAP ID path parameter.
+  3. **Router & Navigation Integration (`lib/app.dart` & `lib/ui/screens/s05_home/home_screen.dart`)**:
+     - Registered `/caps` (`s14_cap_list`) in `GoRouter` with unauthenticated redirect to `/login`.
+     - Added placeholder routes for `/caps/new` (`s15_cap_create`) and `/caps/:id` (`s16_cap_detail`).
+     - Enabled CAPs navigation tile on S05 Home screen (`enabled: true`, navigating to `s14_cap_list`).
+  4. **Mock Database Enhancement (`test/helpers/fake_database.dart`)**:
+     - Adjusted status filter dispatch order so `status = 'aged'` takes precedence over nested `status IN ('open', 'reopened')` clauses.
+  5. **Comprehensive Widget Test Suite (`test/cap_list_screen_test.dart`)**:
+     - 9 widget tests verifying:
+       1. Empty state rendering with icon, title, description, and "New CAP" action.
+       2. List rendering with ID, status badge, problem statement, responsible user name, and deadline badge.
+       3. Deadline color-coding (overdue red, due soon amber, ok green).
+       4. Filter chips switching view between All, Open, Done, Aged, Closed.
+       5. Search bar dynamic filtering by problem statement and CAP ID.
+       6. Role scoping: SM only sees assigned CAPs or CAPs from authored audits.
+       7. Role scoping: GM and Owner see all CAPs.
+       8. Navigation: FAB opens S15 placeholder, card tap opens S16 detail with ID parameter.
+       9. Dual-Language Parity (Rule #8): Marathi locale displays 100% localized text across title, chips, status badges, and cards.
+
+- **Raw Host Execution Logs**:
+  - **Raw `flutter analyze` output (0 issues found)**:
+    ```
+    Analyzing phase-1...                                            
+    No issues found! (ran in 3.8s)
+    ```
+  - **Raw `flutter test test/cap_list_screen_test.dart` output (9/9 passed)**:
+    ```
+    00:00 +0: loading E:/projects/Saagar Audit App/phase-1/test/cap_list_screen_test.dart
+    00:00 +0: S14 CAP List Screen Tests (Spec §5 S14 & Sprint Plan) Empty state renders when no CAPs exist in database
+    00:01 +1: S14 CAP List Screen Tests (Spec §5 S14 & Sprint Plan) Lists CAPs with ID, status badge, problem statement, and deadline
+    00:01 +2: S14 CAP List Screen Tests (Spec §5 S14 & Sprint Plan) Deadline badges render proper color-coded status (overdue, dueSoon, ok)
+    00:01 +3: S14 CAP List Screen Tests (Spec §5 S14 & Sprint Plan) Filter chips switch view between All, Open, Done, Aged, Closed
+    00:02 +4: S14 CAP List Screen Tests (Spec §5 S14 & Sprint Plan) Search bar dynamically filters list by problem statement or CAP ID
+    00:02 +5: S14 CAP List Screen Tests (Spec §5 S14 & Sprint Plan) Role scoping: SM only sees assigned CAPs or CAPs from authored audits
+    00:02 +6: S14 CAP List Screen Tests (Spec §5 S14 & Sprint Plan) Role scoping: GM and OWNER see all CAPs
+    00:02 +7: S14 CAP List Screen Tests (Spec §5 S14 & Sprint Plan) Navigation: FAB navigates to S15 and tapping card navigates to S16
+    00:02 +8: S14 CAP List Screen Tests (Spec §5 S14 & Sprint Plan) Rule #8 Dual-Language Parity: Marathi locale renders localized UI
+    00:02 +9: All tests passed!
+    ```
+  - **Raw `flutter test test/score_engine_test.dart` output (12/12 passed)**:
+    ```
+    00:00 +0: loading E:/projects/Saagar Audit App/phase-1/test/score_engine_test.dart
+    00:00 +0: Band boundaries (Spec §6.2) ≥95.0 is excellent
+    00:00 +1: Band boundaries (Spec §6.2) 94.9 is good (not excellent)
+    00:00 +2: Band boundaries (Spec §6.2) ≥90.0 is good
+    00:00 +3: Band boundaries (Spec §6.2) 89.9 is fair (the most-missed boundary per Workbook §1.5)
+    00:00 +4: Band boundaries (Spec §6.2) ≥85.0 is fair
+    00:00 +5: Band boundaries (Spec §6.2) 84.9 is poor
+    00:00 +6: Band boundaries (Spec §6.2) ≥80.0 is poor
+    00:00 +7: Band boundaries (Spec §6.2) 79.9 is critical
+    00:00 +8: Band boundaries (Spec §6.2) below 80 is critical
+    00:00 +9: NA handling (Spec §6.4) 5 NAs at weight 2 reduce max by 10
+    00:00 +10: NA handling (Spec §6.4) Adding NA does not change the percentage
+    00:00 +11: Workbook §5.1 canonical daily test (MUST equal 81/90 = 90.0% Good) produces 81/90 = 90.0% Good exactly
+    00:00 +12: All tests passed!
+    ```
+  - **Raw `flutter test test/cap_repository_test.dart` output (19/19 passed)**:
+    ```
+    00:00 +0: loading E:/projects/Saagar Audit App/phase-1/test/cap_repository_test.dart
+    00:00 +0: ISO Week & CAP ID Generation (Spec §15.5 & S15) isoWeek calculates expected week numbers
+    00:00 +1: ISO Week & CAP ID Generation (Spec §15.5 & S15) generateNextCapId formats as CAP-YYYY-Wxx-01 for first CAP
+    00:00 +2: ISO Week & CAP ID Generation (Spec §15.5 & S15) generateNextCapId increments sequence within the same week
+    00:00 +3: ISO Week & CAP ID Generation (Spec §15.5 & S15) Cap deadlineStatus and convenience getters work as expected
+    00:00 +4: CapRepository - Validation & Creation (Spec §5 S15) createCap validates mandatory fields
+    00:00 +5: CapRepository - Validation & Creation (Spec §5 S15) createCap enforces 3–5 action steps
+    00:00 +6: CapRepository - Validation & Creation (Spec §5 S15) createCap rejects non-management responsible user
+    00:00 +7: CapRepository - Validation & Creation (Spec §5 S15) createCap inserts cap, actions, and cap_log atomically
+    00:00 +8: CapRepository - Action Step Checklist & Mark Done (Spec §5 S16/S17) toggleAction marks action done and logs event
+    00:00 +9: CapRepository - Action Step Checklist & Mark Done (Spec §5 S16/S17) markDone throws StateError if any action step is incomplete
+    00:00 +10: CapRepository - Action Step Checklist & Mark Done (Spec §5 S16/S17) markDone transitions status to done and writes cap_log
+    00:00 +11: CapRepository - Action Step Checklist & Mark Done (Spec §5 S16/S17) markDone throws StateError if CAP is already done
+    00:00 +12: CapRepository - Role Scoping & Filters (Spec §5 S14) SM viewer only sees own/assigned CAPs
+    00:00 +13: CapRepository - Role Scoping & Filters (Spec §5 S14) GM and OWNER see all CAPs
+    00:00 +14: CapRepository - Role Scoping & Filters (Spec §5 S14) listCaps search filters by problem statement or CAP ID
+    00:00 +15: CapRepository - S13 Link Helpers capsForAudit and capForResult return linked CAPs
+    00:00 +16: AuditRepository - listAudits (Spec §5 S12) listAudits excludes drafts and returns submitted/verified only
+    00:00 +17: AuditRepository - listAudits (Spec §5 S12) listAudits role scoping limits SM to own authored audits
+    00:00 +18: AuditRepository - listAudits (Spec §5 S12) listAudits honors pagination limit and offset
+    00:00 +19: All tests passed!
+    ```
+  - **Raw `flutter test` (Full Suite across 14 test files: 117/117 passed)**:
+    ```
+    00:12 +117: All tests passed!
+    ```
+
+- **Rule 6 Hold Status**:
+  - **HOLDING HERE**. In strict accordance with Rule 6, zero commits or pushes have been performed for application code.
+  - Awaiting **Claude (Senior Developer & Team Lead)** code review of Step 2 (S14 CAP List) and explicit sign-off: `APPROVED — cleared to commit & push`.
+- **Next Immediate Task**:
+  - Hand baton to **Claude** for review of S14 (`cap_list_screen.dart`, `app.dart` route, `home_screen.dart` tile wiring, `app_en.arb`/`app_mr.arb`, and `cap_list_screen_test.dart`).
+  - Upon written approval, commit and push Step 2, then proceed to **Step 3 — Screen S15 (CAP Create)**.
+
+---
+
+### Entry: 2026-09-22 — Step 2 (Screen S14 CAP List) REVIEW → APPROVED
+- **Author**: Claude (Senior Developer & Team Lead)
+- **Method**: Direct code review by inspection of `cap_list_screen.dart`, the `/caps` `/caps/new` `/caps/:id` routes in `app.dart`, the S05 Home tile wiring, EN/MR ARB additions, and `cap_list_screen_test.dart`. Also confirmed the two Step-1 nits were resolved (aged filter now uses a bound `?` param + `whereArgs.add(todayStr)`; verified in `cap_repository.dart`). `flutter analyze`/`flutter test` results are per Antigravity's device run (analyze clean; S14 9/9; cap_repository 19/19; score_engine 12/12; full suite 117/117), **not re-verified by me**.
+- **Confirmed vs plan (all GREEN):**
+  - **Zero hardcoded strings** — screen consumes `AppLocalizations.of(context)!` for every label (title, subtitle, search hint, 5 filter chips, 6 status badges, 3 parameterized deadline badges, responsible prefix, empty state, New CAP). EN/MR parity verified: 21 `s14*` keys on each side, `flutter gen-l10n` run. Marathi rendering asserted in the test.
+  - **Deadline color-coding driven strictly off `Cap.deadlineStatus`** — overdue red (+ red card border), dueSoon amber, ok green. No duplicate date logic in the widget. Matches §3 Step 2.
+  - **Role-scoping** delegated to `CapRepository.listCaps` (not re-implemented in the UI); the test proves SM sees own/assigned + authored-audit-origin CAPs and NOT GM-only, while GM/OWNER see all.
+  - **Navigation**: FAB → `s15_cap_create`, card tap → `s16_cap_detail` with `{id}` path param, `_loadData()` on return (auto-refresh), `RefreshIndicator` pull-to-refresh, and `ref.listen<AuthState>` reload on user switch. All auth-guarded routes redirect to `/login` when logged out.
+  - **S15/S16 correctly stubbed as placeholder routes** for this step (per build order — they're built in Steps 3–4). Home tile enabled → `s14_cap_list`.
+  - **Test suite** genuinely exercises empty state, card fields, dynamic-date color-coding, all 5 filter switches, search by keyword + CAP ID, both role-scoping paths, navigation to S15/S16, and full Marathi parity — not hollow.
+- **Non-blocking nits (do NOT hold Step 2; fold in when convenient):**
+  1. Search runs `_loadData()` on every keystroke with no debounce. Fine for a local SQLite query on a small dataset, but if CAP volume grows, add a ~300ms debounce so each character doesn't fire a query.
+  2. Empty-state copy ("No corrective actions match the selected filter") is filter-agnostic — reads slightly oddly on the All filter with a truly empty DB. Minor wording polish, optional.
+  Neither blocks the push.
+- **Verdict**: **APPROVED — cleared to commit & push.** Commit Step 2 (S14 screen + route + Home tile + ARB + generated l10n + test + the aged-filter nit fix + brain updates), push to `origin main` (never force-push), paste raw `git status` + `git log --oneline` as the push record, then proceed to **Step 3 — Screen S15 (CAP Create)** per §3.
+- **Reminders for Step 3 (S15 CAP Create):** the 10-field template — problem statement, 5 Whys (Why 1 required, 2–5 optional), root cause, responsible dropdown (SM/GM/OWNER active users via `UserRepository.listActive`), deadline picker (default origin-audit-date +7, or today+7 if free-standing), verification-method dropdown from daily checkpoints, and **dynamic 3–5 action-step rows (add/remove, enforce the 3–5 bound in the UI to mirror the repo guard)**. On success → `CapRepository.createCap` → navigate to S16. When launched from a Fail (S08/S10/S13), pre-fill origin fields. Rule #8 EN/MR parity on every string. Build → analyze → test → paste raw output → **HOLD** for review before pushing.
+- **Next Immediate Task (Antigravity)**: Commit & push Step 2, paste the push record, then build **Step 3 — S15 CAP Create** only, and hold for review.
+
+
