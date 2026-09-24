@@ -1,0 +1,118 @@
+{
+  "bands": [
+    {
+      "id": "excellent",
+      "name_en": "EXCELLENT",
+      "name_mr": "उत्कृष्ट",
+      "range_en": "≥ 95% (95.0% – 100.0%)",
+      "range_mr": "≥ ९५% (९५.०% – १००.०%)",
+      "min_percentage": 95.0,
+      "max_percentage": 100.0,
+      "color": "green",
+      "action_en": "Reward; document practice for replication",
+      "action_mr": "बक्षीस; पुनरावृत्तीसाठी पद्धतीचे दस्तऐवजीकरण",
+      "who_acts_en": "SM records; GM cites in weekly report",
+      "who_acts_mr": "SM नोंद करतो; GM साप्ताहिक अहवालात उल्लेख करतो"
+    },
+    {
+      "id": "good",
+      "name_en": "GOOD",
+      "name_mr": "चांगले",
+      "range_en": "≥ 90% (90.0% – 94.9%)",
+      "range_mr": "≥ ९०% (९०.०% – ९४.९%)",
+      "min_percentage": 90.0,
+      "max_percentage": 94.9,
+      "color": "navy",
+      "action_en": "Note minor fixes for next day; no CAP needed",
+      "action_mr": "पुढील दिवसासाठी किरकोळ सुधारणा नोंदवा; कोणतीही CAP आवश्यक नाही",
+      "who_acts_en": "SM verbal with relevant CRO",
+      "who_acts_mr": "संबंधित सीआरओशी SM तोंडी चर्चा करतो"
+    },
+    {
+      "id": "fair",
+      "name_en": "FAIR",
+      "name_mr": "बरे",
+      "range_en": "≥ 85% (85.0% – 89.9%)",
+      "range_mr": "≥ ८५% (८५.०% – ८९.९%)",
+      "min_percentage": 85.0,
+      "max_percentage": 89.9,
+      "color": "amber",
+      "action_en": "Written CAP required",
+      "action_mr": "लिखित CAP आवश्यक",
+      "who_acts_en": "SM opens; GM reviews at weekly",
+      "who_acts_mr": "SM सुरू करतो; GM साप्ताहिकात आढावा घेतो"
+    },
+    {
+      "id": "poor",
+      "name_en": "POOR",
+      "name_mr": "वाईट",
+      "range_en": "≥ 80% (80.0% – 84.9%)",
+      "range_mr": "≥ ८०% (८०.०% – ८४.९%)",
+      "min_percentage": 80.0,
+      "max_percentage": 84.9,
+      "color": "red",
+      "action_en": "Urgent CAP + escalate one tier up",
+      "action_mr": "तातडीची CAP + एक स्तर वर एस्केलेट करा",
+      "who_acts_en": "SM opens; same-day GM escalation",
+      "who_acts_mr": "SM सुरू करतो; त्याच दिवशी GM कडे एस्केलेशन"
+    },
+    {
+      "id": "critical",
+      "name_en": "CRITICAL",
+      "name_mr": "अत्यावश्यक",
+      "range_en": "< 80% (Below 80.0%)",
+      "range_mr": "< ८०% (८०.०% खाली)",
+      "min_percentage": 0.0,
+      "max_percentage": 79.9,
+      "color": "red",
+      "action_en": "Same-day escalation; full root-cause analysis",
+      "action_mr": "त्याच दिवशी एस्केलेशन; पूर्ण मूळ कारण विश्लेषण",
+      "who_acts_en": "Owner involved regardless of tier",
+      "who_acts_mr": "कोणत्याही स्तराची पर्वा न करता मालक सामील"
+    }
+  ],
+  "tier_targets": [
+    {
+      "tier_en": "Tier 1 daily",
+      "tier_mr": "टियर १ दैनंदिन",
+      "auditor_en": "Store Manager",
+      "auditor_mr": "स्टोअर मॅनेजर",
+      "target_pct_en": "90%+",
+      "target_pct_mr": "९०%+",
+      "total_points_en": "90 weighted",
+      "total_points_mr": "९० वजनी",
+      "pass_points_en": "81+ weighted",
+      "pass_points_mr": "८१+ वजनी"
+    },
+    {
+      "tier_en": "Tier 2 weekly",
+      "tier_mr": "टियर २ साप्ताहिक",
+      "auditor_en": "GM",
+      "auditor_mr": "जीएम (जनरल मॅनेजर)",
+      "target_pct_en": "92%+",
+      "target_pct_mr": "९२%+",
+      "total_points_en": "124 weighted",
+      "total_points_mr": "१२४ वजनी",
+      "pass_points_en": "114+ weighted",
+      "pass_points_mr": "११४+ वजनी"
+    },
+    {
+      "tier_en": "Tier 3 monthly",
+      "tier_mr": "टियर ३ मासिक",
+      "auditor_en": "Owner",
+      "auditor_mr": "मालक",
+      "target_pct_en": "95%+",
+      "target_pct_mr": "९५%+",
+      "total_points_en": "(strategic — qualitative)",
+      "total_points_mr": "(धोरणात्मक — गुणात्मक)",
+      "pass_points_en": "—",
+      "pass_points_mr": "—"
+    }
+  ],
+  "reminder": {
+    "title_en": "WARNING: Strict Decimal Precision",
+    "title_mr": "सूचना: अचूक दशांश शिस्त",
+    "text_en": "Always score with one decimal place. 89.9 is FAIR, not Good. \"90\" is ambiguous — could be 90.0 (Good) or 89.7 (Fair) rounded up. The single most common scoring error is writing 90 when the math gave 89.7.",
+    "text_mr": "नेहमी एका दशांश स्थानासह गुण लिहा. ८९.९ बरे आहे, चांगले नाही. \"९०\" अस्पष्ट — ९०.० (चांगले) किंवा ८९.७ (बरे) वर गोलाकार असू शकते. सर्वात सामान्य स्कोअरिंग चूक: गणिताने ८९.७ दिले असताना ९० लिहिणे."
+  }
+}

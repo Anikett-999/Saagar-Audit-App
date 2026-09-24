@@ -20,7 +20,7 @@
 | **S15**    | CAP Create | ✅ Complete | 10-field template, 5-Whys, 3–5 dynamic action steps, responsible dropdown, deadline picker, EN/MR parity |
 | **S16**    | CAP Detail | ✅ Complete | Full CAP view, action checklist, event log timeline, state/role-gated buttons, Phase 2 stubs |
 | **S17**    | Mark Done Modal | ✅ Complete | Gated on all actions done, optional reflection notes & evidence photo, atomic markDone + cap_log, full EN/MR parity |
-| **S22–S26**| Reference Data | ⏳ Scheduled | Rating scale, escalation triggers, glossary |
+| **S22–S26**| Reference Data | 🔄 In Progress | Step 1 Complete (JSON assets, models, repository & 65-row glossary search). Screens S22–S26 pending UI steps. |
 | **S27**    | Settings Hub | ✅ Complete | Role-filtered list (Owner-only Users), profile badge, real S05 navigation |
 | **S28**    | Manage CROs | ✅ Complete | List all, Add/Edit/Deactivate/Reactivate, soft deactivation preserves audit trail, EN/MR parity |
 | **S29**    | Manage Users | ✅ Complete | Owner-only, route-guarded, SM/GM creation only (no Owner), bcrypt PINs, soft deactivation, Owner protected, EN/MR parity |
@@ -28,11 +28,12 @@
 | **S31**    | Language | ✅ Complete | Dedicated screen, live EN/MR switch, persists to users.language_pref, login restore, full EN/MR parity |
 | **S32**    | Backup / Export | ✅ Complete | All 14 tables exported to timestamped JSON in Downloads, Owner-only Firestore sync stub (Coming in Phase 4), security advisory, About card, full EN/MR parity |
 
-> **Sprint S12–S17 (CAPs Workflow) is COMPLETE. All 6 steps built (S14, S15, S16, S17, S12, S13). 163/163 tests passing across 19 test files. Step 7 (S13) holding for Claude review before push.**
+> **Sprint S22–S26 (Reference Data Tab) is ACTIVE. Step 1 (Reference Data Layer + JSON Assets) is built and verified. 182/182 tests passing across 20 test files. Holding for Claude review before push.**
 
 ## 2. Verified Baseline Health
 - `flutter analyze`: **0 issues found (Clean baseline)**
-- `flutter test`: **163/163 tests passing across 19 test files**:
+- `flutter test`: **182/182 tests passing across 20 test files**:
+  - `reference_repository_test.dart` (19 tests) — S22–S26 reference data layer: `rating_scale.json` parsing (5 bands, 3 tier targets, strict score engine cutoffs match, reminder banner), `escalation_triggers.json` parsing (7 triggers, 4-part message format, 3 worked examples for Triggers 1, 3, 5, never-escalates rules), `evidence.json` parsing (8 strong/weak pairs, warning banner), `glossary.json` parsing (exactly 65 bilingual terms & meanings, non-empty validation), glossary search (empty/spaces return all 65, EN term search, Devanagari MR term search, meaning search, acronyms, non-matching), in-memory caching & clearCache
   - `audit_detail_screen_test.dart` (12 tests) — S13 header metadata & read-only lock banner, score card (compliance %, band badge, metric counts), SOP breakdown table with expandable checkpoint inspection, non-compliances list with findings, CRO attribution, photo thumbnails & inspection dialog, linked CAP clickable chip navigating to S16, unlinked fail "+ Create CAP" button navigating to S15 with pre-filled origin parameters, zero-fail clean card, Not Found state, Rule #6 audit immutability (no edit/submit buttons), GM vs SM Verify Audit button visibility, Marathi Rule #8 parity
   - `audit_history_screen_test.dart` (8 tests) — S12 empty state, audit card fields (date, auditor name, score %, band badge, fail count), SM role scoping (own audits only), GM/Owner role scoping (all audits), draft/hidden exclusion, unverified filter chip, card tap navigation to S13, Marathi parity
   - `cap_mark_done_screen_test.dart` (7 tests) — S17 header summary, completed action steps checklist, guard against incomplete steps, optional photo capture + reflection notes submission, photo removal, already-done state guard, Not Found state, Marathi parity

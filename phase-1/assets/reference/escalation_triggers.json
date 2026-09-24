@@ -1,0 +1,174 @@
+{
+  "triggers": [
+    {
+      "number": 1,
+      "name_en": "Daily audit Critical band",
+      "name_mr": "दैनंदिन ऑडिट क्रिटिकल पट्टी",
+      "threshold_en": "< 80%",
+      "threshold_mr": "< ८०%",
+      "escalate_to_en": "GM (Owner if Cash/Inv)",
+      "escalate_to_mr": "GM (रोख/स्टॉक असल्यास मालक)",
+      "when_en": "Same night",
+      "when_mr": "त्याच रात्री"
+    },
+    {
+      "number": 2,
+      "name_en": "Same checkpoint repeated Fail",
+      "name_mr": "एकच तपासणी बिंदू वारंवार नापास",
+      "threshold_en": "5+ days in a week",
+      "threshold_mr": "आठवड्यात ५+ दिवस",
+      "escalate_to_en": "GM (Pattern CAP)",
+      "escalate_to_mr": "GM (पॅटर्न CAP)",
+      "when_en": "At weekly audit",
+      "when_mr": "साप्ताहिक ऑडिटमध्ये"
+    },
+    {
+      "number": 3,
+      "name_en": "Single-day cash variance",
+      "name_mr": "एका दिवसाची रोख तफावत",
+      "threshold_en": "> ₹500",
+      "threshold_mr": "> ₹५००",
+      "escalate_to_en": "GM (regardless of explanation)",
+      "escalate_to_mr": "GM (खुलाशाची पर्वा न करता)",
+      "when_en": "Same day",
+      "when_mr": "त्याच दिवशी"
+    },
+    {
+      "number": 4,
+      "name_en": "Inventory variance",
+      "name_mr": "स्टॉक तफावत",
+      "threshold_en": "> 2% of stock value",
+      "threshold_mr": "स्टॉक मूल्याच्या > २%",
+      "escalate_to_en": "Owner directly",
+      "escalate_to_mr": "थेट मालक",
+      "when_en": "Same day",
+      "when_mr": "त्याच दिवशी"
+    },
+    {
+      "number": 5,
+      "name_en": "Theft / security / legal",
+      "name_mr": "चोरी / सुरक्षा / कायदेशीर",
+      "threshold_en": "Any indication",
+      "threshold_mr": "कोणताही संकेत",
+      "escalate_to_en": "Owner directly",
+      "escalate_to_mr": "थेट मालक",
+      "when_en": "Immediate",
+      "when_mr": "तातडीने"
+    },
+    {
+      "number": 6,
+      "name_en": "Customer complaint",
+      "name_mr": "ग्राहक तक्रार",
+      "threshold_en": "Not store-resolvable",
+      "threshold_mr": "स्टोअरमध्ये न सुटणारी",
+      "escalate_to_en": "Owner directly",
+      "escalate_to_mr": "थेट मालक",
+      "when_en": "Same day",
+      "when_mr": "त्याच दिवशी"
+    },
+    {
+      "number": 7,
+      "name_en": "Declining trend",
+      "name_mr": "घसरता कल",
+      "threshold_en": "3+ consecutive weeks",
+      "threshold_mr": "सलग ३+ आठवडे",
+      "escalate_to_en": "Owner",
+      "escalate_to_mr": "मालक",
+      "when_en": "At third week's audit",
+      "when_mr": "तिसऱ्या आठवड्याच्या ऑडिटमध्ये"
+    }
+  ],
+  "message_format": {
+    "title_en": "Escalation Message Format (Four Parts)",
+    "title_mr": "एस्केलेशन संदेश स्वरूप (चार भाग)",
+    "parts": [
+      {
+        "part": 1,
+        "title_en": "What happened",
+        "title_mr": "काय झाले",
+        "desc_en": "One sentence stating the event, including the relevant numbers.",
+        "desc_mr": "संबंधित आकड्यांसह घटना सांगणारे एक वाक्य."
+      },
+      {
+        "part": 2,
+        "title_en": "Evidence",
+        "title_mr": "पुरावा",
+        "desc_en": "The photo, register entry, variance amount, complaint reference, or trend chart.",
+        "desc_mr": "फोटो, रजिस्टर नोंद, तफावत रक्कम, तक्रार संदर्भ, किंवा कल चार्ट."
+      },
+      {
+        "part": 3,
+        "title_en": "Operational impact",
+        "title_mr": "कार्यवाहक परिणाम",
+        "desc_en": "Store-day, brand-counter, customer relationship, financial exposure.",
+        "desc_mr": "स्टोअर-दिवस, ब्रँड-काउंटर, ग्राहक नातेसंबंध, आर्थिक धोका."
+      },
+      {
+        "part": 4,
+        "title_en": "Requested action",
+        "title_mr": "मागितलेली कृती",
+        "desc_en": "Information only / decision needed / immediate action needed. Be explicit.",
+        "desc_mr": "फक्त माहिती / निर्णय आवश्यक / तातडीची कृती आवश्यक. स्पष्ट सांगा."
+      }
+    ]
+  },
+  "never_escalates": {
+    "title_en": "What Never Escalates",
+    "title_mr": "काय कधीच एस्केलेट होत नाही",
+    "items": [
+      {
+        "en": "Single-checkpoint Fails within Good or Excellent band — get a CAP, not an escalation.",
+        "mr": "चांगले किंवा उत्कृष्ट पट्टीतले एकल-तपासणी बिंदू नापास — CAP मिळते, एस्केलेशन नाही."
+      },
+      {
+        "en": "Personal disagreements between Store Manager and CRO — go through HR, not audit.",
+        "mr": "स्टोअर मॅनेजर आणि सीआरओ यांच्यातले वैयक्तिक मतभेद — HR मधून जातात, ऑडिटमधून नव्हे."
+      },
+      {
+        "en": "Scoring debates between Store Manager and GM on borderline checkpoints — resolve at weekly audit through evidence review.",
+        "mr": "सीमारेषेच्या तपासणी बिंदूवर स्टोअर मॅनेजर आणि जीएम यांच्यात स्कोअरिंग वाद — साप्ताहिक ऑडिटमध्ये पुरावा पुनरावलोकनातून सुटतात."
+      }
+    ]
+  },
+  "examples": [
+    {
+      "trigger_number": 1,
+      "title_en": "Example 1: Trigger 1 — Daily Audit Critical Band (< 80%)",
+      "title_mr": "उदाहरण १: ट्रिगर १ — दैनंदिन ऑडिट क्रिटिकल पट्टी (< ८०%)",
+      "what_happened_en": "Daily audit score for 2026-05-27 dropped to 78.2% (Critical band) with failures on cash reconciliation checkpoints.",
+      "what_happened_mr": "२०२६-०५-२७ चे दैनंदिन ऑडिट गुण ७८.२% (क्रिटिकल पट्टी) वर घसरले, ज्यात रोख ताळमेळ तपासणी बिंदू नापास झाले.",
+      "evidence_en": "Daily audit #42 score sheet, checkpoint 6.5 variance ₹420 and checkpoint 6.11 missing countersignature.",
+      "evidence_mr": "दैनंदिन ऑडिट #४२ गुणपत्रिका, तपासणी बिंदू ६.५ तफावत ₹४२० आणि तपासणी बिंदू ६.११ गहाळ काऊंटर सही.",
+      "impact_en": "Immediate closing cash risk at Titan World counter; store closed without reconciled cash float.",
+      "impact_mr": "टायटन वर्ल्ड काउंटरवर तातडीचा बंद रोख धोका; ताळमेळ न केलेल्या रोख फ्लोटसह स्टोअर बंद.",
+      "action_en": "Decision needed: GM review audit tonight; approve emergency cash audit before tomorrow 10:00 AM opening.",
+      "action_mr": "निर्णय आवश्यक: GM ने आज रात्री ऑडिट तपासावे; उद्या सकाळी १०:०० वाजता स्टोअर उघडण्यापूर्वी आपत्कालीन रोख ऑडिट मंजूर करावे."
+    },
+    {
+      "trigger_number": 3,
+      "title_en": "Example 2: Trigger 3 — Single-Day Cash Variance (> ₹500)",
+      "title_mr": "उदाहरण २: ट्रिगर ३ — एका दिवसाची रोख तफावत (> ₹५००)",
+      "what_happened_en": "Closing cash variance of ₹850 short observed during today's cash count.",
+      "what_happened_mr": "आजच्या रोख मोजणीत ₹८५० ची रोख तफावत (कमी) आढळली.",
+      "evidence_en": "Checkpoint 6.5 fail, POS day-end summary vs physical cash count sheet with cashier signature.",
+      "evidence_mr": "तपासणी बिंदू ६.५ नापास, POS दिवसअखेर सारांश वि. कॅशियर सहीसह प्रत्यक्ष रोख मोजणी पत्रक.",
+      "impact_en": "Direct financial shortage in daily till; unaccounted variance exceeds ₹500 tolerance.",
+      "impact_mr": "दैनंदिन गल्ल्यात थेट आर्थिक तूट; अस्पष्ट तफावत ₹५०० सहनशीलतेपेक्षा जास्त.",
+      "action_en": "Decision needed: GM to investigate cashier log and verify CCTV of cash drawer with SM.",
+      "action_mr": "निर्णय आवश्यक: GM ने कॅशियर लॉग तपासावा आणि SM सह कॅश ड्रॉवरचे सीसीटीव्ही फुटेज पडताळावे."
+    },
+    {
+      "trigger_number": 5,
+      "title_en": "Example 3: Trigger 5 — Theft / Security / Legal Concern",
+      "title_mr": "उदाहरण ३: ट्रिगर ५ — चोरी / सुरक्षा / कायदेशीर चिंता",
+      "what_happened_en": "Tampering detected on display case lock; 1 Helios premium watch unaccounted for during evening round.",
+      "what_happened_mr": "डिस्प्ले केसच्या कुलूपाशी छेडछाड आढळली; संध्याकाळच्या फेरीत १ हेलिओस प्रीमियम घड्याळ बेपत्ता.",
+      "evidence_en": "Photographs of damaged lock on Tray H-02, missing model tag, physical cycle count sheet.",
+      "evidence_mr": "ट्रे H-०२ वरील तुटलेल्या कुलूपाचे फोटो, गहाळ मॉडेल टॅग, प्रत्यक्ष चक्र-मोजणी पत्रक.",
+      "impact_en": "Immediate inventory loss of ₹32,000 and potential ongoing security breach on premises.",
+      "impact_mr": "₹३२,००० चे तातडीचे स्टॉक नुकसान आणि परिसरावर संभाव्य चालू सुरक्षा धोका.",
+      "action_en": "Immediate action needed: Owner notified for police complaint decision and store CCTV footage review tonight.",
+      "action_mr": "तातडीची कृती आवश्यक: पोलिस तक्रारीचा निर्णय आणि आज रात्री स्टोअर सीसीटीव्ही फुटेज तपासण्यासाठी मालकाला सूचना."
+    }
+  ]
+}

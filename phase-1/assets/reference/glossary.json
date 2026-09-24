@@ -1,0 +1,392 @@
+[
+  {
+    "en": "Audit",
+    "mr": "ऑडिट",
+    "meaning_en": "Independent check of standard vs reality",
+    "meaning_mr": "मानक वि. वास्तविकता यांची स्वतंत्र तपासणी"
+  },
+  {
+    "en": "Auditor",
+    "mr": "ऑडिटर",
+    "meaning_en": "Person conducting the audit",
+    "meaning_mr": "ऑडिट करणारी व्यक्ती"
+  },
+  {
+    "en": "Compliance",
+    "mr": "अनुपालन",
+    "meaning_en": "Meeting the SOP standard",
+    "meaning_mr": "एसओपी मानकाची पूर्तता करणे"
+  },
+  {
+    "en": "Checkpoint",
+    "mr": "तपासणी बिंदू",
+    "meaning_en": "Single item being audited",
+    "meaning_mr": "तपासला जाणारा एक घटक"
+  },
+  {
+    "en": "SOP",
+    "mr": "एसओपी",
+    "meaning_en": "Standard Operating Procedure",
+    "meaning_mr": "प्रमाणित कार्यप्रणाली (एसओपी)"
+  },
+  {
+    "en": "Tier",
+    "mr": "स्तर",
+    "meaning_en": "Audit level (daily/weekly/monthly)",
+    "meaning_mr": "ऑडिट स्तर (दैनंदिन/साप्ताहिक/मासिक)"
+  },
+  {
+    "en": "Store Manager",
+    "mr": "स्टोअर मॅनेजर",
+    "meaning_en": "Tier 1 auditor; conducts daily audit",
+    "meaning_mr": "टियर १ ऑडिटर; दैनंदिन ऑडिट करतो"
+  },
+  {
+    "en": "GM",
+    "mr": "जीएम (जनरल मॅनेजर)",
+    "meaning_en": "Tier 2 auditor; conducts weekly audit",
+    "meaning_mr": "टियर २ ऑडिटर; साप्ताहिक ऑडिट करतो"
+  },
+  {
+    "en": "CRO",
+    "mr": "सीआरओ",
+    "meaning_en": "Customer Relationship Officer",
+    "meaning_mr": "ग्राहक संबंध अधिकारी (सीआरओ)"
+  },
+  {
+    "en": "Owner",
+    "mr": "मालक",
+    "meaning_en": "Tier 3 auditor; conducts monthly audit",
+    "meaning_mr": "टियर ३ ऑडिटर; मासिक ऑडिट करतो"
+  },
+  {
+    "en": "Pass",
+    "mr": "पास",
+    "meaning_en": "Checkpoint meets standard",
+    "meaning_mr": "तपासणी बिंदू मानकाची पूर्तता करतो"
+  },
+  {
+    "en": "Fail",
+    "mr": "नापास",
+    "meaning_en": "Checkpoint does not meet standard",
+    "meaning_mr": "तपासणी बिंदू मानकाची पूर्तता करत नाही"
+  },
+  {
+    "en": "NA / Not Applicable",
+    "mr": "NA / लागू नाही",
+    "meaning_en": "Checkpoint genuinely does not apply",
+    "meaning_mr": "तपासणी बिंदू खरोखर लागू होत नाही"
+  },
+  {
+    "en": "Weighted score",
+    "mr": "वजनी गुण",
+    "meaning_en": "Score adjusted for SOP weight",
+    "meaning_mr": "एसओपी वजनानुसार समायोजित केलेले गुण"
+  },
+  {
+    "en": "Raw checkpoint",
+    "mr": "कच्चा तपासणी बिंदू",
+    "meaning_en": "Unweighted count of checkpoint",
+    "meaning_mr": "तपासणी बिंदूंची अवजनी संख्या"
+  },
+  {
+    "en": "Band",
+    "mr": "पट्टी",
+    "meaning_en": "Compliance category (Excellent/Good/Fair/Poor/Critical)",
+    "meaning_mr": "अनुपालन वर्गवारी (उत्कृष्ट/चांगले/बरे/वाईट/क्रिटिकल)"
+  },
+  {
+    "en": "Evidence",
+    "mr": "पुरावा",
+    "meaning_en": "Proof supporting an audit finding",
+    "meaning_mr": "ऑडिट निष्कर्षाला आधार देणारा पुरावा"
+  },
+  {
+    "en": "Strong evidence",
+    "mr": "मजबूत पुरावा",
+    "meaning_en": "Independent, dated, preserved proof",
+    "meaning_mr": "स्वतंत्र, दिनांकित, जतन केलेला पुरावा"
+  },
+  {
+    "en": "Weak evidence",
+    "mr": "दुर्बल पुरावा",
+    "meaning_en": "Verbal, memory, or unsigned — not acceptable",
+    "meaning_mr": "तोंडी, स्मरण, किंवा स्वाक्षरी नसलेले — अस्वीकार्य"
+  },
+  {
+    "en": "Finding",
+    "mr": "निष्कर्ष",
+    "meaning_en": "Named outcome of an audit",
+    "meaning_mr": "ऑडिटचा नमूद केलेला निष्कर्ष"
+  },
+  {
+    "en": "Variance",
+    "mr": "तफावत",
+    "meaning_en": "Difference between expected and actual",
+    "meaning_mr": "अपेक्षित आणि प्रत्यक्ष यातील फरक"
+  },
+  {
+    "en": "Reconciliation",
+    "mr": "ताळमेळ",
+    "meaning_en": "Process of matching two sets of records",
+    "meaning_mr": "दोन नोंदींचा ताळमेळ जुळवण्याची प्रक्रिया"
+  },
+  {
+    "en": "Cash reconciliation",
+    "mr": "रोख ताळमेळ",
+    "meaning_en": "Match POS, register, and physical cash",
+    "meaning_mr": "POS, रजिस्टर आणि प्रत्यक्ष रोख यांचा ताळमेळ जुळवणे"
+  },
+  {
+    "en": "Petty cash",
+    "mr": "फुटकळ रोख",
+    "meaning_en": "Small-amount cash for minor expenses",
+    "meaning_mr": "किरकोळ खर्चासाठी लागणारी लहान रोख रक्कम"
+  },
+  {
+    "en": "Safe / vault",
+    "mr": "तिजोरी",
+    "meaning_en": "Secure cash and high-value storage",
+    "meaning_mr": "सुरक्षित रोख आणि उच्च-मूल्य वस्तूंचे स्थान"
+  },
+  {
+    "en": "Override",
+    "mr": "ओव्हरराइड",
+    "meaning_en": "Manual exception to standard POS flow",
+    "meaning_mr": "प्रमाणित POS प्रक्रियेतील मॅन्युअल अपवाद"
+  },
+  {
+    "en": "Refund",
+    "mr": "परतावा",
+    "meaning_en": "Money returned to customer",
+    "meaning_mr": "ग्राहकाला परत केलेली रक्कम"
+  },
+  {
+    "en": "GRN",
+    "mr": "GRN (वस्तू प्राप्ती नोंद)",
+    "meaning_en": "Goods Received Note",
+    "meaning_mr": "वस्तू प्राप्ती नोंद (GRN)"
+  },
+  {
+    "en": "Stock movement",
+    "mr": "स्टॉक हालचाल",
+    "meaning_en": "Change in inventory recorded in system",
+    "meaning_mr": "सिस्टममध्ये नोंदवलेली इन्व्हेंटरीतील हालचाल"
+  },
+  {
+    "en": "Cycle count",
+    "mr": "चक्र-मोजणी",
+    "meaning_en": "Daily count of one stock tray",
+    "meaning_mr": "एका स्टॉक ट्रेची दैनंदिन मोजणी"
+  },
+  {
+    "en": "FIFO",
+    "mr": "FIFO (पहिल्या आत, पहिल्या बाहेर)",
+    "meaning_en": "First In, First Out — sell oldest first",
+    "meaning_mr": "पहिल्यांदा आलेले, पहिल्यांदा बाहेर — जुने आधी विका"
+  },
+  {
+    "en": "Display / planogram",
+    "mr": "डिस्प्ले / प्लानोग्राम",
+    "meaning_en": "Standard layout of brand zone",
+    "meaning_mr": "ब्रँड झोनची प्रमाणित रचना/मांडणी"
+  },
+  {
+    "en": "Aging report",
+    "mr": "एजिंग अहवाल",
+    "meaning_en": "Report of stock by time-in-store",
+    "meaning_mr": "स्टोअरमधील वेळेनुसार स्टॉकचा अहवाल"
+  },
+  {
+    "en": "Slow-moving stock",
+    "mr": "हळू-विक्री स्टॉक",
+    "meaning_en": "Items not sold in 90+ days",
+    "meaning_mr": "९०+ दिवसांत न विकल्या गेलेल्या वस्तू"
+  },
+  {
+    "en": "Write-off",
+    "mr": "राइट-ऑफ",
+    "meaning_en": "Item formally removed from stock as loss",
+    "meaning_mr": "नुकसान म्हणून साठ्यातून अधिकृतपणे काढलेली वस्तू"
+  },
+  {
+    "en": "Service intake",
+    "mr": "सर्व्हिस इनटेक",
+    "meaning_en": "Customer watch accepted for repair",
+    "meaning_mr": "दुरुस्तीसाठी स्वीकारलेले ग्राहकाचे घड्याळ"
+  },
+  {
+    "en": "Order ID",
+    "mr": "ऑर्डर आयडी",
+    "meaning_en": "Unique system-generated ID per intake",
+    "meaning_mr": "प्रत्येक इनटेकसाठी सिस्टमद्वारे तयार केलेला अद्वितीय आयडी"
+  },
+  {
+    "en": "Pickup",
+    "mr": "पिकअप",
+    "meaning_en": "Customer collection of repaired watch",
+    "meaning_mr": "दुरुस्त केलेले घड्याळ ग्राहकाने घेऊन जाणे"
+  },
+  {
+    "en": "Grooming",
+    "mr": "ग्रूमिंग",
+    "meaning_en": "CRO personal appearance standards",
+    "meaning_mr": "सीआरओ वैयक्तिक व्यक्तिमत्त्व व स्वरूप मानके"
+  },
+  {
+    "en": "NPS",
+    "mr": "एनपीएस (नेट प्रमोटर स्कोर)",
+    "meaning_en": "Customer satisfaction measurement",
+    "meaning_mr": "ग्राहक समाधान मोजमाप (नेट प्रमोटर स्कोर)"
+  },
+  {
+    "en": "DPDP",
+    "mr": "DPDP (डिजिटल वैयक्तिक डेटा संरक्षण)",
+    "meaning_en": "Indian data privacy regulation",
+    "meaning_mr": "भारतीय डिजिटल वैयक्तिक डेटा संरक्षण नियमन"
+  },
+  {
+    "en": "Sales Buddy",
+    "mr": "सेल्स बडी",
+    "meaning_en": "Titan's daily compliance photo app",
+    "meaning_mr": "टायटनचे दैनंदिन अनुपालन फोटो अॅप"
+  },
+  {
+    "en": "Planogram",
+    "mr": "प्लानोग्राम",
+    "meaning_en": "Diagram of correct display layout",
+    "meaning_mr": "योग्य डिस्प्ले मांडणीचा आकृतीबंध"
+  },
+  {
+    "en": "CAP",
+    "mr": "कृती योजना (CAP)",
+    "meaning_en": "Corrective Action Plan",
+    "meaning_mr": "सुधारात्मक कृती योजना (CAP)"
+  },
+  {
+    "en": "Plan / Do / Verify / Close",
+    "mr": "योजना / अंमलबजावणी / पडताळणी / बंद",
+    "meaning_en": "Four phases of the CAP cycle",
+    "meaning_mr": "CAP चक्राचे चार टप्पे (योजना, कृती, पडताळणी, बंद)"
+  },
+  {
+    "en": "Root cause",
+    "mr": "मूळ कारण",
+    "meaning_en": "Underlying reason for a finding",
+    "meaning_mr": "निष्कर्षामागील मूळ कारण"
+  },
+  {
+    "en": "5 Whys",
+    "mr": "पाच का?",
+    "meaning_en": "Technique to drill from symptom to root cause",
+    "meaning_mr": "लक्षणापासून मूळ कारणापर्यंत पोहोचण्याचे तंत्र"
+  },
+  {
+    "en": "Aged CAP",
+    "mr": "जुनी CAP",
+    "meaning_en": "CAP whose deadline passed without verification",
+    "meaning_mr": "पडताळणीविना मुदत संपलेली CAP"
+  },
+  {
+    "en": "Escalation",
+    "mr": "एस्केलेशन",
+    "meaning_en": "Moving an issue to the next audit tier",
+    "meaning_mr": "पुढील ऑडिट स्तराकडे समस्या पाठवणे"
+  },
+  {
+    "en": "Trigger",
+    "mr": "ट्रिगर",
+    "meaning_en": "Condition that requires escalation",
+    "meaning_mr": "ज्या परिस्थितीमुळे एस्केलेशन आवश्यक होते ती अट"
+  },
+  {
+    "en": "Pattern",
+    "mr": "पॅटर्न",
+    "meaning_en": "Repeated finding across days or weeks",
+    "meaning_mr": "दिवस किंवा आठवड्यांत वारंवार दिसणारा निष्कर्ष"
+  },
+  {
+    "en": "Slow slide",
+    "mr": "हळू घसरण",
+    "meaning_en": "Gradual decline across 3+ weeks",
+    "meaning_mr": "३+ आठवड्यांत झालेली हळूहळू घसरण"
+  },
+  {
+    "en": "Single-SOP decay",
+    "mr": "एक-एसओपी क्षय",
+    "meaning_en": "One SOP failing repeatedly while overall stays healthy",
+    "meaning_mr": "एकूण गुण ठीक असताना एकाच एसओपीचे वारंवार अपयश"
+  },
+  {
+    "en": "Day-of-week clustering",
+    "mr": "दिवस-गठ्ठा",
+    "meaning_en": "Failures concentrated on specific days",
+    "meaning_mr": "विशिष्ट दिवसांवर केंद्रित झालेली अपयशे"
+  },
+  {
+    "en": "Spot check",
+    "mr": "स्पॉट चेक",
+    "meaning_en": "Targeted re-verification of evidence",
+    "meaning_mr": "पुराव्यांची लक्ष्यित पुनर्तपासणी"
+  },
+  {
+    "en": "Verification",
+    "mr": "पडताळणी",
+    "meaning_en": "Confirming evidence still supports finding",
+    "meaning_mr": "पुरावा अजूनही निष्कर्षाला पुष्टी देतो याची खात्री करणे"
+  },
+  {
+    "en": "Weekly report",
+    "mr": "साप्ताहिक अहवाल",
+    "meaning_en": "GM's submission to Owner after weekly audit",
+    "meaning_mr": "साप्ताहिक ऑडिटनंतर जीएमने मालकाला सादर केलेला अहवाल"
+  },
+  {
+    "en": "Critical SOP",
+    "mr": "अत्यावश्यक एसओपी",
+    "meaning_en": "Cash and Inventory — double-weighted",
+    "meaning_mr": "रोख आणि इन्व्हेंटरी — दुप्पट वजनी एसओपी"
+  },
+  {
+    "en": "Tolerance window",
+    "mr": "सूट खिडकी",
+    "meaning_en": "Allowable variance around a standard time/value",
+    "meaning_mr": "प्रमाणित वेळ/मूल्याभोवती अनुमत फरक मर्यादा"
+  },
+  {
+    "en": "Daily audit folder",
+    "mr": "दैनंदिन ऑडिट फोल्डर",
+    "meaning_en": "Monthly file of all daily audit sheets",
+    "meaning_mr": "सर्व दैनंदिन ऑडिट पत्रिकांची मासिक फाइल"
+  },
+  {
+    "en": "High-value stock",
+    "mr": "उच्च-मूल्य स्टॉक",
+    "meaning_en": "Items above ₹25,000 — separate handling",
+    "meaning_mr": "₹२५,००० वरील वस्तू — स्वतंत्र व्यवस्थापन"
+  },
+  {
+    "en": "Verbal confirmation",
+    "mr": "तोंडी पुष्टी",
+    "meaning_en": "Statement without supporting evidence",
+    "meaning_mr": "सहाय्यक पुराव्याशिवाय केलेले तोंडी विधान"
+  },
+  {
+    "en": "Countersignature",
+    "mr": "काऊंटर सही",
+    "meaning_en": "Second authorising signature required for some actions",
+    "meaning_mr": "काही कृतींसाठी आवश्यक असलेली दुसरी अधिकृत स्वाक्षरी"
+  },
+  {
+    "en": "Closing time",
+    "mr": "बंदोबस्ताची वेळ",
+    "meaning_en": "End of business day; cash counted, audit done",
+    "meaning_mr": "कामकाजाचा शेवट; रोख मोजणी व ऑडिट पूर्ण"
+  },
+  {
+    "en": "Opening time",
+    "mr": "उघडण्याची वेळ",
+    "meaning_en": "Start of business day; float ready, photo uploaded",
+    "meaning_mr": "कामकाजाची सुरुवात; रोख फ्लोट तयार व फोटो अपलोड"
+  }
+]
