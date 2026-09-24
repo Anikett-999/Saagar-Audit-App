@@ -314,26 +314,32 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.navy.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    cap.id,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: AppColors.navy,
+            SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.navy.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      cap.id,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: AppColors.navy,
+                      ),
                     ),
                   ),
-                ),
-                _statusBadge(l10n, cap.status),
-              ],
+                  _statusBadge(l10n, cap.status),
+                ],
+              ),
             ),
             const SizedBox(height: 12),
             Text(
@@ -369,9 +375,11 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
               children: [
                 const Icon(Icons.person, size: 16, color: AppColors.gray600),
                 const SizedBox(width: 6),
-                Text(
-                  '${l10n.s17Responsible}: ${_responsibleUser?.name ?? cap.responsibleUserId}${_responsibleUser != null ? ' (${_responsibleUser!.role.toUpperCase()})' : ''}',
-                  style: const TextStyle(fontSize: 13, color: AppColors.gray800),
+                Expanded(
+                  child: Text(
+                    '${l10n.s17Responsible}: ${_responsibleUser?.name ?? cap.responsibleUserId}${_responsibleUser != null ? ' (${_responsibleUser!.role.toUpperCase()})' : ''}',
+                    style: const TextStyle(fontSize: 13, color: AppColors.gray800),
+                  ),
                 ),
               ],
             ),
@@ -380,9 +388,11 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
               children: [
                 const Icon(Icons.event, size: 16, color: AppColors.gray600),
                 const SizedBox(width: 6),
-                Text(
-                  l10n.s16DeadlineLabel(cap.deadline),
-                  style: const TextStyle(fontSize: 13, color: AppColors.gray800),
+                Expanded(
+                  child: Text(
+                    l10n.s16DeadlineLabel(cap.deadline),
+                    style: const TextStyle(fontSize: 13, color: AppColors.gray800),
+                  ),
                 ),
               ],
             ),
@@ -405,12 +415,14 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
               children: [
                 const Icon(Icons.playlist_add_check, color: AppColors.navy),
                 const SizedBox(width: 8),
-                Text(
-                  l10n.s17SectionCompletedSteps,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.navy,
+                Expanded(
+                  child: Text(
+                    l10n.s17SectionCompletedSteps,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.navy,
+                    ),
                   ),
                 ),
               ],
@@ -523,12 +535,14 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
               children: [
                 const Icon(Icons.rate_review_outlined, color: AppColors.navy),
                 const SizedBox(width: 8),
-                Text(
-                  l10n.s17SectionDoneNotes,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.navy,
+                Expanded(
+                  child: Text(
+                    l10n.s17SectionDoneNotes,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.navy,
+                    ),
                   ),
                 ),
               ],
@@ -569,12 +583,14 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
               children: [
                 const Icon(Icons.camera_alt_outlined, color: AppColors.navy),
                 const SizedBox(width: 8),
-                Text(
-                  l10n.s17SectionEvidencePhoto,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.navy,
+                Expanded(
+                  child: Text(
+                    l10n.s17SectionEvidencePhoto,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.navy,
+                    ),
                   ),
                 ),
               ],

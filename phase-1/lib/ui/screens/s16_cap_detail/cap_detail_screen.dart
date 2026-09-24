@@ -319,12 +319,18 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _statusBadge(l10n, cap.status),
-                _deadlineBadge(l10n, cap, deadlineStatus, diffDays),
-              ],
+            SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  _statusBadge(l10n, cap.status),
+                  _deadlineBadge(l10n, cap, deadlineStatus, diffDays),
+                ],
+              ),
             ),
             const SizedBox(height: 12),
             Container(
@@ -337,12 +343,14 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
                 children: [
                   const Icon(Icons.calendar_today, size: 16, color: AppColors.navy),
                   const SizedBox(width: 8),
-                  Text(
-                    l10n.s16DeadlineLabel(cap.deadline),
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.navy,
+                  Expanded(
+                    child: Text(
+                      l10n.s16DeadlineLabel(cap.deadline),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.navy,
+                      ),
                     ),
                   ),
                 ],
@@ -520,16 +528,18 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
               children: [
                 const Icon(Icons.link, size: 20, color: AppColors.navy),
                 const SizedBox(width: 8),
-                Text(
-                  l10n.s16SectionOrigin,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.navy,
+                Expanded(
+                  child: Text(
+                    l10n.s16SectionOrigin,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.navy,
+                    ),
                   ),
                 ),
                 if (cap.isPattern) ...[
-                  const Spacer(),
+                  const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
@@ -574,12 +584,14 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
               children: [
                 const Icon(Icons.psychology, size: 20, color: AppColors.navy),
                 const SizedBox(width: 8),
-                Text(
-                  l10n.s16SectionAnalysis,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.navy,
+                Expanded(
+                  child: Text(
+                    l10n.s16SectionAnalysis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.navy,
+                    ),
                   ),
                 ),
               ],
@@ -709,12 +721,14 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
               children: [
                 const Icon(Icons.person_pin, size: 20, color: AppColors.navy),
                 const SizedBox(width: 8),
-                Text(
-                  l10n.s16SectionOwnership,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.navy,
+                Expanded(
+                  child: Text(
+                    l10n.s16SectionOwnership,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.navy,
+                    ),
                   ),
                 ),
               ],
@@ -768,22 +782,20 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    const Icon(Icons.checklist, size: 20, color: AppColors.navy),
-                    const SizedBox(width: 8),
-                    Text(
-                      l10n.s16SectionActionSteps(doneCount, total),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.navy,
-                      ),
+                const Icon(Icons.checklist, size: 20, color: AppColors.navy),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l10n.s16SectionActionSteps(doneCount, total),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.navy,
                     ),
-                  ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 Text(
                   '${(progress * 100).toInt()}%',
                   style: const TextStyle(
@@ -1021,12 +1033,14 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
               children: [
                 const Icon(Icons.history, size: 20, color: AppColors.navy),
                 const SizedBox(width: 8),
-                Text(
-                  l10n.s16SectionTimeline,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.navy,
+                Expanded(
+                  child: Text(
+                    l10n.s16SectionTimeline,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.navy,
+                    ),
                   ),
                 ),
               ],
