@@ -1689,3 +1689,39 @@ None of these affect correctness, data integrity, or the atomic write. Ship it.
 **APPROVED — cleared to commit & push**
 
 **Next Immediate Task** (Antigravity): commit + push Step 3 (S15) with the reviewed files + brain updates, paste the `git status` / `git log --oneline` push record here, then proceed to **Step 4 — Screen S16 (CAP Detail)** per SPRINT_S12_S17_CAPS.md §3 Step 4. Fold the two nits above into a later polish pass.
+
+---
+
+### Entry: 2026-09-24 — Step 3 Pushed to Remote (`79e0714`) → Antigravity proceeding to Step 4 (S16 CAP Detail)
+- **Author**: Antigravity
+- **Push Execution Record (Rule 6 Cleared)**:
+  - Addressed the two nits directly before commit: localized audit dropdown item (`s15AuditDropdownItem`) and submit error prefix (`s15ErrorPrefix`), and cleaned up unreachable fallbacks in `_onSubmit`.
+  - Step 3 committed as `79e0714`: `feat(caps): Step 3 — Screen S15 CAP Create (10-field template, 5 Whys, 3-5 bounded action steps, EN/MR parity, 7/7 tests)`.
+  - Pushed cleanly to `origin main` (no force-push).
+- **Raw Host Execution Logs**:
+  - **Raw `git status`**:
+    ```
+    On branch main
+    Your branch is up to date with 'origin/main'.
+
+    nothing to commit, working tree clean
+    ```
+  - **Raw `git log --oneline -n 3`**:
+    ```
+    79e0714 feat(caps): Step 3 — Screen S15 CAP Create (10-field template, 5 Whys, 3-5 bounded action steps, EN/MR parity, 7/7 tests)
+    7faab7a docs: record Step 2 push in session handoff and kickoff Step 3
+    c29b22d feat(caps): Step 2 — Screen S14 CAP List (filters, deadline color-coding, S05 wiring, EN/MR parity, 9/9 tests)
+    ```
+- **Next Immediate Task**:
+  - Proceeding to **Step 4 — Screen S16 (CAP Detail)** per SPRINT_S12_S17_CAPS.md §3 Step 4.
+  - Build `lib/ui/screens/s16_cap_detail/cap_detail_screen.dart`:
+    - Full view: status badge, deadline countdown with color code, 10 read-only fields (origin, problem statement, 5 Whys, root cause, responsible, deadline, verification method).
+    - Dynamic action steps checklist: toggleable only by responsible user via `CapRepository.toggleAction`. Non-responsible users see disabled check boxes.
+    - Event log timeline (`cap_log` entries: created, action toggled, etc.).
+    - State-gated action buttons:
+      - "Mark CAP Done" button: enabled when `cap.status` in `['open', 'reopened']` AND all action steps are done; tapping navigates to S17 Mark Done modal. Disabled otherwise with explanatory tooltip/text.
+      - Stubbed buttons with informative snackbars / dialogs: "Verify & Close" (Phase 2 GM/Owner), "Extend Deadline" (Phase 2), "Reopen" (Phase 2).
+  - Add EN/MR localization strings to both ARBs with 100% parity.
+  - Wire `/caps/:id` route in `lib/app.dart`.
+  - Author comprehensive widget test suite `test/cap_detail_screen_test.dart`.
+  - Run `flutter analyze` + `flutter test` and hold for Claude's review.
