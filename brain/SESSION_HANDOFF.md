@@ -2527,3 +2527,37 @@ No blocking issues; no new nits.
 **APPROVED — cleared to commit & push**
 
 **Next Immediate Task** (Antigravity): commit + push Step 1 (assets/reference/*.json, models/reference/*, reference_repository.dart + re-export, reference_repository_test.dart, pubspec.yaml, brain), paste the `git status` / `git log --oneline` record, then proceed to **Step 2 — S22 Reference Index + routing + Home entry tile** per `SPRINT_S22_S26_REFERENCE.md` §5. Confirm the S05 Home tile placement in the actual build before wiring; screen chrome via ARB with strict Rule #8 parity (reference content stays in JSON).
+
+---
+
+### Entry: 2026-09-25 — Step 1 Pushed to Remote (`d823396`) — Starting Step 2
+- **Author**: Antigravity
+- **Sprint**: S22–S26 Reference Data Tab
+- **Push Execution Record (Rule 6 Cleared)**:
+  - Committed Step 1 as `d823396`: `feat(reference): Step 1 — reference data layer (bilingual JSON assets, models, repository, 65-entry glossary search, 19/19 tests)`.
+  - Pushed cleanly to `origin main` (no force-push): `e036c9e..d823396 main -> main`.
+- **Raw Host Execution Logs**:
+  - **Raw `git status`**:
+    ```
+    On branch main
+    Your branch is up to date with 'origin/main'.
+
+    nothing to commit, working tree clean
+    ```
+  - **Raw `git log --oneline -n 5`**:
+    ```
+    d823396 feat(reference): Step 1 — reference data layer (bilingual JSON assets, models, repository, 65-entry glossary search, 19/19 tests)
+    e036c9e docs: record Step 7 push in session handoff and close sprint S12-S17
+    1917aa3 feat(detail): Step 7 — Screen S13 Audit Detail (read-only immutability, SOP breakdown, Fail→CAP link, 12/12 tests)
+    78ca8e8 docs: record Step 6 push in session handoff and kickoff Step 7
+    0eae706 feat(history): Step 6 — Screen S12 Audit History (role scoping, filter chips, score badges, EN/MR parity, 8/8 tests)
+    ```
+- **Next Immediate Task**:
+  - Proceed immediately to **Step 2 — S22 Reference Index + routing + Home entry tile**:
+    1. Inspect `lib/ui/screens/s05_home/home_screen.dart` to check existing tile placements and wire the Reference tile to `/reference`.
+    2. Add `/reference` and sub-routes (`/reference/rating`, `/reference/escalation`, `/reference/evidence`, `/reference/glossary`) to `lib/app.dart`.
+    3. Build `ReferenceIndexScreen` (S22) under `lib/ui/screens/s22_reference/reference_index_screen.dart` with 4 navigation cards.
+    4. Add screen chrome keys to `app_en.arb` and `app_mr.arb` maintaining 1:1 parity (Rule #8).
+    5. Author widget tests verifying S22 renders 4 cards, navigates to sub-routes, and has full Marathi parity.
+    6. Run `flutter analyze` + `flutter test`, paste raw output into handoff, and HOLD for Claude's review.
+
