@@ -1112,4 +1112,215 @@ class AppLocalizationsEn extends AppLocalizations {
   String s15ErrorPrefix(String message) {
     return 'Error: $message';
   }
+
+  @override
+  String get s16Title => 'CAP Detail';
+
+  @override
+  String get s16Subtitle => 'Corrective Action Plan';
+
+  @override
+  String get s16NotFound => 'CAP not found';
+
+  @override
+  String get s16BackToCaps => 'Back to CAP List';
+
+  @override
+  String get s16StatusOpen => 'Open';
+
+  @override
+  String get s16StatusDone => 'Done (Pending Verify)';
+
+  @override
+  String get s16StatusVerified => 'Verified';
+
+  @override
+  String get s16StatusClosed => 'Closed';
+
+  @override
+  String get s16StatusAged => 'Aged';
+
+  @override
+  String get s16StatusReopened => 'Reopened';
+
+  @override
+  String s16OverdueByDays(int days) {
+    return 'Overdue by $days days';
+  }
+
+  @override
+  String get s16DueToday => 'Due today';
+
+  @override
+  String get s16DueTomorrow => '1 day left (Due tomorrow)';
+
+  @override
+  String s16DaysRemaining(int days) {
+    return '$days days left';
+  }
+
+  @override
+  String s16CompletedOn(String date) {
+    return 'Completed on $date';
+  }
+
+  @override
+  String s16DeadlineLabel(String date) {
+    return 'Deadline: $date';
+  }
+
+  @override
+  String get s16SectionOrigin => '1. Origin Information';
+
+  @override
+  String get s16OriginAudit => 'Origin Audit';
+
+  @override
+  String get s16OriginCheckpoint => 'Origin Checkpoint';
+
+  @override
+  String get s16PatternBadge => 'Recurring Issue (Pattern)';
+
+  @override
+  String get s16SectionAnalysis => '2. Problem & 5-Whys Analysis';
+
+  @override
+  String get s16ProblemStatement => 'Problem Statement';
+
+  @override
+  String s16WhyLabel(int number) {
+    return 'Why $number';
+  }
+
+  @override
+  String get s16RootCause => 'Root Cause';
+
+  @override
+  String get s16SectionOwnership => '3. Ownership & Verification';
+
+  @override
+  String get s16ResponsibleUser => 'Responsible (CAP Owner)';
+
+  @override
+  String get s16CreatedBy => 'Created By';
+
+  @override
+  String s16OpenedAt(String date) {
+    return 'Opened: $date';
+  }
+
+  @override
+  String get s16VerificationMethod => 'Verification Method';
+
+  @override
+  String s16AgedCount(int count) {
+    return 'Aged: $count times';
+  }
+
+  @override
+  String s16ExtensionCount(int count) {
+    return 'Extensions: $count';
+  }
+
+  @override
+  String s16LatestExtensionReason(String reason) {
+    return 'Reason: $reason';
+  }
+
+  @override
+  String s16SectionActionSteps(int done, int total) {
+    return '4. Action Steps ($done/$total)';
+  }
+
+  @override
+  String s16StepLabel(int number) {
+    return 'Step $number';
+  }
+
+  @override
+  String s16ActionDoneBy(String user, String date) {
+    return 'Done by $user on $date';
+  }
+
+  @override
+  String get s16OnlyResponsibleCanToggle =>
+      'Only the assigned responsible user can check off action steps.';
+
+  @override
+  String get s16CapAlreadyDoneNotice =>
+      'CAP is already marked done. Action steps cannot be edited.';
+
+  @override
+  String get s16MarkDoneButton => 'Mark CAP Done';
+
+  @override
+  String get s16CompleteAllStepsToMarkDone =>
+      'Complete all action steps to enable Mark Done';
+
+  @override
+  String get s16VerifyButton => 'Verify CAP';
+
+  @override
+  String get s16CloseButton => 'Close CAP';
+
+  @override
+  String get s16RequestExtensionButton => 'Request Extension';
+
+  @override
+  String get s16ReopenButton => 'Reopen CAP';
+
+  @override
+  String get s16Phase2Notice => 'Phase 2 (Coming Soon)';
+
+  @override
+  String get s16SectionTimeline => '5. Event Timeline';
+
+  @override
+  String get s16EventCreated => 'CAP Created';
+
+  @override
+  String get s16EventActionDone => 'Action Step Completed';
+
+  @override
+  String get s16EventActionUndone => 'Action Step Reopened';
+
+  @override
+  String get s16EventMarkedDone => 'Marked Done (Pending Verification)';
+
+  @override
+  String get s16EventVerified => 'Verified by Management';
+
+  @override
+  String get s16EventClosed => 'CAP Closed';
+
+  @override
+  String get s16EventExtended => 'Deadline Extended';
+
+  @override
+  String get s16EventAged => 'Marked Aged';
+
+  @override
+  String get s16EventReopened => 'CAP Reopened';
+
+  @override
+  String get s16ActorSystem => 'System';
+
+  @override
+  String s16ActorPrefix(String user) {
+    return 'By $user';
+  }
+
+  @override
+  String s16ActionToggleFailed(String error) {
+    return 'Failed to update action step: $error';
+  }
+
+  @override
+  String get s16RefreshTooltip => 'Refresh';
+
+  @override
+  String get s16WhysSubheader => '5 Whys';
+
+  @override
+  String get s16NoTimelineEntries => 'No timeline entries';
 }

@@ -1113,4 +1113,215 @@ class AppLocalizationsMr extends AppLocalizations {
   String s15ErrorPrefix(String message) {
     return 'त्रुटी: $message';
   }
+
+  @override
+  String get s16Title => 'CAP तपशील';
+
+  @override
+  String get s16Subtitle => 'सुधारात्मक कृती योजना';
+
+  @override
+  String get s16NotFound => 'CAP सापडली नाही';
+
+  @override
+  String get s16BackToCaps => 'CAP यादीकडे परत';
+
+  @override
+  String get s16StatusOpen => 'उघडे';
+
+  @override
+  String get s16StatusDone => 'पूर्ण (पडताळणी प्रलंबित)';
+
+  @override
+  String get s16StatusVerified => 'पडताळलेले';
+
+  @override
+  String get s16StatusClosed => 'बंद';
+
+  @override
+  String get s16StatusAged => 'जुने';
+
+  @override
+  String get s16StatusReopened => 'पुन्हा उघडलेले';
+
+  @override
+  String s16OverdueByDays(int days) {
+    return '$days दिवस मुदत संपली';
+  }
+
+  @override
+  String get s16DueToday => 'आज मुदत आहे';
+
+  @override
+  String get s16DueTomorrow => '१ दिवस उरला (उद्या मुदत)';
+
+  @override
+  String s16DaysRemaining(int days) {
+    return '$days दिवस उरले';
+  }
+
+  @override
+  String s16CompletedOn(String date) {
+    return '$date रोजी पूर्ण';
+  }
+
+  @override
+  String s16DeadlineLabel(String date) {
+    return 'मुदत: $date';
+  }
+
+  @override
+  String get s16SectionOrigin => '१. मूळ माहिती';
+
+  @override
+  String get s16OriginAudit => 'मूळ ऑडिट';
+
+  @override
+  String get s16OriginCheckpoint => 'मूळ तपासणी बिंदू';
+
+  @override
+  String get s16PatternBadge => 'वारंवार समस्या (पॅटर्न)';
+
+  @override
+  String get s16SectionAnalysis => '२. समस्या आणि ५-का? विश्लेषण';
+
+  @override
+  String get s16ProblemStatement => 'समस्या विधान';
+
+  @override
+  String s16WhyLabel(int number) {
+    return 'का? $number';
+  }
+
+  @override
+  String get s16RootCause => 'मूळ कारण';
+
+  @override
+  String get s16SectionOwnership => '३. मालकी आणि पडताळणी';
+
+  @override
+  String get s16ResponsibleUser => 'जबाबदार (CAP मालक)';
+
+  @override
+  String get s16CreatedBy => 'निर्मिती केली';
+
+  @override
+  String s16OpenedAt(String date) {
+    return 'उघडले: $date';
+  }
+
+  @override
+  String get s16VerificationMethod => 'पडताळणी पद्धत';
+
+  @override
+  String s16AgedCount(int count) {
+    return 'जुने: $count वेळा';
+  }
+
+  @override
+  String s16ExtensionCount(int count) {
+    return 'मुदतवाढ: $count';
+  }
+
+  @override
+  String s16LatestExtensionReason(String reason) {
+    return 'कारण: $reason';
+  }
+
+  @override
+  String s16SectionActionSteps(int done, int total) {
+    return '४. कृती पावले ($done/$total)';
+  }
+
+  @override
+  String s16StepLabel(int number) {
+    return 'पाऊल $number';
+  }
+
+  @override
+  String s16ActionDoneBy(String user, String date) {
+    return '$user द्वारे $date रोजी पूर्ण';
+  }
+
+  @override
+  String get s16OnlyResponsibleCanToggle =>
+      'केवळ नेमलेला जबाबदार वापरकर्ता कृती पावले तपासू शकतो.';
+
+  @override
+  String get s16CapAlreadyDoneNotice =>
+      'CAP आधीच पूर्ण म्हणून चिन्हांकित आहे. कृती पावले संपादित करता येत नाहीत.';
+
+  @override
+  String get s16MarkDoneButton => 'CAP पूर्ण म्हणून खूण करा';
+
+  @override
+  String get s16CompleteAllStepsToMarkDone =>
+      'पूर्ण म्हणून खूण करण्यासाठी सर्व कृती पावले पूर्ण करा';
+
+  @override
+  String get s16VerifyButton => 'CAP पडताळा';
+
+  @override
+  String get s16CloseButton => 'CAP बंद करा';
+
+  @override
+  String get s16RequestExtensionButton => 'मुदतवाढ विनंती';
+
+  @override
+  String get s16ReopenButton => 'CAP पुन्हा उघडा';
+
+  @override
+  String get s16Phase2Notice => 'टप्पा २ (लवकरच येत आहे)';
+
+  @override
+  String get s16SectionTimeline => '५. घटना टाइमलाइन';
+
+  @override
+  String get s16EventCreated => 'CAP तयार केली';
+
+  @override
+  String get s16EventActionDone => 'कृती पाऊल पूर्ण केले';
+
+  @override
+  String get s16EventActionUndone => 'कृती पाऊल पुन्हा उघडले';
+
+  @override
+  String get s16EventMarkedDone => 'पूर्ण म्हणून खूण केली (पडताळणी प्रलंबित)';
+
+  @override
+  String get s16EventVerified => 'व्यवस्थापनाने पडताळले';
+
+  @override
+  String get s16EventClosed => 'CAP बंद केली';
+
+  @override
+  String get s16EventExtended => 'मुदत वाढवली';
+
+  @override
+  String get s16EventAged => 'जुने म्हणून नोंदवले';
+
+  @override
+  String get s16EventReopened => 'CAP पुन्हा उघडली';
+
+  @override
+  String get s16ActorSystem => 'प्रणाली';
+
+  @override
+  String s16ActorPrefix(String user) {
+    return '$user द्वारे';
+  }
+
+  @override
+  String s16ActionToggleFailed(String error) {
+    return 'कृती पाऊल अद्यतनित करण्यात अयशस्वी: $error';
+  }
+
+  @override
+  String get s16RefreshTooltip => 'रिफ्रेश करा';
+
+  @override
+  String get s16WhysSubheader => '५ का? (५ व्हाय)';
+
+  @override
+  String get s16NoTimelineEntries => 'कोणत्याही टाइमलाइन नोंदी नाहीत';
 }

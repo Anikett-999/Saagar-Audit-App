@@ -245,4 +245,16 @@ class AuditRepository {
 
     return rows.map(Audit.fromMap).toList();
   }
+
+  /// Lookup an audit by ID.
+  Future<Audit?> getById(String id) async {
+    final rows = await AppDatabase.instance.db.query(
+      'audits',
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return Audit.fromMap(rows.first);
+  }
 }

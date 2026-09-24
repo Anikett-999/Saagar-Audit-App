@@ -17,6 +17,7 @@ import 'ui/screens/s10_review/review_submit_screen.dart';
 import 'ui/screens/s11_submitted/submitted_screen.dart';
 import 'ui/screens/s14_cap_list/cap_list_screen.dart';
 import 'ui/screens/s15_cap_create/cap_create_screen.dart';
+import 'ui/screens/s16_cap_detail/cap_detail_screen.dart';
 import 'providers/auth_provider.dart';
 import 'ui/screens/s27_settings/settings_screen.dart';
 import 'ui/screens/s28_manage_cros/manage_cros_screen.dart';
@@ -124,9 +125,23 @@ final routerProvider = Provider<GoRouter>((ref) {
           }
           return null;
         },
+        builder: (context, state) => CapDetailScreen(
+          capId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
+        path: '/caps/:id/mark-done',
+        name: 's17_cap_mark_done',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          return null;
+        },
         builder: (context, state) => Scaffold(
           body: Center(
-            child: Text('S16 CAP Detail: ${state.pathParameters['id']}'),
+            child: Text('S17 Mark Done: ${state.pathParameters['id']}'),
           ),
         ),
       ),

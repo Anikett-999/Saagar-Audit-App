@@ -2174,6 +2174,366 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error: {message}'**
   String s15ErrorPrefix(String message);
+
+  /// No description provided for @s16Title.
+  ///
+  /// In en, this message translates to:
+  /// **'CAP Detail'**
+  String get s16Title;
+
+  /// No description provided for @s16Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Corrective Action Plan'**
+  String get s16Subtitle;
+
+  /// No description provided for @s16NotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'CAP not found'**
+  String get s16NotFound;
+
+  /// No description provided for @s16BackToCaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to CAP List'**
+  String get s16BackToCaps;
+
+  /// No description provided for @s16StatusOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get s16StatusOpen;
+
+  /// No description provided for @s16StatusDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done (Pending Verify)'**
+  String get s16StatusDone;
+
+  /// No description provided for @s16StatusVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get s16StatusVerified;
+
+  /// No description provided for @s16StatusClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get s16StatusClosed;
+
+  /// No description provided for @s16StatusAged.
+  ///
+  /// In en, this message translates to:
+  /// **'Aged'**
+  String get s16StatusAged;
+
+  /// No description provided for @s16StatusReopened.
+  ///
+  /// In en, this message translates to:
+  /// **'Reopened'**
+  String get s16StatusReopened;
+
+  /// No description provided for @s16OverdueByDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue by {days} days'**
+  String s16OverdueByDays(int days);
+
+  /// No description provided for @s16DueToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Due today'**
+  String get s16DueToday;
+
+  /// No description provided for @s16DueTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'1 day left (Due tomorrow)'**
+  String get s16DueTomorrow;
+
+  /// No description provided for @s16DaysRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days left'**
+  String s16DaysRemaining(int days);
+
+  /// No description provided for @s16CompletedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed on {date}'**
+  String s16CompletedOn(String date);
+
+  /// No description provided for @s16DeadlineLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Deadline: {date}'**
+  String s16DeadlineLabel(String date);
+
+  /// No description provided for @s16SectionOrigin.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Origin Information'**
+  String get s16SectionOrigin;
+
+  /// No description provided for @s16OriginAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'Origin Audit'**
+  String get s16OriginAudit;
+
+  /// No description provided for @s16OriginCheckpoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Origin Checkpoint'**
+  String get s16OriginCheckpoint;
+
+  /// No description provided for @s16PatternBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring Issue (Pattern)'**
+  String get s16PatternBadge;
+
+  /// No description provided for @s16SectionAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'2. Problem & 5-Whys Analysis'**
+  String get s16SectionAnalysis;
+
+  /// No description provided for @s16ProblemStatement.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem Statement'**
+  String get s16ProblemStatement;
+
+  /// No description provided for @s16WhyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Why {number}'**
+  String s16WhyLabel(int number);
+
+  /// No description provided for @s16RootCause.
+  ///
+  /// In en, this message translates to:
+  /// **'Root Cause'**
+  String get s16RootCause;
+
+  /// No description provided for @s16SectionOwnership.
+  ///
+  /// In en, this message translates to:
+  /// **'3. Ownership & Verification'**
+  String get s16SectionOwnership;
+
+  /// No description provided for @s16ResponsibleUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Responsible (CAP Owner)'**
+  String get s16ResponsibleUser;
+
+  /// No description provided for @s16CreatedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Created By'**
+  String get s16CreatedBy;
+
+  /// No description provided for @s16OpenedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Opened: {date}'**
+  String s16OpenedAt(String date);
+
+  /// No description provided for @s16VerificationMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Method'**
+  String get s16VerificationMethod;
+
+  /// No description provided for @s16AgedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Aged: {count} times'**
+  String s16AgedCount(int count);
+
+  /// No description provided for @s16ExtensionCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Extensions: {count}'**
+  String s16ExtensionCount(int count);
+
+  /// No description provided for @s16LatestExtensionReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason: {reason}'**
+  String s16LatestExtensionReason(String reason);
+
+  /// No description provided for @s16SectionActionSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'4. Action Steps ({done}/{total})'**
+  String s16SectionActionSteps(int done, int total);
+
+  /// No description provided for @s16StepLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {number}'**
+  String s16StepLabel(int number);
+
+  /// No description provided for @s16ActionDoneBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Done by {user} on {date}'**
+  String s16ActionDoneBy(String user, String date);
+
+  /// No description provided for @s16OnlyResponsibleCanToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the assigned responsible user can check off action steps.'**
+  String get s16OnlyResponsibleCanToggle;
+
+  /// No description provided for @s16CapAlreadyDoneNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'CAP is already marked done. Action steps cannot be edited.'**
+  String get s16CapAlreadyDoneNotice;
+
+  /// No description provided for @s16MarkDoneButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark CAP Done'**
+  String get s16MarkDoneButton;
+
+  /// No description provided for @s16CompleteAllStepsToMarkDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete all action steps to enable Mark Done'**
+  String get s16CompleteAllStepsToMarkDone;
+
+  /// No description provided for @s16VerifyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify CAP'**
+  String get s16VerifyButton;
+
+  /// No description provided for @s16CloseButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Close CAP'**
+  String get s16CloseButton;
+
+  /// No description provided for @s16RequestExtensionButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Extension'**
+  String get s16RequestExtensionButton;
+
+  /// No description provided for @s16ReopenButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Reopen CAP'**
+  String get s16ReopenButton;
+
+  /// No description provided for @s16Phase2Notice.
+  ///
+  /// In en, this message translates to:
+  /// **'Phase 2 (Coming Soon)'**
+  String get s16Phase2Notice;
+
+  /// No description provided for @s16SectionTimeline.
+  ///
+  /// In en, this message translates to:
+  /// **'5. Event Timeline'**
+  String get s16SectionTimeline;
+
+  /// No description provided for @s16EventCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'CAP Created'**
+  String get s16EventCreated;
+
+  /// No description provided for @s16EventActionDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Action Step Completed'**
+  String get s16EventActionDone;
+
+  /// No description provided for @s16EventActionUndone.
+  ///
+  /// In en, this message translates to:
+  /// **'Action Step Reopened'**
+  String get s16EventActionUndone;
+
+  /// No description provided for @s16EventMarkedDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked Done (Pending Verification)'**
+  String get s16EventMarkedDone;
+
+  /// No description provided for @s16EventVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified by Management'**
+  String get s16EventVerified;
+
+  /// No description provided for @s16EventClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'CAP Closed'**
+  String get s16EventClosed;
+
+  /// No description provided for @s16EventExtended.
+  ///
+  /// In en, this message translates to:
+  /// **'Deadline Extended'**
+  String get s16EventExtended;
+
+  /// No description provided for @s16EventAged.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked Aged'**
+  String get s16EventAged;
+
+  /// No description provided for @s16EventReopened.
+  ///
+  /// In en, this message translates to:
+  /// **'CAP Reopened'**
+  String get s16EventReopened;
+
+  /// No description provided for @s16ActorSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get s16ActorSystem;
+
+  /// No description provided for @s16ActorPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'By {user}'**
+  String s16ActorPrefix(String user);
+
+  /// No description provided for @s16ActionToggleFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update action step: {error}'**
+  String s16ActionToggleFailed(String error);
+
+  /// No description provided for @s16RefreshTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get s16RefreshTooltip;
+
+  /// No description provided for @s16WhysSubheader.
+  ///
+  /// In en, this message translates to:
+  /// **'5 Whys'**
+  String get s16WhysSubheader;
+
+  /// No description provided for @s16NoTimelineEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'No timeline entries'**
+  String get s16NoTimelineEntries;
 }
 
 class _AppLocalizationsDelegate

@@ -139,15 +139,24 @@ class Cap {
   /// - dueSoon: deadline is today or tomorrow (difference <= 1 day)
   /// - ok: deadline is 2 or more days in future
   CapDeadlineStatus deadlineStatus([DateTime? now]) {
-    final current = now ?? DateTime.now();
-    final today = DateTime(current.year, current.month, current.day);
-    final parsed = DateTime.tryParse(deadline);
-    if (parsed == null) return CapDeadlineStatus.ok;
-    final d = DateTime(parsed.year, parsed.month, parsed.day);
-    final diffDays = d.difference(today).inDays;
+    final diffDays = daysUntilDeadline(now);
+    if (diffDays == null) return CapDeadlineStatus.ok;
     if (diffDays < 0) return CapDeadlineStatus.overdue;
     if (diffDays <= 1) return CapDeadlineStatus.dueSoon;
     return CapDeadlineStatus.ok;
+  }
+
+  /// Returns the number of days until the deadline relative to [now]:
+  /// - Negative value if overdue (e.g. -2 = overdue by 2 days)
+  /// - 0 if due today
+  /// - Positive value if due in future (e.g. 1 = due tomorrow)
+  int? daysUntilDeadline([DateTime? now]) {
+    final current = now ?? DateTime.now();
+    final today = DateTime(current.year, current.month, current.day);
+    final parsed = DateTime.tryParse(deadline);
+    if (parsed == null) return null;
+    final d = DateTime(parsed.year, parsed.month, parsed.day);
+    return d.difference(today).inDays;
   }
 
   Cap copyWith({

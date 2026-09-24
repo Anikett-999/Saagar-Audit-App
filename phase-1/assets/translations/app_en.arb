@@ -431,5 +431,137 @@
     "placeholders": {
       "message": {"type": "String"}
     }
-  }
+  },
+  "s16Title": "CAP Detail",
+  "s16Subtitle": "Corrective Action Plan",
+  "s16NotFound": "CAP not found",
+  "s16BackToCaps": "Back to CAP List",
+  "s16StatusOpen": "Open",
+  "s16StatusDone": "Done (Pending Verify)",
+  "s16StatusVerified": "Verified",
+  "s16StatusClosed": "Closed",
+  "s16StatusAged": "Aged",
+  "s16StatusReopened": "Reopened",
+  "s16OverdueByDays": "Overdue by {days} days",
+  "@s16OverdueByDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "s16DueToday": "Due today",
+  "s16DueTomorrow": "1 day left (Due tomorrow)",
+  "s16DaysRemaining": "{days} days left",
+  "@s16DaysRemaining": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "s16CompletedOn": "Completed on {date}",
+  "@s16CompletedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "s16DeadlineLabel": "Deadline: {date}",
+  "@s16DeadlineLabel": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "s16SectionOrigin": "1. Origin Information",
+  "s16OriginAudit": "Origin Audit",
+  "s16OriginCheckpoint": "Origin Checkpoint",
+  "s16PatternBadge": "Recurring Issue (Pattern)",
+  "s16SectionAnalysis": "2. Problem & 5-Whys Analysis",
+  "s16ProblemStatement": "Problem Statement",
+  "s16WhyLabel": "Why {number}",
+  "@s16WhyLabel": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "s16RootCause": "Root Cause",
+  "s16SectionOwnership": "3. Ownership & Verification",
+  "s16ResponsibleUser": "Responsible (CAP Owner)",
+  "s16CreatedBy": "Created By",
+  "s16OpenedAt": "Opened: {date}",
+  "@s16OpenedAt": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "s16VerificationMethod": "Verification Method",
+  "s16AgedCount": "Aged: {count} times",
+  "@s16AgedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s16ExtensionCount": "Extensions: {count}",
+  "@s16ExtensionCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s16LatestExtensionReason": "Reason: {reason}",
+  "@s16LatestExtensionReason": {
+    "placeholders": {
+      "reason": {"type": "String"}
+    }
+  },
+  "s16SectionActionSteps": "4. Action Steps ({done}/{total})",
+  "@s16SectionActionSteps": {
+    "placeholders": {
+      "done": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "s16StepLabel": "Step {number}",
+  "@s16StepLabel": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "s16ActionDoneBy": "Done by {user} on {date}",
+  "@s16ActionDoneBy": {
+    "placeholders": {
+      "user": {"type": "String"},
+      "date": {"type": "String"}
+    }
+  },
+  "s16OnlyResponsibleCanToggle": "Only the assigned responsible user can check off action steps.",
+  "s16CapAlreadyDoneNotice": "CAP is already marked done. Action steps cannot be edited.",
+  "s16MarkDoneButton": "Mark CAP Done",
+  "s16CompleteAllStepsToMarkDone": "Complete all action steps to enable Mark Done",
+  "s16VerifyButton": "Verify CAP",
+  "s16CloseButton": "Close CAP",
+  "s16RequestExtensionButton": "Request Extension",
+  "s16ReopenButton": "Reopen CAP",
+  "s16Phase2Notice": "Phase 2 (Coming Soon)",
+  "s16SectionTimeline": "5. Event Timeline",
+  "s16EventCreated": "CAP Created",
+  "s16EventActionDone": "Action Step Completed",
+  "s16EventActionUndone": "Action Step Reopened",
+  "s16EventMarkedDone": "Marked Done (Pending Verification)",
+  "s16EventVerified": "Verified by Management",
+  "s16EventClosed": "CAP Closed",
+  "s16EventExtended": "Deadline Extended",
+  "s16EventAged": "Marked Aged",
+  "s16EventReopened": "CAP Reopened",
+  "s16ActorSystem": "System",
+  "s16ActorPrefix": "By {user}",
+  "@s16ActorPrefix": {
+    "placeholders": {
+      "user": {"type": "String"}
+    }
+  },
+  "s16ActionToggleFailed": "Failed to update action step: {error}",
+  "@s16ActionToggleFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "s16RefreshTooltip": "Refresh",
+  "s16WhysSubheader": "5 Whys",
+  "s16NoTimelineEntries": "No timeline entries"
 }

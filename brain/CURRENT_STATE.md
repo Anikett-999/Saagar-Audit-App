@@ -17,7 +17,7 @@
 | **S12–S13**| Audit History & Detail | ⏳ Scheduled | Read-only view of submitted audits & WhatsApp share |
 | **S14**    | CAP List | ✅ Complete | Filterable/searchable CAP list, deadline color-coding, S05 nav wired, EN/MR parity |
 | **S15**    | CAP Create | ✅ Complete | 10-field template, 5-Whys, 3–5 dynamic action steps, responsible dropdown, deadline picker, EN/MR parity |
-| **S16**    | CAP Detail | 🟡 In Progress | Full CAP view, action checklist, event log timeline, mark done navigation |
+| **S16**    | CAP Detail | ✅ Complete | Full CAP view, action checklist, event log timeline, state/role-gated buttons, Phase 2 stubs |
 | **S17**    | Mark Done Modal | ⏳ Scheduled | Mark done dialog, reflection notes, photo proof, verification |
 | **S22–S26**| Reference Data | ⏳ Scheduled | Rating scale, escalation triggers, glossary |
 | **S27**    | Settings Hub | ✅ Complete | Role-filtered list (Owner-only Users), profile badge, real S05 navigation |
@@ -27,11 +27,12 @@
 | **S31**    | Language | ✅ Complete | Dedicated screen, live EN/MR switch, persists to users.language_pref, login restore, full EN/MR parity |
 | **S32**    | Backup / Export | ✅ Complete | All 14 tables exported to timestamped JSON in Downloads, Owner-only Firestore sync stub (Coming in Phase 4), security advisory, About card, full EN/MR parity |
 
-> **Sprint S12–S17 (CAPs Workflow) is ACTIVE. Step 1 (Data Layer), Step 2 (S14 CAP List), and Step 3 (S15 CAP Create) pushed; Step 4 (S16 CAP Detail) in progress.**
+> **Sprint S12–S17 (CAPs Workflow) is ACTIVE. Steps 1–4 pushed; Step 5 (S17 Mark Done Modal) is next.**
 
 ## 2. Verified Baseline Health
 - `flutter analyze`: **0 issues found (Clean baseline)**
-- `flutter test`: **124/124 tests passing across 15 test files**:
+- `flutter test`: **135/135 tests passing across 16 test files**:
+  - `cap_detail_screen_test.dart` (11 tests) — S16 full 10 fields read-only inspection, status badge, deadline color-coding, responsible action step toggling, non-responsible permission blocking, Mark Done gating on completion, Phase 2 stubs (Extension/Verify/Close/Reopen), Not Found state, Marathi parity
   - `cap_create_screen_test.dart` (7 tests) — S15 10-field template rendering, pre-fills from fail, mandatory field validation, 3–5 bounded dynamic action steps, empty step validation, atomic creation & navigation to S16, Marathi parity
   - `cap_list_screen_test.dart` (9 tests) — S14 list rendering, empty state, deadline color-coding (overdue/dueSoon/ok), filter chips, search, SM role scoping, GM/Owner unscoped, S15 FAB + S16 card navigation, Marathi parity
   - `cap_repository_test.dart` (19 tests) — ISO-week formatting, sequential ID generation, createCap validation & atomic writes, toggleAction, markDone guards, role scoping, status filters, search, S13 helpers, listAudits pagination/scoping
