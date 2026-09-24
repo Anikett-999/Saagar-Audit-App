@@ -1416,4 +1416,108 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get s17CapAlreadyDoneNotice =>
       'This CAP is already marked done or closed.';
+
+  @override
+  String get s12Title => 'Audit History';
+
+  @override
+  String get s12Subtitle => 'View past audits and compliance records';
+
+  @override
+  String get s12FilterAll => 'All';
+
+  @override
+  String get s12FilterDaily => 'Daily';
+
+  @override
+  String get s12FilterUnverified => 'Unverified';
+
+  @override
+  String get s12FilterWeekly => 'Weekly (Phase 2)';
+
+  @override
+  String get s12FilterMonthly => 'Monthly (Phase 3)';
+
+  @override
+  String get s12NoAuditsFound => 'No audits found';
+
+  @override
+  String get s12NoAuditsMatchFilter => 'No audits match the selected filter.';
+
+  @override
+  String get s12CompleteAuditPrompt =>
+      'Complete and submit a daily audit to view history here.';
+
+  @override
+  String s12Auditor(String name) {
+    return 'Auditor: $name';
+  }
+
+  @override
+  String s12Date(String date) {
+    return 'Date: $date';
+  }
+
+  @override
+  String s12ComplianceScore(String score) {
+    return '$score%';
+  }
+
+  @override
+  String s12FailsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fails',
+      one: '1 Fail',
+      zero: '0 Fails',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get s12StatusSubmitted => 'Submitted';
+
+  @override
+  String get s12StatusVerified => 'Verified';
+
+  @override
+  String get s12Loading => 'Loading audit history...';
+
+  @override
+  String get s12TypeDaily => 'Daily';
+
+  @override
+  String get s12TypeWeekly => 'Weekly';
+
+  @override
+  String get s12TypeMonthly => 'Monthly';
+
+  @override
+  String get s12BandExcellent => 'Excellent';
+
+  @override
+  String get s12BandGood => 'Good';
+
+  @override
+  String get s12BandFair => 'Fair';
+
+  @override
+  String get s12BandPoor => 'Poor';
+
+  @override
+  String get s12BandCritical => 'Critical';
+
+  @override
+  String get s12BandPending => 'Pending';
+
+  @override
+  String get s12RefreshTooltip => 'Refresh audit history';
+
+  @override
+  String get s12FilterWeeklyTooltip => 'Weekly Audit is scheduled for Phase 2';
+
+  @override
+  String get s12FilterMonthlyTooltip =>
+      'Monthly Audit is scheduled for Phase 3';
 }

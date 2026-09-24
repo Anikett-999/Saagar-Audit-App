@@ -85,7 +85,7 @@ class FakeDatabase extends Fake implements Database, Transaction {
           if (where.contains("audit_type = 'daily'")) {
             results = results.where((r) => r['audit_type'] == 'daily').toList();
           }
-          if (where.contains("status = 'submitted'") && !where.contains("status IN")) {
+          if (where.contains("status = 'submitted'")) {
             results = results.where((r) => r['status'] == 'submitted').toList();
           }
           if (where.contains('auditor_id = ?') && whereArgs != null && argIdx < whereArgs.length) {

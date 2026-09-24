@@ -1417,4 +1417,109 @@ class AppLocalizationsMr extends AppLocalizations {
   @override
   String get s17CapAlreadyDoneNotice =>
       'ही CAP आधीच पूर्ण किंवा बंद म्हणून चिन्हांकित आहे.';
+
+  @override
+  String get s12Title => 'ऑडिट इतिहास';
+
+  @override
+  String get s12Subtitle => 'मागील ऑडिट आणि अनुपालन नोंदी पहा';
+
+  @override
+  String get s12FilterAll => 'सर्व';
+
+  @override
+  String get s12FilterDaily => 'दैनंदिन';
+
+  @override
+  String get s12FilterUnverified => 'अपडताळलेले';
+
+  @override
+  String get s12FilterWeekly => 'साप्ताहिक (टप्पा २)';
+
+  @override
+  String get s12FilterMonthly => 'मासिक (टप्पा ३)';
+
+  @override
+  String get s12NoAuditsFound => 'कोणतेही ऑडिट आढळले नाही';
+
+  @override
+  String get s12NoAuditsMatchFilter =>
+      'निवडलेल्या फिल्टरशी जुळणारे कोणतेही ऑडिट आढळले नाही.';
+
+  @override
+  String get s12CompleteAuditPrompt =>
+      'येथे इतिहास पाहण्यासाठी दैनंदिन ऑडिट पूर्ण करा आणि सबमिट करा.';
+
+  @override
+  String s12Auditor(String name) {
+    return 'ऑडिटर: $name';
+  }
+
+  @override
+  String s12Date(String date) {
+    return 'तारीख: $date';
+  }
+
+  @override
+  String s12ComplianceScore(String score) {
+    return '$score%';
+  }
+
+  @override
+  String s12FailsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count नापास',
+      one: '१ नापास',
+      zero: '० नापास',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get s12StatusSubmitted => 'सादर केले';
+
+  @override
+  String get s12StatusVerified => 'पडताळले';
+
+  @override
+  String get s12Loading => 'ऑडिट इतिहास लोड होत आहे...';
+
+  @override
+  String get s12TypeDaily => 'दैनंदिन';
+
+  @override
+  String get s12TypeWeekly => 'साप्ताहिक';
+
+  @override
+  String get s12TypeMonthly => 'मासिक';
+
+  @override
+  String get s12BandExcellent => 'उत्कृष्ट';
+
+  @override
+  String get s12BandGood => 'चांगले';
+
+  @override
+  String get s12BandFair => 'साधारण';
+
+  @override
+  String get s12BandPoor => 'खराब';
+
+  @override
+  String get s12BandCritical => 'गंभीर';
+
+  @override
+  String get s12BandPending => 'प्रलंबित';
+
+  @override
+  String get s12RefreshTooltip => 'ऑडिट इतिहास रिफ्रेश करा';
+
+  @override
+  String get s12FilterWeeklyTooltip =>
+      'साप्ताहिक ऑडिट टप्पा २ साठी नियोजित आहे';
+
+  @override
+  String get s12FilterMonthlyTooltip => 'मासिक ऑडिट टप्पा ३ साठी नियोजित आहे';
 }

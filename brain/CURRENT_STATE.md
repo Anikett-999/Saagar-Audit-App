@@ -14,7 +14,8 @@
 | **S09** | Photo Capture | ✅ Complete | Collapsed into S08 inline camera launcher |
 | **S10** | Daily Audit Summary | ✅ Complete | Localized, score card, SOP table, mandatory-photo validation |
 | **S11** | Submit Confirmation | ✅ Complete | Localized, animated checkmark, final score, offline sync indicator |
-| **S12–S13**| Audit History & Detail | ⏳ Scheduled | Read-only view of submitted audits & WhatsApp share |
+| **S12**    | Audit History | ✅ Complete | Role-scoped (SM own, GM/Owner all), filter chips (All, Daily, Unverified), compliance % pill, band color, fail count, infinite scroll (30/pg), pull-to-refresh |
+| **S13**    | Audit Detail | ⏳ Scheduled | Read-only view of submitted audits, checkpoints breakdown & WhatsApp share |
 | **S14**    | CAP List | ✅ Complete | Filterable/searchable CAP list, deadline color-coding, S05 nav wired, EN/MR parity |
 | **S15**    | CAP Create | ✅ Complete | 10-field template, 5-Whys, 3–5 dynamic action steps, responsible dropdown, deadline picker, EN/MR parity |
 | **S16**    | CAP Detail | ✅ Complete | Full CAP view, action checklist, event log timeline, state/role-gated buttons, Phase 2 stubs |
@@ -27,11 +28,12 @@
 | **S31**    | Language | ✅ Complete | Dedicated screen, live EN/MR switch, persists to users.language_pref, login restore, full EN/MR parity |
 | **S32**    | Backup / Export | ✅ Complete | All 14 tables exported to timestamped JSON in Downloads, Owner-only Firestore sync stub (Coming in Phase 4), security advisory, About card, full EN/MR parity |
 
-> **Sprint S12–S17 (CAPs Workflow) is ACTIVE. Steps 1–5 complete (S17 built, 143/143 tests passing); awaiting Claude review before push.**
+> **Sprint S12–S17 (CAPs Workflow) is ACTIVE. Steps 1–6 complete (S12 built, 151/151 tests passing across 18 test files); holding for Claude review before push.**
 
 ## 2. Verified Baseline Health
 - `flutter analyze`: **0 issues found (Clean baseline)**
-- `flutter test`: **143/143 tests passing across 17 test files**:
+- `flutter test`: **151/151 tests passing across 18 test files**:
+  - `audit_history_screen_test.dart` (8 tests) — S12 empty state, audit card fields (date, auditor name, score %, band badge, fail count), SM role scoping (own audits only), GM/Owner role scoping (all audits), draft/hidden exclusion, unverified filter chip, card tap navigation to S13, Marathi parity
   - `cap_mark_done_screen_test.dart` (7 tests) — S17 header summary, completed action steps checklist, guard against incomplete steps, optional photo capture + reflection notes submission, photo removal, already-done state guard, Not Found state, Marathi parity
   - `cap_repository_test.dart` (20 tests) — ISO-week formatting, sequential ID generation, createCap validation & atomic writes, toggleAction, markDone guards, optional completion photo persistence with context=cap_progress, role scoping, status filters, search, S13 helpers, listAudits pagination/scoping
   - `cap_detail_screen_test.dart` (11 tests) — S16 full 10 fields read-only inspection, status badge, deadline color-coding, responsible action step toggling, non-responsible permission blocking, Mark Done gating on completion, Phase 2 stubs (Extension/Verify/Close/Reopen), Not Found state, Marathi parity

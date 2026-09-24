@@ -2696,6 +2696,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This CAP is already marked done or closed.'**
   String get s17CapAlreadyDoneNotice;
+
+  /// No description provided for @s12Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit History'**
+  String get s12Title;
+
+  /// No description provided for @s12Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'View past audits and compliance records'**
+  String get s12Subtitle;
+
+  /// No description provided for @s12FilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get s12FilterAll;
+
+  /// No description provided for @s12FilterDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get s12FilterDaily;
+
+  /// No description provided for @s12FilterUnverified.
+  ///
+  /// In en, this message translates to:
+  /// **'Unverified'**
+  String get s12FilterUnverified;
+
+  /// No description provided for @s12FilterWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly (Phase 2)'**
+  String get s12FilterWeekly;
+
+  /// No description provided for @s12FilterMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly (Phase 3)'**
+  String get s12FilterMonthly;
+
+  /// No description provided for @s12NoAuditsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No audits found'**
+  String get s12NoAuditsFound;
+
+  /// No description provided for @s12NoAuditsMatchFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'No audits match the selected filter.'**
+  String get s12NoAuditsMatchFilter;
+
+  /// No description provided for @s12CompleteAuditPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete and submit a daily audit to view history here.'**
+  String get s12CompleteAuditPrompt;
+
+  /// No description provided for @s12Auditor.
+  ///
+  /// In en, this message translates to:
+  /// **'Auditor: {name}'**
+  String s12Auditor(String name);
+
+  /// No description provided for @s12Date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date: {date}'**
+  String s12Date(String date);
+
+  /// No description provided for @s12ComplianceScore.
+  ///
+  /// In en, this message translates to:
+  /// **'{score}%'**
+  String s12ComplianceScore(String score);
+
+  /// No description provided for @s12FailsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 Fails} =1{1 Fail} other{{count} Fails}}'**
+  String s12FailsCount(int count);
+
+  /// No description provided for @s12StatusSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted'**
+  String get s12StatusSubmitted;
+
+  /// No description provided for @s12StatusVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get s12StatusVerified;
+
+  /// No description provided for @s12Loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading audit history...'**
+  String get s12Loading;
+
+  /// No description provided for @s12TypeDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get s12TypeDaily;
+
+  /// No description provided for @s12TypeWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get s12TypeWeekly;
+
+  /// No description provided for @s12TypeMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get s12TypeMonthly;
+
+  /// No description provided for @s12BandExcellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent'**
+  String get s12BandExcellent;
+
+  /// No description provided for @s12BandGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get s12BandGood;
+
+  /// No description provided for @s12BandFair.
+  ///
+  /// In en, this message translates to:
+  /// **'Fair'**
+  String get s12BandFair;
+
+  /// No description provided for @s12BandPoor.
+  ///
+  /// In en, this message translates to:
+  /// **'Poor'**
+  String get s12BandPoor;
+
+  /// No description provided for @s12BandCritical.
+  ///
+  /// In en, this message translates to:
+  /// **'Critical'**
+  String get s12BandCritical;
+
+  /// No description provided for @s12BandPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get s12BandPending;
+
+  /// No description provided for @s12RefreshTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh audit history'**
+  String get s12RefreshTooltip;
+
+  /// No description provided for @s12FilterWeeklyTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Audit is scheduled for Phase 2'**
+  String get s12FilterWeeklyTooltip;
+
+  /// No description provided for @s12FilterMonthlyTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Audit is scheduled for Phase 3'**
+  String get s12FilterMonthlyTooltip;
 }
 
 class _AppLocalizationsDelegate

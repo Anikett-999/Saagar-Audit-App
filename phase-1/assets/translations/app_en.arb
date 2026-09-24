@@ -611,5 +611,55 @@
   },
   "s17CapNotFound": "CAP not found",
   "s17Loading": "Loading CAP details...",
-  "s17CapAlreadyDoneNotice": "This CAP is already marked done or closed."
+  "s17CapAlreadyDoneNotice": "This CAP is already marked done or closed.",
+
+  "s12Title": "Audit History",
+  "s12Subtitle": "View past audits and compliance records",
+  "s12FilterAll": "All",
+  "s12FilterDaily": "Daily",
+  "s12FilterUnverified": "Unverified",
+  "s12FilterWeekly": "Weekly (Phase 2)",
+  "s12FilterMonthly": "Monthly (Phase 3)",
+  "s12NoAuditsFound": "No audits found",
+  "s12NoAuditsMatchFilter": "No audits match the selected filter.",
+  "s12CompleteAuditPrompt": "Complete and submit a daily audit to view history here.",
+  "s12Auditor": "Auditor: {name}",
+  "@s12Auditor": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "s12Date": "Date: {date}",
+  "@s12Date": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "s12ComplianceScore": "{score}%",
+  "@s12ComplianceScore": {
+    "placeholders": {
+      "score": {"type": "String"}
+    }
+  },
+  "s12FailsCount": "{count, plural, =0{0 Fails} =1{1 Fail} other{{count} Fails}}",
+  "@s12FailsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s12StatusSubmitted": "Submitted",
+  "s12StatusVerified": "Verified",
+  "s12Loading": "Loading audit history...",
+  "s12TypeDaily": "Daily",
+  "s12TypeWeekly": "Weekly",
+  "s12TypeMonthly": "Monthly",
+  "s12BandExcellent": "Excellent",
+  "s12BandGood": "Good",
+  "s12BandFair": "Fair",
+  "s12BandPoor": "Poor",
+  "s12BandCritical": "Critical",
+  "s12BandPending": "Pending",
+  "s12RefreshTooltip": "Refresh audit history",
+  "s12FilterWeeklyTooltip": "Weekly Audit is scheduled for Phase 2",
+  "s12FilterMonthlyTooltip": "Monthly Audit is scheduled for Phase 3"
 }

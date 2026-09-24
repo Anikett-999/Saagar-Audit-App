@@ -248,8 +248,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           icon: Icons.history_outlined,
           title: l10n.s05AuditHistoryTitle,
           subtitle: l10n.s05AuditHistorySubtitle,
-          enabled: false,
-          onTap: () => _showComingSoon(context, l10n, l10n.s05AuditHistoryTitle),
+          enabled: true,
+          onTap: () => context.pushNamed('s12_audit_history'),
         ),
         _navTile(
           icon: Icons.fact_check_outlined,

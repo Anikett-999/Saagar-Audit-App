@@ -2110,3 +2110,78 @@ Remaining non-blocking nit (deferred Rule #8 pass): `'Done: ${action.doneAt.subs
 **APPROVED — cleared to commit & push**
 
 **Next Immediate Task** (Antigravity): commit + push the overflow hotfix together with the still-unpushed S17 (Step 5) work — one descriptive commit is fine — then paste the `git status` / `git log --oneline` push record here. After that, proceed to **Step 6 — Screen S12 (Audit History)** feature build per SPRINT_S12_S17_CAPS.md §3 Step 6 (the defensive Wrap edits already landed; build the remaining S12 functionality on top).
+
+---
+
+### Entry: 2026-09-24 — UI Overflow Hotfix Pushed to Remote (`4648700`) → Ready for Step 6 Review
+- **Author**: Antigravity
+- **Push Execution Record (Rule 6 Cleared)**:
+  - Committed hotfix as `4648700`: `fix(ui): resolve device pixel overflows on S16 header and S17 section cards`.
+  - Pushed cleanly to `origin main` (no force-push).
+- **Raw Host Execution Logs**:
+  - **Raw `git status`**:
+    ```
+    On branch main
+    Your branch is up to date with 'origin/main'.
+
+    Changes not staged for commit:
+      modified:   brain/CURRENT_STATE.md
+      modified:   phase-1/assets/translations/app_en.arb
+      modified:   phase-1/assets/translations/app_mr.arb
+      modified:   phase-1/lib/app.dart
+      modified:   phase-1/lib/l10n/app_localizations.dart
+      modified:   phase-1/lib/l10n/app_localizations_en.dart
+      modified:   phase-1/lib/l10n/app_localizations_mr.dart
+      modified:   phase-1/lib/ui/screens/s05_home/home_screen.dart
+      modified:   phase-1/test/helpers/fake_database.dart
+
+    Untracked files:
+      phase-1/lib/ui/screens/s12_audit_history/
+      phase-1/test/audit_history_screen_test.dart
+    ```
+  - **Raw `git log --oneline -n 3`**:
+    ```
+    4648700 fix(ui): resolve device pixel overflows on S16 header and S17 section cards
+    81c9317 docs: record Step 5 push in session handoff and kickoff Step 6
+    6f18db0 feat(caps): Step 5 — Screen S17 CAP Mark Done (action verification, reflection notes, photo proof, atomic markDone, EN/MR parity, 7/7 tests)
+    ```
+- **Step 6 (Screen S12 Audit History) Full Feature Status**:
+  - The complete Step 6 feature implementation is built, wired, and verified in the working tree:
+    - Screen: `lib/ui/screens/s12_audit_history/audit_history_screen.dart` (role-scoped SM vs GM/Owner, filter chips All/Daily/Unverified, dynamic score pills, fail indicators, infinite scroll pagination, pull-to-refresh).
+    - Routes & Nav: `/audits` in `lib/app.dart`, tile enabled in `home_screen.dart`.
+    - Localization: 20 keys with 100% 1:1 parity in `app_en.arb` and `app_mr.arb`.
+    - Tests: `test/audit_history_screen_test.dart` (8/8 passed).
+    - Baseline health: `flutter analyze` 0 issues, full suite 151/151 passed across 18 files, canonical score engine 12/12 passed.
+  - **Physical Device QA Confirmed**: User tested S12 on physical Android device — verified list rendering, zero pixel overflows, filter chips, pull-to-refresh, and card tap navigation to `/audits/:id` opening placeholder `S13 Audit Detail: 5defc802-...` with target ID successfully.
+- **Rule 6 Hold Status**:
+  - Holding application code commit/push for Step 6 until Claude's code review and written sign-off: `APPROVED — cleared to commit & push`.
+- **Next Immediate Task**:
+  - Hand baton to **Claude** for full review of Step 6 (Screen S12 Audit History: `audit_history_screen.dart`, `audit_history_screen_test.dart`, `app.dart`, `home_screen.dart`, ARBs, `fake_database.dart`).
+
+---
+
+**Author**: Claude — Senior Developer & Team Lead
+**Date**: 2026-09-24
+**Subject**: REVIEW — Step 6 (Screen S12 Audit History)
+
+Confirmed hotfix push `4648700` synced to origin/main. Reviewed the actual Step 6 code: `audit_history_screen.dart` (full), `audit_repository.dart` `listAudits` + `AuditHistoryFilter` enum, `/audits` + `/audits/:id` routes in `app.dart`, `UserRepository.listAll`, `bandColor`, and ARB parity. Verified against SPRINT_S12_S17_CAPS.md §3 Step 6.
+
+Confirmed:
+- **Role scoping (correct & enforced in SQL)** — `listAudits` filters `status IN ('submitted','verified')` (drafts/hidden never leak; honours submitted-audit immutability), and for SM adds `auditor_id = viewer.id`. GM/OWNER see all. Ordered `submitted_at DESC`, paginated by `limit`/`offset`.
+- **Filters** — enum `all | daily | unverified`; daily → `audit_type='daily'`, unverified → `status='submitted'`, all → no extra clause. Weekly/Monthly chips are disabled with tooltips (Phase 2/3), matching spec scope.
+- **List mechanics** — infinite scroll (200px pre-fetch, guarded on `_isLoading`/`_isLoadingMore`/`_hasMore`, `_offset` advanced by returned count, `_hasMore` = page-full), `RefreshIndicator` pull-to-refresh, `ref.listen` reloads on user change, empty-state (no-audits vs no-match), auth guard on null user.
+- **Cards** — overflow-safe (`Wrap` on top/bottom rows, `Expanded`+ellipsis auditor line), `ValueKey('audit_card_<id>')` for tests, tap → `s13_audit_detail`.
+- **Routing** — `/audits` (s12) auth-guarded; `/audits/:id` (s13) present as a placeholder Scaffold so card taps don't crash before Step 7. Home tile enabled.
+- **Contracts exist** — `UserRepository.listAll()` (L17), `bandColor(double)` (app_colors L47). No dangling references.
+- **Rule #8 parity** — 26 `s12*` keys in both ARBs, zero diff.
+- **Tests** — 8 S12 widget tests; `fake_database` status-filter helper updated. Per Antigravity's run (not re-verified by me): analyze 0 issues, full suite 151/151 across 18 files, score_engine 12/12 (81/90=90.0% intact).
+
+Non-blocking nits (deferred Rule #8 pass — do NOT hold push):
+1. Two disabled-chip tooltips hardcoded in English ('Weekly Audit is scheduled for Phase 2' L249, 'Monthly Audit is scheduled for Phase 3' L254).
+2. Refresh action reuses `l10n.s16RefreshTooltip` on an S12 screen — cosmetic cross-screen key reuse; consider an s12-scoped key.
+
+Role-scoped querying, immutability boundary, pagination, and layout are all sound.
+
+**APPROVED — cleared to commit & push**
+
+**Next Immediate Task** (Antigravity): commit + push Step 6 (S12 screen + test + app.dart + home_screen + ARBs + fake_database + brain), paste the `git status` / `git log --oneline` push record here, then proceed to **Step 7 — Screen S13 (Audit Detail)** per SPRINT_S12_S17_CAPS.md §3 Step 7 (replace the `/audits/:id` placeholder with the real read-only detail view; remember submitted audits are immutable). Carry the two S12 tooltip nits into the deferred Rule #8 pass.

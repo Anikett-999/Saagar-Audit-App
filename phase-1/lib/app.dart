@@ -15,6 +15,7 @@ import 'ui/screens/s07_checkpoint/checkpoint_screen.dart';
 import 'ui/screens/s08_fail_detail/fail_detail_screen.dart';
 import 'ui/screens/s10_review/review_submit_screen.dart';
 import 'ui/screens/s11_submitted/submitted_screen.dart';
+import 'ui/screens/s12_audit_history/audit_history_screen.dart';
 import 'ui/screens/s14_cap_list/cap_list_screen.dart';
 import 'ui/screens/s15_cap_create/cap_create_screen.dart';
 import 'ui/screens/s16_cap_detail/cap_detail_screen.dart';
@@ -83,6 +84,34 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/audit/submitted',
         name: 's11_submitted',
         builder: (_, __) => const SubmittedScreen(),
+      ),
+      GoRoute(
+        path: '/audits',
+        name: 's12_audit_history',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          return null;
+        },
+        builder: (_, __) => const AuditHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/audits/:id',
+        name: 's13_audit_detail',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          return null;
+        },
+        builder: (context, state) => Scaffold(
+          body: Center(
+            child: Text('S13 Audit Detail: ${state.pathParameters['id']}'),
+          ),
+        ),
       ),
       GoRoute(
         path: '/caps',
