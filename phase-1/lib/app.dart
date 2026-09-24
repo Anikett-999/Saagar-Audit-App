@@ -18,6 +18,7 @@ import 'ui/screens/s11_submitted/submitted_screen.dart';
 import 'ui/screens/s14_cap_list/cap_list_screen.dart';
 import 'ui/screens/s15_cap_create/cap_create_screen.dart';
 import 'ui/screens/s16_cap_detail/cap_detail_screen.dart';
+import 'ui/screens/s17_cap_mark_done/cap_mark_done_screen.dart';
 import 'providers/auth_provider.dart';
 import 'ui/screens/s27_settings/settings_screen.dart';
 import 'ui/screens/s28_manage_cros/manage_cros_screen.dart';
@@ -139,10 +140,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           }
           return null;
         },
-        builder: (context, state) => Scaffold(
-          body: Center(
-            child: Text('S17 Mark Done: ${state.pathParameters['id']}'),
-          ),
+        builder: (context, state) => CapMarkDoneScreen(
+          capId: state.pathParameters['id']!,
         ),
       ),
       GoRoute(

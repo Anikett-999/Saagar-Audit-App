@@ -65,8 +65,10 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
     }
   }
 
-  Future<void> _loadData() async {
-    setState(() => _isLoading = true);
+  Future<void> _loadData({bool showSpinner = true}) async {
+    if (showSpinner) {
+      setState(() => _isLoading = true);
+    }
 
     try {
       final cap = await CapRepository.instance.getById(widget.capId);
@@ -164,7 +166,7 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
         done: !action.isDone,
         userId: user.id,
       );
-      await _loadData();
+      await _loadData(showSpinner: false);
     } catch (e) {
       if (mounted) {
         final l10n = AppLocalizations.of(context);
@@ -206,6 +208,16 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop(true);
+            } else {
+              context.goNamed('s14_cap_list');
+            }
+          },
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -899,13 +911,16 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
             key: const ValueKey('s16_request_extension_button'),
             onPressed: null, // Disabled per Phase 1 scope
             icon: const Icon(Icons.access_time),
-            label: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(l10n.s16RequestExtensionButton),
-                const SizedBox(width: 8),
-                _phase2Badge(l10n),
-              ],
+            label: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(l10n.s16RequestExtensionButton),
+                  const SizedBox(width: 8),
+                  _phase2Badge(l10n),
+                ],
+              ),
             ),
           ),
         ],
@@ -916,13 +931,16 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
             key: const ValueKey('s16_verify_button'),
             onPressed: null, // Disabled per Phase 1 scope
             icon: const Icon(Icons.verified),
-            label: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(l10n.s16VerifyButton),
-                const SizedBox(width: 8),
-                _phase2Badge(l10n),
-              ],
+            label: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(l10n.s16VerifyButton),
+                  const SizedBox(width: 8),
+                  _phase2Badge(l10n),
+                ],
+              ),
             ),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14),
@@ -936,13 +954,16 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
             key: const ValueKey('s16_close_button'),
             onPressed: null, // Disabled per Phase 1 scope
             icon: const Icon(Icons.lock),
-            label: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(l10n.s16CloseButton),
-                const SizedBox(width: 8),
-                _phase2Badge(l10n),
-              ],
+            label: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(l10n.s16CloseButton),
+                  const SizedBox(width: 8),
+                  _phase2Badge(l10n),
+                ],
+              ),
             ),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14),
@@ -956,13 +977,16 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
             key: const ValueKey('s16_reopen_button'),
             onPressed: null, // Disabled per Phase 1 scope
             icon: const Icon(Icons.replay),
-            label: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(l10n.s16ReopenButton),
-                const SizedBox(width: 8),
-                _phase2Badge(l10n),
-              ],
+            label: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(l10n.s16ReopenButton),
+                  const SizedBox(width: 8),
+                  _phase2Badge(l10n),
+                ],
+              ),
             ),
           ),
         ],
@@ -1103,12 +1127,15 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    eventTitle,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                  Expanded(
+                    child: Text(
+                      eventTitle,
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   Text(
                     dateStr,
                     style: const TextStyle(fontSize: 11, color: AppColors.gray600),

@@ -1761,6 +1761,24 @@ abstract class AppLocalizations {
   /// **'OK'**
   String get s32OkButton;
 
+  /// No description provided for @s32CopyPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Path'**
+  String get s32CopyPath;
+
+  /// No description provided for @s32PathCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup path copied to clipboard'**
+  String get s32PathCopied;
+
+  /// No description provided for @s32ShareFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Share / Save File'**
+  String get s32ShareFile;
+
   /// No description provided for @s14Title.
   ///
   /// In en, this message translates to:
@@ -2534,6 +2552,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No timeline entries'**
   String get s16NoTimelineEntries;
+
+  /// No description provided for @s17Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark CAP Done'**
+  String get s17Title;
+
+  /// No description provided for @s17Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm completion & submit for verification'**
+  String get s17Subtitle;
+
+  /// No description provided for @s17ProblemStatement.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem Statement'**
+  String get s17ProblemStatement;
+
+  /// No description provided for @s17Responsible.
+  ///
+  /// In en, this message translates to:
+  /// **'Responsible'**
+  String get s17Responsible;
+
+  /// No description provided for @s17SectionCompletedSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed Action Steps'**
+  String get s17SectionCompletedSteps;
+
+  /// No description provided for @s17AllStepsCompletedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'All {count} action steps have been completed.'**
+  String s17AllStepsCompletedNotice(int count);
+
+  /// No description provided for @s17IncompleteStepsWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning: Incomplete action steps remain. You must complete all action steps before marking this CAP done.'**
+  String get s17IncompleteStepsWarning;
+
+  /// No description provided for @s17SectionDoneNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Done Notes / Reflection (optional)'**
+  String get s17SectionDoneNotes;
+
+  /// No description provided for @s17DoneNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe how the issue was resolved or notes for verification...'**
+  String get s17DoneNotesHint;
+
+  /// No description provided for @s17SectionEvidencePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Completion Evidence Photo (optional)'**
+  String get s17SectionEvidencePhoto;
+
+  /// No description provided for @s17TakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take Photo'**
+  String get s17TakePhoto;
+
+  /// No description provided for @s17RetakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Retake Photo'**
+  String get s17RetakePhoto;
+
+  /// No description provided for @s17RemovePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Photo'**
+  String get s17RemovePhoto;
+
+  /// No description provided for @s17PhotoAttached.
+  ///
+  /// In en, this message translates to:
+  /// **'1 photo attached'**
+  String get s17PhotoAttached;
+
+  /// No description provided for @s17AdvisoryCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Marking this CAP done will transition its status to \'Done (Pending Verification)\'. Management (GM/Owner) will be notified to review and verify this corrective action.'**
+  String get s17AdvisoryCard;
+
+  /// No description provided for @s17ConfirmButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm & Mark Done'**
+  String get s17ConfirmButton;
+
+  /// No description provided for @s17CancelButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get s17CancelButton;
+
+  /// No description provided for @s17Submitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Marking Done...'**
+  String get s17Submitting;
+
+  /// No description provided for @s17SuccessSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'CAP {id} marked done (Pending Verification)'**
+  String s17SuccessSnackbar(String id);
+
+  /// No description provided for @s17ErrorSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to mark CAP done: {error}'**
+  String s17ErrorSnackbar(String error);
+
+  /// No description provided for @s17StepNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {number}'**
+  String s17StepNumber(int number);
+
+  /// No description provided for @s17CapNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'CAP not found'**
+  String get s17CapNotFound;
+
+  /// No description provided for @s17Loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading CAP details...'**
+  String get s17Loading;
+
+  /// No description provided for @s17CapAlreadyDoneNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This CAP is already marked done or closed.'**
+  String get s17CapAlreadyDoneNotice;
 }
 
 class _AppLocalizationsDelegate

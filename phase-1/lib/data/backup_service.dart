@@ -93,10 +93,48 @@ class BackupService {
   }
 
   /// Locates the appropriate directory for saving backups.
-  /// Prefers Downloads, falls back gracefully to ApplicationDocuments.
+  /// Prefers public Downloads or external storage, falls back gracefully to ApplicationDocuments.
   Future<Directory> getBackupDirectory() async {
     if (_testDirectory != null) {
       return _testDirectory!;
+    }
+
+    if (Platform.isAndroid) {
+      // 1. Try public Download folder on Android device
+      try {
+        final publicDownload = Directory('/storage/emulated/0/Download');
+        if (publicDownload.existsSync()) {
+          final testFile = File(p.join(publicDownload.path, '.probe_write'));
+          testFile.writeAsStringSync('ok');
+          testFile.deleteSync();
+          return publicDownload;
+        }
+      } catch (_) {
+        // Scoped storage policy may prevent direct /storage/emulated/0/Download write without SAF
+      }
+
+      // 2. Try external storage app Downloads directory (visible in Files under Android/data/com.saagar.audit/files/Download)
+      try {
+        final extDirs = await getExternalStorageDirectories(type: StorageDirectory.downloads);
+        if (extDirs != null && extDirs.isNotEmpty) {
+          final dir = extDirs.first;
+          if (!dir.existsSync()) {
+            dir.createSync(recursive: true);
+          }
+          return dir;
+        }
+      } catch (_) {}
+
+      // 3. Try external storage directory
+      try {
+        final extDir = await getExternalStorageDirectory();
+        if (extDir != null) {
+          if (!extDir.existsSync()) {
+            extDir.createSync(recursive: true);
+          }
+          return extDir;
+        }
+      } catch (_) {}
     }
 
     Directory? dir;

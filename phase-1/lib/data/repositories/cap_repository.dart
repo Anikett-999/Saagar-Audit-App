@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:uuid/uuid.dart';
 
 import '../../domain/iso_week.dart';
@@ -335,10 +337,12 @@ class CapRepository {
   /// Enforces:
   /// - Current status must be `open` or `reopened`.
   /// - Every action step in `cap_actions` must have `is_done = 1`.
+  /// - Optionally saves a completion photo with `context = 'cap_progress'`.
   Future<void> markDone({
     required String capId,
     required String userId,
     String? doneNotes,
+    String? photoPath,
   }) async {
     final cap = await getById(capId);
     if (cap == null) {
@@ -382,9 +386,47 @@ class CapRepository {
         'timestamp': now,
         'note': doneNotes,
       });
+
+      if (photoPath != null && photoPath.trim().isNotEmpty) {
+        int? bytes;
+        try {
+          final f = File(photoPath);
+          if (f.existsSync()) {
+            bytes = f.lengthSync();
+          }
+        } catch (_) {
+          bytes = null;
+        }
+
+        await txn.insert('photos', {
+          'id': const Uuid().v4(),
+          'audit_result_id': null,
+          'cap_id': capId,
+          'context': 'cap_progress',
+          'local_path': photoPath,
+          'cloud_url': null,
+          'thumb_local_path': null,
+          'upload_status': 'pending',
+          'captured_at': now,
+          'captured_lat': null,
+          'captured_lng': null,
+          'uploaded_by': userId,
+          'file_size_bytes': bytes,
+        });
+      }
     });
 
     // TODO(phase4): Push notification to GM alerting CAP marked done
+  }
+
+  /// Returns all photos attached to a given CAP (context: cap_progress, cap_verification).
+  Future<List<Map<String, Object?>>> photosForCap(String capId) async {
+    return await AppDatabase.instance.db.query(
+      'photos',
+      where: 'cap_id = ?',
+      whereArgs: [capId],
+      orderBy: 'captured_at ASC',
+    );
   }
 
   /// Returns all CAPs linked to a given audit (for S13 Audit Detail).

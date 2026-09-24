@@ -325,6 +325,9 @@
   "s32AboutStore": "Stores: Titan World (WLMHW) & Helios (HEMW), Latur",
   "s32AboutSpec": "Specification: Saagar P1 Retail Audit Spec v1",
   "s32OkButton": "OK",
+  "s32CopyPath": "Copy Path",
+  "s32PathCopied": "Backup path copied to clipboard",
+  "s32ShareFile": "Share / Save File",
 
   "s14Title": "Corrective Action Plans",
   "s14Subtitle": "Track and resolve audit findings",
@@ -563,5 +566,50 @@
   },
   "s16RefreshTooltip": "Refresh",
   "s16WhysSubheader": "5 Whys",
-  "s16NoTimelineEntries": "No timeline entries"
+  "s16NoTimelineEntries": "No timeline entries",
+
+  "s17Title": "Mark CAP Done",
+  "s17Subtitle": "Confirm completion & submit for verification",
+  "s17ProblemStatement": "Problem Statement",
+  "s17Responsible": "Responsible",
+  "s17SectionCompletedSteps": "Completed Action Steps",
+  "s17AllStepsCompletedNotice": "All {count} action steps have been completed.",
+  "@s17AllStepsCompletedNotice": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s17IncompleteStepsWarning": "Warning: Incomplete action steps remain. You must complete all action steps before marking this CAP done.",
+  "s17SectionDoneNotes": "Done Notes / Reflection (optional)",
+  "s17DoneNotesHint": "Describe how the issue was resolved or notes for verification...",
+  "s17SectionEvidencePhoto": "Completion Evidence Photo (optional)",
+  "s17TakePhoto": "Take Photo",
+  "s17RetakePhoto": "Retake Photo",
+  "s17RemovePhoto": "Remove Photo",
+  "s17PhotoAttached": "1 photo attached",
+  "s17AdvisoryCard": "Marking this CAP done will transition its status to 'Done (Pending Verification)'. Management (GM/Owner) will be notified to review and verify this corrective action.",
+  "s17ConfirmButton": "Confirm & Mark Done",
+  "s17CancelButton": "Cancel",
+  "s17Submitting": "Marking Done...",
+  "s17SuccessSnackbar": "CAP {id} marked done (Pending Verification)",
+  "@s17SuccessSnackbar": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+  "s17ErrorSnackbar": "Failed to mark CAP done: {error}",
+  "@s17ErrorSnackbar": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "s17StepNumber": "Step {number}",
+  "@s17StepNumber": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "s17CapNotFound": "CAP not found",
+  "s17Loading": "Loading CAP details...",
+  "s17CapAlreadyDoneNotice": "This CAP is already marked done or closed."
 }

@@ -268,11 +268,14 @@ class _CapCreateScreenState extends ConsumerState<CapCreateScreen> {
       if (!mounted) return;
       setState(() => _isSubmitting = false);
 
-      // Navigate to S16 CAP Detail
-      context.pushReplacementNamed(
+      // Navigate to S16 CAP Detail, then pop back to list upon return
+      await context.pushNamed(
         's16_cap_detail',
         pathParameters: {'id': created.id},
       );
+      if (mounted) {
+        context.pop(true);
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _isSubmitting = false);
@@ -666,19 +669,23 @@ class _CapCreateScreenState extends ConsumerState<CapCreateScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    const Icon(Icons.checklist, size: 20, color: AppColors.navy),
-                    const SizedBox(width: 8),
-                    Text(
-                      l10n.s15SectionActions,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.navy,
+                Expanded(
+                  child: Row(
+                    children: [
+                      const Icon(Icons.checklist, size: 20, color: AppColors.navy),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l10n.s15SectionActions,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.navy,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 Text(
                   '${_actionControllers.length}/5',

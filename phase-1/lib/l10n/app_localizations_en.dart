@@ -893,6 +893,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s32OkButton => 'OK';
 
   @override
+  String get s32CopyPath => 'Copy Path';
+
+  @override
+  String get s32PathCopied => 'Backup path copied to clipboard';
+
+  @override
+  String get s32ShareFile => 'Share / Save File';
+
+  @override
   String get s14Title => 'Corrective Action Plans';
 
   @override
@@ -1323,4 +1332,88 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s16NoTimelineEntries => 'No timeline entries';
+
+  @override
+  String get s17Title => 'Mark CAP Done';
+
+  @override
+  String get s17Subtitle => 'Confirm completion & submit for verification';
+
+  @override
+  String get s17ProblemStatement => 'Problem Statement';
+
+  @override
+  String get s17Responsible => 'Responsible';
+
+  @override
+  String get s17SectionCompletedSteps => 'Completed Action Steps';
+
+  @override
+  String s17AllStepsCompletedNotice(int count) {
+    return 'All $count action steps have been completed.';
+  }
+
+  @override
+  String get s17IncompleteStepsWarning =>
+      'Warning: Incomplete action steps remain. You must complete all action steps before marking this CAP done.';
+
+  @override
+  String get s17SectionDoneNotes => 'Done Notes / Reflection (optional)';
+
+  @override
+  String get s17DoneNotesHint =>
+      'Describe how the issue was resolved or notes for verification...';
+
+  @override
+  String get s17SectionEvidencePhoto => 'Completion Evidence Photo (optional)';
+
+  @override
+  String get s17TakePhoto => 'Take Photo';
+
+  @override
+  String get s17RetakePhoto => 'Retake Photo';
+
+  @override
+  String get s17RemovePhoto => 'Remove Photo';
+
+  @override
+  String get s17PhotoAttached => '1 photo attached';
+
+  @override
+  String get s17AdvisoryCard =>
+      'Marking this CAP done will transition its status to \'Done (Pending Verification)\'. Management (GM/Owner) will be notified to review and verify this corrective action.';
+
+  @override
+  String get s17ConfirmButton => 'Confirm & Mark Done';
+
+  @override
+  String get s17CancelButton => 'Cancel';
+
+  @override
+  String get s17Submitting => 'Marking Done...';
+
+  @override
+  String s17SuccessSnackbar(String id) {
+    return 'CAP $id marked done (Pending Verification)';
+  }
+
+  @override
+  String s17ErrorSnackbar(String error) {
+    return 'Failed to mark CAP done: $error';
+  }
+
+  @override
+  String s17StepNumber(int number) {
+    return 'Step $number';
+  }
+
+  @override
+  String get s17CapNotFound => 'CAP not found';
+
+  @override
+  String get s17Loading => 'Loading CAP details...';
+
+  @override
+  String get s17CapAlreadyDoneNotice =>
+      'This CAP is already marked done or closed.';
 }

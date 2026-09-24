@@ -18,7 +18,7 @@
 | **S14**    | CAP List | ✅ Complete | Filterable/searchable CAP list, deadline color-coding, S05 nav wired, EN/MR parity |
 | **S15**    | CAP Create | ✅ Complete | 10-field template, 5-Whys, 3–5 dynamic action steps, responsible dropdown, deadline picker, EN/MR parity |
 | **S16**    | CAP Detail | ✅ Complete | Full CAP view, action checklist, event log timeline, state/role-gated buttons, Phase 2 stubs |
-| **S17**    | Mark Done Modal | ⏳ Scheduled | Mark done dialog, reflection notes, photo proof, verification |
+| **S17**    | Mark Done Modal | ✅ Complete | Gated on all actions done, optional reflection notes & evidence photo, atomic markDone + cap_log, full EN/MR parity |
 | **S22–S26**| Reference Data | ⏳ Scheduled | Rating scale, escalation triggers, glossary |
 | **S27**    | Settings Hub | ✅ Complete | Role-filtered list (Owner-only Users), profile badge, real S05 navigation |
 | **S28**    | Manage CROs | ✅ Complete | List all, Add/Edit/Deactivate/Reactivate, soft deactivation preserves audit trail, EN/MR parity |
@@ -27,15 +27,16 @@
 | **S31**    | Language | ✅ Complete | Dedicated screen, live EN/MR switch, persists to users.language_pref, login restore, full EN/MR parity |
 | **S32**    | Backup / Export | ✅ Complete | All 14 tables exported to timestamped JSON in Downloads, Owner-only Firestore sync stub (Coming in Phase 4), security advisory, About card, full EN/MR parity |
 
-> **Sprint S12–S17 (CAPs Workflow) is ACTIVE. Steps 1–4 pushed; Step 5 (S17 Mark Done Modal) is next.**
+> **Sprint S12–S17 (CAPs Workflow) is ACTIVE. Steps 1–5 complete (S17 built, 143/143 tests passing); awaiting Claude review before push.**
 
 ## 2. Verified Baseline Health
 - `flutter analyze`: **0 issues found (Clean baseline)**
-- `flutter test`: **135/135 tests passing across 16 test files**:
+- `flutter test`: **143/143 tests passing across 17 test files**:
+  - `cap_mark_done_screen_test.dart` (7 tests) — S17 header summary, completed action steps checklist, guard against incomplete steps, optional photo capture + reflection notes submission, photo removal, already-done state guard, Not Found state, Marathi parity
+  - `cap_repository_test.dart` (20 tests) — ISO-week formatting, sequential ID generation, createCap validation & atomic writes, toggleAction, markDone guards, optional completion photo persistence with context=cap_progress, role scoping, status filters, search, S13 helpers, listAudits pagination/scoping
   - `cap_detail_screen_test.dart` (11 tests) — S16 full 10 fields read-only inspection, status badge, deadline color-coding, responsible action step toggling, non-responsible permission blocking, Mark Done gating on completion, Phase 2 stubs (Extension/Verify/Close/Reopen), Not Found state, Marathi parity
   - `cap_create_screen_test.dart` (7 tests) — S15 10-field template rendering, pre-fills from fail, mandatory field validation, 3–5 bounded dynamic action steps, empty step validation, atomic creation & navigation to S16, Marathi parity
   - `cap_list_screen_test.dart` (9 tests) — S14 list rendering, empty state, deadline color-coding (overdue/dueSoon/ok), filter chips, search, SM role scoping, GM/Owner unscoped, S15 FAB + S16 card navigation, Marathi parity
-  - `cap_repository_test.dart` (19 tests) — ISO-week formatting, sequential ID generation, createCap validation & atomic writes, toggleAction, markDone guards, role scoping, status filters, search, S13 helpers, listAudits pagination/scoping
   - `score_engine_test.dart` (12 tests) — Canonical score invariant `81 / 90 = 90.0% Good`, band cutoffs, NA handling
   - `backup_export_test.dart` (8 tests) — S32 all 14 tables JSON export, file writing, core sections, Owner-only Firestore sync section with Phase 4 badge, SM hide guard, export AlertDialog, unauthenticated guard, Marathi parity
   - `language_screen_test.dart` (6 tests) — S31 options rendering, selection indicator, live switch + SQLite users.language_pref persistence, unauthenticated guard, login stored pref restore, Marathi parity

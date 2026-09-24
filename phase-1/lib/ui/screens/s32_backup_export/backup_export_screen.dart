@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:printing/printing.dart';
 
 import '../../../data/backup_service.dart';
 import '../../../l10n/app_localizations.dart';
@@ -64,6 +68,41 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
             style: const TextStyle(fontFamily: 'DMSans', height: 1.4),
           ),
           actions: [
+            TextButton.icon(
+              icon: const Icon(Icons.share, size: 16),
+              label: Text(l10n.s32ShareFile),
+              onPressed: () async {
+                try {
+                  final file = File(result.filePath);
+                  if (await file.exists()) {
+                    final bytes = await file.readAsBytes();
+                    await Printing.sharePdf(
+                      bytes: bytes,
+                      filename: result.fileName,
+                    );
+                  }
+                } catch (e) {
+                  if (ctx.mounted) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      SnackBar(content: Text('Could not share file: $e')),
+                    );
+                  }
+                }
+              },
+            ),
+            TextButton.icon(
+              icon: const Icon(Icons.copy, size: 16),
+              label: Text(l10n.s32CopyPath),
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: result.filePath));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(l10n.s32PathCopied),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
+            ),
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
               child: Text(

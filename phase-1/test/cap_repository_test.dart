@@ -416,6 +416,34 @@ void main() {
         throwsStateError,
       );
     });
+
+    test('markDone persists optional photo with context=cap_progress', () async {
+      for (final id in actionIds) {
+        await repo.toggleAction(actionId: id, done: true, userId: 'user-sm-1');
+      }
+
+      await repo.markDone(
+        capId: capId,
+        userId: 'user-sm-1',
+        doneNotes: 'Replaced with photo proof',
+        photoPath: '/mock/evidence/photo_01.jpg',
+      );
+
+      final cap = await repo.getById(capId);
+      expect(cap!.status, 'done');
+
+      final photos = fakeDb.tables['photos']!;
+      final capPhotos = photos.where((p) => p['cap_id'] == capId).toList();
+      expect(capPhotos.length, 1);
+      expect(capPhotos.first['context'], 'cap_progress');
+      expect(capPhotos.first['local_path'], '/mock/evidence/photo_01.jpg');
+      expect(capPhotos.first['uploaded_by'], 'user-sm-1');
+      expect(capPhotos.first['audit_result_id'], isNull);
+
+      final repoPhotos = await repo.photosForCap(capId);
+      expect(repoPhotos.length, 1);
+      expect(repoPhotos.first['local_path'], '/mock/evidence/photo_01.jpg');
+    });
   });
 
   group('CapRepository - Role Scoping & Filters (Spec §5 S14)', () {

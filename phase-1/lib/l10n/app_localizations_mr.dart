@@ -892,6 +892,15 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s32OkButton => 'ठीक आहे';
 
   @override
+  String get s32CopyPath => 'पाथ कॉपी करा';
+
+  @override
+  String get s32PathCopied => 'बॅकअप पाथ क्लिपबोर्डवर कॉपी केला';
+
+  @override
+  String get s32ShareFile => 'फाईल शेअर / जतन करा';
+
+  @override
   String get s14Title => 'सुधारात्मक कृती योजना (CAP)';
 
   @override
@@ -1324,4 +1333,88 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s16NoTimelineEntries => 'कोणत्याही टाइमलाइन नोंदी नाहीत';
+
+  @override
+  String get s17Title => 'CAP पूर्ण म्हणून खूण करा';
+
+  @override
+  String get s17Subtitle => 'पूर्ण झाल्याची पुष्टी करा आणि पडताळणीसाठी पाठवा';
+
+  @override
+  String get s17ProblemStatement => 'समस्या विधान';
+
+  @override
+  String get s17Responsible => 'जबाबदार';
+
+  @override
+  String get s17SectionCompletedSteps => 'पूर्ण झालेली कृती पावले';
+
+  @override
+  String s17AllStepsCompletedNotice(int count) {
+    return 'सर्व $count कृती पावले पूर्ण झाली आहेत.';
+  }
+
+  @override
+  String get s17IncompleteStepsWarning =>
+      'चेतावणी: अपूर्ण कृती पावले शिल्लक आहेत. ही CAP पूर्ण चिन्हांकित करण्यापूर्वी सर्व कृती पावले पूर्ण केली पाहिजेत.';
+
+  @override
+  String get s17SectionDoneNotes => 'पूर्ण नोंदी / शेरे (ऐच्छिक)';
+
+  @override
+  String get s17DoneNotesHint =>
+      'समस्या कशी सोडवली गेली याचे वर्णन किंवा पडताळणीसाठी नोंदी...';
+
+  @override
+  String get s17SectionEvidencePhoto => 'पूर्णता पुरावा फोटो (ऐच्छिक)';
+
+  @override
+  String get s17TakePhoto => 'फोटो काढा';
+
+  @override
+  String get s17RetakePhoto => 'पुन्हा फोटो काढा';
+
+  @override
+  String get s17RemovePhoto => 'फोटो काढून टाका';
+
+  @override
+  String get s17PhotoAttached => '१ फोटो जोडला';
+
+  @override
+  String get s17AdvisoryCard =>
+      'ही CAP पूर्ण म्हणून खूण केल्यावर तिची स्थिती \'पूर्ण (पडताळणी प्रलंबित)\' मध्ये बदलेल. व्यवस्थापनाला (GM/मालक) याचे पुनरावलोकन व पडताळणी करण्यासाठी सूचित केले जाईल.';
+
+  @override
+  String get s17ConfirmButton => 'पुष्टी करा आणि पूर्ण खूण करा';
+
+  @override
+  String get s17CancelButton => 'रद्द करा';
+
+  @override
+  String get s17Submitting => 'पूर्ण म्हणून खूण करत आहे...';
+
+  @override
+  String s17SuccessSnackbar(String id) {
+    return 'CAP $id पूर्ण म्हणून खूण केली (पडताळणी प्रलंबित)';
+  }
+
+  @override
+  String s17ErrorSnackbar(String error) {
+    return 'CAP पूर्ण म्हणून चिन्हांकित करण्यात अयशस्वी: $error';
+  }
+
+  @override
+  String s17StepNumber(int number) {
+    return 'पाऊल $number';
+  }
+
+  @override
+  String get s17CapNotFound => 'CAP आढळली नाही';
+
+  @override
+  String get s17Loading => 'CAP तपशील लोड होत आहेत...';
+
+  @override
+  String get s17CapAlreadyDoneNotice =>
+      'ही CAP आधीच पूर्ण किंवा बंद म्हणून चिन्हांकित आहे.';
 }
