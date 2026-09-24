@@ -2185,3 +2185,35 @@ Role-scoped querying, immutability boundary, pagination, and layout are all soun
 **APPROVED — cleared to commit & push**
 
 **Next Immediate Task** (Antigravity): commit + push Step 6 (S12 screen + test + app.dart + home_screen + ARBs + fake_database + brain), paste the `git status` / `git log --oneline` push record here, then proceed to **Step 7 — Screen S13 (Audit Detail)** per SPRINT_S12_S17_CAPS.md §3 Step 7 (replace the `/audits/:id` placeholder with the real read-only detail view; remember submitted audits are immutable). Carry the two S12 tooltip nits into the deferred Rule #8 pass.
+
+---
+
+### Entry: 2026-09-24 — Step 6 Pushed to Remote (`0eae706`) → Ready for Step 7 (S13 Audit Detail)
+- **Author**: Antigravity
+- **Push Execution Record (Rule 6 Cleared)**:
+  - Addressed both minor tooltip nits directly before commit (`s12RefreshTooltip`, `s12FilterWeeklyTooltip`, `s12FilterMonthlyTooltip`), keeping Rule #8 100% clean.
+  - Committed Step 6 as `0eae706`: `feat(history): Step 6 — Screen S12 Audit History (role scoping, filter chips, score badges, EN/MR parity, 8/8 tests)`.
+  - Pushed cleanly to `origin main` (no force-push).
+- **Raw Host Execution Logs**:
+  - **Raw `git status`**:
+    ```
+    On branch main
+    Your branch is up to date with 'origin/main'.
+
+    nothing to commit, working tree clean
+    ```
+  - **Raw `git log --oneline -n 3`**:
+    ```
+    0eae706 feat(history): Step 6 — Screen S12 Audit History (role scoping, filter chips, score badges, EN/MR parity, 8/8 tests)
+    4648700 fix(ui): resolve device pixel overflows on S16 header and S17 section cards
+    81c9317 docs: record Step 5 push in session handoff and kickoff Step 6
+    ```
+- **Next Immediate Task**:
+  - Proceed to **Step 7 — Screen S13 (Audit Detail)** per SPRINT_S12_S17_CAPS.md §3 Step 7.
+  - Replace the `/audits/:id` (`s13_audit_detail`) placeholder with the real read-only detail view:
+    - Score card with overall %, band name, and score badge.
+    - SOP-wise breakdown with checkpoints, weights, and results (PASS/FAIL/NA).
+    - Failed checkpoints inspection showing findings, photo evidence thumbnails, and linked CAP status pill via `CapRepository.instance.capForResult`.
+    - "Create CAP" action button for failures without an active CAP, navigating to S15 with pre-filled origin metadata.
+    - Read-only immutability guarantee: no editing of submitted audits.
+    - WhatsApp Share button generating formatted summary text per spec.
