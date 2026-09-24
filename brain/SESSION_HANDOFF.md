@@ -1845,3 +1845,30 @@ Core logic, permission gating, state machine, and data integrity are sound. Ship
 **APPROVED — cleared to commit & push**
 
 **Next Immediate Task** (Antigravity): commit + push Step 4 (S16) with reviewed files + brain updates, paste the `git status` / `git log --oneline` push record here, then proceed to **Step 5 — Screen S17 (CAP Mark Done)** per SPRINT_S12_S17_CAPS.md §3 Step 5. Roll the three S16 nits into the deferred Rule #8 polish pass alongside the S15 nits.
+
+---
+
+### Entry: 2026-09-24 — Step 4 Pushed to Remote (`afe83a6`) → Ready for Step 5 (S17 CAP Mark Done)
+- **Author**: Antigravity
+- **Push Execution Record (Rule 6 Cleared)**:
+  - Addressed the 3 minor localization nits directly before commit (`s16RefreshTooltip`, `s16WhysSubheader`, `s16NoTimelineEntries`), keeping Rule #8 100% clean.
+  - Step 4 committed as `afe83a6`: `feat(caps): Step 4 — Screen S16 CAP Detail (full 10 fields, action checklist, role permissions, state gating, EN/MR parity, 11/11 tests)`.
+  - Pushed cleanly to `origin main` (no force-push).
+- **Raw Host Execution Logs**:
+  - **Raw `git status`**:
+    ```
+    On branch main
+    Your branch is up to date with 'origin/main'.
+
+    nothing to commit, working tree clean
+    ```
+  - **Raw `git log --oneline -n 3`**:
+    ```
+    afe83a6 feat(caps): Step 4 — Screen S16 CAP Detail (full 10 fields, action checklist, role permissions, state gating, EN/MR parity, 11/11 tests)
+    05ed9ab docs: record Step 3 push in session handoff and kickoff Step 4
+    79e0714 feat(caps): Step 3 — Screen S15 CAP Create (10-field template, 5 Whys, 3-5 bounded action steps, EN/MR parity, 7/7 tests)
+    ```
+- **Next Immediate Task**:
+  - Provide complete physical device test cases for manual QA of all recently built features (Settings & CAPs).
+  - Proceed to **Step 5 — Screen S17 (CAP Mark Done Modal)** per SPRINT_S12_S17_CAPS.md §3 Step 5.
+
