@@ -15,7 +15,7 @@
 | **S10** | Daily Audit Summary | ✅ Complete | Localized, score card, SOP table, mandatory-photo validation |
 | **S11** | Submit Confirmation | ✅ Complete | Localized, animated checkmark, final score, offline sync indicator |
 | **S12**    | Audit History | ✅ Complete | Role-scoped (SM own, GM/Owner all), filter chips (All, Daily, Unverified), compliance % pill, band color, fail count, infinite scroll (30/pg), pull-to-refresh |
-| **S13**    | Audit Detail | ⏳ Scheduled | Read-only view of submitted audits, checkpoints breakdown & WhatsApp share |
+| **S13**    | Audit Detail | ✅ Complete | Read-only immutable view of submitted audits, score card, SOP breakdown table, expandable checkpoints, non-compliances with photos & linked CAP chip, "+ Create CAP" launch to S15 |
 | **S14**    | CAP List | ✅ Complete | Filterable/searchable CAP list, deadline color-coding, S05 nav wired, EN/MR parity |
 | **S15**    | CAP Create | ✅ Complete | 10-field template, 5-Whys, 3–5 dynamic action steps, responsible dropdown, deadline picker, EN/MR parity |
 | **S16**    | CAP Detail | ✅ Complete | Full CAP view, action checklist, event log timeline, state/role-gated buttons, Phase 2 stubs |
@@ -28,11 +28,12 @@
 | **S31**    | Language | ✅ Complete | Dedicated screen, live EN/MR switch, persists to users.language_pref, login restore, full EN/MR parity |
 | **S32**    | Backup / Export | ✅ Complete | All 14 tables exported to timestamped JSON in Downloads, Owner-only Firestore sync stub (Coming in Phase 4), security advisory, About card, full EN/MR parity |
 
-> **Sprint S12–S17 (CAPs Workflow) is ACTIVE. Steps 1–6 complete (S12 built, 151/151 tests passing across 18 test files); holding for Claude review before push.**
+> **Sprint S12–S17 (CAPs Workflow) is COMPLETE. All 6 steps built (S14, S15, S16, S17, S12, S13). 163/163 tests passing across 19 test files. Step 7 (S13) holding for Claude review before push.**
 
 ## 2. Verified Baseline Health
 - `flutter analyze`: **0 issues found (Clean baseline)**
-- `flutter test`: **151/151 tests passing across 18 test files**:
+- `flutter test`: **163/163 tests passing across 19 test files**:
+  - `audit_detail_screen_test.dart` (12 tests) — S13 header metadata & read-only lock banner, score card (compliance %, band badge, metric counts), SOP breakdown table with expandable checkpoint inspection, non-compliances list with findings, CRO attribution, photo thumbnails & inspection dialog, linked CAP clickable chip navigating to S16, unlinked fail "+ Create CAP" button navigating to S15 with pre-filled origin parameters, zero-fail clean card, Not Found state, Rule #6 audit immutability (no edit/submit buttons), GM vs SM Verify Audit button visibility, Marathi Rule #8 parity
   - `audit_history_screen_test.dart` (8 tests) — S12 empty state, audit card fields (date, auditor name, score %, band badge, fail count), SM role scoping (own audits only), GM/Owner role scoping (all audits), draft/hidden exclusion, unverified filter chip, card tap navigation to S13, Marathi parity
   - `cap_mark_done_screen_test.dart` (7 tests) — S17 header summary, completed action steps checklist, guard against incomplete steps, optional photo capture + reflection notes submission, photo removal, already-done state guard, Not Found state, Marathi parity
   - `cap_repository_test.dart` (20 tests) — ISO-week formatting, sequential ID generation, createCap validation & atomic writes, toggleAction, markDone guards, optional completion photo persistence with context=cap_progress, role scoping, status filters, search, S13 helpers, listAudits pagination/scoping

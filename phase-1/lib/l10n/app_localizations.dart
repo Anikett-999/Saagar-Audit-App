@@ -2870,6 +2870,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Monthly Audit is scheduled for Phase 3'**
   String get s12FilterMonthlyTooltip;
+
+  /// No description provided for @s13Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit Detail'**
+  String get s13Title;
+
+  /// No description provided for @s13ReadOnlyBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted audit — read-only archive'**
+  String get s13ReadOnlyBanner;
+
+  /// No description provided for @s13Auditor.
+  ///
+  /// In en, this message translates to:
+  /// **'Auditor: {name}'**
+  String s13Auditor(String name);
+
+  /// No description provided for @s13Date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date: {date}'**
+  String s13Date(String date);
+
+  /// No description provided for @s13SubmittedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted: {time}'**
+  String s13SubmittedAt(String time);
+
+  /// No description provided for @s13AuditType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type: {type}'**
+  String s13AuditType(String type);
+
+  /// No description provided for @s13ScoreCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit Score'**
+  String get s13ScoreCard;
+
+  /// No description provided for @s13SopBreakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'SOP Breakdown'**
+  String get s13SopBreakdown;
+
+  /// No description provided for @s13ExpandSopTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to view checkpoints'**
+  String get s13ExpandSopTooltip;
+
+  /// No description provided for @s13Points.
+  ///
+  /// In en, this message translates to:
+  /// **'Points'**
+  String get s13Points;
+
+  /// No description provided for @s13FailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Non-Compliances ({count})'**
+  String s13FailsTitle(int count);
+
+  /// No description provided for @s13NoFails.
+  ///
+  /// In en, this message translates to:
+  /// **'No failures recorded in this audit!'**
+  String get s13NoFails;
+
+  /// No description provided for @s13Finding.
+  ///
+  /// In en, this message translates to:
+  /// **'Finding: {finding}'**
+  String s13Finding(String finding);
+
+  /// No description provided for @s13Cro.
+  ///
+  /// In en, this message translates to:
+  /// **'CRO: {name}'**
+  String s13Cro(String name);
+
+  /// No description provided for @s13LinkedCap.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked CAP'**
+  String get s13LinkedCap;
+
+  /// No description provided for @s13CreateCap.
+  ///
+  /// In en, this message translates to:
+  /// **'+ Create CAP'**
+  String get s13CreateCap;
+
+  /// No description provided for @s13NotesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Auditor Notes'**
+  String get s13NotesTitle;
+
+  /// No description provided for @s13ExportPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Export PDF'**
+  String get s13ExportPdf;
+
+  /// No description provided for @s13ExportPdfTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF export is scheduled for Phase 2'**
+  String get s13ExportPdfTooltip;
+
+  /// No description provided for @s13ShareWhatsApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Share to WhatsApp'**
+  String get s13ShareWhatsApp;
+
+  /// No description provided for @s13ShareWhatsAppTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp share is scheduled for Phase 2'**
+  String get s13ShareWhatsAppTooltip;
+
+  /// No description provided for @s13VerifyAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Audit'**
+  String get s13VerifyAudit;
+
+  /// No description provided for @s13VerifyAuditTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit verification is scheduled for Phase 2'**
+  String get s13VerifyAuditTooltip;
+
+  /// No description provided for @s13NotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit not found'**
+  String get s13NotFound;
+
+  /// No description provided for @s13BackToHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Audit History'**
+  String get s13BackToHistory;
+
+  /// No description provided for @s13RefreshTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh audit detail'**
+  String get s13RefreshTooltip;
+
+  /// No description provided for @s13ViewPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Evidence Photo'**
+  String get s13ViewPhoto;
+
+  /// No description provided for @s13Close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get s13Close;
+
+  /// No description provided for @s13Loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading audit details...'**
+  String get s13Loading;
 }
 
 class _AppLocalizationsDelegate

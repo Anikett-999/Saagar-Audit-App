@@ -1522,4 +1522,106 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s12FilterMonthlyTooltip => 'मासिक ऑडिट टप्पा ३ साठी नियोजित आहे';
+
+  @override
+  String get s13Title => 'ऑडिट तपशील';
+
+  @override
+  String get s13ReadOnlyBanner => 'सादर केलेले ऑडिट — फक्त-वाचन संग्रहण';
+
+  @override
+  String s13Auditor(String name) {
+    return 'ऑडिटर: $name';
+  }
+
+  @override
+  String s13Date(String date) {
+    return 'तारीख: $date';
+  }
+
+  @override
+  String s13SubmittedAt(String time) {
+    return 'सादर केले: $time';
+  }
+
+  @override
+  String s13AuditType(String type) {
+    return 'प्रकार: $type';
+  }
+
+  @override
+  String get s13ScoreCard => 'ऑडिट गुण';
+
+  @override
+  String get s13SopBreakdown => 'एसओपी (SOP) तपशील';
+
+  @override
+  String get s13ExpandSopTooltip => 'चेकपॉईंट्स पाहण्यासाठी टॅप करा';
+
+  @override
+  String get s13Points => 'गुण';
+
+  @override
+  String s13FailsTitle(int count) {
+    return 'आढळलेले दोष ($count)';
+  }
+
+  @override
+  String get s13NoFails => 'या ऑडिटमध्ये कोणतेही दोष आढळले नाहीत!';
+
+  @override
+  String s13Finding(String finding) {
+    return 'निष्कर्ष: $finding';
+  }
+
+  @override
+  String s13Cro(String name) {
+    return 'सीआरओ: $name';
+  }
+
+  @override
+  String get s13LinkedCap => 'जोडलेली CAP';
+
+  @override
+  String get s13CreateCap => '+ CAP तयार करा';
+
+  @override
+  String get s13NotesTitle => 'ऑडिटरच्या टिप्पण्या';
+
+  @override
+  String get s13ExportPdf => 'PDF निर्यात';
+
+  @override
+  String get s13ExportPdfTooltip => 'PDF निर्यात टप्पा २ साठी नियोजित आहे';
+
+  @override
+  String get s13ShareWhatsApp => 'WhatsApp ला शेअर करा';
+
+  @override
+  String get s13ShareWhatsAppTooltip =>
+      'WhatsApp शेअर टप्पा २ साठी नियोजित आहे';
+
+  @override
+  String get s13VerifyAudit => 'ऑडिट पडताळा';
+
+  @override
+  String get s13VerifyAuditTooltip => 'ऑडिट पडताळणी टप्पा २ साठी नियोजित आहे';
+
+  @override
+  String get s13NotFound => 'ऑडिट आढळले नाही';
+
+  @override
+  String get s13BackToHistory => 'ऑडिट इतिहासावर परत जा';
+
+  @override
+  String get s13RefreshTooltip => 'ऑडिट तपशील रिफ्रेश करा';
+
+  @override
+  String get s13ViewPhoto => 'पुरावा फोटो';
+
+  @override
+  String get s13Close => 'बंद करा';
+
+  @override
+  String get s13Loading => 'ऑडिट तपशील लोड होत आहे...';
 }

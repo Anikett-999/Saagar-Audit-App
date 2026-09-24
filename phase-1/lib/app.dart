@@ -16,6 +16,7 @@ import 'ui/screens/s08_fail_detail/fail_detail_screen.dart';
 import 'ui/screens/s10_review/review_submit_screen.dart';
 import 'ui/screens/s11_submitted/submitted_screen.dart';
 import 'ui/screens/s12_audit_history/audit_history_screen.dart';
+import 'ui/screens/s13_audit_detail/audit_detail_screen.dart';
 import 'ui/screens/s14_cap_list/cap_list_screen.dart';
 import 'ui/screens/s15_cap_create/cap_create_screen.dart';
 import 'ui/screens/s16_cap_detail/cap_detail_screen.dart';
@@ -107,10 +108,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           }
           return null;
         },
-        builder: (context, state) => Scaffold(
-          body: Center(
-            child: Text('S13 Audit Detail: ${state.pathParameters['id']}'),
-          ),
+        builder: (context, state) => AuditDetailScreen(
+          auditId: state.pathParameters['id']!,
         ),
       ),
       GoRoute(

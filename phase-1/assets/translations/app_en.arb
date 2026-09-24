@@ -661,5 +661,84 @@
   "s12BandPending": "Pending",
   "s12RefreshTooltip": "Refresh audit history",
   "s12FilterWeeklyTooltip": "Weekly Audit is scheduled for Phase 2",
-  "s12FilterMonthlyTooltip": "Monthly Audit is scheduled for Phase 3"
+  "s12FilterMonthlyTooltip": "Monthly Audit is scheduled for Phase 3",
+  "s13Title": "Audit Detail",
+  "s13ReadOnlyBanner": "Submitted audit — read-only archive",
+  "s13Auditor": "Auditor: {name}",
+  "@s13Auditor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "s13Date": "Date: {date}",
+  "@s13Date": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "s13SubmittedAt": "Submitted: {time}",
+  "@s13SubmittedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "s13AuditType": "Type: {type}",
+  "@s13AuditType": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "s13ScoreCard": "Audit Score",
+  "s13SopBreakdown": "SOP Breakdown",
+  "s13ExpandSopTooltip": "Tap to view checkpoints",
+  "s13Points": "Points",
+  "s13FailsTitle": "Non-Compliances ({count})",
+  "@s13FailsTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "s13NoFails": "No failures recorded in this audit!",
+  "s13Finding": "Finding: {finding}",
+  "@s13Finding": {
+    "placeholders": {
+      "finding": {
+        "type": "String"
+      }
+    }
+  },
+  "s13Cro": "CRO: {name}",
+  "@s13Cro": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "s13LinkedCap": "Linked CAP",
+  "s13CreateCap": "+ Create CAP",
+  "s13NotesTitle": "Auditor Notes",
+  "s13ExportPdf": "Export PDF",
+  "s13ExportPdfTooltip": "PDF export is scheduled for Phase 2",
+  "s13ShareWhatsApp": "Share to WhatsApp",
+  "s13ShareWhatsAppTooltip": "WhatsApp share is scheduled for Phase 2",
+  "s13VerifyAudit": "Verify Audit",
+  "s13VerifyAuditTooltip": "Audit verification is scheduled for Phase 2",
+  "s13NotFound": "Audit not found",
+  "s13BackToHistory": "Back to Audit History",
+  "s13RefreshTooltip": "Refresh audit detail",
+  "s13ViewPhoto": "Evidence Photo",
+  "s13Close": "Close",
+  "s13Loading": "Loading audit details..."
 }
+

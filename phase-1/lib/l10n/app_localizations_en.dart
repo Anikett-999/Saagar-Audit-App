@@ -1520,4 +1520,107 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get s12FilterMonthlyTooltip =>
       'Monthly Audit is scheduled for Phase 3';
+
+  @override
+  String get s13Title => 'Audit Detail';
+
+  @override
+  String get s13ReadOnlyBanner => 'Submitted audit — read-only archive';
+
+  @override
+  String s13Auditor(String name) {
+    return 'Auditor: $name';
+  }
+
+  @override
+  String s13Date(String date) {
+    return 'Date: $date';
+  }
+
+  @override
+  String s13SubmittedAt(String time) {
+    return 'Submitted: $time';
+  }
+
+  @override
+  String s13AuditType(String type) {
+    return 'Type: $type';
+  }
+
+  @override
+  String get s13ScoreCard => 'Audit Score';
+
+  @override
+  String get s13SopBreakdown => 'SOP Breakdown';
+
+  @override
+  String get s13ExpandSopTooltip => 'Tap to view checkpoints';
+
+  @override
+  String get s13Points => 'Points';
+
+  @override
+  String s13FailsTitle(int count) {
+    return 'Non-Compliances ($count)';
+  }
+
+  @override
+  String get s13NoFails => 'No failures recorded in this audit!';
+
+  @override
+  String s13Finding(String finding) {
+    return 'Finding: $finding';
+  }
+
+  @override
+  String s13Cro(String name) {
+    return 'CRO: $name';
+  }
+
+  @override
+  String get s13LinkedCap => 'Linked CAP';
+
+  @override
+  String get s13CreateCap => '+ Create CAP';
+
+  @override
+  String get s13NotesTitle => 'Auditor Notes';
+
+  @override
+  String get s13ExportPdf => 'Export PDF';
+
+  @override
+  String get s13ExportPdfTooltip => 'PDF export is scheduled for Phase 2';
+
+  @override
+  String get s13ShareWhatsApp => 'Share to WhatsApp';
+
+  @override
+  String get s13ShareWhatsAppTooltip =>
+      'WhatsApp share is scheduled for Phase 2';
+
+  @override
+  String get s13VerifyAudit => 'Verify Audit';
+
+  @override
+  String get s13VerifyAuditTooltip =>
+      'Audit verification is scheduled for Phase 2';
+
+  @override
+  String get s13NotFound => 'Audit not found';
+
+  @override
+  String get s13BackToHistory => 'Back to Audit History';
+
+  @override
+  String get s13RefreshTooltip => 'Refresh audit detail';
+
+  @override
+  String get s13ViewPhoto => 'Evidence Photo';
+
+  @override
+  String get s13Close => 'Close';
+
+  @override
+  String get s13Loading => 'Loading audit details...';
 }
