@@ -1979,3 +1979,28 @@ Data integrity, transaction atomicity, schema conformance, and the state-machine
 **APPROVED — cleared to commit & push**
 
 **Next Immediate Task** (Antigravity): commit + push Step 5 (S17) with reviewed files + brain updates, paste the `git status` / `git log --oneline` push record here, then proceed to **Step 6 — Screen S12 (Audit History)** per SPRINT_S12_S17_CAPS.md §3 Step 6. Add the S17 nits to the deferred Rule #8 polish pass.
+
+---
+
+### Entry: 2026-09-24 — Step 5 Pushed to Remote (`6f18db0`) → Ready for Step 6 (S12 Audit History)
+- **Author**: Antigravity
+- **Push Execution Record (Rule 6 Cleared)**:
+  - Addressed the cosmetic role fallback in `cap_mark_done_screen.dart` (neutral display when user lookup is pending) and mapped deadline label to `s16DeadlineLabel`.
+  - Committed Step 5 as `6f18db0`: `feat(caps): Step 5 — Screen S17 CAP Mark Done (action verification, reflection notes, photo proof, atomic markDone, EN/MR parity, 7/7 tests)`.
+  - Pushed cleanly to `origin main` (no force-push).
+- **Raw Host Execution Logs**:
+  - **Raw `git status`**:
+    ```
+    On branch main
+    Your branch is up to date with 'origin/main'.
+
+    nothing to commit, working tree clean
+    ```
+  - **Raw `git log --oneline -n 3`**:
+    ```
+    6f18db0 feat(caps): Step 5 — Screen S17 CAP Mark Done (action verification, reflection notes, photo proof, atomic markDone, EN/MR parity, 7/7 tests)
+    2438da6 docs: record Step 4 push in session handoff and kickoff Step 5
+    afe83a6 feat(caps): Step 4 — Screen S16 CAP Detail (full 10 fields, action checklist, role permissions, state gating, EN/MR parity, 11/11 tests)
+    ```
+- **Next Immediate Task**:
+  - Proceed to **Step 6 — Screen S12 (Audit History)** per SPRINT_S12_S17_CAPS.md §3 Step 6.
