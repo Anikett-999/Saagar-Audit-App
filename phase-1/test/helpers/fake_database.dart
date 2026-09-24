@@ -183,6 +183,8 @@ class FakeDatabase extends Fake implements Database, Transaction {
           results = results.where((r) => r['audit_id'] == whereArgs[0]).toList();
         } else if (where == 'audit_result_id = ?' && whereArgs != null && whereArgs.isNotEmpty) {
           results = results.where((r) => r['audit_result_id'] == whereArgs[0]).toList();
+        } else if (where == 'frequency = ?' && whereArgs != null && whereArgs.isNotEmpty) {
+          results = results.where((r) => r['frequency'] == whereArgs[0]).toList();
         }
       }
     }

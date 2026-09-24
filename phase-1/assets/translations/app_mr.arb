@@ -365,5 +365,59 @@
     "placeholders": {
       "name": {"type": "String"}
     }
-  }
+  },
+
+  "s15Title": "नवीन सुधारात्मक कृती योजना",
+  "s15Subtitle": "१०-फील्ड मूळ कारण आणि कृती टेम्पलेट",
+  "s15CapIdPreview": "CAP आयडी (आपोआप तयार)",
+  "s15SectionOrigin": "१. मूळ निष्कर्ष",
+  "s15OriginAudit": "मूळ ऑडिट",
+  "s15OriginCheckpoint": "नापास तपासणी बिंदू",
+  "s15SelectAudit": "ऑडिट निवडा",
+  "s15SelectCheckpoint": "तपासणी बिंदू निवडा",
+  "s15NoAuditsFound": "कोणतेही ऑडिट सापडले नाही. प्रथम ऑडिट पूर्ण करा.",
+  "s15SectionProblem": "२. समस्या आणि ५-का? विश्लेषण",
+  "s15ProblemStatement": "समस्या विधान",
+  "s15ProblemStatementHint": "काय नापास झाले ते वर्णन करा (१ वाक्य)",
+  "s15ProblemRequired": "समस्या विधान आवश्यक आहे",
+  "s15Why1": "का? १ (प्राथमिक कारण)",
+  "s15Why1Hint": "ही परिस्थिती का घडली?",
+  "s15Why1Required": "का? १ आवश्यक आहे",
+  "s15Why2": "का? २ (पर्यायी)",
+  "s15Why2Hint": "असे का घडले?",
+  "s15Why3": "का? ३ (पर्यायी)",
+  "s15Why3Hint": "असे का घडले?",
+  "s15Why4": "का? ४ (पर्यायी)",
+  "s15Why4Hint": "असे का घडले?",
+  "s15Why5": "का? ५ (पर्यायी)",
+  "s15Why5Hint": "असे का घडले?",
+  "s15RootCause": "मूळ कारण",
+  "s15RootCauseHint": "पद्धतशीर मूळ कारण (१-२ वाक्ये)",
+  "s15RootCauseRequired": "मूळ कारण आवश्यक आहे",
+  "s15SectionActions": "३. कृती पावले (३ ते ५ पावले)",
+  "s15StepLabel": "पाऊल {number}",
+  "@s15StepLabel": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "s15StepHint": "कृती पावलाचे वर्णन",
+  "s15StepRequired": "कृती पाऊल रिक्त असू शकत नाही",
+  "s15AddStep": "पाऊल जोडा",
+  "s15MinStepsNotice": "किमान ३ पावले आवश्यक आहेत",
+  "s15MaxStepsReached": "जास्तीत जास्त ५ पावले गाठली",
+  "s15SectionOwnership": "४. मालकी आणि पडताळणी",
+  "s15ResponsibleUser": "जबाबदार (CAP मालक)",
+  "s15SelectResponsible": "जबाबदार वापरकर्ता निवडा (SM, GM, मालक)",
+  "s15ResponsibleRequired": "जबाबदार वापरकर्ता आवश्यक आहे",
+  "s15Deadline": "मुदत (लक्ष्य पूर्णता तारीख)",
+  "s15SelectDate": "तारीख निवडा",
+  "s15VerificationMethod": "पडताळणी पद्धत",
+  "s15VerificationMethodHint": "पूर्णतेची पडताळणी कशी केली जाईल?",
+  "s15VerificationRequired": "पडताळणी पद्धत आवश्यक आहे",
+  "s15CreateButton": "CAP तयार करा",
+  "s15Creating": "CAP तयार करत आहे...",
+  "s15CreatedSuccess": "CAP यशस्वीरित्या तयार केली",
+  "s15AuditDropdownItem": "ऑडिट {date} ({type})",
+  "s15ErrorPrefix": "त्रुटी: {message}"
 }

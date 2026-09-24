@@ -16,6 +16,7 @@ import 'ui/screens/s08_fail_detail/fail_detail_screen.dart';
 import 'ui/screens/s10_review/review_submit_screen.dart';
 import 'ui/screens/s11_submitted/submitted_screen.dart';
 import 'ui/screens/s14_cap_list/cap_list_screen.dart';
+import 'ui/screens/s15_cap_create/cap_create_screen.dart';
 import 'providers/auth_provider.dart';
 import 'ui/screens/s27_settings/settings_screen.dart';
 import 'ui/screens/s28_manage_cros/manage_cros_screen.dart';
@@ -103,9 +104,15 @@ final routerProvider = Provider<GoRouter>((ref) {
           }
           return null;
         },
-        builder: (_, __) => const Scaffold(
-          body: Center(child: Text('S15 CAP Create Placeholder')),
-        ),
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return CapCreateScreen(
+            originAuditId: state.uri.queryParameters['auditId'] ?? extra?['auditId'] as String?,
+            originCheckpointId: state.uri.queryParameters['checkpointId'] ?? extra?['checkpointId'] as String?,
+            originResultId: state.uri.queryParameters['resultId'] ?? extra?['resultId'] as String?,
+            initialProblemStatement: state.uri.queryParameters['problem'] ?? extra?['problem'] as String?,
+          );
+        },
       ),
       GoRoute(
         path: '/caps/:id',

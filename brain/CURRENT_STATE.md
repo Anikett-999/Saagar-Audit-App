@@ -15,8 +15,10 @@
 | **S10** | Daily Audit Summary | ✅ Complete | Localized, score card, SOP table, mandatory-photo validation |
 | **S11** | Submit Confirmation | ✅ Complete | Localized, animated checkmark, final score, offline sync indicator |
 | **S12–S13**| Audit History & Detail | ⏳ Scheduled | Read-only view of submitted audits & WhatsApp share |
-| **S14**    | CAP List | 🟡 Built (Review Gate) | Filterable/searchable CAP list, deadline color-coding, S05 nav wired, EN/MR parity |
-| **S15–S17**| CAP Create, Detail & Mark Done | ⏳ Scheduled | CAP creation (10-field template), action checklist, mark done modal |
+| **S14**    | CAP List | ✅ Complete | Filterable/searchable CAP list, deadline color-coding, S05 nav wired, EN/MR parity |
+| **S15**    | CAP Create | ✅ Complete | 10-field template, 5-Whys, 3–5 dynamic action steps, responsible dropdown, deadline picker, EN/MR parity |
+| **S16**    | CAP Detail | 🟡 In Progress | Full CAP view, action checklist, event log timeline, mark done navigation |
+| **S17**    | Mark Done Modal | ⏳ Scheduled | Mark done dialog, reflection notes, photo proof, verification |
 | **S22–S26**| Reference Data | ⏳ Scheduled | Rating scale, escalation triggers, glossary |
 | **S27**    | Settings Hub | ✅ Complete | Role-filtered list (Owner-only Users), profile badge, real S05 navigation |
 | **S28**    | Manage CROs | ✅ Complete | List all, Add/Edit/Deactivate/Reactivate, soft deactivation preserves audit trail, EN/MR parity |
@@ -25,11 +27,12 @@
 | **S31**    | Language | ✅ Complete | Dedicated screen, live EN/MR switch, persists to users.language_pref, login restore, full EN/MR parity |
 | **S32**    | Backup / Export | ✅ Complete | All 14 tables exported to timestamped JSON in Downloads, Owner-only Firestore sync stub (Coming in Phase 4), security advisory, About card, full EN/MR parity |
 
-> **Sprint S12–S17 (CAPs Workflow) is ACTIVE. Step 1 (Data Layer) pushed; Step 2 (S14 CAP List) built & holding for review.**
+> **Sprint S12–S17 (CAPs Workflow) is ACTIVE. Step 1 (Data Layer), Step 2 (S14 CAP List), and Step 3 (S15 CAP Create) pushed; Step 4 (S16 CAP Detail) in progress.**
 
 ## 2. Verified Baseline Health
 - `flutter analyze`: **0 issues found (Clean baseline)**
-- `flutter test`: **117/117 tests passing across 14 test files**:
+- `flutter test`: **124/124 tests passing across 15 test files**:
+  - `cap_create_screen_test.dart` (7 tests) — S15 10-field template rendering, pre-fills from fail, mandatory field validation, 3–5 bounded dynamic action steps, empty step validation, atomic creation & navigation to S16, Marathi parity
   - `cap_list_screen_test.dart` (9 tests) — S14 list rendering, empty state, deadline color-coding (overdue/dueSoon/ok), filter chips, search, SM role scoping, GM/Owner unscoped, S15 FAB + S16 card navigation, Marathi parity
   - `cap_repository_test.dart` (19 tests) — ISO-week formatting, sequential ID generation, createCap validation & atomic writes, toggleAction, markDone guards, role scoping, status filters, search, S13 helpers, listAudits pagination/scoping
   - `score_engine_test.dart` (12 tests) — Canonical score invariant `81 / 90 = 90.0% Good`, band cutoffs, NA handling

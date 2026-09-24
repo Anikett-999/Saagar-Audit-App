@@ -962,4 +962,155 @@ class AppLocalizationsMr extends AppLocalizations {
   String s14ResponsiblePrefix(String name) {
     return 'जबाबदार: $name';
   }
+
+  @override
+  String get s15Title => 'नवीन सुधारात्मक कृती योजना';
+
+  @override
+  String get s15Subtitle => '१०-फील्ड मूळ कारण आणि कृती टेम्पलेट';
+
+  @override
+  String get s15CapIdPreview => 'CAP आयडी (आपोआप तयार)';
+
+  @override
+  String get s15SectionOrigin => '१. मूळ निष्कर्ष';
+
+  @override
+  String get s15OriginAudit => 'मूळ ऑडिट';
+
+  @override
+  String get s15OriginCheckpoint => 'नापास तपासणी बिंदू';
+
+  @override
+  String get s15SelectAudit => 'ऑडिट निवडा';
+
+  @override
+  String get s15SelectCheckpoint => 'तपासणी बिंदू निवडा';
+
+  @override
+  String get s15NoAuditsFound =>
+      'कोणतेही ऑडिट सापडले नाही. प्रथम ऑडिट पूर्ण करा.';
+
+  @override
+  String get s15SectionProblem => '२. समस्या आणि ५-का? विश्लेषण';
+
+  @override
+  String get s15ProblemStatement => 'समस्या विधान';
+
+  @override
+  String get s15ProblemStatementHint => 'काय नापास झाले ते वर्णन करा (१ वाक्य)';
+
+  @override
+  String get s15ProblemRequired => 'समस्या विधान आवश्यक आहे';
+
+  @override
+  String get s15Why1 => 'का? १ (प्राथमिक कारण)';
+
+  @override
+  String get s15Why1Hint => 'ही परिस्थिती का घडली?';
+
+  @override
+  String get s15Why1Required => 'का? १ आवश्यक आहे';
+
+  @override
+  String get s15Why2 => 'का? २ (पर्यायी)';
+
+  @override
+  String get s15Why2Hint => 'असे का घडले?';
+
+  @override
+  String get s15Why3 => 'का? ३ (पर्यायी)';
+
+  @override
+  String get s15Why3Hint => 'असे का घडले?';
+
+  @override
+  String get s15Why4 => 'का? ४ (पर्यायी)';
+
+  @override
+  String get s15Why4Hint => 'असे का घडले?';
+
+  @override
+  String get s15Why5 => 'का? ५ (पर्यायी)';
+
+  @override
+  String get s15Why5Hint => 'असे का घडले?';
+
+  @override
+  String get s15RootCause => 'मूळ कारण';
+
+  @override
+  String get s15RootCauseHint => 'पद्धतशीर मूळ कारण (१-२ वाक्ये)';
+
+  @override
+  String get s15RootCauseRequired => 'मूळ कारण आवश्यक आहे';
+
+  @override
+  String get s15SectionActions => '३. कृती पावले (३ ते ५ पावले)';
+
+  @override
+  String s15StepLabel(int number) {
+    return 'पाऊल $number';
+  }
+
+  @override
+  String get s15StepHint => 'कृती पावलाचे वर्णन';
+
+  @override
+  String get s15StepRequired => 'कृती पाऊल रिक्त असू शकत नाही';
+
+  @override
+  String get s15AddStep => 'पाऊल जोडा';
+
+  @override
+  String get s15MinStepsNotice => 'किमान ३ पावले आवश्यक आहेत';
+
+  @override
+  String get s15MaxStepsReached => 'जास्तीत जास्त ५ पावले गाठली';
+
+  @override
+  String get s15SectionOwnership => '४. मालकी आणि पडताळणी';
+
+  @override
+  String get s15ResponsibleUser => 'जबाबदार (CAP मालक)';
+
+  @override
+  String get s15SelectResponsible => 'जबाबदार वापरकर्ता निवडा (SM, GM, मालक)';
+
+  @override
+  String get s15ResponsibleRequired => 'जबाबदार वापरकर्ता आवश्यक आहे';
+
+  @override
+  String get s15Deadline => 'मुदत (लक्ष्य पूर्णता तारीख)';
+
+  @override
+  String get s15SelectDate => 'तारीख निवडा';
+
+  @override
+  String get s15VerificationMethod => 'पडताळणी पद्धत';
+
+  @override
+  String get s15VerificationMethodHint => 'पूर्णतेची पडताळणी कशी केली जाईल?';
+
+  @override
+  String get s15VerificationRequired => 'पडताळणी पद्धत आवश्यक आहे';
+
+  @override
+  String get s15CreateButton => 'CAP तयार करा';
+
+  @override
+  String get s15Creating => 'CAP तयार करत आहे...';
+
+  @override
+  String get s15CreatedSuccess => 'CAP यशस्वीरित्या तयार केली';
+
+  @override
+  String s15AuditDropdownItem(String date, String type) {
+    return 'ऑडिट $date ($type)';
+  }
+
+  @override
+  String s15ErrorPrefix(String message) {
+    return 'त्रुटी: $message';
+  }
 }

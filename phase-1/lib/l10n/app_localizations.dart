@@ -1886,6 +1886,294 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Responsible: {name}'**
   String s14ResponsiblePrefix(String name);
+
+  /// No description provided for @s15Title.
+  ///
+  /// In en, this message translates to:
+  /// **'New Corrective Action Plan'**
+  String get s15Title;
+
+  /// No description provided for @s15Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'10-field root cause & action template'**
+  String get s15Subtitle;
+
+  /// No description provided for @s15CapIdPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'CAP ID (Auto-Generated)'**
+  String get s15CapIdPreview;
+
+  /// No description provided for @s15SectionOrigin.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Originating Finding'**
+  String get s15SectionOrigin;
+
+  /// No description provided for @s15OriginAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'Origin Audit'**
+  String get s15OriginAudit;
+
+  /// No description provided for @s15OriginCheckpoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed Checkpoint'**
+  String get s15OriginCheckpoint;
+
+  /// No description provided for @s15SelectAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Audit'**
+  String get s15SelectAudit;
+
+  /// No description provided for @s15SelectCheckpoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Checkpoint'**
+  String get s15SelectCheckpoint;
+
+  /// No description provided for @s15NoAuditsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No audits found. Complete an audit first.'**
+  String get s15NoAuditsFound;
+
+  /// No description provided for @s15SectionProblem.
+  ///
+  /// In en, this message translates to:
+  /// **'2. Problem & 5-Whys Analysis'**
+  String get s15SectionProblem;
+
+  /// No description provided for @s15ProblemStatement.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem Statement'**
+  String get s15ProblemStatement;
+
+  /// No description provided for @s15ProblemStatementHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe what failed (1 sentence)'**
+  String get s15ProblemStatementHint;
+
+  /// No description provided for @s15ProblemRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem statement is required'**
+  String get s15ProblemRequired;
+
+  /// No description provided for @s15Why1.
+  ///
+  /// In en, this message translates to:
+  /// **'Why 1 (Primary Cause)'**
+  String get s15Why1;
+
+  /// No description provided for @s15Why1Hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Why did this condition occur?'**
+  String get s15Why1Hint;
+
+  /// No description provided for @s15Why1Required.
+  ///
+  /// In en, this message translates to:
+  /// **'Why 1 is required'**
+  String get s15Why1Required;
+
+  /// No description provided for @s15Why2.
+  ///
+  /// In en, this message translates to:
+  /// **'Why 2 (optional)'**
+  String get s15Why2;
+
+  /// No description provided for @s15Why2Hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Why did that happen?'**
+  String get s15Why2Hint;
+
+  /// No description provided for @s15Why3.
+  ///
+  /// In en, this message translates to:
+  /// **'Why 3 (optional)'**
+  String get s15Why3;
+
+  /// No description provided for @s15Why3Hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Why did that happen?'**
+  String get s15Why3Hint;
+
+  /// No description provided for @s15Why4.
+  ///
+  /// In en, this message translates to:
+  /// **'Why 4 (optional)'**
+  String get s15Why4;
+
+  /// No description provided for @s15Why4Hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Why did that happen?'**
+  String get s15Why4Hint;
+
+  /// No description provided for @s15Why5.
+  ///
+  /// In en, this message translates to:
+  /// **'Why 5 (optional)'**
+  String get s15Why5;
+
+  /// No description provided for @s15Why5Hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Why did that happen?'**
+  String get s15Why5Hint;
+
+  /// No description provided for @s15RootCause.
+  ///
+  /// In en, this message translates to:
+  /// **'Root Cause'**
+  String get s15RootCause;
+
+  /// No description provided for @s15RootCauseHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Systemic root cause (1-2 sentences)'**
+  String get s15RootCauseHint;
+
+  /// No description provided for @s15RootCauseRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Root cause is required'**
+  String get s15RootCauseRequired;
+
+  /// No description provided for @s15SectionActions.
+  ///
+  /// In en, this message translates to:
+  /// **'3. Action Steps (3 to 5 steps)'**
+  String get s15SectionActions;
+
+  /// No description provided for @s15StepLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {number}'**
+  String s15StepLabel(int number);
+
+  /// No description provided for @s15StepHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Action step description'**
+  String get s15StepHint;
+
+  /// No description provided for @s15StepRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Action step cannot be empty'**
+  String get s15StepRequired;
+
+  /// No description provided for @s15AddStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Step'**
+  String get s15AddStep;
+
+  /// No description provided for @s15MinStepsNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'At least 3 steps required'**
+  String get s15MinStepsNotice;
+
+  /// No description provided for @s15MaxStepsReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum 5 steps reached'**
+  String get s15MaxStepsReached;
+
+  /// No description provided for @s15SectionOwnership.
+  ///
+  /// In en, this message translates to:
+  /// **'4. Ownership & Verification'**
+  String get s15SectionOwnership;
+
+  /// No description provided for @s15ResponsibleUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Responsible (CAP Owner)'**
+  String get s15ResponsibleUser;
+
+  /// No description provided for @s15SelectResponsible.
+  ///
+  /// In en, this message translates to:
+  /// **'Select responsible user (SM, GM, Owner)'**
+  String get s15SelectResponsible;
+
+  /// No description provided for @s15ResponsibleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Responsible user is required'**
+  String get s15ResponsibleRequired;
+
+  /// No description provided for @s15Deadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Deadline (Target Completion Date)'**
+  String get s15Deadline;
+
+  /// No description provided for @s15SelectDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Date'**
+  String get s15SelectDate;
+
+  /// No description provided for @s15VerificationMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Method'**
+  String get s15VerificationMethod;
+
+  /// No description provided for @s15VerificationMethodHint.
+  ///
+  /// In en, this message translates to:
+  /// **'How will completion be verified?'**
+  String get s15VerificationMethodHint;
+
+  /// No description provided for @s15VerificationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification method is required'**
+  String get s15VerificationRequired;
+
+  /// No description provided for @s15CreateButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create CAP'**
+  String get s15CreateButton;
+
+  /// No description provided for @s15Creating.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating CAP...'**
+  String get s15Creating;
+
+  /// No description provided for @s15CreatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'CAP created successfully'**
+  String get s15CreatedSuccess;
+
+  /// No description provided for @s15AuditDropdownItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit {date} ({type})'**
+  String s15AuditDropdownItem(String date, String type);
+
+  /// No description provided for @s15ErrorPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {message}'**
+  String s15ErrorPrefix(String message);
 }
 
 class _AppLocalizationsDelegate

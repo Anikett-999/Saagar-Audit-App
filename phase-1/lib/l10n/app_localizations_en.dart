@@ -962,4 +962,154 @@ class AppLocalizationsEn extends AppLocalizations {
   String s14ResponsiblePrefix(String name) {
     return 'Responsible: $name';
   }
+
+  @override
+  String get s15Title => 'New Corrective Action Plan';
+
+  @override
+  String get s15Subtitle => '10-field root cause & action template';
+
+  @override
+  String get s15CapIdPreview => 'CAP ID (Auto-Generated)';
+
+  @override
+  String get s15SectionOrigin => '1. Originating Finding';
+
+  @override
+  String get s15OriginAudit => 'Origin Audit';
+
+  @override
+  String get s15OriginCheckpoint => 'Failed Checkpoint';
+
+  @override
+  String get s15SelectAudit => 'Select Audit';
+
+  @override
+  String get s15SelectCheckpoint => 'Select Checkpoint';
+
+  @override
+  String get s15NoAuditsFound => 'No audits found. Complete an audit first.';
+
+  @override
+  String get s15SectionProblem => '2. Problem & 5-Whys Analysis';
+
+  @override
+  String get s15ProblemStatement => 'Problem Statement';
+
+  @override
+  String get s15ProblemStatementHint => 'Describe what failed (1 sentence)';
+
+  @override
+  String get s15ProblemRequired => 'Problem statement is required';
+
+  @override
+  String get s15Why1 => 'Why 1 (Primary Cause)';
+
+  @override
+  String get s15Why1Hint => 'Why did this condition occur?';
+
+  @override
+  String get s15Why1Required => 'Why 1 is required';
+
+  @override
+  String get s15Why2 => 'Why 2 (optional)';
+
+  @override
+  String get s15Why2Hint => 'Why did that happen?';
+
+  @override
+  String get s15Why3 => 'Why 3 (optional)';
+
+  @override
+  String get s15Why3Hint => 'Why did that happen?';
+
+  @override
+  String get s15Why4 => 'Why 4 (optional)';
+
+  @override
+  String get s15Why4Hint => 'Why did that happen?';
+
+  @override
+  String get s15Why5 => 'Why 5 (optional)';
+
+  @override
+  String get s15Why5Hint => 'Why did that happen?';
+
+  @override
+  String get s15RootCause => 'Root Cause';
+
+  @override
+  String get s15RootCauseHint => 'Systemic root cause (1-2 sentences)';
+
+  @override
+  String get s15RootCauseRequired => 'Root cause is required';
+
+  @override
+  String get s15SectionActions => '3. Action Steps (3 to 5 steps)';
+
+  @override
+  String s15StepLabel(int number) {
+    return 'Step $number';
+  }
+
+  @override
+  String get s15StepHint => 'Action step description';
+
+  @override
+  String get s15StepRequired => 'Action step cannot be empty';
+
+  @override
+  String get s15AddStep => 'Add Step';
+
+  @override
+  String get s15MinStepsNotice => 'At least 3 steps required';
+
+  @override
+  String get s15MaxStepsReached => 'Maximum 5 steps reached';
+
+  @override
+  String get s15SectionOwnership => '4. Ownership & Verification';
+
+  @override
+  String get s15ResponsibleUser => 'Responsible (CAP Owner)';
+
+  @override
+  String get s15SelectResponsible => 'Select responsible user (SM, GM, Owner)';
+
+  @override
+  String get s15ResponsibleRequired => 'Responsible user is required';
+
+  @override
+  String get s15Deadline => 'Deadline (Target Completion Date)';
+
+  @override
+  String get s15SelectDate => 'Select Date';
+
+  @override
+  String get s15VerificationMethod => 'Verification Method';
+
+  @override
+  String get s15VerificationMethodHint => 'How will completion be verified?';
+
+  @override
+  String get s15VerificationRequired => 'Verification method is required';
+
+  @override
+  String get s15CreateButton => 'Create CAP';
+
+  @override
+  String get s15Creating => 'Creating CAP...';
+
+  @override
+  String get s15CreatedSuccess => 'CAP created successfully';
+
+  @override
+  String s15AuditDropdownItem(String date, String type) {
+    return 'Audit $date ($type)';
+  }
+
+  @override
+  String s15ErrorPrefix(String message) {
+    return 'Error: $message';
+  }
 }

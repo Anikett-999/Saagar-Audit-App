@@ -366,5 +366,70 @@
     "placeholders": {
       "name": {"type": "String"}
     }
+  },
+
+  "s15Title": "New Corrective Action Plan",
+  "s15Subtitle": "10-field root cause & action template",
+  "s15CapIdPreview": "CAP ID (Auto-Generated)",
+  "s15SectionOrigin": "1. Originating Finding",
+  "s15OriginAudit": "Origin Audit",
+  "s15OriginCheckpoint": "Failed Checkpoint",
+  "s15SelectAudit": "Select Audit",
+  "s15SelectCheckpoint": "Select Checkpoint",
+  "s15NoAuditsFound": "No audits found. Complete an audit first.",
+  "s15SectionProblem": "2. Problem & 5-Whys Analysis",
+  "s15ProblemStatement": "Problem Statement",
+  "s15ProblemStatementHint": "Describe what failed (1 sentence)",
+  "s15ProblemRequired": "Problem statement is required",
+  "s15Why1": "Why 1 (Primary Cause)",
+  "s15Why1Hint": "Why did this condition occur?",
+  "s15Why1Required": "Why 1 is required",
+  "s15Why2": "Why 2 (optional)",
+  "s15Why2Hint": "Why did that happen?",
+  "s15Why3": "Why 3 (optional)",
+  "s15Why3Hint": "Why did that happen?",
+  "s15Why4": "Why 4 (optional)",
+  "s15Why4Hint": "Why did that happen?",
+  "s15Why5": "Why 5 (optional)",
+  "s15Why5Hint": "Why did that happen?",
+  "s15RootCause": "Root Cause",
+  "s15RootCauseHint": "Systemic root cause (1-2 sentences)",
+  "s15RootCauseRequired": "Root cause is required",
+  "s15SectionActions": "3. Action Steps (3 to 5 steps)",
+  "s15StepLabel": "Step {number}",
+  "@s15StepLabel": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "s15StepHint": "Action step description",
+  "s15StepRequired": "Action step cannot be empty",
+  "s15AddStep": "Add Step",
+  "s15MinStepsNotice": "At least 3 steps required",
+  "s15MaxStepsReached": "Maximum 5 steps reached",
+  "s15SectionOwnership": "4. Ownership & Verification",
+  "s15ResponsibleUser": "Responsible (CAP Owner)",
+  "s15SelectResponsible": "Select responsible user (SM, GM, Owner)",
+  "s15ResponsibleRequired": "Responsible user is required",
+  "s15Deadline": "Deadline (Target Completion Date)",
+  "s15SelectDate": "Select Date",
+  "s15VerificationMethod": "Verification Method",
+  "s15VerificationMethodHint": "How will completion be verified?",
+  "s15VerificationRequired": "Verification method is required",
+  "s15CreateButton": "Create CAP",
+  "s15Creating": "Creating CAP...",
+  "s15CreatedSuccess": "CAP created successfully",
+  "s15AuditDropdownItem": "Audit {date} ({type})",
+  "@s15AuditDropdownItem": {
+    "placeholders": {
+      "date": {"type": "String"},
+      "type": {"type": "String"}
+    }
+  },
+  "s15ErrorPrefix": "Error: {message}",
+  "@s15ErrorPrefix": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
   }
 }
