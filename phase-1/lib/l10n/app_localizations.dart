@@ -3410,6 +3410,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry'**
   String get s25Retry;
+
+  /// No description provided for @s26HeaderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Workbook Appendix A.7 • 65 bilingual retail & audit terms with definitions'**
+  String get s26HeaderSubtitle;
+
+  /// No description provided for @s26SearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search term or definition (English / मराठी)...'**
+  String get s26SearchHint;
+
+  /// No description provided for @s26ShowingCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing {count} of {total} terms'**
+  String s26ShowingCount(int count, int total);
+
+  /// No description provided for @s26ClearSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get s26ClearSearch;
+
+  /// No description provided for @s26EmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching terms found'**
+  String get s26EmptyTitle;
+
+  /// No description provided for @s26EmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Try searching with a different English or Marathi keyword'**
+  String get s26EmptySubtitle;
+
+  /// No description provided for @s26Loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading glossary...'**
+  String get s26Loading;
+
+  /// No description provided for @s26Error.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load glossary'**
+  String get s26Error;
+
+  /// No description provided for @s26Retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get s26Retry;
+
+  /// No description provided for @s26EnglishLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'EN'**
+  String get s26EnglishLabel;
+
+  /// No description provided for @s26MarathiLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'मराठी'**
+  String get s26MarathiLabel;
 }
 
 class _AppLocalizationsDelegate

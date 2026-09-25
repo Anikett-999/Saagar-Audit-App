@@ -1826,4 +1826,41 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s25Retry => 'पुन्हा प्रयत्न करा';
+
+  @override
+  String get s26HeaderSubtitle =>
+      'पुस्तिका परिशिष्ट A.७ • व्याख्यांसह ६५ द्विभाषी रिटेल आणि ऑडिट संज्ञा';
+
+  @override
+  String get s26SearchHint => 'संज्ञा किंवा व्याख्या शोधा (English / मराठी)...';
+
+  @override
+  String s26ShowingCount(int count, int total) {
+    return '$total पैकी $count संज्ञा दर्शवत आहे';
+  }
+
+  @override
+  String get s26ClearSearch => 'शोध साफ करा';
+
+  @override
+  String get s26EmptyTitle => 'कोणतीही जुळणारी संज्ञा सापडली नाही';
+
+  @override
+  String get s26EmptySubtitle =>
+      'वेगळ्या इंग्रजी किंवा मराठी कीवर्डने शोधून पहा';
+
+  @override
+  String get s26Loading => 'शब्दकोश लोड होत आहे...';
+
+  @override
+  String get s26Error => 'शब्दकोश लोड करण्यात अयशस्वी';
+
+  @override
+  String get s26Retry => 'पुन्हा प्रयत्न करा';
+
+  @override
+  String get s26EnglishLabel => 'EN';
+
+  @override
+  String get s26MarathiLabel => 'मराठी';
 }

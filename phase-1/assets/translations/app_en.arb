@@ -818,7 +818,29 @@
   "s25WarningTitle": "Auditing vs Reporting Rule",
   "s25Loading": "Loading evidence guide...",
   "s25Error": "Failed to load evidence guide",
-  "s25Retry": "Retry"
+  "s25Retry": "Retry",
+
+  "s26HeaderSubtitle": "Workbook Appendix A.7 • 65 bilingual retail & audit terms with definitions",
+  "s26SearchHint": "Search term or definition (English / मराठी)...",
+  "s26ShowingCount": "Showing {count} of {total} terms",
+  "@s26ShowingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "s26ClearSearch": "Clear search",
+  "s26EmptyTitle": "No matching terms found",
+  "s26EmptySubtitle": "Try searching with a different English or Marathi keyword",
+  "s26Loading": "Loading glossary...",
+  "s26Error": "Failed to load glossary",
+  "s26Retry": "Retry",
+  "s26EnglishLabel": "EN",
+  "s26MarathiLabel": "मराठी"
 }
 
 

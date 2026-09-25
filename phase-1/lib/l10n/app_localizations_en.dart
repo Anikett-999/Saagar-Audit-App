@@ -1826,4 +1826,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s25Retry => 'Retry';
+
+  @override
+  String get s26HeaderSubtitle =>
+      'Workbook Appendix A.7 • 65 bilingual retail & audit terms with definitions';
+
+  @override
+  String get s26SearchHint => 'Search term or definition (English / मराठी)...';
+
+  @override
+  String s26ShowingCount(int count, int total) {
+    return 'Showing $count of $total terms';
+  }
+
+  @override
+  String get s26ClearSearch => 'Clear search';
+
+  @override
+  String get s26EmptyTitle => 'No matching terms found';
+
+  @override
+  String get s26EmptySubtitle =>
+      'Try searching with a different English or Marathi keyword';
+
+  @override
+  String get s26Loading => 'Loading glossary...';
+
+  @override
+  String get s26Error => 'Failed to load glossary';
+
+  @override
+  String get s26Retry => 'Retry';
+
+  @override
+  String get s26EnglishLabel => 'EN';
+
+  @override
+  String get s26MarathiLabel => 'मराठी';
 }
