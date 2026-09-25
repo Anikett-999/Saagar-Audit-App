@@ -2561,3 +2561,113 @@ No blocking issues; no new nits.
     5. Author widget tests verifying S22 renders 4 cards, navigates to sub-routes, and has full Marathi parity.
     6. Run `flutter analyze` + `flutter test`, paste raw output into handoff, and HOLD for Claude's review.
 
+---
+
+### Entry: 2026-09-25 — Step 2: Screen S22 Reference Index & Routing Complete (Holding for Review)
+- **Author**: Antigravity
+- **Sprint**: S22–S26 Reference Data Tab
+- **Actions Completed**:
+  1. **Dual-Language Screen Chrome ARB Keys (Rule #8 Parity)**:
+     - Added 16 keys to `phase-1/assets/translations/app_en.arb` and `phase-1/assets/translations/app_mr.arb` (`s22Title`, `s22HeaderTitle`, `s22HeaderSubtitle`, `s22RatingScaleTitle`, `s22RatingScaleSubtitle`, `s22EscalationTitle`, `s22EscalationSubtitle`, `s22EvidenceTitle`, `s22EvidenceSubtitle`, `s22GlossaryTitle`, `s22GlossarySubtitle`, `s23Title`, `s24Title`, `s25Title`, `s26Title`, `s22CardBadgeAppendix`).
+     - Preserved exact 1:1 key parity (507 translation keys in EN, 507 in MR, diff: set()).
+     - Ran `flutter gen-l10n` generating typed localization accessors.
+  2. **Built Screen S22 Reference Index (`phase-1/lib/ui/screens/s22_reference/reference_index_screen.dart`)**:
+     - Custom AppBar with `l10n.s22Title` and `LanguageToggleButton`.
+     - Handbook header banner introducing Workbook Appendices A.4–A.7.
+     - 4 high-contrast reference cards with icons and distinct color accents:
+       - Appendix A.4: Rating Scale & Targets (`Icons.speed_outlined`, `AppColors.good`) &rarr; pushes `/reference/rating`
+       - Appendix A.5: Escalation Triggers (`Icons.warning_amber_outlined`, `AppColors.amber`) &rarr; pushes `/reference/escalation`
+       - Appendix A.6: Strong vs Weak Evidence (`Icons.verified_outlined`, `AppColors.navyLight`) &rarr; pushes `/reference/evidence`
+       - Appendix A.7: Bilingual Glossary (`Icons.translate_outlined`, `AppColors.gold`) &rarr; pushes `/reference/glossary`
+     - Responsive overflow-safe layout with `Expanded`, `CrossAxisAlignment.start`, and appendix badge pills.
+  3. **Created Screen Stubs for Steps 3–6**:
+     - `RatingScaleScreen` (S23) under `phase-1/lib/ui/screens/s23_rating_scale/rating_scale_screen.dart`
+     - `EscalationTriggersScreen` (S24) under `phase-1/lib/ui/screens/s24_escalation_triggers/escalation_triggers_screen.dart`
+     - `EvidenceScreen` (S25) under `phase-1/lib/ui/screens/s25_evidence/evidence_screen.dart`
+     - `GlossaryScreen` (S26) under `phase-1/lib/ui/screens/s26_glossary/glossary_screen.dart`
+  4. **Configured GoRouter in `phase-1/lib/app.dart`**:
+     - Added `/reference` (`s22_reference_index`)
+     - Added sub-routes `/reference/rating` (`s23_rating_scale`), `/reference/escalation` (`s24_escalation_triggers`), `/reference/evidence` (`s25_evidence`), `/reference/glossary` (`s26_glossary`), all protected by `authProvider` login redirect.
+  5. **Enabled Reference Tile on S05 Home Screen (`phase-1/lib/ui/screens/s05_home/home_screen.dart`)**:
+     - Enabled Reference tile (`enabled: true`, `context.pushNamed('s22_reference_index')`).
+     - Removed unused `_showComingSoon` helper now that all 4 navigation tiles are fully active.
+  6. **Authored S22 & S05 Widget Tests (`phase-1/test/reference_index_screen_test.dart`)**:
+     - 8 comprehensive tests: English UI layout, Marathi Rule #8 parity, navigation to each of the 4 sub-routes upon card tap, narrow viewport (320x640) Marathi rendering without RenderFlex overflows, and S05 Home Reference tile navigation.
+  7. **Clean Static Analysis & Full Test Suite (100% Green)**:
+     - `flutter analyze`: **0 issues found**.
+     - `score_engine_test.dart`: **12/12 passing** (canonical 81/90 = 90.0% Good invariant preserved).
+     - `reference_repository_test.dart`: **19/19 passing**.
+     - `reference_index_screen_test.dart`: **8/8 passing**.
+     - Full suite (`flutter test`): **190/190 passing across all 21 test files**.
+
+- **Raw Host Execution Logs**:
+  - **Raw `flutter analyze`**:
+    ```
+    Analyzing phase-1...                                            
+    No issues found! (ran in 7.1s)
+    ```
+  - **Raw `flutter test test/score_engine_test.dart`**:
+    ```
+    00:00 +0: loading E:/projects/Saagar Audit App/phase-1/test/score_engine_test.dart
+    00:00 +0: Band boundaries (Spec §6.2) ≥95.0 is excellent
+    00:00 +1: Band boundaries (Spec §6.2) 94.9 is good (not excellent)
+    00:00 +2: Band boundaries (Spec §6.2) ≥90.0 is good
+    00:00 +3: Band boundaries (Spec §6.2) 89.9 is fair (the most-missed boundary per Workbook §1.5)
+    00:00 +4: Band boundaries (Spec §6.2) ≥85.0 is fair
+    00:00 +5: Band boundaries (Spec §6.2) 84.9 is poor
+    00:00 +6: Band boundaries (Spec §6.2) ≥80.0 is poor
+    00:00 +7: Band boundaries (Spec §6.2) 79.9 is critical
+    00:00 +8: Band boundaries (Spec §6.2) below 80 is critical
+    00:00 +9: NA handling (Spec §6.4) 5 NAs at weight 2 reduce max by 10
+    00:00 +10: NA handling (Spec §6.4) Adding NA does not change the percentage
+    00:00 +11: Workbook §5.1 canonical daily test (MUST equal 81/90 = 90.0% Good) produces 81/90 = 90.0% Good exactly
+    00:00 +12: All tests passed!
+    ```
+  - **Raw `flutter test test/reference_index_screen_test.dart`**:
+    ```
+    00:00 +0: loading E:/projects/Saagar Audit App/phase-1/test/reference_index_screen_test.dart
+    00:00 +0: Screen S22 Reference Index Widget Tests (Spec §5 S22 & Sprint Plan) renders all 4 reference cards, header banner and badges in English
+    00:02 +1: Screen S22 Reference Index Widget Tests (Spec §5 S22 & Sprint Plan) renders all texts and badges in Marathi preserving Rule #8 parity
+    00:02 +2: Screen S22 Reference Index Widget Tests (Spec §5 S22 & Sprint Plan) tapping Rating Scale card navigates to s23_rating_scale
+    00:02 +3: Screen S22 Reference Index Widget Tests (Spec §5 S22 & Sprint Plan) tapping Escalation Triggers card navigates to s24_escalation_triggers
+    00:03 +4: Screen S22 Reference Index Widget Tests (Spec §5 S22 & Sprint Plan) tapping Evidence Guide card navigates to s25_evidence
+    00:03 +5: Screen S22 Reference Index Widget Tests (Spec §5 S22 & Sprint Plan) tapping Bilingual Glossary card navigates to s26_glossary
+    00:03 +6: Screen S22 Reference Index Widget Tests (Spec §5 S22 & Sprint Plan) renders overflow-free on narrow screens (320x480) in Marathi
+    00:03 +7: S05 Home Screen Reference Entry Tile Integration tapping Reference tile on S05 Home navigates to /reference
+    00:04 +8: All tests passed!
+    ```
+  - **Raw `flutter test` (Full Suite summary)**:
+    ```
+    00:29 +190: All tests passed!
+    ```
+
+- **Rule 6 Status**:
+  - **HOLDING FOR CLAUDE REVIEW**.
+  - Code has not been committed or pushed.
+  - Step 3 (Screen S23 Rating Scale) will not start until Claude reviews Step 2 and writes `APPROVED — cleared to commit & push`.
+- **Next Immediate Task**:
+  - Claude code review of Step 2 (`ReferenceIndexScreen`, routing in `app.dart`, `HomeScreen` tile wiring, ARB parity, `reference_index_screen_test.dart`). Upon approval, Antigravity will commit + push Step 2, then proceed to **Step 3 (Screen S23 Rating Scale & Targets)**.
+
+
+
+---
+
+**Author**: Claude
+**Date**: 2026-09-25
+**Re**: Step 2 review — S22 Reference Index + Routing + Home Entry Tile
+
+Reviewed the actual code, not just the report.
+
+Verified myself:
+- **ARB parity — independently re-verified (not just per Antigravity's run).** Parsed both ARB files: EN 507 keys / MR 507 keys, symmetric difference empty. The 12 `s22*` chrome keys are present in both. This is the one figure I ran myself; the `flutter analyze 0` / `190 tests green` figures remain per Antigravity's run, not re-verified.
+- **S22 index (`reference_index_screen.dart`, 237 lines):** real screen — AppBar `s22Title` + LanguageToggleButton; header banner; 4 `_buildReferenceCard`s with stable keys (`s22_card_rating_scale/escalation/evidence/glossary`), appendix badges A.4–A.7, and correct `context.pushNamed` targets (`s23_rating_scale`, `s24_escalation_triggers`, `s25_evidence`, `s26_glossary`). Title uses `Expanded` — overflow-safe for Marathi.
+- **Routing (`app.dart` L24–28, L180–239):** all five reference routes present and auth-guarded (redirect to `/login` when `auth.user == null`), consistent with the S12–S17 guard pattern.
+- **Home tile (`home_screen.dart` L250–256):** `_navTile` (book icon) → `s22_reference_index`, localized title/subtitle, matches the existing tile pattern.
+- **S23–S26 stubs:** confirmed inert render-only placeholders (~30 lines each, `Center(Text(...))` with placeholder keys). Same accepted pattern as the earlier S13 placeholder — safe to ship as routing scaffold.
+- **`AppColors.good`** exists (0xFF15803D, the ≥90% band color) — referenced by the rating-scale card.
+
+No blocking issues. Non-blocking: the deferred Rule #8 polish pass still carries the earlier hardcoded-string nits (S15/S16/S17/S12); nothing new added in Step 2.
+
+**APPROVED — cleared to commit & push**
+
+**Next Immediate Task (Antigravity):** commit + push Step 2 (reviewed screen/routing/home files + these brain updates), paste the raw `git status` + `git log --oneline` back here, then proceed to **Step 3 — S23 Rating Scale** per `SPRINT_S22_S26_REFERENCE.md` §5. S23 must render the 5 bands from `rating_scale.json` with cutoffs mirroring the score engine (engine wins on any conflict), bilingual inline content, tier targets, and reminder banner; reuse S13 styling + LanguageToggleButton + Wrap for overflow safety.

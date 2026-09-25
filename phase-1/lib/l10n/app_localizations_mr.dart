@@ -1624,4 +1624,59 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s13Loading => 'ऑडिट तपशील लोड होत आहे...';
+
+  @override
+  String get s22Title => 'संदर्भ माहिती';
+
+  @override
+  String get s22HeaderTitle => 'स्टोअर ऑडिट कार्यपुस्तिका';
+
+  @override
+  String get s22HeaderSubtitle =>
+      'पुस्तिका परिशिष्टे A.४–A.७. स्टोअर कामकाजासाठी अंतर्निहित अनुपालन मानके आणि एस्केलेशन नियम.';
+
+  @override
+  String get s22RatingScaleTitle => 'रेटिंग स्केल आणि लक्ष्ये';
+
+  @override
+  String get s22RatingScaleSubtitle =>
+      '५ अनुपालन पट्ट्या, स्तर लक्ष्ये, दशांश अचूकता नियम (परिशिष्ट A.४)';
+
+  @override
+  String get s22EscalationTitle => 'एस्केलेशन ट्रिगर';
+
+  @override
+  String get s22EscalationSubtitle =>
+      '७ अनिवार्य ट्रिगर, ४-भाग संदेश स्वरूप, ३ उदाहरणे (परिशिष्ट A.५)';
+
+  @override
+  String get s22EvidenceTitle => 'मजबूत वि. दुर्बल पुरावा';
+
+  @override
+  String get s22EvidenceSubtitle =>
+      '८ मजबूत वि. ८ दुर्बल पुरावा प्रकार, ऑडिट मानके (परिशिष्ट A.६)';
+
+  @override
+  String get s22GlossaryTitle => 'द्विभाषी शब्दकोश';
+
+  @override
+  String get s22GlossarySubtitle =>
+      'इंग्रजी आणि मराठीतील ६५ रिटेल व ऑडिट संज्ञा, थेट शोधासह (परिशिष्ट A.७)';
+
+  @override
+  String get s23Title => 'रेटिंग स्केल';
+
+  @override
+  String get s24Title => 'एस्केलेशन ट्रिगर';
+
+  @override
+  String get s25Title => 'पुरावा मार्गदर्शिका';
+
+  @override
+  String get s26Title => 'द्विभाषी शब्दकोश';
+
+  @override
+  String s22CardBadgeAppendix(String code) {
+    return 'परिशिष्ट $code';
+  }
 }

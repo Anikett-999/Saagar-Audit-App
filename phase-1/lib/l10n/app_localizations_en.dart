@@ -1623,4 +1623,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s13Loading => 'Loading audit details...';
+
+  @override
+  String get s22Title => 'Reference Data';
+
+  @override
+  String get s22HeaderTitle => 'Store Audit Handbook';
+
+  @override
+  String get s22HeaderSubtitle =>
+      'Workbook Appendices A.4–A.7. Built-in compliance standards and escalation rules for store operations.';
+
+  @override
+  String get s22RatingScaleTitle => 'Rating Scale & Targets';
+
+  @override
+  String get s22RatingScaleSubtitle =>
+      '5 compliance bands, tier targets, decimal precision rules (Appendix A.4)';
+
+  @override
+  String get s22EscalationTitle => 'Escalation Triggers';
+
+  @override
+  String get s22EscalationSubtitle =>
+      '7 mandatory triggers, 4-part message format, 3 worked examples (Appendix A.5)';
+
+  @override
+  String get s22EvidenceTitle => 'Strong vs Weak Evidence';
+
+  @override
+  String get s22EvidenceSubtitle =>
+      '8 strong vs 8 weak evidence types, auditing standards (Appendix A.6)';
+
+  @override
+  String get s22GlossaryTitle => 'Bilingual Glossary';
+
+  @override
+  String get s22GlossarySubtitle =>
+      '65 retail and audit terms in English & Marathi with live search (Appendix A.7)';
+
+  @override
+  String get s23Title => 'Rating Scale';
+
+  @override
+  String get s24Title => 'Escalation Triggers';
+
+  @override
+  String get s25Title => 'Evidence Guide';
+
+  @override
+  String get s26Title => 'Bilingual Glossary';
+
+  @override
+  String s22CardBadgeAppendix(String code) {
+    return 'Appendix $code';
+  }
 }

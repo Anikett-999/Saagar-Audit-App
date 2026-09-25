@@ -3044,6 +3044,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading audit details...'**
   String get s13Loading;
+
+  /// No description provided for @s22Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference Data'**
+  String get s22Title;
+
+  /// No description provided for @s22HeaderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Store Audit Handbook'**
+  String get s22HeaderTitle;
+
+  /// No description provided for @s22HeaderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Workbook Appendices A.4–A.7. Built-in compliance standards and escalation rules for store operations.'**
+  String get s22HeaderSubtitle;
+
+  /// No description provided for @s22RatingScaleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating Scale & Targets'**
+  String get s22RatingScaleTitle;
+
+  /// No description provided for @s22RatingScaleSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'5 compliance bands, tier targets, decimal precision rules (Appendix A.4)'**
+  String get s22RatingScaleSubtitle;
+
+  /// No description provided for @s22EscalationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalation Triggers'**
+  String get s22EscalationTitle;
+
+  /// No description provided for @s22EscalationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'7 mandatory triggers, 4-part message format, 3 worked examples (Appendix A.5)'**
+  String get s22EscalationSubtitle;
+
+  /// No description provided for @s22EvidenceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong vs Weak Evidence'**
+  String get s22EvidenceTitle;
+
+  /// No description provided for @s22EvidenceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'8 strong vs 8 weak evidence types, auditing standards (Appendix A.6)'**
+  String get s22EvidenceSubtitle;
+
+  /// No description provided for @s22GlossaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bilingual Glossary'**
+  String get s22GlossaryTitle;
+
+  /// No description provided for @s22GlossarySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'65 retail and audit terms in English & Marathi with live search (Appendix A.7)'**
+  String get s22GlossarySubtitle;
+
+  /// No description provided for @s23Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating Scale'**
+  String get s23Title;
+
+  /// No description provided for @s24Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalation Triggers'**
+  String get s24Title;
+
+  /// No description provided for @s25Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Evidence Guide'**
+  String get s25Title;
+
+  /// No description provided for @s26Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Bilingual Glossary'**
+  String get s26Title;
+
+  /// No description provided for @s22CardBadgeAppendix.
+  ///
+  /// In en, this message translates to:
+  /// **'Appendix {code}'**
+  String s22CardBadgeAppendix(String code);
 }
 
 class _AppLocalizationsDelegate

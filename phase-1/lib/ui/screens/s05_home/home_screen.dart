@@ -230,17 +230,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  void _showComingSoon(BuildContext context, AppLocalizations l10n, String feature) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.s05ComingSoon(feature)),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 3),
-      ),
-    );
-  }
-
   Widget _navTiles(BuildContext context, AppLocalizations l10n, String role) {
     return Column(
       children: [
@@ -262,8 +251,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           icon: Icons.menu_book_outlined,
           title: l10n.s05ReferenceTitle,
           subtitle: l10n.s05ReferenceSubtitle,
-          enabled: false,
-          onTap: () => _showComingSoon(context, l10n, l10n.s05ReferenceTitle),
+          enabled: true,
+          onTap: () => context.pushNamed('s22_reference_index'),
         ),
         _navTile(
           icon: Icons.settings_outlined,

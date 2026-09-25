@@ -21,6 +21,11 @@ import 'ui/screens/s14_cap_list/cap_list_screen.dart';
 import 'ui/screens/s15_cap_create/cap_create_screen.dart';
 import 'ui/screens/s16_cap_detail/cap_detail_screen.dart';
 import 'ui/screens/s17_cap_mark_done/cap_mark_done_screen.dart';
+import 'ui/screens/s22_reference/reference_index_screen.dart';
+import 'ui/screens/s23_rating_scale/rating_scale_screen.dart';
+import 'ui/screens/s24_escalation_triggers/escalation_triggers_screen.dart';
+import 'ui/screens/s25_evidence/evidence_screen.dart';
+import 'ui/screens/s26_glossary/glossary_screen.dart';
 import 'providers/auth_provider.dart';
 import 'ui/screens/s27_settings/settings_screen.dart';
 import 'ui/screens/s28_manage_cros/manage_cros_screen.dart';
@@ -171,6 +176,66 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => CapMarkDoneScreen(
           capId: state.pathParameters['id']!,
         ),
+      ),
+      GoRoute(
+        path: '/reference',
+        name: 's22_reference_index',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          return null;
+        },
+        builder: (_, __) => const ReferenceIndexScreen(),
+      ),
+      GoRoute(
+        path: '/reference/rating',
+        name: 's23_rating_scale',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          return null;
+        },
+        builder: (_, __) => const RatingScaleScreen(),
+      ),
+      GoRoute(
+        path: '/reference/escalation',
+        name: 's24_escalation_triggers',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          return null;
+        },
+        builder: (_, __) => const EscalationTriggersScreen(),
+      ),
+      GoRoute(
+        path: '/reference/evidence',
+        name: 's25_evidence',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          return null;
+        },
+        builder: (_, __) => const EvidenceScreen(),
+      ),
+      GoRoute(
+        path: '/reference/glossary',
+        name: 's26_glossary',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          return null;
+        },
+        builder: (_, __) => const GlossaryScreen(),
       ),
       GoRoute(
         path: '/settings',
