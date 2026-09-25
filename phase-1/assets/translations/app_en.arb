@@ -778,7 +778,38 @@
   "s23TotalPointsLabel": "Total Weight",
   "s23Loading": "Loading rating scale...",
   "s23Error": "Failed to load rating scale",
-  "s23Retry": "Retry"
+  "s23Retry": "Retry",
+
+  "s24HeaderSubtitle": "Workbook Appendix A.5 • 7 mandatory escalation triggers & rules",
+  "s24SectionTriggersTitle": "7 Mandatory Escalation Triggers",
+  "s24SectionTriggersSubtitle": "Specific thresholds requiring immediate tier escalation",
+  "s24ThresholdLabel": "Threshold",
+  "s24EscalateToLabel": "Escalate to",
+  "s24WhenLabel": "When",
+  "s24SectionMessageFormatTitle": "Escalation Message Format (4 Parts)",
+  "s24SectionMessageFormatSubtitle": "Standard 4-part structure for escalation communications",
+  "s24PartBadge": "Part {number}",
+  "@s24PartBadge": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "s24SectionNeverEscalatesTitle": "What Never Escalates",
+  "s24SectionNeverEscalatesSubtitle": "Items resolved locally that must not be escalated through audit channels",
+  "s24SectionExamplesTitle": "Worked Example Messages",
+  "s24SectionExamplesSubtitle": "Ready-to-use communication templates for common triggers",
+  "s24WhatHappenedLabel": "1. What Happened",
+  "s24EvidenceLabel": "2. Evidence",
+  "s24ImpactLabel": "3. Operational Impact",
+  "s24ActionLabel": "4. Requested Action",
+  "s24CopyButton": "Copy Message",
+  "s24CopiedSnackbar": "Escalation message copied to clipboard",
+  "s24Loading": "Loading escalation triggers...",
+  "s24Error": "Failed to load escalation triggers",
+  "s24Retry": "Retry"
 }
+
 
 

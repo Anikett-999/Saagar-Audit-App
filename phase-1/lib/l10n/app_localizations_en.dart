@@ -1723,4 +1723,78 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s23Retry => 'Retry';
+
+  @override
+  String get s24HeaderSubtitle =>
+      'Workbook Appendix A.5 • 7 mandatory escalation triggers & rules';
+
+  @override
+  String get s24SectionTriggersTitle => '7 Mandatory Escalation Triggers';
+
+  @override
+  String get s24SectionTriggersSubtitle =>
+      'Specific thresholds requiring immediate tier escalation';
+
+  @override
+  String get s24ThresholdLabel => 'Threshold';
+
+  @override
+  String get s24EscalateToLabel => 'Escalate to';
+
+  @override
+  String get s24WhenLabel => 'When';
+
+  @override
+  String get s24SectionMessageFormatTitle =>
+      'Escalation Message Format (4 Parts)';
+
+  @override
+  String get s24SectionMessageFormatSubtitle =>
+      'Standard 4-part structure for escalation communications';
+
+  @override
+  String s24PartBadge(int number) {
+    return 'Part $number';
+  }
+
+  @override
+  String get s24SectionNeverEscalatesTitle => 'What Never Escalates';
+
+  @override
+  String get s24SectionNeverEscalatesSubtitle =>
+      'Items resolved locally that must not be escalated through audit channels';
+
+  @override
+  String get s24SectionExamplesTitle => 'Worked Example Messages';
+
+  @override
+  String get s24SectionExamplesSubtitle =>
+      'Ready-to-use communication templates for common triggers';
+
+  @override
+  String get s24WhatHappenedLabel => '1. What Happened';
+
+  @override
+  String get s24EvidenceLabel => '2. Evidence';
+
+  @override
+  String get s24ImpactLabel => '3. Operational Impact';
+
+  @override
+  String get s24ActionLabel => '4. Requested Action';
+
+  @override
+  String get s24CopyButton => 'Copy Message';
+
+  @override
+  String get s24CopiedSnackbar => 'Escalation message copied to clipboard';
+
+  @override
+  String get s24Loading => 'Loading escalation triggers...';
+
+  @override
+  String get s24Error => 'Failed to load escalation triggers';
+
+  @override
+  String get s24Retry => 'Retry';
 }

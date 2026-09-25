@@ -605,7 +605,38 @@
   "s23TotalPointsLabel": "एकूण वजन",
   "s23Loading": "रेटिंग स्केल लोड होत आहे...",
   "s23Error": "रेटिंग स्केल लोड करण्यात अयशस्वी",
-  "s23Retry": "पुन्हा प्रयत्न करा"
+  "s23Retry": "पुन्हा प्रयत्न करा",
+
+  "s24HeaderSubtitle": "पुस्तिका परिशिष्ट A.५ • ७ अनिवार्य एस्केलेशन ट्रिगर्स आणि नियम",
+  "s24SectionTriggersTitle": "७ अनिवार्य एस्केलेशन ट्रिगर्स",
+  "s24SectionTriggersSubtitle": "तातडीने स्तर वाढवणे आवश्यक असणाऱ्या विशिष्ट मर्यादा",
+  "s24ThresholdLabel": "मर्यादा",
+  "s24EscalateToLabel": "कोणाकडे",
+  "s24WhenLabel": "कधी",
+  "s24SectionMessageFormatTitle": "एस्केलेशन संदेश स्वरूप (४ भाग)",
+  "s24SectionMessageFormatSubtitle": "एस्केलेशन संप्रेषणासाठी प्रमाणित ४-भागांची रचना",
+  "s24PartBadge": "भाग {number}",
+  "@s24PartBadge": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "s24SectionNeverEscalatesTitle": "काय कधीच एस्केलेट होत नाही",
+  "s24SectionNeverEscalatesSubtitle": "स्थानिक पातळीवर सोडवल्या जाणाऱ्या बाबी ज्या ऑडिटद्वारे एस्केलेट करू नयेत",
+  "s24SectionExamplesTitle": "तयार उदाहरण संदेश",
+  "s24SectionExamplesSubtitle": "सामान्य ट्रिगर्ससाठी वापरण्यास तयार संदेश नमुने",
+  "s24WhatHappenedLabel": "१. काय झाले",
+  "s24EvidenceLabel": "२. पुरावा",
+  "s24ImpactLabel": "३. कार्यवाहक परिणाम",
+  "s24ActionLabel": "४. मागितलेली कृती",
+  "s24CopyButton": "संदेश कॉपी करा",
+  "s24CopiedSnackbar": "एस्केलेशन संदेश क्लिपबोर्डवर कॉपी केला",
+  "s24Loading": "एस्केलेशन ट्रिगर्स लोड होत आहेत...",
+  "s24Error": "एस्केलेशन ट्रिगर्स लोड करण्यात अयशस्वी",
+  "s24Retry": "पुन्हा प्रयत्न करा"
 }
+
 
 

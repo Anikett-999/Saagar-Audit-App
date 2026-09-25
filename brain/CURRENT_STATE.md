@@ -22,7 +22,8 @@
 | **S17**    | Mark Done Modal | ✅ Complete | Gated on all actions done, optional reflection notes & evidence photo, atomic markDone + cap_log, full EN/MR parity |
 | **S22**    | Reference Index | ✅ Complete | Built-in Store Audit Handbook hub (Appendices A.4–A.7), 4 navigation cards with distinct icons/accents, appendix badges, responsive layout, S05 Home tile wired, EN/MR parity |
 | **S23**    | Rating Scale | ✅ Complete | Appendix A.4: 5 compliance bands matching score engine cutoffs (≥95/≥90/≥85/≥80/<80), tier targets table (Tier 1 90%+, 81/90 canonical invariant), strict decimal warning banner ("89.9 is FAIR, not Good"), EN/MR parity |
-| **S24–S26**| Reference Data | 🔄 In Progress | Steps 1, 2, and 3 complete. Screens S24–S26 pending full UI steps. |
+| **S24**    | Escalation Triggers | ✅ Complete | Appendix A.5: 7 mandatory escalation triggers with thresholds & roles, 4-part message format card, what never escalates rules, 3 worked example message cards with clipboard copy, EN/MR parity |
+| **S25–S26**| Reference Data | 🔄 In Progress | Steps 1 to 4 complete. Screens S25 & S26 pending full UI steps. |
 | **S27**    | Settings Hub | ✅ Complete | Role-filtered list (Owner-only Users), profile badge, real S05 navigation |
 | **S28**    | Manage CROs | ✅ Complete | List all, Add/Edit/Deactivate/Reactivate, soft deactivation preserves audit trail, EN/MR parity |
 | **S29**    | Manage Users | ✅ Complete | Owner-only, route-guarded, SM/GM creation only (no Owner), bcrypt PINs, soft deactivation, Owner protected, EN/MR parity |
@@ -30,11 +31,12 @@
 | **S31**    | Language | ✅ Complete | Dedicated screen, live EN/MR switch, persists to users.language_pref, login restore, full EN/MR parity |
 | **S32**    | Backup / Export | ✅ Complete | All 14 tables exported to timestamped JSON in Downloads, Owner-only Firestore sync stub (Coming in Phase 4), security advisory, About card, full EN/MR parity |
 
-> **Sprint S22–S26 (Reference Data Tab) is ACTIVE. Step 3 (Screen S23 Rating Scale & Targets) is built and verified. 195/195 tests passing across 22 test files. Holding for Claude review before push.**
+> **Sprint S22–S26 (Reference Data Tab) is ACTIVE. Step 4 (Screen S24 Escalation Triggers) is built and verified. 200/200 tests passing across 23 test files. Holding for Claude review before push.**
 
 ## 2. Verified Baseline Health
 - `flutter analyze`: **0 issues found (Clean baseline)**
-- `flutter test`: **195/195 tests passing across 22 test files**:
+- `flutter test`: **200/200 tests passing across 23 test files**:
+  - `escalation_triggers_screen_test.dart` (5 tests) — Screen S24 Escalation Triggers: 7 mandatory escalation triggers with thresholds/recipients/timing, 4-part message format card, what never escalates section, 3 worked example cards with copy action, full Marathi Rule #8 parity, 320x640 narrow-width overflow safety, refresh data action
   - `rating_scale_screen_test.dart` (5 tests) — Screen S23 Rating Scale: 5 compliance bands table/cards matching score engine cutoffs, tier targets table (Tier 1 daily, Tier 2 weekly, Tier 3 monthly with canonical 81/90 pts invariant), decimal precision reminder banner ("89.9 is FAIR, not Good"), full Marathi Rule #8 parity, 320x640 narrow-width overflow safety, refresh data action
   - `reference_index_screen_test.dart` (8 tests) — Screen S22 Reference Index: AppBar title & LanguageToggleButton, handbook header banner, 4 navigation cards with titles/subtitles/appendix badges (A.4 Rating Scale, A.5 Escalation, A.6 Evidence, A.7 Glossary), tapping cards navigates to `/reference/rating`, `/reference/escalation`, `/reference/evidence`, `/reference/glossary`, Marathi Rule #8 parity, 320x640 narrow-width overflow safety, S05 Home Reference tile navigation to `/reference`
   - `reference_repository_test.dart` (19 tests) — S22–S26 reference data layer: `rating_scale.json` parsing (5 bands, 3 tier targets, strict score engine cutoffs match, reminder banner), `escalation_triggers.json` parsing (7 triggers, 4-part message format, 3 worked examples for Triggers 1, 3, 5, never-escalates rules), `evidence.json` parsing (8 strong/weak pairs, warning banner), `glossary.json` parsing (exactly 65 bilingual terms & meanings, non-empty validation), glossary search (empty/spaces return all 65, EN term search, Devanagari MR term search, meaning search, acronyms, non-matching), in-memory caching & clearCache

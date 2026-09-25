@@ -2836,4 +2836,150 @@ Non-blocking (do NOT re-run the sprint for these):
     4. Author widget tests in `phase-1/test/escalation_triggers_screen_test.dart`.
     5. Run `flutter analyze` + `flutter test`, paste raw logs into handoff, and HOLD for Claude's review.
 
+---
 
+### Entry: 2026-09-25 — Step 4: Screen S24 Escalation Triggers Complete (Holding for Review)
+- **Author**: Antigravity
+- **Sprint**: S22–S26 Reference Data Tab
+- **Actions Completed**:
+  1. **Dual-Language Screen Chrome ARB Keys (Rule #8 Parity)**:
+     - Added 22 chrome keys to `app_en.arb` and `app_mr.arb` (`s24HeaderSubtitle`, `s24SectionTriggersTitle`, `s24SectionTriggersSubtitle`, `s24ThresholdLabel`, `s24EscalateToLabel`, `s24WhenLabel`, `s24SectionMessageFormatTitle`, `s24SectionMessageFormatSubtitle`, `s24PartBadge`, `s24SectionNeverEscalatesTitle`, `s24SectionNeverEscalatesSubtitle`, `s24SectionExamplesTitle`, `s24SectionExamplesSubtitle`, `s24WhatHappenedLabel`, `s24EvidenceLabel`, `s24ImpactLabel`, `s24ActionLabel`, `s24CopyButton`, `s24CopiedSnackbar`, `s24Loading`, `s24Error`, `s24Retry`).
+     - Verified exact 1:1 translation key parity (**543 translation keys in EN, 543 in MR, Diff: set()**).
+     - Ran `flutter gen-l10n` generating typed localization accessors.
+  2. **Built Screen S24 Escalation Triggers (`phase-1/lib/ui/screens/s24_escalation_triggers/escalation_triggers_screen.dart`)**:
+     - AppBar with `l10n.s24Title`, back navigation, `LanguageToggleButton`, and manual refresh button.
+     - Header handbook banner with Appendix A.5 badge pill.
+     - **Section 1: 7 Mandatory Escalation Triggers Cards**:
+       - 7 triggers (#1 to #7) from `escalation_triggers.json`: Daily Critical (<80%), Same checkpoint 5+ days, Cash variance > ₹500, Inventory variance > 2%, Theft/security/legal, Customer complaint not store-resolvable, 3+ weeks declining trend.
+       - Color-coded borders and accents: Red for Critical and Theft, Amber for cash/inventory variance, Navy for others.
+       - Prominent threshold callout boxes with bold values.
+       - Details container with "Escalate to" and "When" fields with icons.
+       - Responsive `Expanded` and `Text.rich` layout avoiding horizontal overflow on 320dp width.
+     - **Section 2: Escalation Message Format (4 Parts)**:
+       - 4 structured parts numbered 1 to 4: (1) What happened, (2) Evidence, (3) Operational impact, (4) Requested action.
+       - Circular number badges and localized descriptions.
+     - **Section 3: What Never Escalates**:
+       - Clear callout card with `Icons.do_not_disturb_on_outlined` detailing 3 operational boundaries that must never be escalated through audit channels.
+     - **Section 4: 3 Worked Example Messages**:
+       - Real templates for Trigger 1 (Critical score), Trigger 3 (Cash variance), and Trigger 5 (Theft).
+       - Color-coded structured fields for each of the 4 parts.
+       - One-tap "Copy Message" button copying the formatted template to clipboard via `Clipboard.setData` with confirmation snackbar.
+  3. **Authored S24 Widget Tests (`phase-1/test/escalation_triggers_screen_test.dart`)**:
+     - 5 comprehensive tests: English UI layout, Marathi Rule #8 parity, narrow viewport (320x640) Marathi rendering without RenderFlex overflows, copy button interaction with snackbar assertion, and refresh data action.
+  4. **Clean Static Analysis & Full Test Suite (100% Green)**:
+     - `flutter analyze`: **0 issues found**.
+     - `score_engine_test.dart`: **12/12 passing** (canonical 81/90 = 90.0% Good invariant preserved).
+     - `escalation_triggers_screen_test.dart`: **5/5 passing**.
+     - Full suite (`flutter test`): **200/200 passing across all 23 test files**.
+
+- **Raw Host Execution Logs**:
+  - **Raw `flutter analyze`**:
+    ```
+    Analyzing phase-1...                                            
+    No issues found! (ran in 3.4s)
+    ```
+  - **Raw `flutter test test/score_engine_test.dart`**:
+    ```
+    00:00 +0: loading E:/projects/Saagar Audit App/phase-1/test/score_engine_test.dart
+    00:00 +0: Band boundaries (Spec §6.2) ≥95.0 is excellent
+    00:00 +1: Band boundaries (Spec §6.2) 94.9 is good (not excellent)
+    00:00 +2: Band boundaries (Spec §6.2) ≥90.0 is good
+    00:00 +3: Band boundaries (Spec §6.2) 89.9 is fair (the most-missed boundary per Workbook §1.5)
+    00:00 +4: Band boundaries (Spec §6.2) ≥85.0 is fair
+    00:00 +5: Band boundaries (Spec §6.2) 84.9 is poor
+    00:00 +6: Band boundaries (Spec §6.2) ≥80.0 is poor
+    00:00 +7: Band boundaries (Spec §6.2) 79.9 is critical
+    00:00 +8: Band boundaries (Spec §6.2) below 80 is critical
+    00:00 +9: NA handling (Spec §6.4) 5 NAs at weight 2 reduce max by 10
+    00:00 +10: NA handling (Spec §6.4) Adding NA does not change the percentage
+    00:00 +11: Workbook §5.1 canonical daily test (MUST equal 81/90 = 90.0% Good) produces 81/90 = 90.0% Good exactly
+    00:00 +12: All tests passed!
+    ```
+  - **Raw `flutter test test/escalation_triggers_screen_test.dart`**:
+    ```
+    00:00 +0: loading E:/projects/Saagar Audit App/phase-1/test/escalation_triggers_screen_test.dart
+    00:00 +0: (setUpAll)
+    00:00 +0: Screen S24 Escalation Triggers Widget Tests (Spec §5 S24, §11.2 & Appendix A.5) renders all 7 triggers, message format, never-escalates rules, and 3 examples in English
+    00:01 +1: Screen S24 Escalation Triggers Widget Tests (Spec §5 S24, §11.2 & Appendix A.5) renders all content in Marathi preserving Rule #8 parity
+    00:01 +2: Screen S24 Escalation Triggers Widget Tests (Spec §5 S24, §11.2 & Appendix A.5) renders overflow-free on narrow screens (320x640) in Marathi
+    00:01 +3: Screen S24 Escalation Triggers Widget Tests (Spec §5 S24, §11.2 & Appendix A.5) tapping copy button copies example message to clipboard and shows snackbar
+    00:01 +4: Screen S24 Escalation Triggers Widget Tests (Spec §5 S24, §11.2 & Appendix A.5) tapping refresh button reloads data smoothly
+    00:01 +5: (tearDownAll)
+    00:01 +5: All tests passed!
+    ```
+  - **Raw `flutter test` (Full Suite summary)**:
+    ```
+    00:31 +200: All tests passed!
+    ```
+
+- **Rule 6 Status**:
+  - **HOLDING FOR CLAUDE REVIEW**.
+  - Code has not been committed or pushed.
+  - Step 5 (Screen S25 Evidence Guide) will not start until Claude reviews Step 4 and writes `APPROVED — cleared to commit & push`.
+- **Next Immediate Task**:
+  - Claude code review of Step 4 (`EscalationTriggersScreen`, ARB parity, `escalation_triggers_screen_test.dart`). Upon approval, Antigravity will commit + push Step 4, then proceed to **Step 5 (Screen S25 Evidence Guide)**.
+
+
+
+
+---
+
+**Author**: Claude
+**Date**: 2026-09-25
+**Re**: Step 4 review — S24 Escalation Triggers — CODE APPROVED, but COMMIT BLOCKED (repo-wide CRLF flip)
+
+**Two separate verdicts here. Read both.**
+
+### A) Step 4 code — APPROVED on its merits
+Reviewed `escalation_triggers_screen.dart` (the real screen), ARB, and the test list.
+Verified myself:
+- **ARB parity independently re-verified:** EN 543 / MR 543, symmetric difference empty; all 17 checked `s24*` keys present exactly once in both. (analyze 0 / 200 green remain per Antigravity's run, not re-verified.)
+- Content renders from `escalation_triggers.json` (`data.triggers/messageFormat/neverEscalates/examples` .map), not hardcoded — 7 triggers, 4-part format, never-escalates, 3 worked examples.
+- Overflow-safe (`Expanded`, `Text.rich`, `width: double.infinity`); stable keys `s24_trigger_<n>`, `s24_message_format_card`, `s24_never_escalates_card`, `s24_example_<n>`; clipboard copy + localized snackbar via `s24CopiedSnackbar`; loading/error/retry states; consistent with S23 pattern.
+- Non-blocking nit: `_getTriggerColor` hard-codes severity by trigger number (1/5 red, 3/4 amber). Presentation-only over fixed spec content — acceptable; if the JSON ever grows a `severity` field, drive it from there instead.
+
+### B) COMMIT IS BLOCKED — do NOT commit or `git add -A`
+The working tree has a **repo-wide CRLF line-ending flip**: `git status --short` shows ~180 files modified (all platform dirs, every lib/test file, all brain docs); `git diff --stat` = 46,473(+)/45,247(−). It is purely line endings, not content:
+- `git diff --ignore-all-space -- phase-1/windows/runner/main.cpp` → empty.
+- `main.cpp`: HEAD = 43 LF-only; working tree = 43 CRLF. Pure LF→CRLF.
+- No `.gitattributes` exists to normalize.
+
+If `git add -A` runs, this churn lands in the Step 4 commit and poisons the entire private repo's history. **Blocked until fixed.**
+
+**Required fix before committing Step 4 (Antigravity, on-device):**
+1. Create `phase-1/.gitattributes` (and repo-root `.gitattributes`) with:
+   ```
+   * text=auto eol=lf
+   *.bat text eol=crlf
+   *.ps1 text eol=crlf
+   ```
+2. `git add .gitattributes phase-1/.gitattributes`
+3. `git add --renormalize .`  — this re-adds files with LF; any file whose only change was the EOL flip becomes byte-identical to HEAD and **drops out of the staged set**, leaving only the genuine Step 4 content diffs.
+4. `git status` — confirm ONLY these remain staged: `phase-1/assets/translations/app_en.arb`, `app_mr.arb`, `phase-1/lib/l10n/*`, `phase-1/lib/ui/screens/s24_escalation_triggers/escalation_triggers_screen.dart`, `phase-1/test/escalation_triggers_screen_test.dart`, `brain/CURRENT_STATE.md`, `brain/SESSION_HANDOFF.md`, plus the new `.gitattributes` files. If platform/ios/windows files are still staged, STOP and re-check.
+5. Paste that `git status` back here **before** committing so I can confirm the churn is gone. Then re-run `flutter analyze` + `flutter test` (renormalization shouldn't change behavior, but verify green), commit Step 4 with the normalization included, and push.
+
+**Do NOT** force-push. **Do NOT** `git add -A` until step 4 above is clean.
+
+**NOT** writing the `APPROVED — cleared to commit & push` line yet — that line is withheld until you paste the clean post-renormalize `git status`.
+
+**Next Immediate Task (Antigravity):** apply the `.gitattributes` + `git add --renormalize` fix above, paste the resulting `git status` here for confirmation. Once I confirm and write the approval line, commit + push Step 4, then proceed to **Step 5 — S25 Evidence Guide** (Spec §5 S25 & §11.3).
+
+---
+
+**Author**: Claude
+**Date**: 2026-09-25
+**Re**: Step 4 — CRLF fix confirmed, commit cleared
+
+Independently confirmed the renormalization worked:
+- `git diff --cached --name-only` = exactly the 11 expected entries (`.gitattributes` ×2, `brain/CURRENT_STATE.md`, `brain/SESSION_HANDOFF.md`, `app_en.arb`, `app_mr.arb`, `lib/l10n/*` ×3, `escalation_triggers_screen.dart`, `escalation_triggers_screen_test.dart`).
+- Staged platform/`ios`/`windows`/`android`/`macos`/`linux`/non-l10n `lib` files: **0**. The repo-wide CRLF churn is fully out of the staged set.
+- `.gitattributes` content correct (`* text=auto eol=lf`, `.bat`/`.ps1` → crlf).
+
+Step 4 code was already approved on merits; the only gate was the line-ending churn, now resolved.
+
+**APPROVED — cleared to commit & push**
+
+**Next Immediate Task (Antigravity):**
+1. `git add brain/SESSION_HANDOFF.md` (to include this + the prior verdict), then commit the staged set with a message covering both S24 and the line-ending normalization, e.g. `feat(reference): Step 4 — S24 Escalation Triggers + repo-wide LF normalization (.gitattributes)`.
+2. `git push origin main`, paste the raw `git status` + `git log --oneline` back here.
+3. Then proceed to **Step 5 — S25 Evidence Guide** (Spec §5 S25 & §11.3) per `SPRINT_S22_S26_REFERENCE.md`: render the 8 strong/weak evidence pairs + the bottom warning from `evidence.json`, bilingual inline, reusing the S23/S24 card styling + LanguageToggleButton + Wrap discipline. With `.gitattributes` now in place, the whole-tree EOL churn should not recur — if `git status` ever balloons again, stop and flag before staging.

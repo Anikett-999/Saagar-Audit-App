@@ -3224,6 +3224,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry'**
   String get s23Retry;
+
+  /// No description provided for @s24HeaderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Workbook Appendix A.5 • 7 mandatory escalation triggers & rules'**
+  String get s24HeaderSubtitle;
+
+  /// No description provided for @s24SectionTriggersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'7 Mandatory Escalation Triggers'**
+  String get s24SectionTriggersTitle;
+
+  /// No description provided for @s24SectionTriggersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Specific thresholds requiring immediate tier escalation'**
+  String get s24SectionTriggersSubtitle;
+
+  /// No description provided for @s24ThresholdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Threshold'**
+  String get s24ThresholdLabel;
+
+  /// No description provided for @s24EscalateToLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalate to'**
+  String get s24EscalateToLabel;
+
+  /// No description provided for @s24WhenLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'When'**
+  String get s24WhenLabel;
+
+  /// No description provided for @s24SectionMessageFormatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalation Message Format (4 Parts)'**
+  String get s24SectionMessageFormatTitle;
+
+  /// No description provided for @s24SectionMessageFormatSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard 4-part structure for escalation communications'**
+  String get s24SectionMessageFormatSubtitle;
+
+  /// No description provided for @s24PartBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Part {number}'**
+  String s24PartBadge(int number);
+
+  /// No description provided for @s24SectionNeverEscalatesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What Never Escalates'**
+  String get s24SectionNeverEscalatesTitle;
+
+  /// No description provided for @s24SectionNeverEscalatesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Items resolved locally that must not be escalated through audit channels'**
+  String get s24SectionNeverEscalatesSubtitle;
+
+  /// No description provided for @s24SectionExamplesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Worked Example Messages'**
+  String get s24SectionExamplesTitle;
+
+  /// No description provided for @s24SectionExamplesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready-to-use communication templates for common triggers'**
+  String get s24SectionExamplesSubtitle;
+
+  /// No description provided for @s24WhatHappenedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'1. What Happened'**
+  String get s24WhatHappenedLabel;
+
+  /// No description provided for @s24EvidenceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'2. Evidence'**
+  String get s24EvidenceLabel;
+
+  /// No description provided for @s24ImpactLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'3. Operational Impact'**
+  String get s24ImpactLabel;
+
+  /// No description provided for @s24ActionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'4. Requested Action'**
+  String get s24ActionLabel;
+
+  /// No description provided for @s24CopyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Message'**
+  String get s24CopyButton;
+
+  /// No description provided for @s24CopiedSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalation message copied to clipboard'**
+  String get s24CopiedSnackbar;
+
+  /// No description provided for @s24Loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading escalation triggers...'**
+  String get s24Loading;
+
+  /// No description provided for @s24Error.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load escalation triggers'**
+  String get s24Error;
+
+  /// No description provided for @s24Retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get s24Retry;
 }
 
 class _AppLocalizationsDelegate

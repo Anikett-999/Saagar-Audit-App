@@ -1724,4 +1724,77 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s23Retry => 'पुन्हा प्रयत्न करा';
+
+  @override
+  String get s24HeaderSubtitle =>
+      'पुस्तिका परिशिष्ट A.५ • ७ अनिवार्य एस्केलेशन ट्रिगर्स आणि नियम';
+
+  @override
+  String get s24SectionTriggersTitle => '७ अनिवार्य एस्केलेशन ट्रिगर्स';
+
+  @override
+  String get s24SectionTriggersSubtitle =>
+      'तातडीने स्तर वाढवणे आवश्यक असणाऱ्या विशिष्ट मर्यादा';
+
+  @override
+  String get s24ThresholdLabel => 'मर्यादा';
+
+  @override
+  String get s24EscalateToLabel => 'कोणाकडे';
+
+  @override
+  String get s24WhenLabel => 'कधी';
+
+  @override
+  String get s24SectionMessageFormatTitle => 'एस्केलेशन संदेश स्वरूप (४ भाग)';
+
+  @override
+  String get s24SectionMessageFormatSubtitle =>
+      'एस्केलेशन संप्रेषणासाठी प्रमाणित ४-भागांची रचना';
+
+  @override
+  String s24PartBadge(int number) {
+    return 'भाग $number';
+  }
+
+  @override
+  String get s24SectionNeverEscalatesTitle => 'काय कधीच एस्केलेट होत नाही';
+
+  @override
+  String get s24SectionNeverEscalatesSubtitle =>
+      'स्थानिक पातळीवर सोडवल्या जाणाऱ्या बाबी ज्या ऑडिटद्वारे एस्केलेट करू नयेत';
+
+  @override
+  String get s24SectionExamplesTitle => 'तयार उदाहरण संदेश';
+
+  @override
+  String get s24SectionExamplesSubtitle =>
+      'सामान्य ट्रिगर्ससाठी वापरण्यास तयार संदेश नमुने';
+
+  @override
+  String get s24WhatHappenedLabel => '१. काय झाले';
+
+  @override
+  String get s24EvidenceLabel => '२. पुरावा';
+
+  @override
+  String get s24ImpactLabel => '३. कार्यवाहक परिणाम';
+
+  @override
+  String get s24ActionLabel => '४. मागितलेली कृती';
+
+  @override
+  String get s24CopyButton => 'संदेश कॉपी करा';
+
+  @override
+  String get s24CopiedSnackbar => 'एस्केलेशन संदेश क्लिपबोर्डवर कॉपी केला';
+
+  @override
+  String get s24Loading => 'एस्केलेशन ट्रिगर्स लोड होत आहेत...';
+
+  @override
+  String get s24Error => 'एस्केलेशन ट्रिगर्स लोड करण्यात अयशस्वी';
+
+  @override
+  String get s24Retry => 'पुन्हा प्रयत्न करा';
 }
