@@ -808,8 +808,19 @@
   "s24CopiedSnackbar": "Escalation message copied to clipboard",
   "s24Loading": "Loading escalation triggers...",
   "s24Error": "Failed to load escalation triggers",
-  "s24Retry": "Retry"
+  "s24Retry": "Retry",
+
+  "s25HeaderSubtitle": "Workbook Appendix A.6 • 8 strong vs weak evidence standards",
+  "s25SectionPairsTitle": "8 Evidence Standards",
+  "s25SectionPairsSubtitle": "Every audit finding must rest on strong evidence",
+  "s25StrongEvidenceLabel": "STRONG EVIDENCE",
+  "s25WeakEvidenceLabel": "WEAK EVIDENCE (UNACCEPTABLE)",
+  "s25WarningTitle": "Auditing vs Reporting Rule",
+  "s25Loading": "Loading evidence guide...",
+  "s25Error": "Failed to load evidence guide",
+  "s25Retry": "Retry"
 }
+
 
 
 

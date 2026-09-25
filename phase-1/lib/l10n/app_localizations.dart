@@ -3356,6 +3356,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry'**
   String get s24Retry;
+
+  /// No description provided for @s25HeaderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Workbook Appendix A.6 • 8 strong vs weak evidence standards'**
+  String get s25HeaderSubtitle;
+
+  /// No description provided for @s25SectionPairsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'8 Evidence Standards'**
+  String get s25SectionPairsTitle;
+
+  /// No description provided for @s25SectionPairsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Every audit finding must rest on strong evidence'**
+  String get s25SectionPairsSubtitle;
+
+  /// No description provided for @s25StrongEvidenceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'STRONG EVIDENCE'**
+  String get s25StrongEvidenceLabel;
+
+  /// No description provided for @s25WeakEvidenceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'WEAK EVIDENCE (UNACCEPTABLE)'**
+  String get s25WeakEvidenceLabel;
+
+  /// No description provided for @s25WarningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Auditing vs Reporting Rule'**
+  String get s25WarningTitle;
+
+  /// No description provided for @s25Loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading evidence guide...'**
+  String get s25Loading;
+
+  /// No description provided for @s25Error.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load evidence guide'**
+  String get s25Error;
+
+  /// No description provided for @s25Retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get s25Retry;
 }
 
 class _AppLocalizationsDelegate

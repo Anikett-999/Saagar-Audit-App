@@ -1797,4 +1797,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s24Retry => 'Retry';
+
+  @override
+  String get s25HeaderSubtitle =>
+      'Workbook Appendix A.6 • 8 strong vs weak evidence standards';
+
+  @override
+  String get s25SectionPairsTitle => '8 Evidence Standards';
+
+  @override
+  String get s25SectionPairsSubtitle =>
+      'Every audit finding must rest on strong evidence';
+
+  @override
+  String get s25StrongEvidenceLabel => 'STRONG EVIDENCE';
+
+  @override
+  String get s25WeakEvidenceLabel => 'WEAK EVIDENCE (UNACCEPTABLE)';
+
+  @override
+  String get s25WarningTitle => 'Auditing vs Reporting Rule';
+
+  @override
+  String get s25Loading => 'Loading evidence guide...';
+
+  @override
+  String get s25Error => 'Failed to load evidence guide';
+
+  @override
+  String get s25Retry => 'Retry';
 }

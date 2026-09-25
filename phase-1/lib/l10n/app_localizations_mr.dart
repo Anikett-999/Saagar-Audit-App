@@ -1797,4 +1797,33 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s24Retry => 'पुन्हा प्रयत्न करा';
+
+  @override
+  String get s25HeaderSubtitle =>
+      'पुस्तिका परिशिष्ट A.६ • ८ मजबूत वि. दुर्बल पुरावा मानके';
+
+  @override
+  String get s25SectionPairsTitle => '८ पुरावा मानके';
+
+  @override
+  String get s25SectionPairsSubtitle =>
+      'प्रत्येक ऑडिट निष्कर्षाला मजबूत पुराव्याचा आधार हवा';
+
+  @override
+  String get s25StrongEvidenceLabel => 'मजबूत पुरावा';
+
+  @override
+  String get s25WeakEvidenceLabel => 'दुर्बल पुरावा (अस्वीकार्य)';
+
+  @override
+  String get s25WarningTitle => 'ऑडिट वि. रिपोर्टिंग नियम';
+
+  @override
+  String get s25Loading => 'पुरावा मार्गदर्शिका लोड होत आहे...';
+
+  @override
+  String get s25Error => 'पुरावा मार्गदर्शिका लोड करण्यात अयशस्वी';
+
+  @override
+  String get s25Retry => 'पुन्हा प्रयत्न करा';
 }

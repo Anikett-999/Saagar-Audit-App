@@ -3018,3 +3018,100 @@ Step 4 code was already approved on merits; the only gate was the line-ending ch
     4. Author widget tests in `phase-1/test/evidence_screen_test.dart`.
     5. Run `flutter analyze` + `flutter test`, paste raw logs into handoff, and HOLD for Claude's review.
 
+---
+
+### Entry: 2026-09-25 — Step 5 (Screen S25 Evidence Guide) Built & Verified (204/204 Tests Green)
+- **Author**: Antigravity (reporting to Claude, Senior Developer & Team Lead)
+- **Sprint**: S22–S26 Reference Data Tab — Step 5 (Screen S25 Evidence Guide)
+- **Scope & Deliverables Completed**:
+  1. **Rule #8 Localization Parity**:
+     - Added 9 chrome keys to `phase-1/assets/translations/app_en.arb` and `phase-1/assets/translations/app_mr.arb`:
+       `s25HeaderSubtitle`, `s25SectionPairsTitle`, `s25SectionPairsSubtitle`, `s25StrongEvidenceLabel`, `s25WeakEvidenceLabel`, `s25WarningTitle`, `s25Loading`, `s25Error`, `s25Retry`.
+     - Verified parity via script: **552 translation keys in EN, 552 in MR, symmetric difference is empty `set()`**.
+     - Compiled localized accessors with `flutter gen-l10n`.
+  2. **Screen S25 Implemented (`phase-1/lib/ui/screens/s25_evidence/evidence_screen.dart`)**:
+     - Built `EvidenceScreen` (ConsumerStatefulWidget) consuming `ReferenceRepository.loadEvidenceGuide()`.
+     - Standard AppBar with `l10n.s25Title` ("Evidence Guide" / "पुरावा मार्गदर्शिका"), back navigation with fallback to `s22_reference_index`, `LanguageToggleButton`, and reload action.
+     - Appendix A.6 handbook header banner with pill badge (`l10n.s22CardBadgeAppendix('A.6')`).
+     - Subtitle context callout (*"Every audit finding must be evidenced by something in the Strong Evidence column..."*).
+     - Section Header: "8 Evidence Standards" / "८ पुरावा मानके".
+     - **8 Evidence Comparison Cards** (`s25_pair_1` to `s25_pair_8`):
+       - Strong Evidence box: green accent (`AppColors.good`), `Icons.check_circle_outline`, `pair.strong(locale)`.
+       - Weak Evidence box: red accent (`AppColors.red`), `Icons.cancel_outlined`, `pair.weak(locale)`.
+       - Clean layout using `ClipRRect` and left border to prevent Flutter non-uniform border exceptions.
+     - **Operational Bottom Warning Banner** (`s25_warning_banner`): `AppColors.amberPale` callout with `Icons.warning_amber_rounded` explaining the auditing vs reporting rule.
+  3. **Widget Tests Authoring (`phase-1/test/evidence_screen_test.dart`)**:
+     - 4/4 passing widget tests:
+       - English UI layout: renders all 8 evidence standards, subtitle callout, and warning banner.
+       - Marathi Rule #8 parity: renders all content in Marathi without missing strings.
+       - Responsive layout: verified overflow-free on 320x640 narrow screens.
+       - Manual refresh action: verifies data reload.
+  4. **Raw Host Execution Logs**:
+     - **Raw `flutter analyze` output**:
+       ```
+       Analyzing phase-1...                                            
+       No issues found! (ran in 7.4s)
+       ```
+     - **Raw ARB Parity Check**:
+       ```
+       EN: 552 MR: 552
+       Diff: NONE
+       ```
+     - **Targeted Test Run (`flutter test test/evidence_screen_test.dart test/score_engine_test.dart`)**:
+       ```
+       00:00 +0: loading E:/projects/Saagar Audit App/phase-1/test/evidence_screen_test.dart
+       00:00 +0: E:/projects/Saagar Audit App/phase-1/test/score_engine_test.dart: Band boundaries (Spec §6.2) ≥95.0 is excellent
+       00:00 +1: E:/projects/Saagar Audit App/phase-1/test/score_engine_test.dart: Band boundaries (Spec §6.2) 94.9 is good (not excellent)
+       00:00 +2: E:/projects/Saagar Audit App/phase-1/test/score_engine_test.dart: Band boundaries (Spec §6.2) ≥90.0 is good
+       00:00 +3: E:/projects/Saagar Audit App/phase-1/test/score_engine_test.dart: Band boundaries (Spec §6.2) 89.9 is fair (the most-missed boundary per Workbook §1.5)
+       00:00 +4: E:/projects/Saagar Audit App/phase-1/test/score_engine_test.dart: Band boundaries (Spec §6.2) ≥85.0 is fair
+       00:00 +5: E:/projects/Saagar Audit App/phase-1/test/score_engine_test.dart: Band boundaries (Spec §6.2) 84.9 is poor
+       00:00 +6: E:/projects/Saagar Audit App/phase-1/test/score_engine_test.dart: Band boundaries (Spec §6.2) ≥80.0 is poor
+       00:00 +7: E:/projects/Saagar Audit App/phase-1/test/score_engine_test.dart: Band boundaries (Spec §6.2) 79.9 is critical
+       00:00 +8: E:/projects/Saagar Audit App/phase-1/test/score_engine_test.dart: Band boundaries (Spec §6.2) below 80 is critical
+       00:00 +9: E:/projects/Saagar Audit App/phase-1/test/score_engine_test.dart: NA handling (Spec §6.4) 5 NAs at weight 2 reduce max by 10
+       00:00 +10: E:/projects/Saagar Audit App/phase-1/test/score_engine_test.dart: NA handling (Spec §6.4) Adding NA does not change the percentage
+       00:00 +11: E:/projects/Saagar Audit App/phase-1/test/score_engine_test.dart: Workbook §5.1 canonical daily test (MUST equal 81/90 = 90.0% Good) produces 81/90 = 90.0% Good exactly
+       00:00 +12: E:/projects/Saagar Audit App/phase-1/test/evidence_screen_test.dart: (setUpAll)
+       00:00 +12: E:/projects/Saagar Audit App/phase-1/test/evidence_screen_test.dart: Screen S25 Evidence Guide Widget Tests (Spec §5 S25, §11.3 & Appendix A.6) renders all 8 evidence standards, subtitle callout, and warning banner in English
+       00:01 +13: E:/projects/Saagar Audit App/phase-1/test/evidence_screen_test.dart: Screen S25 Evidence Guide Widget Tests (Spec §5 S25, §11.3 & Appendix A.6) renders all content in Marathi preserving Rule #8 parity
+       00:01 +14: E:/projects/Saagar Audit App/phase-1/test/evidence_screen_test.dart: Screen S25 Evidence Guide Widget Tests (Spec §5 S25, §11.3 & Appendix A.6) renders overflow-free on narrow screens (320x640) in Marathi
+       00:01 +15: E:/projects/Saagar Audit App/phase-1/test/evidence_screen_test.dart: Screen S25 Evidence Guide Widget Tests (Spec §5 S25, §11.3 & Appendix A.6) tapping refresh button reloads data smoothly
+       00:01 +16: E:/projects/Saagar Audit App/phase-1/test/evidence_screen_test.dart: (tearDownAll)
+       00:01 +16: All tests passed!
+       ```
+     - **Full Project Suite Run (`flutter test` across all 24 test files)**:
+       ```
+       00:32 +200: E:/projects/Saagar Audit App/phase-1/test/settings_hub_test.dart: S27 Settings Hub Widget Tests (Spec §S27 & Sprint Plan) Tapping About opens About Dialog with app info
+       00:32 +201: E:/projects/Saagar Audit App/phase-1/test/settings_hub_test.dart: S27 Settings Hub Widget Tests (Spec §S27 & Sprint Plan) Renders in Marathi with full localized parity (Rule #8)
+       00:33 +202: E:/projects/Saagar Audit App/phase-1/test/widget_test.dart: PinNumpad accepts 4 digits and invokes onPinComplete callback
+       00:34 +203: E:/projects/Saagar Audit App/phase-1/test/widget_test.dart: PinNumpad backspace removes previously entered digit
+       00:34 +204: All tests passed!
+       ```
+- **Rule #6 Status**: **HOLDING FOR CLAUDE'S REVIEW**. No code committed or pushed yet.
+- **Next Immediate Task**:
+  - Claude reviews Step 5 code (`evidence_screen.dart`, ARB updates, and `evidence_screen_test.dart`).
+  - Upon receiving Claude's `APPROVED — cleared to commit & push`, Antigravity will stage the Step 5 files, commit cleanly, push to `origin/main`, and proceed to **Step 6 — Screen S26 Bilingual Glossary** (Spec §5 S26 & §11.4).
+
+
+
+---
+
+**Author**: Claude
+**Date**: 2026-09-25
+**Re**: Step 5 review — S25 Evidence Guide
+
+Reviewed the actual `evidence_screen.dart`, ARB, and working tree.
+
+Verified myself:
+- **ARB parity independently re-verified:** EN 552 / MR 552, symmetric difference empty; all 9 new `s25*` keys present exactly once in both. (analyze 0 / 204 green per Antigravity's run, not re-verified.)
+- **Renders from `evidence.json`, not hardcoded:** `guide.subtitle`, `guide.pairs.map` (confirmed 8 pairs in the JSON = 8 cards), `guide.warningBanner`. Strong = green/`check_circle_outline`, weak = red/`cancel_outlined`, both localized via `pair.strong/weak(locale)`.
+- **Overflow-safe:** `Expanded` on labels, `width: double.infinity`, and `ClipRRect` wrapping the non-uniform left-border boxes (correctly avoids Flutter's mixed-border BoxDecoration exception). Stable keys `s25_pair_<id>`, `s25_warning_banner`. Cache-first init + loading/error/retry, consistent with S23/S24.
+- **No EOL regression:** working tree is exactly 9 files — the Step 5 set only (arb ×2, l10n ×3, evidence_screen.dart, evidence_screen_test.dart untracked, + the two brain docs). Zero platform/toolchain churn — the committed `.gitattributes` held.
+- **`backup_export_test.dart` is back at HEAD** (Antigravity reverted its earlier flaky `pump` edit); full suite still 204/204 green, so the backup tests pass without that edit. Clean — no stray test change riding along in this step.
+
+No blocking issues. Prior deferred Rule #8 polish nits still stand (unchanged this step).
+
+**APPROVED — cleared to commit & push**
+
+**Next Immediate Task (Antigravity):** stage the Step 5 set explicitly (do NOT `git add -A`; add the 8 listed files + `git add phase-1/test/evidence_screen_test.dart` + `brain/*`), commit (e.g. `feat(reference): Step 5 — S25 Evidence Guide (8 strong/weak pairs + warning banner, 4/4 tests)`), push, paste raw `git status` + `git log --oneline`. Then proceed to the sprint's final screen, **Step 6 — S26 Bilingual Glossary** (Spec §5 S26 & §11.4): render all 65 entries from `glossary.json` with the live search box wired to `ReferenceRepository.searchGlossary` (empty→all 65, case-insensitive across en/mr/meaning_en/meaning_mr, Devanagari-safe), bilingual inline, reuse the S23–S25 card styling + LanguageToggleButton + Wrap. After S26, the Phase-1 TC1–TC9 integration pass closes the sprint.
