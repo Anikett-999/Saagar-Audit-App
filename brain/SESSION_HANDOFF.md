@@ -2983,3 +2983,38 @@ Step 4 code was already approved on merits; the only gate was the line-ending ch
 1. `git add brain/SESSION_HANDOFF.md` (to include this + the prior verdict), then commit the staged set with a message covering both S24 and the line-ending normalization, e.g. `feat(reference): Step 4 — S24 Escalation Triggers + repo-wide LF normalization (.gitattributes)`.
 2. `git push origin main`, paste the raw `git status` + `git log --oneline` back here.
 3. Then proceed to **Step 5 — S25 Evidence Guide** (Spec §5 S25 & §11.3) per `SPRINT_S22_S26_REFERENCE.md`: render the 8 strong/weak evidence pairs + the bottom warning from `evidence.json`, bilingual inline, reusing the S23/S24 card styling + LanguageToggleButton + Wrap discipline. With `.gitattributes` now in place, the whole-tree EOL churn should not recur — if `git status` ever balloons again, stop and flag before staging.
+
+---
+
+### Entry: 2026-09-25 — Step 4 Pushed to Remote (`1b5d696`) — Starting Step 5
+- **Author**: Antigravity
+- **Sprint**: S22–S26 Reference Data Tab
+- **Push Execution Record (Rule 6 Cleared)**:
+  - Renormalization verified: created `.gitattributes` at root & in `phase-1/`, ran `git add --renormalize .`.
+  - Zero platform churn in staged set (11 files changed, 1591 insertions(+), 14 deletions(-)).
+  - Committed Step 4 as `1b5d696`: `feat(reference): Step 4 — S24 Escalation Triggers + repo-wide LF normalization (.gitattributes)`.
+  - Pushed cleanly to `origin main` (no force-push): `6ce4736..1b5d696 main -> main`.
+- **Raw Host Execution Logs**:
+  - **Raw `git status`**:
+    ```
+    On branch main
+    Your branch is up to date with 'origin/main'.
+
+    nothing to commit, working tree clean
+    ```
+  - **Raw `git log --oneline -n 5`**:
+    ```
+    1b5d696 feat(reference): Step 4 — S24 Escalation Triggers + repo-wide LF normalization (.gitattributes)
+    6ce4736 docs: record Step 3 push in session handoff and kickoff Step 4
+    cccd5b7 feat(reference): Step 3 — Screen S23 Rating Scale & Targets (bilingual cards, score engine cutoffs, 5/5 tests)
+    ce4b228 feat(reference): Step 2 — Screen S22 Reference Index, routing, Home tile, and 8 widget tests
+    4d7d8ad docs: record Step 1 push in session handoff and kickoff Step 2
+    ```
+- **Next Immediate Task**:
+  - Proceed immediately to **Step 5 — Screen S25 Evidence Guide** (Spec §5 S25 & §11.3):
+    1. Inspect `phase-1/assets/reference/evidence.json` (8 strong evidence types, 8 weak evidence types, bottom warning callout).
+    2. Add screen chrome keys to `app_en.arb` and `app_mr.arb` maintaining 1:1 parity (Rule #8).
+    3. Build `EvidenceScreen` under `phase-1/lib/ui/screens/s25_evidence/evidence_screen.dart` with header banner, side-by-side or stacked comparison cards for Strong vs Weak evidence, and bottom warning callout.
+    4. Author widget tests in `phase-1/test/evidence_screen_test.dart`.
+    5. Run `flutter analyze` + `flutter test`, paste raw logs into handoff, and HOLD for Claude's review.
+
