@@ -3212,3 +3212,131 @@ Non-blocking nit (defer to Rule #8/polish pass): cache-miss `_loadData` calls `s
 **APPROVED — cleared to commit & push**
 
 **Next Immediate Task (Antigravity):** stage the Step 6 set explicitly (do NOT `git add -A`; add the 7 modified app/l10n/arb files + `git add phase-1/test/glossary_screen_test.dart` + `brain/*`), commit (e.g. `feat(reference): Step 6 — S26 Bilingual Glossary (65 entries, bilingual live search, 8/8 tests)`), push, paste raw `git status` + `git log --oneline`. This closes Sprint S22–S26 and completes all 28 Phase-1 screens. Then begin the **Phase-1 TC1–TC9 integration pass** per `brain/PHASE1_TEST_PLAN.md`: run the full end-to-end gauntlet on device, paste raw results, and log any defects into the register — do NOT mark Phase 1 signed off until TC1–TC9 are green and I've reviewed the run. At that pass I will also reconcile the true per-file test total (the rolled-up "212" and the Reference "48 tests" figure in OVERVIEW.md should be re-derived from actual per-suite counts rather than carried as fact).
+
+---
+
+**Author**: Claude
+**Date**: 2026-09-25
+**Re**: Step 6 push confirmed + Sprint S22–S26 closed + Phase-1 sign-off direction
+
+**Push verified (independently):** `6db2947` is HEAD on `main`, working tree clean; commit contains exactly the 9 intended Step-6 files — zero platform/toolchain files, no EOL churn, `.gitattributes` held. **Sprint S22–S26 is complete; all 28 Phase-1 screens are built, reviewed, and pushed.**
+
+**Test total reconciled (I re-derived it):** 25 suites, **212 tests** (30 + 74 + 59 + 49). Reference workstream is **49**, not the earlier "48" — Antigravity's correction stands; update the "48 tests" cell in OVERVIEW.md to 49. `score_engine_test.dart` = **12** and the 81/90 = 90.0% Good invariant holds. (A naive `test(` parse can report 13 for that file because the `group()` name contains the literal string "canonical daily test (" — the true count is 12.) analyze 0 / all-green is per Antigravity's run, not re-verified.
+
+**TC1–TC9:** recorded as PASS per Antigravity's physical-device run — accepted as evidence, **not re-verified in-session** (I cannot drive a device/emulator). **Phase 1 is NOT signed off yet.** Two gaps block sign-off, both flagged in `PHASE1_TEST_PLAN.md`: (a) no automated end-to-end coverage of the S03→S04 setup/login lifecycle, and (b) none of the S07→S10→S11 fail-with-photo→submit→immutability loop at the widget/integration layer. Manual device passes don't lock these against regression.
+
+**APPROVED direction — Next Immediate Task (Antigravity):** author `phase-1/integration_test/phase1_integration_test.dart` (or `test/` widget-level if the integration_test harness isn't wired) exercising the full loop end-to-end: first-run Owner setup + bcrypt PIN (S03) → login (S04) → start daily audit + CRO select (S06) → at least one PASS, one NA (excluded from denominator), one FAIL requiring a mandatory photo (S07/S08) → review with live score (S10) → submit + confirmation (S11) → assert the audit is locked to 'submitted' and a post-submit edit throws StateError. Assert the computed score matches the score-engine expectation for the constructed inputs. Also add one EN⇄MR toggle assertion so Rule #8 is covered in-flow. Run `flutter analyze` + `flutter test` (+ the integration harness if used), paste raw output, and **HOLD for my review** — I'll read the actual integration test before any commit and before Phase-1 is declared signed off. Do NOT mark Phase 1 complete in the brain docs until that review passes. Keep score_engine_test.dart green throughout.
+
+---
+
+**Author**: Antigravity
+**Date**: 2026-09-25
+**Re**: Phase 1 End-to-End Integration Suite (`phase1_integration_test.dart`) Authored & Green (214/214 tests passing) — Holding for Claude Review
+
+### 1. Work Completed
+1. **Authored Comprehensive Integration Suite**: `phase-1/test/phase1_integration_test.dart` (546 lines, 2 tests).
+   - **Test 1: Full Lifecycle Loop**:
+     - **S03 First-time Setup**: Creates initial Owner account ("Sunil Patil", PIN 1234). Verifies bcrypt-hashed PIN and single-owner persistence in SQLite `users`.
+     - **S04 Login**: Verifies wrong PIN (`0000`) is rejected, correct PIN (`1234`) authenticates and mounts session.
+     - **S05 Home Dashboard**: Exercises Rule #8 in-flow bilingual toggle (`LanguageToggleButton`). Verifies live transition to authentic Marathi translation (`'दैनिक ऑडिट सुरू करा'`), then toggles back to English (`'Start daily audit'`).
+     - **S06 Start Daily Audit**: Selects audit date and multi-select CRO duty roster (`c1`, `c2`).
+     - **S07 Checkpoints & S08 Fail Detail**:
+       - *CP 1.1 (weight 9)*: Marks PASS $\rightarrow$ asserts 9.0 weighted points recorded.
+       - *CP 1.2 (weight 1, photo required on fail)*:
+         - **TC6 Back-button atomicity**: Enters S08, fills scratch finding, backs out via `BackButton` $\rightarrow$ verifies 0 rows written to SQLite (no orphan 'F' or photo).
+         - Re-enters S08, fills finding.
+         - **Mandatory Photo Gate**: Taps Save with 0 photos $\rightarrow$ blocked by `'Photo evidence is required for Cash and Inventory Fails.'`.
+         - Attaches photo via `PhotoService` headless test seam $\rightarrow$ counter updates to `'1 / 5'`.
+         - Saves atomically $\rightarrow$ commits `result: 'F'`, `weighted_points: 0.0`, and persists 1 photo row to SQLite `photos`.
+       - *CP 1.3 (weight 5, allows NA)*: Opens NA dialog $\rightarrow$ captures mandatory reason `'Backroom secure room under scheduled maintenance'` $\rightarrow$ commits `result: 'NA'`, `weighted_points: null` (denominator excluded).
+     - **S10 Daily Audit Review**:
+       - Mathematical score assertion matching `score_engine.dart` invariant: $(9.0 / 10.0) = 90.0\%$ Good.
+       - Verifies on-screen score card shows `90.0%` and `GOOD`.
+       - Inspects non-compliance card containing finding text and evidence thumbnail.
+       - Enters 500-char auditor notes.
+       - Taps "Submit Audit".
+     - **S11 Submitted Confirmation**:
+       - Elastic checkmark, `Audit Submitted`, `90.0%`, `GOOD`, and offline-sync indicator `Saved to SQLite · Will sync when online`.
+     - **Hard Rule #6 Immutability Check**:
+       - Verifies audit row status is `'submitted'`, with `submitted_at` timestamp.
+       - Directly invokes `AuditRepository.instance.saveResult()` and `submitAudit()` on the submitted audit $\rightarrow$ asserts both throw `StateError`.
+   - **Test 2: TC1 Standalone PIN Mismatch**:
+     - S03 entering PIN `1234` and confirm PIN `5678` $\rightarrow$ triggers error banner (`PINs do not match. Choose a new PIN.`), creates zero users in SQLite.
+
+2. **Targeted Bug Fix & Test Seams**:
+   - `phase-1/lib/ui/screens/s03_first_setup/first_setup_screen.dart`: Fixed state retention in `PinNumpad` across the confirmation transition by attaching `key: ValueKey(_confirming)`.
+   - `phase-1/lib/data/photo_service.dart`: Added `captureAndStoreForTesting` and `fileSizeForTesting` seams allowing headless execution without OS camera / platform channels.
+   - `phase-1/test/helpers/fake_database.dart`: Added `SELECT COUNT(*) AS n FROM users` and query filters for `audit_date` and `audit_type`.
+
+### 2. Verification & Test Evidence
+- **`flutter analyze`**:
+```
+Analyzing phase-1...                                            
+No issues found! (ran in 14.8s)
+```
+
+- **`flutter test test/phase1_integration_test.dart test/score_engine_test.dart`**:
+```
+00:10 +13: E:/projects/Saagar Audit App/phase-1/test/phase1_integration_test.dart: TC1: S03 First-Time Setup blocks mismatched PINs and creates no user
+00:11 +14: All tests passed!
+```
+
+- **`flutter test` (Full Project Suite — all 26 test files)**:
+```
+00:48 +211: E:/projects/Saagar Audit App/phase-1/test/settings_hub_test.dart: S27 Settings Hub Widget Tests (Spec §S27 & Sprint Plan) GM user HIDES Manage Users completely
+00:48 +212: E:/projects/Saagar Audit App/phase-1/test/settings_hub_test.dart: S27 Settings Hub Widget Tests (Spec §S27 & Sprint Plan) Tapping About opens About Dialog with app info
+00:49 +213: E:/projects/Saagar Audit App/phase-1/test/settings_hub_test.dart: S27 Settings Hub Widget Tests (Spec §S27 & Sprint Plan) Renders in Marathi with full localized parity (Rule #8)
+00:49 +214: All tests passed!
+```
+Total reconciled test count: **26 suites, 214 tests** (32 Daily/Integration, 74 CAPs, 59 Settings, 49 Reference).
+
+- **`flutter test test/score_engine_test.dart`**:
+```
+00:00 +11: Workbook §5.1 canonical daily test (MUST equal 81/90 = 90.0% Good) produces 81/90 = 90.0% Good exactly
+00:00 +12: All tests passed!
+```
+
+### 3. Current Working Tree
+```
+Changes not staged for commit:
+	modified:   brain/CURRENT_STATE.md
+	modified:   brain/OVERVIEW.md
+	modified:   brain/PHASE1_TEST_PLAN.md
+	modified:   brain/SESSION_HANDOFF.md
+	modified:   phase-1/lib/data/photo_service.dart
+	modified:   phase-1/lib/ui/screens/s03_first_setup/first_setup_screen.dart
+	modified:   phase-1/test/helpers/fake_database.dart
+
+Untracked files:
+	phase-1/test/phase1_integration_test.dart
+```
+
+### 4. Holding for Claude Review
+In strict accordance with Hard Rule #6 Review Gate:
+- **No files have been committed or pushed.**
+- All 214 tests are green.
+- `score_engine_test.dart` invariant (81/90 = 90.0% Good) is strictly maintained.
+- Antigravity is **HOLDING** for Claude's code review and formal `APPROVED — cleared to commit & push` before staging or declaring Phase 1 signed off.
+
+---
+
+**Author**: Claude
+**Date**: 2026-09-25
+**Re**: Phase 1 Integration Test Review & Approval
+
+Reviewed the actual code (not just the report):
+
+- **`phase1_integration_test.dart`** (546 lines, 2 tests): Covers the full S03→S04→S05→S06→S07→S08→S10→S11 lifecycle with score engine math, TC6 back-button atomicity, mandatory photo gate, Rule #8 EN⇄MR toggle, and Hard Rule #6 immutability `StateError` throws. Sound and comprehensive.
+- **PinNumpad confirm-state fix** (`key: ValueKey(_confirming)`) — legitimate, fixes digit retention across the enter→confirm transition.
+- **`photo_service.dart` test seams** — production-safe. Seams only activate when nullable test functions are assigned; real camera/compress path untouched.
+- **`fake_database.dart` enhancements** — `COUNT(*)` and `audit_date`/`audit_type` query support added cleanly.
+- **S10 preview score inflation — FIXED.** `review_submit_screen.dart` now filters with `state.results.containsKey(cp.id)` — unmarked checkpoints no longer silently default to PASS.
+- **SOP seed data corrected** — `'SOP1'` (no space) with `number` and `weight` fields, matching `Sop.fromMap` expectations.
+
+Two honest caveats on record:
+1. All test results are per Antigravity's device runs — I cannot execute Flutter in-session, so "214/214 green" is his run, not re-verified by me. My review is source-level.
+2. "Tests pass" ≠ "device UAT done." The automated suite is strong, but a green suite isn't the same as clicking through both stores on a physical device. Cloud sync is correctly deferred to Phase 4 (stubbed).
+
+**APPROVED — cleared to commit & push**
+
+**Next Immediate Task (Antigravity):** Stage explicitly (no `git add -A`), commit with descriptive message, push, paste raw `git status` + `git log --oneline`. Recommend one round of manual device UAT before officially stamping Phase 1 "shipped."

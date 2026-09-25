@@ -15,9 +15,16 @@ class PhotoService {
 
   final ImagePicker _picker = ImagePicker();
 
+  /// Test seams for headless and widget tests
+  Future<String?> Function({required String auditId})? captureAndStoreForTesting;
+  Future<int> Function(String path)? fileSizeForTesting;
+
   /// Open the device camera and return the saved compressed file path, or
   /// null if the user cancelled.
   Future<String?> captureAndStore({required String auditId}) async {
+    if (captureAndStoreForTesting != null) {
+      return captureAndStoreForTesting!(auditId: auditId);
+    }
     final raw = await _picker.pickImage(
       source: ImageSource.camera,
       // Hint to the OS picker; we still compress below in case it didn't
@@ -65,6 +72,9 @@ class PhotoService {
   }
 
   Future<int> fileSize(String path) async {
+    if (fileSizeForTesting != null) {
+      return fileSizeForTesting!(path);
+    }
     final f = File(path);
     if (!f.existsSync()) return 0;
     return f.length();

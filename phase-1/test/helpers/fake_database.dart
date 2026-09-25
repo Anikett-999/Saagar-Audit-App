@@ -77,6 +77,17 @@ class FakeDatabase extends Fake implements Database, Transaction {
         } else if (where == 'audit_id = ?' && whereArgs != null && whereArgs.isNotEmpty) {
           results = results.where((r) => r['id'] == whereArgs[0]).toList();
         } else {
+          if (where.contains('audit_date = ?') && whereArgs != null && argIdx < whereArgs.length) {
+            final dateVal = whereArgs[argIdx++];
+            results = results.where((r) => r['audit_date'] == dateVal).toList();
+          }
+          if (where.contains('audit_type = ?') && whereArgs != null && argIdx < whereArgs.length) {
+            final typeVal = whereArgs[argIdx++];
+            results = results.where((r) => r['audit_type'] == typeVal).toList();
+          }
+          if (where.contains("status NOT IN ('hidden')")) {
+            results = results.where((r) => r['status'] != 'hidden').toList();
+          }
           if (where.contains("status IN ('submitted', 'verified')")) {
             results = results
                 .where((r) => r['status'] == 'submitted' || r['status'] == 'verified')
@@ -283,6 +294,12 @@ class FakeDatabase extends Fake implements Database, Transaction {
     String sql, [
     List<Object?>? arguments,
   ]) async {
+    if (sql.contains('COUNT(*)')) {
+      final list = tables['users'] ?? [];
+      return [
+        {'n': list.length},
+      ];
+    }
     if (sql.contains('FROM users')) {
       final list = tables['users'] ?? [];
       var results = List<Map<String, Object?>>.from(list);

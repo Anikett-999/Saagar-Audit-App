@@ -128,6 +128,7 @@ class _FirstSetupScreenState extends ConsumerState<FirstSetupScreen> {
                 Expanded(
                   child: Center(
                     child: PinNumpad(
+                      key: ValueKey(_confirming),
                       onPinComplete: (pin) {
                         FocusScope.of(context).unfocus();
                         _onPinEntered(pin);

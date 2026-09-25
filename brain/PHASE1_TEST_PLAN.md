@@ -59,11 +59,14 @@ code-reading judgment — labeled accordingly.
 
 ---
 
-## Coverage Gaps (automated)
-- S03→S04 auth lifecycle UI flow — no automated test.
-- S07→S10→S11 submit UI flow — no automated test.
-- Mandatory-photo gate at the UI layer — domain covered (`mandatory_photo_gate_test.dart`), UI not.
-- Immutability throw — now covered by `audit_immutability_test.dart` (was the #1 gap).
+## Coverage Gaps (automated) — CLOSED
+All previous coverage gaps are now fully locked with automated tests:
+- S03→S04 auth lifecycle UI flow — **CLOSED** by `phase1_integration_test.dart` (Owner setup, bcrypt hash, wrong PIN blocked, valid PIN authenticated, TC1 PIN mismatch error).
+- S07→S10→S11 submit UI flow — **CLOSED** by `phase1_integration_test.dart` (Checkpoints PASS, FAIL with photo, NA with dialog reason, live score engine match 90.0% Good, notes entered, submitted).
+- Mandatory-photo gate at the UI layer — **CLOSED** by `phase1_integration_test.dart` (S08 blocks save when photo required and 0 photos attached, displaying 'Photo evidence is required for Cash and Inventory Fails.', then succeeds once photo added).
+- TC6 back-button atomicity — **CLOSED** by `phase1_integration_test.dart` (backing out of S08 leaves 0 rows written).
+- Immutability throw — **CLOSED** by `audit_immutability_test.dart` and `phase1_integration_test.dart` (asserts `StateError` on post-submit `saveResult` and `submitAudit`).
+- Rule #8 in-flow language toggle — **CLOSED** by `phase1_integration_test.dart` (toggles on S05 to Marathi, asserts authentic Marathi translation `'दैनिक ऑडिट सुरू करा'`, toggles back to English).
 
 ## Defect Register (see SESSION_HANDOFF.md for full re-ratings)
 - **DEF-01** — PIN lockout reset on process restart. Sev: High → re-rated Medium by Claude (60s speed-bump on local PIN, no data exposure). REMEDIATED.
