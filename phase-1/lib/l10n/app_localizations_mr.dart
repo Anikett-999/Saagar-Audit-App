@@ -1679,4 +1679,49 @@ class AppLocalizationsMr extends AppLocalizations {
   String s22CardBadgeAppendix(String code) {
     return 'परिशिष्ट $code';
   }
+
+  @override
+  String get s23HeaderSubtitle =>
+      'पुस्तिका परिशिष्ट A.४ • ५ अनुपालन पट्ट्या आणि स्तर लक्ष्ये';
+
+  @override
+  String get s23SectionBandsTitle => '५ अनुपालन पट्ट्या';
+
+  @override
+  String get s23SectionBandsSubtitle =>
+      'अनिवार्य कार्यवाहक कृतींसह ५ कार्यप्रदर्शन स्तर';
+
+  @override
+  String get s23SectionTargetsTitle => 'स्तर लक्ष्ये';
+
+  @override
+  String get s23SectionTargetsSubtitle =>
+      'भूमिकेनुसार ऑडिट वारंवारता, लक्ष्य गुण आणि उत्तीर्ण मर्यादा';
+
+  @override
+  String get s23ActionLabel => 'आवश्यक कृती';
+
+  @override
+  String get s23WhoActsLabel => 'कोणाकडून कृती';
+
+  @override
+  String get s23AuditorLabel => 'ऑडिटर';
+
+  @override
+  String get s23TargetLabel => 'लक्ष्य';
+
+  @override
+  String get s23PassPointsLabel => 'उत्तीर्ण गुण';
+
+  @override
+  String get s23TotalPointsLabel => 'एकूण वजन';
+
+  @override
+  String get s23Loading => 'रेटिंग स्केल लोड होत आहे...';
+
+  @override
+  String get s23Error => 'रेटिंग स्केल लोड करण्यात अयशस्वी';
+
+  @override
+  String get s23Retry => 'पुन्हा प्रयत्न करा';
 }

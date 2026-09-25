@@ -763,7 +763,22 @@
         "type": "String"
       }
     }
-  }
+  },
+
+  "s23HeaderSubtitle": "Workbook Appendix A.4 • 5 compliance bands & tier targets",
+  "s23SectionBandsTitle": "Compliance Bands",
+  "s23SectionBandsSubtitle": "5 performance tiers with mandatory operational actions",
+  "s23SectionTargetsTitle": "Tier Targets",
+  "s23SectionTargetsSubtitle": "Audit frequency, target scores, and passing thresholds by role",
+  "s23ActionLabel": "Action Required",
+  "s23WhoActsLabel": "Who Acts",
+  "s23AuditorLabel": "Auditor",
+  "s23TargetLabel": "Target",
+  "s23PassPointsLabel": "Passing Score",
+  "s23TotalPointsLabel": "Total Weight",
+  "s23Loading": "Loading rating scale...",
+  "s23Error": "Failed to load rating scale",
+  "s23Retry": "Retry"
 }
 
 

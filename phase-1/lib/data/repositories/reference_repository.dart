@@ -37,6 +37,11 @@ class ReferenceRepository {
   EvidenceGuide? _cachedEvidenceGuide;
   List<GlossaryEntry>? _cachedGlossary;
 
+  RatingScale? get cachedRatingScale => _cachedRatingScale;
+  EscalationTriggers? get cachedEscalationTriggers => _cachedEscalationTriggers;
+  EvidenceGuide? get cachedEvidenceGuide => _cachedEvidenceGuide;
+  List<GlossaryEntry>? get cachedGlossary => _cachedGlossary;
+
   /// Loads and caches the [RatingScale] (Workbook Appendix A.4).
   Future<RatingScale> loadRatingScale({bool forceReload = false}) async {
     if (_cachedRatingScale != null && !forceReload) {

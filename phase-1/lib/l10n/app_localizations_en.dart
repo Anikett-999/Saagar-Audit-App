@@ -1678,4 +1678,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String s22CardBadgeAppendix(String code) {
     return 'Appendix $code';
   }
+
+  @override
+  String get s23HeaderSubtitle =>
+      'Workbook Appendix A.4 • 5 compliance bands & tier targets';
+
+  @override
+  String get s23SectionBandsTitle => 'Compliance Bands';
+
+  @override
+  String get s23SectionBandsSubtitle =>
+      '5 performance tiers with mandatory operational actions';
+
+  @override
+  String get s23SectionTargetsTitle => 'Tier Targets';
+
+  @override
+  String get s23SectionTargetsSubtitle =>
+      'Audit frequency, target scores, and passing thresholds by role';
+
+  @override
+  String get s23ActionLabel => 'Action Required';
+
+  @override
+  String get s23WhoActsLabel => 'Who Acts';
+
+  @override
+  String get s23AuditorLabel => 'Auditor';
+
+  @override
+  String get s23TargetLabel => 'Target';
+
+  @override
+  String get s23PassPointsLabel => 'Passing Score';
+
+  @override
+  String get s23TotalPointsLabel => 'Total Weight';
+
+  @override
+  String get s23Loading => 'Loading rating scale...';
+
+  @override
+  String get s23Error => 'Failed to load rating scale';
+
+  @override
+  String get s23Retry => 'Retry';
 }

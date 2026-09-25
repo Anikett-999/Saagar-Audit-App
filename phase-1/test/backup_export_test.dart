@@ -285,6 +285,7 @@ void main() {
           pollCount++;
         }
       });
+      await tester.pump(const Duration(milliseconds: 100));
       await tester.pumpAndSettle();
 
       // Verify success dialog is shown

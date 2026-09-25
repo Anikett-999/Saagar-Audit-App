@@ -3140,6 +3140,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Appendix {code}'**
   String s22CardBadgeAppendix(String code);
+
+  /// No description provided for @s23HeaderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Workbook Appendix A.4 • 5 compliance bands & tier targets'**
+  String get s23HeaderSubtitle;
+
+  /// No description provided for @s23SectionBandsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Compliance Bands'**
+  String get s23SectionBandsTitle;
+
+  /// No description provided for @s23SectionBandsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'5 performance tiers with mandatory operational actions'**
+  String get s23SectionBandsSubtitle;
+
+  /// No description provided for @s23SectionTargetsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tier Targets'**
+  String get s23SectionTargetsTitle;
+
+  /// No description provided for @s23SectionTargetsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit frequency, target scores, and passing thresholds by role'**
+  String get s23SectionTargetsSubtitle;
+
+  /// No description provided for @s23ActionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Action Required'**
+  String get s23ActionLabel;
+
+  /// No description provided for @s23WhoActsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Who Acts'**
+  String get s23WhoActsLabel;
+
+  /// No description provided for @s23AuditorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Auditor'**
+  String get s23AuditorLabel;
+
+  /// No description provided for @s23TargetLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get s23TargetLabel;
+
+  /// No description provided for @s23PassPointsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Passing Score'**
+  String get s23PassPointsLabel;
+
+  /// No description provided for @s23TotalPointsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Weight'**
+  String get s23TotalPointsLabel;
+
+  /// No description provided for @s23Loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading rating scale...'**
+  String get s23Loading;
+
+  /// No description provided for @s23Error.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load rating scale'**
+  String get s23Error;
+
+  /// No description provided for @s23Retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get s23Retry;
 }
 
 class _AppLocalizationsDelegate
