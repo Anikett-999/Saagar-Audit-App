@@ -32,7 +32,21 @@
 | **S31**    | Language | ✅ Complete | Dedicated screen, live EN/MR switch, persists to users.language_pref, login restore, full EN/MR parity |
 | **S32**    | Backup / Export | ✅ Complete | All 14 tables exported to timestamped JSON in Downloads, Owner-only Firestore sync stub (Coming in Phase 4), security advisory, About card, full EN/MR parity |
 
-> **PHASE 1 IS 100% COMPLETE & SIGNED OFF.** All 28 screens (S01–S17, S22–S32) are fully built and verified. Automated suite: 214/214 tests passing across 26 test files. Claude code review: APPROVED. Physical device UAT: verified by owner on device. Phase 2 (Weekly Audit, GM Verification & Reports) is next.
+> **PHASE 1 IS 100% COMPLETE & SIGNED OFF.** All 28 screens (S01–S17, S22–S32) are fully built and verified. Automated suite: 214/214 tests passing across 26 test files. Claude code review: APPROVED. Physical device UAT: verified by owner on device.
+
+> **PHASE 2 KICKED OFF (2026-09-26).** flatten-to-root merged to `main`, CI green (Run #36234413654). Sprint sequence set: **P2-1** Weekly Audit Foundation (score engine + data model + 36 weekly-only seed) → **P2-2** weekly conduct screens → **P2-3** 7-day review + spot check → **P2-4** weekly report S20/S21 + PDF (§3.6) → **P2-5** CAP Verify S18 + Close S19 + GM dashboard. Sprint P2-1 spec: `brain/SPRINT_P2_1_WEEKLY_FOUNDATION.md`. **In flight:** Antigravity implementing P2-1 on `feature/p2-weekly-score-engine` (off `phase-2` off `main`), holding for Claude review per Rule 6.
+
+### Phase 2 screen registry (planned)
+| Screen | Name | Status | Notes |
+|---|---|---|---|
+| **S18** | CAP Verify | ⏳ Planned (P2-5) | GM verifies a done CAP against re-run checkpoint |
+| **S19** | CAP Close | ⏳ Planned (P2-5) | GM closes verified CAP; cap_log timeline entry |
+| **S20** | Reports List | ⏳ Planned (P2-4) | Weekly report list |
+| **S21** | Report Detail | ⏳ Planned (P2-4) | 1-page weekly report, Workbook §3.6 9-section format, PDF export |
+| **Weekly conduct** | S6–S10 analogues | ⏳ Planned (P2-2) | `audit_type='weekly'`, 36 weekly-only checkpoints |
+| **7-day review** | Daily review + spot check | ⏳ Planned (P2-3) | 7 daily cards, 3 random spot-check checkpoints/day, GM signature |
+
+**Score engine (Phase 2):** `computeWeeklyScore` (§6.5, daily-avg ×0.68 + weekly_raw, missing-day-as-zero) and `computeCumulativeWeeklyVariance` (CW.7, §6.7) — being added to `lib/domain/score_engine.dart` in P2-1. Canonical target: Workbook §5.2 = 104.8/124 = **84.5% Poor** exact (test T2.1).
 
 ## 2. Verified Baseline Health
 - `flutter analyze`: **0 issues found (Clean baseline)**

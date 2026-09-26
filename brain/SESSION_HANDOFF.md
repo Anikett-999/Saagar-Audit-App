@@ -3590,6 +3590,34 @@ nothing to commit, working tree clean
 - **Claude**: Initiate **Phase 2 Kickoff Planning** per Spec §15.2 / §15.4 (Weekly Audit, GM Verification & Close, PDF / WhatsApp Reports).
 - **Rule 7 Invariant**: Phase 2 implementation will branch from `main` as `phase-2` (with `feature/*` sub-branches), maintaining the single app layout at repository root.
 
+---
+
+**Author**: Claude
+**Date**: 2026-09-26
+**Re**: Phase 2 kickoff — Sprint P2-1 (Weekly Audit Foundation) plan set; baton to Antigravity
+
+CI green on `main` (Run #36234413654, analyze + canonical score + unit tests all Success) confirmed by Sagar. Pre-condition for Phase 2 is met. I read the Phase 2 spec (§12.2, §6.5–§6.7, §14.3, §16.2) and the Phase 2 test scenarios (T2.1–T2.4) before planning. Sagar confirmed we are on **Phase 2** and gave the go.
+
+**Full Phase 2 sprint sequence (each review-gated per Rule 6):**
+- **P2-1 — Weekly Audit Foundation** (score engine + data model + 36 weekly-only seed). ← current
+- **P2-2 — Weekly conduct screens** (analogues of S6–S10 for `audit_type='weekly'`).
+- **P2-3 — 7-day daily review + spot check** (GM opens 7 daily cards; app picks 3 random checkpoints/day; Verified/Discrepancy + GM signature).
+- **P2-4 — Weekly report S20/S21 + PDF** in Workbook §3.6 9-section format, incl. Pattern section (T2.4).
+- **P2-5 — CAP Verify S18 + Close S19 + GM pending-verifications dashboard.**
+
+**Sprint P2-1 is specified in full in `brain/SPRINT_P2_1_WEEKLY_FOUNDATION.md`.** Rationale: lock the weekly math and data model (highest-risk, canonical §5.2 invariant) before any UI — same discipline that locked the daily engine in Phase 1. No screens ship in P2-1.
+
+**Two flags on record (R1/R3 discipline):**
+1. **Pre-existing Phase-1 debt (not P2-1 scope):** daily seed rows still carry English text in `text_mr` (e.g. 1.1). This should be cleaned in a Marathi sweep — tracked for a later Phase-1 hygiene pass, flagged to Sagar. Do NOT let the 36 new weekly rows inherit this pattern.
+2. **R3 hard stop for P2-1:** every new weekly checkpoint needs real EN **and** MR at insertion — no English-duplicate placeholders, no guessing. Missing Marathi → STOP and ask Sagar.
+
+**Next Immediate Task (Antigravity):**
+1. Cut `phase-2` off `main`, then `feature/p2-weekly-score-engine` off `phase-2` (Rule 7 — branches only).
+2. Implement Sprint P2-1 exactly as specified in `brain/SPRINT_P2_1_WEEKLY_FOUNDATION.md`: reuse `audits`/`audit_results` with `audit_type='weekly'` (no silent schema drift — R2), add the 36 weekly-only checkpoints to `assets/seed/checkpoints.json` (real EN+MR — R3), and add `computeWeeklyScore` + `computeCumulativeWeeklyVariance` to `lib/domain/score_engine.dart` (pure, no IO).
+3. Add `test/weekly_score_engine_test.dart` with **T2.1** (must produce 84.5% Poor exactly), **T2.2** (missing day = 0% → contribution 52.4), rounding-boundary and NA-exclusion tests, and CW.7 variance.
+4. Run `flutter analyze` + `flutter test` (all 214 Phase-1 tests must still pass — Rule 5) + the new weekly suite. Paste **raw** output here.
+5. **HOLD for Claude review.** Do NOT commit/push app code until I write `APPROVED — cleared to commit & push`. Never force-push. (Brain-only doc commits are exempt.)
+6. If any weekly Marathi string is missing, STOP at step 2 and post the open items here for Sagar.
 
 
 
