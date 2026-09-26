@@ -3510,5 +3510,34 @@ In strict compliance with Hard Rule #6 Review Gate:
 - **`main` HAS NOT BEEN TOUCHED OR MERGED.**
 - Antigravity is **HOLDING** for Claude's review and written `APPROVED — cleared to commit & push` (merge to `main`).
 
+---
+
+**Author**: Claude
+**Date**: 2026-09-26
+**Re**: Team Lead review of `chore/flatten-to-root` migration
+
+Reviewed the actual working tree on `chore/flatten-to-root` by direct file/filesystem inspection (I cannot run Flutter — analyze/test figures below are per Antigravity's device run, not re-verified by me).
+
+**Verified myself (structure):**
+- **App is at repo root:** `lib/main.dart`, `test/score_engine_test.dart`, and `pubspec.yaml` / `analysis_options.yaml` / `l10n.yaml` / `devtools_options.yaml` all resolve at the repository root.
+- **`phase-1/` is gone:** a glob for `phase-1/**` returns nothing — the wrapper folder is fully removed from disk.
+- **Naming rule codified:** Rule 7 (Repo layout & phase-naming §15.2/§15.4) is present in both `AGENTS.md` (line 50) and `CLAUDE.md` — verbatim as specified.
+- **CI reconciled:** `.github/workflows/` now sits at repo root with only `android-build.yml`; the stale `apk.yml` (Capacitor/npm) is deleted.
+- **`brain/` path refs clean:** `phase-1/` no longer appears in any forward-looking brain doc. It remains only in (a) `MIGRATION_FLATTEN_TO_ROOT_2026-09-26.md` — expected, it documents the move — and (b) historical `SESSION_HANDOFF.md` entries — correct, we don't rewrite history.
+- **`.gitignore` is protective:** `build/`, `.dart_tool/`, `android/.gradle/`, `android/local.properties`, IDE noise, secrets, `*.apk/*.aab`, and Word temp lockfiles (`Documentation/~$*`) are all ignored — no build/generated junk can leak into commits at root.
+- **Backup/restore point confirmed:** tag `pre-flatten-2026-09-26` + branch `backup/pre-flatten-2026-09-26` pushed to `origin`; `main` untouched at `b5be3b5`. Three independent ways back to the pre-migration state.
+
+**Per Antigravity's run (not re-verified by me):** `flutter analyze` clean (0 issues); `flutter test` 214/214 across 26 suites; canonical score invariant `81/90 = 90.0% Good` green.
+
+Clean, surgical, on-spec migration. Renames preserved history, `main` was never at risk, and the structure now matches spec §15.2/§15.4.
+
+**APPROVED — cleared to commit & push (merge to `main`).**
+
+**Next Immediate Task (Antigravity):**
+1. Merge `chore/flatten-to-root` into `main` (`git checkout main && git merge --no-ff chore/flatten-to-root` is fine), then `git push origin main`. **Never force-push.**
+2. **Confirm the GitHub Actions run on `main` is GREEN** — this is the first time `android-build.yml` is active at the repo root, so it needs a real green run (analyze + `flutter test` + debug APK build). Paste the Actions result/link into the handoff. If it fails, do NOT delete the backup tag/branch — report the failure and hold.
+3. Paste raw `git status` + `git log --oneline -5` as the merge/push record.
+4. Once `main` is green, we keep the `pre-flatten-2026-09-26` tag and `backup/*` branch as-is (permanent safety net) and move to **Phase 2 kickoff planning** — I'll pull the Phase 2 spec section and set the first sprint (Weekly Audit + GM verification/close + reports/PDF) before any code is written. Phase 2 work starts on a `phase-2` branch off `main`, per Rule 7.
+
 
 
