@@ -3409,4 +3409,28 @@ Two housekeeping notes on record:
 
 **Next Immediate Task**: Await kickoff planning and spec review for Phase 2.
 
+---
+
+**Author**: Claude
+**Date**: 2026-09-26
+**Re**: Repo structure decision — flatten app to root (`phase-1/` → root) BEFORE Phase 2 starts
+
+Sagar reviewed the folder-naming issue and **approved Option A**: move the entire Flutter app out of the `phase-1/` wrapper folder and up to the **repository root**, to match spec §15.2, and enforce a rule that `phase-1`…`phase-4` are Git BRANCH names only — never folders (§15.4).
+
+**Why now:** leaving the app inside `phase-1/` invites a fatal Phase-2 mistake — creating a sibling `phase-2/` folder and copying the codebase, which forks the app and breaks the "keep all Phase-1 tests green" guarantee. We fix the structure once, before any Phase-2 code exists.
+
+**Full migration prompt handed off:** see **`brain/MIGRATION_FLATTEN_TO_ROOT_2026-09-26.md`** — it contains the step-by-step procedure, the exact naming-rule text to add to `AGENTS.md` + `CLAUDE.md`, the collision-file reconciliation list, and the acceptance gate.
+
+**Findings from my inspection (for the record):**
+- The whole app (`lib/`, `test/`, `android/`, `ios/`, `assets/`, `Documentation/`, `pubspec.yaml`, `.github/`) currently sits in `phase-1/`. `.git` and `brain/` are already at the root.
+- **4 files collide** at the root (root already has its own): `.gitignore`, `README.md`, `AGENTS.md`, `CLAUDE.md` — must be merged by hand, not overwritten.
+- **CI is currently dormant:** `.github/workflows/` is nested in `phase-1/`, but GitHub only reads workflows at the repo root. Moving the app activates CI. `android-build.yml` already assumes app-at-root (no `cd`). **`apk.yml` is stale** (Capacitor/npm, not Flutter) — delete it during the move.
+- Dart imports won't break (package:/relative-within-lib; folder moves as one unit). The guarantee is by verification: 214/214 + green CI on the branch = proof.
+
+**⚠️ TRANSITION NOTE for both agents (until migration merges):** file paths are changing. If you look inside `phase-1/` for a source file and it's gone, **check the REPOSITORY ROOT.** `brain/` does not move.
+
+**Next Immediate Task (Antigravity):** Execute the migration in `brain/MIGRATION_FLATTEN_TO_ROOT_2026-09-26.md`. **FIRST do Step 0 (§2A): create the backup/restore point** — tag `pre-flatten-2026-09-26` + branch `backup/pre-flatten-2026-09-26`, both pushed to `origin`, and write the restore-point commit hash here. Only then run the migration on branch `chore/flatten-to-root` (NOT on `main`). Add the naming rule to `AGENTS.md` + `CLAUDE.md`. Run `flutter pub get` + `flutter analyze` + `flutter test` (must be 214/214 green), confirm CI green on the branch, paste raw output + `git status` + `git log --oneline` here, and **HOLD for my review**. Do NOT merge to `main` or push the migration until I post the written `APPROVED — cleared to commit & push` line. No force-push. Only after the merge is clean and reviewed do we begin Phase 2 kickoff planning.
+
+**Backup/rollback on record:** the migration runs on a branch and is not merged to `main` until I approve, so `main` stays a valid restore point throughout. Plus the tag + backup branch from Step 0 are pushed to GitHub (off-machine). Rollback if needed: `git checkout main && git branch -D chore/flatten-to-root`. Any history reset requires Sagar's explicit OK — never force-push unilaterally.
+
 
