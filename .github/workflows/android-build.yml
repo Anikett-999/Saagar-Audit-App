@@ -41,7 +41,15 @@ jobs:
         continue-on-error: true
 
       - name: Run unit tests (canonical score test must pass)
-        run: flutter test --reporter=expanded
+        run: |
+          set -o pipefail
+          flutter test --reporter=expanded 2>&1 | tee test_output.txt || {
+            echo "### ❌ Unit Test Failures" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            grep -C 3 "\[E\]" test_output.txt | head -n 60 >> $GITHUB_STEP_SUMMARY || true
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            exit 1
+          }
 
 
       - name: Build debug APK
