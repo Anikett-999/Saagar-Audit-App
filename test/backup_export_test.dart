@@ -285,8 +285,8 @@ void main() {
           pollCount++;
         }
       });
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       // Verify success dialog is shown
       expect(find.byType(AlertDialog), findsOneWidget);
@@ -296,7 +296,8 @@ void main() {
 
       // Tap OK to dismiss
       await tester.tap(find.text('OK'));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
       expect(find.byType(AlertDialog), findsNothing);
     });
 
