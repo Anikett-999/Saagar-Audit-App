@@ -25,7 +25,6 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.16.5"
           channel: stable
           cache: true
 
@@ -33,12 +32,6 @@ jobs:
         run: |
           flutter --version
           dart --version
-
-      # The `android/` folder is gitignored locally because it's mostly
-      # generated. Recreate it from scratch on every build so the repo stays
-      # tidy and we always get fresh Gradle/AGP scaffolding.
-      - name: Generate android/ folder
-        run: flutter create . --platforms=android --org com.saagar --project-name saagar_audit_app
 
       - name: Resolve dependencies
         run: flutter pub get
