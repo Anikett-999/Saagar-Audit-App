@@ -42,14 +42,20 @@ jobs:
 
       - name: Run unit tests (canonical score test must pass)
         run: |
-          set -o pipefail
-          flutter test --reporter=expanded 2>&1 | tee test_output.txt || {
-            echo "### ❌ Unit Test Failures" >> $GITHUB_STEP_SUMMARY
+          echo "## 🧪 Unit Test Execution Summary" >> $GITHUB_STEP_SUMMARY
+          if flutter test --no-color --reporter=expanded > test_output.log 2>&1; then
+            echo "✅ **All unit tests passed successfully!**" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            grep -C 3 "\[E\]" test_output.txt | head -n 60 >> $GITHUB_STEP_SUMMARY || true
+            tail -n 25 test_output.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Unit tests failed!**" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            grep -B 2 -A 8 "\[E\]" test_output.log | head -n 80 >> $GITHUB_STEP_SUMMARY || tail -n 80 test_output.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
             exit 1
-          }
+          fi
+
 
 
       - name: Build debug APK
