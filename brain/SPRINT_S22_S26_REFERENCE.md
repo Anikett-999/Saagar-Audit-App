@@ -9,7 +9,7 @@
 Ship the offline Reference tab: the app's built-in copy of Workbook Appendices A.4–A.7, so the SM can reach the rating scale, escalation triggers, evidence rules, and glossary at 9:15 PM when the paper cards are gone. Five screens (S22 index + S23–S26 content), all offline, all EN/MR.
 
 ## 2. Locked design decisions (do not deviate without Claude sign-off)
-1. **Content lives in bundled JSON assets, NOT SQLite and NOT ARB.** Spec §11 is explicit: reference content ships as JSON so it can be updated in a future APK without code changes. Create under `phase-1/assets/reference/`:
+1. **Content lives in bundled JSON assets, NOT SQLite and NOT ARB.** Spec §11 is explicit: reference content ships as JSON so it can be updated in a future APK without code changes. Create under `assets/reference/`:
    - `rating_scale.json` — 5 bands + 3 tier targets + critical reminder.
    - `escalation_triggers.json` — 7 triggers + 4-part message format + 3 worked examples.
    - `evidence.json` — 8 strong + 8 weak types + bottom warning.

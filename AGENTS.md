@@ -47,3 +47,6 @@ Coordination rules (both agents):
    3. Only **after** Claude's written approval does Antigravity `git add` the reviewed files + brain updates, commit with a descriptive message, and `git push origin main`.
    4. Antigravity then pastes the raw `git status` + `git log --oneline` back into the handoff as the push record.
    Rationale: Claude is Team Lead and quality gate; nothing enters the permanent history without a review. **Never force-push.** The only exception is a pure `brain/`-docs/handoff commit (no app code), which Antigravity may push without a code review since there is nothing to review.
+7. **Repo layout & phase-naming rule (spec §15.2 / §15.4):**
+   The Flutter app lives at the **repository root** (`lib/`, `test/`, `android/`, `assets/`, `pubspec.yaml`, etc. sit directly in the repo root). There is **one** app that grows across phases. **`phase-1`…`phase-4` are Git BRANCH names ONLY — never folders.** Never create a `phase-N/` directory and never copy the app into a per-phase folder. New phase work happens on a `phase-N` branch (with `feature/*` branches off it), then merges to `main` when signed off.
+

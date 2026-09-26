@@ -2,7 +2,7 @@
 
 > **Author**: Claude (Senior Developer & Team Lead) — 2026-09-22
 > **Spec source**: `brain/spec/03_S12_S21_AUDITS_CAPS_REPORTS.md` (Spec §5, Screens S12–S21)
-> **Schema**: `phase-1/lib/data/db/schema.dart` (`caps`, `cap_actions`, `cap_log`, `audits`, `audit_results`, `photos`)
+> **Schema**: `lib/data/db/schema.dart` (`caps`, `cap_actions`, `cap_log`, `audits`, `audit_results`, `photos`)
 > **Status when planned**: Sprint S27–S32 complete; 89/89 tests green; repo live & private.
 
 ---

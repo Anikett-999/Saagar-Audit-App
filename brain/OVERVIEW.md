@@ -6,9 +6,9 @@ A production-grade Android compliance audit mobile application built for **Saaga
 - **Helios Watch Store** (Store code: `HEMW`)
 
 Ground-truth documents:
-- `phase-1/Documentation/Saagar_P1_App_Spec_v1.docx`
-- `phase-1/Documentation/Saagar_P1_Audit_Workbook_v1.docx` (Operational ground truth)
-- `phase-1/Documentation/Saagar_P1_QuickRef_v1.docx`
+- `Documentation/Saagar_P1_App_Spec_v1.docx`
+- `Documentation/Saagar_P1_Audit_Workbook_v1.docx` (Operational ground truth)
+- `Documentation/Saagar_P1_QuickRef_v1.docx`
 
 ## 2. Business Hierarchy & Roles
 - **OWNER**: Super-admin access. Creates accounts, changes user roles, can mark audits `hidden`, views executive reports, full system control.

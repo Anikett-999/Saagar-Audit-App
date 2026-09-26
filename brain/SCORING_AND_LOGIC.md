@@ -1,7 +1,8 @@
 # Scoring Engine & Operational Mathematical Logic
 
-Location: `phase-1/lib/domain/score_engine.dart`  
-Tests: `phase-1/test/score_engine_test.dart` (Must pass 100%)
+Location: `lib/domain/score_engine.dart`  
+Tests: `test/score_engine_test.dart` (Must pass 100%)
+
 
 ## 1. Core Mathematical Formula
 $$\text{Compliance } \% = \operatorname{round}\left(\frac{\sum \text{Weighted Points Earned}}{\sum \text{Weighted Points Maximum}} \times 100,\; 1\right)$$

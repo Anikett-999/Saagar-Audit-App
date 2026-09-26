@@ -1,25 +1,27 @@
-# Flutter/Dart build + tooling
-phase-1/build/
-phase-1/.dart_tool/
-phase-1/.flutter-plugins
-phase-1/.flutter-plugins-dependencies
-phase-1/lib/l10n/generated/
-phase-1/.packages
-phase-1/.pub-cache/
-phase-1/.pub/
+# Flutter / Dart build + tooling
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+lib/l10n/generated/
 
 # Android build & local environment
-phase-1/android/.gradle/
-phase-1/android/local.properties
-phase-1/android/key.properties
-phase-1/android/.cxx/
-phase-1/android/captures/
+android/.gradle/
+android/local.properties
+android/key.properties
+android/app/upload-keystore.jks
+android/app/debug.keystore
+android/captures/
+android/.cxx/
 
 # iOS build & pods
-phase-1/ios/Pods/
-phase-1/ios/.symlinks/
-phase-1/ios/Flutter/Flutter.framework
-phase-1/ios/Flutter/Flutter.podspec
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
 
 # IDE noise
 .idea/
@@ -37,17 +39,30 @@ desktop.ini
 **/Microsoft/
 **/ModuleAnalysisCache
 
-# Secrets — never commit
+# Secrets — NEVER commit
+google-services.json
+firebase_options.dart
 *.keystore
 *.jks
 *.p12
-*.env
 .env
 .env.*
-**/google-services.json
-**/firebase_options.dart
+
+# Build outputs
+*.apk
+*.aab
+*.ipa
+builds/
 
 # Runtime data (we track code + brain, not live DB data)
 *.db
 *.sqlite
 *.sqlite3
+
+# Documentation scratch
+Documentation/_extract_*.txt
+Documentation/_p1_spec_summary.md
+Documentation/~$*
+
+# Memory
+.claude/
