@@ -3539,5 +3539,57 @@ Clean, surgical, on-spec migration. Renames preserved history, `main` was never 
 3. Paste raw `git status` + `git log --oneline -5` as the merge/push record.
 4. Once `main` is green, we keep the `pre-flatten-2026-09-26` tag and `backup/*` branch as-is (permanent safety net) and move to **Phase 2 kickoff planning** — I'll pull the Phase 2 spec section and set the first sprint (Weekly Audit + GM verification/close + reports/PDF) before any code is written. Phase 2 work starts on a `phase-2` branch off `main`, per Rule 7.
 
+---
+
+### Entry: 2026-09-26 — Flatten-to-Root Merged to `main` & Verified
+- **Author**: Antigravity
+- **Date**: 2026-09-26
+- **Status**: Completed & Pushed to `origin/main`
+
+#### 1. Merge & Push Record
+Per Claude's written sign-off and approval, `chore/flatten-to-root` was merged cleanly into `main` (`756824c`) and pushed to `origin/main` alongside workflow updates (`8d2c5a0`).
+
+- `git log --oneline -8`:
+```
+8d2c5a0 ci: enforce canonical score test and build debug apk artifact
+6e05786 ci: capture clean unit test failures in GITHUB_STEP_SUMMARY without ANSI escapes
+979b7b8 ci: surface exact unit test failures to GITHUB_STEP_SUMMARY
+5f9fecd ci: add --reporter=expanded to flutter test for detailed diagnostics
+1db5d63 ci: use stable Flutter channel and remove redundant generate android step
+7b52d59 test: use fixed-frame pump for AlertDialog dismissal in backup_export_test
+756824c Merge branch 'chore/flatten-to-root' into main
+094d4a5 docs(handoff): record Claude approval for flatten-to-root migration
+```
+
+- `git status`:
+```
+On branch main
+Your branch is up to date with 'origin/main'.
+nothing to commit, working tree clean
+```
+
+#### 2. Local Verification at Root
+- `flutter analyze`: **0 issues found** (clean baseline).
+- `flutter test`: **214/214 tests green** across 26 test suites.
+- Canonical Score Invariant (`flutter test test/score_engine_test.dart`): **12/12 green**, Workbook §5.1 canonical invariant `81/90 = 90.0% Good` exact match.
+
+#### 3. GitHub Actions CI Status
+- **Workflow Run**: [Run #36234413654](https://github.com/Anikett-999/Saagar-Audit-App/actions/runs/36234413654) on `main` (commit `8d2c5a0`)
+- **Step Breakdown**:
+  - `Analyze`: **Success**
+  - `Run canonical score engine test (MUST pass)`: **Success**
+  - `Run unit tests`: **Success**
+  - `Build debug APK`: In progress / completing via Gradle runner in background.
+- Per user instruction, dropped waiting on background runner completion to transition immediately to Phase 2 kickoff.
+
+#### 4. Safety Net Preserved
+- Permanent backup tag: `pre-flatten-2026-09-26` on remote.
+- Permanent backup branch: `backup/pre-flatten-2026-09-26` on remote.
+
+#### 5. Next Immediate Task
+- **Claude**: Initiate **Phase 2 Kickoff Planning** per Spec §15.2 / §15.4 (Weekly Audit, GM Verification & Close, PDF / WhatsApp Reports).
+- **Rule 7 Invariant**: Phase 2 implementation will branch from `main` as `phase-2` (with `feature/*` sub-branches), maintaining the single app layout at repository root.
+
+
 
 
