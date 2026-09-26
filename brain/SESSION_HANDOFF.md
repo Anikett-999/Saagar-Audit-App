@@ -3433,4 +3433,82 @@ Sagar reviewed the folder-naming issue and **approved Option A**: move the entir
 
 **Backup/rollback on record:** the migration runs on a branch and is not merged to `main` until I approve, so `main` stays a valid restore point throughout. Plus the tag + backup branch from Step 0 are pushed to GitHub (off-machine). Rollback if needed: `git checkout main && git branch -D chore/flatten-to-root`. Any history reset requires Sagar's explicit OK — never force-push unilaterally.
 
+---
+
+**Author**: Antigravity  
+**Date**: 2026-09-26  
+**Re**: Flatten App to Repo Root Execution Record — HOLDING for Claude Review  
+
+### 1. Step 0 (§2A) Backup / Restore Point Confirmed
+Before touching any files or branches:
+- **Restore-Point Commit Hash**: `b5be3b5` (contains full migration plan and handoff)
+- **Tag**: `pre-flatten-2026-09-26` created and pushed to `origin/pre-flatten-2026-09-26`
+- **Backup Branch**: `backup/pre-flatten-2026-09-26` created and pushed to `origin/backup/pre-flatten-2026-09-26`
+- `main` remains untouched at `b5be3b5`.
+
+### 2. Migration Execution (§3)
+- Checked out dedicated branch: `chore/flatten-to-root`
+- Cleaned build artifacts: `flutter clean` executed inside `phase-1`
+- Tracked source moved up to root via `git mv`:
+  - `lib/`, `test/`, `assets/`, `Documentation/`, `android/`, `ios/`, `linux/`, `macos/`, `web/`, `windows/`
+  - `pubspec.yaml`, `pubspec.lock`, `l10n.yaml`, `analysis_options.yaml`, `devtools_options.yaml`, `.metadata`, `.github/`
+- Reconciled 4 collision files:
+  - `.gitignore`: merged root + Flutter ignores, added `Documentation/~$*`
+  - `README.md`: replaced stub with rich project documentation updated for Phase 1 completion & root layout
+  - `AGENTS.md` + `CLAUDE.md`: codified Rule 7 (Repo layout & phase-naming rule §15.2 / §15.4) verbatim
+  - `.gitattributes`: reconciled; redundant `phase-1/` copy removed
+- Removed stale CI workflow: `git rm -f .github/workflows/apk.yml` (Capacitor/npm). `android-build.yml` now active at repo root.
+- Cleaned directory: `phase-1/` folder completely gone from disk and git index.
+- Updated forward-looking path references across `brain/` docs (`OVERVIEW.md`, `DATABASE_SCHEMA.md`, `SCORING_AND_LOGIC.md`, `SPRINT_S12_S17_CAPS.md`, `SPRINT_S22_S26_REFERENCE.md`).
+
+### 3. Acceptance Gate Verification (Raw Output)
+
+#### A. `flutter pub get`
+```
+Resolving dependencies...
+Downloading packages...
+Got dependencies!
+```
+
+#### B. `flutter analyze`
+```
+Analyzing Saagar Audit App...                                   
+No issues found! (ran in 10.6s)
+```
+
+#### C. `flutter test`
+```
+00:43 +214: All tests passed!
+```
+(All 214 tests passing across 26 test files; `phase1_integration_test.dart` passes cleanly at root).
+
+#### D. Canonical Score Engine Check (`flutter test test/score_engine_test.dart`)
+```
+00:00 +11: Workbook §5.1 canonical daily test (MUST equal 81/90 = 90.0% Good) produces 81/90 = 90.0% Good exactly
+00:00 +12: All tests passed!
+```
+
+### 4. Git Branch & Commit Status
+- **Commit on `chore/flatten-to-root`**: `4efc998`
+- **Pushed to Remote**: `origin/chore/flatten-to-root`
+```
+4efc998 chore: flatten Flutter app from phase-1/ to repository root
+b5be3b5 docs: add flatten-to-root migration plan and handoff instructions
+c4a8674 docs(handoff): record Claude Team Lead official Phase 1 sign-off verdict
+```
+- `git status`:
+```
+On branch chore/flatten-to-root
+Your branch is up to date with 'origin/chore/flatten-to-root'.
+
+nothing to commit, working tree clean
+```
+
+### 5. HOLDING for Claude Review
+In strict compliance with Hard Rule #6 Review Gate:
+- `chore/flatten-to-root` is committed and pushed to remote for CI verification.
+- **`main` HAS NOT BEEN TOUCHED OR MERGED.**
+- Antigravity is **HOLDING** for Claude's review and written `APPROVED — cleared to commit & push` (merge to `main`).
+
+
 
