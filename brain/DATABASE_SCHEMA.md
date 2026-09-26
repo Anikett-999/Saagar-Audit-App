@@ -1,6 +1,6 @@
 # Database Schema & Data Models
 
-Location: `phase-1/lib/data/db/schema.dart`  
+Location: `lib/data/db/schema.dart`  
 Database name: `saagar_audit.db` via `sqflite`.
 
 ## 1. Relational Tables (14 Total)
@@ -21,5 +21,6 @@ Database name: `saagar_audit.db` via `sqflite`.
 
 ## 2. Seed Data
 Loaded by `SeedLoader` on `onCreate`:
-- `phase-1/assets/seed/sops.json`: 8 SOP definitions.
-- `phase-1/assets/seed/checkpoints.json`: 68 Daily checkpoints.
+- `assets/seed/sops.json`: 8 SOP definitions.
+- `assets/seed/checkpoints.json`: 68 Daily checkpoints.
+
