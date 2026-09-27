@@ -13,6 +13,7 @@ import '../models/photo.dart';
 enum AuditHistoryFilter {
   all,
   daily,
+  weekly,
   unverified,
 }
 
@@ -36,6 +37,71 @@ class AuditRepository {
     );
     if (rows.isEmpty) return null;
     return Audit.fromMap(rows.first);
+  }
+
+  /// Finds an audit for a specific week and year (used for weekly audits).
+  Future<Audit?> findByWeek({
+    required int weekNumber,
+    required int year,
+    required String auditType,
+  }) async {
+    final rows = await AppDatabase.instance.db.query(
+      'audits',
+      where:
+          "week_number = ? AND year = ? AND audit_type = ? AND status NOT IN ('hidden')",
+      whereArgs: [weekNumber, year, auditType],
+      orderBy: 'submitted_at DESC, draft_started_at DESC',
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return Audit.fromMap(rows.first);
+  }
+
+  /// Returns submitted or verified daily audits for a given ISO week and year,
+  /// ordered by audit_date ASC. Deduplicates per audit_date so that superseded
+  /// daily audits (e.g. re-done audits) do not cause double-counting or exceed
+  /// 7 days in the weekly score engine rollup.
+  Future<List<Audit>> findSubmittedDailyAuditsForWeek({
+    required int weekNumber,
+    required int year,
+  }) async {
+    final rows = await AppDatabase.instance.db.query(
+      'audits',
+      where:
+          "week_number = ? AND year = ? AND audit_type = 'daily' AND status IN ('submitted', 'verified')",
+      whereArgs: [weekNumber, year],
+      orderBy: 'audit_date ASC',
+    );
+    final allAudits = rows.map(Audit.fromMap).toList();
+
+    // 1. Identify all audit IDs that were explicitly superseded by another audit
+    final supersededIds = allAudits
+        .map((a) => a.supersedesAuditId)
+        .whereType<String>()
+        .toSet();
+
+    // 2. Group by audit_date, keeping only non-superseded audits and picking
+    // the latest by submitted_at (or draftStartedAt)
+    final Map<String, Audit> latestByDate = {};
+    for (final audit in allAudits) {
+      if (supersededIds.contains(audit.id)) {
+        continue;
+      }
+      final existing = latestByDate[audit.auditDate];
+      if (existing == null) {
+        latestByDate[audit.auditDate] = audit;
+      } else {
+        final existingTime = existing.submittedAt ?? existing.draftStartedAt ?? '';
+        final auditTime = audit.submittedAt ?? audit.draftStartedAt ?? '';
+        if (auditTime.compareTo(existingTime) >= 0) {
+          latestByDate[audit.auditDate] = audit;
+        }
+      }
+    }
+
+    final result = latestByDate.values.toList()
+      ..sort((a, b) => a.auditDate.compareTo(b.auditDate));
+    return result;
   }
 
   /// Creates a new draft audit row. Caller can pass [supersedesAuditId] when
@@ -226,6 +292,9 @@ class AuditRepository {
     switch (filter) {
       case AuditHistoryFilter.daily:
         whereClauses.add("audit_type = 'daily'");
+        break;
+      case AuditHistoryFilter.weekly:
+        whereClauses.add("audit_type = 'weekly'");
         break;
       case AuditHistoryFilter.unverified:
         whereClauses.add("status = 'submitted'");

@@ -77,6 +77,14 @@ class FakeDatabase extends Fake implements Database, Transaction {
         } else if (where == 'audit_id = ?' && whereArgs != null && whereArgs.isNotEmpty) {
           results = results.where((r) => r['id'] == whereArgs[0]).toList();
         } else {
+          if (where.contains('week_number = ?') && whereArgs != null && argIdx < whereArgs.length) {
+            final weekVal = whereArgs[argIdx++];
+            results = results.where((r) => r['week_number'] == weekVal).toList();
+          }
+          if (where.contains('year = ?') && whereArgs != null && argIdx < whereArgs.length) {
+            final yearVal = whereArgs[argIdx++];
+            results = results.where((r) => r['year'] == yearVal).toList();
+          }
           if (where.contains('audit_date = ?') && whereArgs != null && argIdx < whereArgs.length) {
             final dateVal = whereArgs[argIdx++];
             results = results.where((r) => r['audit_date'] == dateVal).toList();
@@ -95,6 +103,9 @@ class FakeDatabase extends Fake implements Database, Transaction {
           }
           if (where.contains("audit_type = 'daily'")) {
             results = results.where((r) => r['audit_type'] == 'daily').toList();
+          }
+          if (where.contains("audit_type = 'weekly'")) {
+            results = results.where((r) => r['audit_type'] == 'weekly').toList();
           }
           if (where.contains("status = 'submitted'")) {
             results = results.where((r) => r['status'] == 'submitted').toList();

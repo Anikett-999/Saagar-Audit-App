@@ -43,14 +43,15 @@
 | **S19** | CAP Close | ⏳ Planned (P2-5) | GM closes verified CAP; cap_log timeline entry |
 | **S20** | Reports List | ⏳ Planned (P2-4) | Weekly report list |
 | **S21** | Report Detail | ⏳ Planned (P2-4) | 1-page weekly report, Workbook §3.6 9-section format, PDF export |
-| **Weekly conduct** | S6–S10 analogues | ⏳ Planned (P2-2) | `audit_type='weekly'`, 36 weekly-only checkpoints |
+| **Weekly conduct** | S6–S11 analogues | ✅ Complete (P2-2) | Parameterized S06–S11 by `audit_type='weekly'`, 36 weekly checkpoints in 4 SOP groups (display_order 69–104), S05 GM/Owner Weekly card, S10 124-pt combined score with missing-day-as-zero & CW.7 variance subline, S12 history & S13 detail support |
 | **7-day review** | Daily review + spot check | ⏳ Planned (P2-3) | 7 daily cards, 3 random spot-check checkpoints/day, GM signature |
 
 **Score engine (Phase 2):** `computeWeeklyScore` (§6.5, daily-avg ×0.68 + weekly_raw, missing-day-as-zero) and `computeCumulativeWeeklyVariance` (CW.7, §6.7) — added to `lib/domain/score_engine.dart` in P2-1. Canonical target: Workbook §5.2 = 104.8/124 = **84.5% Poor** exact (test T2.1 passed).
 
 ## 2. Verified Baseline Health
 - `flutter analyze`: **0 issues found (Clean baseline)**
-- `flutter test`: **228/228 tests passing across 28 test files**:
+- `flutter test`: **235/235 tests passing across 29 test files**:
+  - `weekly_conduct_test.dart` (7 tests) — Sprint P2-2 Weekly Audit Conduct Suite: 36 weekly checkpoints load in 4 SOP groups in Workbook Day 3 §3.3..§3.6 order (Ops 10, Cash 8 ★, Service 6, Inv 12 ★; 56 weighted pts); R7 photo requirement enforced on Cash/Inventory fails via seed flag; S10 Review wiring reproduces Workbook §5.2 / T2.1 canonical score (104.8 / 124 = 84.5% Poor); T2.2 missing-day padding (6 days @ 90% + 1 absent day = 52.4 contribution); S12 History weekly filter & S13 Detail weekly checkpoints loading; GM/Owner role gating; Regression test 7: deduplication of superseded daily audits per `audit_date` preventing double-counting and >7 days ArgumentError on weekly submit.
   - `weekly_score_engine_test.dart` (10 tests) — T2.1 canonical Workbook §5.2 reproduction (104.8 / 124 = 84.5% Poor exact match), T2.2 missing day = 0% -> 52.4 contribution, day padding, boundary checks, NA-exclusion, CW.7 cumulative variance calculation and threshold breach detection.
   - `weekly_seed_test.dart` (4 tests) — Exactly 104 total checkpoints (68 daily + 36 weekly), SOP9 Operations present, R3 Hard Stop verified (real Marathi in all 36 weekly checkpoints, zero duplicates/placeholders), component breakdowns and weights verified (Ops 10x1=10, Cash 8x2=16 ★, RS 6x1=6, Inv 12x2=24 ★ = 56 wt; photo flags on Cash & Inv).
   - `phase1_integration_test.dart` (2 tests) — Comprehensive Phase 1 end-to-end lifecycle integration: S03 Owner Setup (bcrypt hash verification) -> S04 Login (wrong PIN blocked, correct PIN authenticated) -> S05 Home Dashboard with Rule #8 in-flow EN ⇄ MR language toggle ('दैनिक ऑडिट सुरू करा' assertion) -> S06 Start Daily Audit with CRO duty roster -> S07 Checkpoints & S08 Fail Detail (CP 1.1 PASS with 9.0 weighted pts; CP 1.2 FAIL with TC6 back-button atomicity, mandatory photo gate enforcement, photo attachment via PhotoService seam, atomic commit with 0.0 pts & photo row; CP 1.3 NA modal with reason capture & denominator exclusion) -> S10 Review with live score card matching score engine (90.0% Good, 9.0 / 10.0 pts), SOP breakdown, Fails section, auditor notes -> S11 Submit confirmation with checkmark, 90.0% Good, "Saved to SQLite · Will sync when online" -> Hard Rule #6 Immutability check (asserts StateError on post-submit saveResult and submitAudit); plus TC1 standalone PIN mismatch guard test on S03.
@@ -83,3 +84,6 @@
 - **DEF-01 PIN Lockout Durability**: Complete. `lockout_until` and `failure_timestamps` persisted to `SharedPreferences`, survives process death and restart.
 - **Immutability (TC8)**: Verified via automated tests asserting `StateError` on post-submit modifications.
 - **Atomic Fail (TC6)**: `recordFailAndAdvance` enforces finding text and mandatory photos atomically; `submitAudit` blocks submission if required photos are missing.
+
+## 3. Latent Edge Cases & Backlog Wishlist
+- **ISO Week/Year Boundary**: In `AuditRepository.createDraft`, `week_number` is computed via `isoWeek(parsed)`, while `year` is stored as `parsed.year` (calendar year). Around the December/January transition, ISO week 52/53 or week 1 can belong to the adjacent year (e.g. 2027-01-01 is ISO week 53 of 2026). Currently all Phase 1 daily audits and weekly queries match on `(week_number, year)`. To ensure seamless weekly↔daily joins across New Year boundaries, an ISO-year helper (`thursday.year`) should be introduced in a future sprint (e.g. Phase 2/3 cleanup) without breaking existing historical records.

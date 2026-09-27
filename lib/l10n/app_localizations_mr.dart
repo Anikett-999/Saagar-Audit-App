@@ -334,6 +334,36 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s05StatusSubmitted => 'सादर केले';
 
   @override
+  String get s05ThisWeekWeeklyAudit => 'या आठवड्याचे साप्ताहिक ऑडिट';
+
+  @override
+  String get s05WeeklyNotStartedYet =>
+      'तुम्ही या आठवड्याचे ऑडिट अद्याप सुरू केलेले नाही.';
+
+  @override
+  String get s05WeeklyNotStartedAdmin =>
+      'या आठवड्याचे साप्ताहिक ऑडिट अद्याप सुरू झालेले नाही.';
+
+  @override
+  String get s05StartWeeklyAudit => 'साप्ताहिक ऑडिट सुरू करा';
+
+  @override
+  String get s05ResumeWeeklyDraft => 'साप्ताहिक मसुदा पुन्हा सुरू करा';
+
+  @override
+  String get s05WeeklyDraftInProgress =>
+      'साप्ताहिक मसुदा ऑडिट सुरू आहे. तपासणी पुढे चालू ठेवण्यासाठी पुन्हा सुरू करा.';
+
+  @override
+  String get s05WeeklyAuditsRunByGm =>
+      'साप्ताहिक ऑडिट जनरल मॅनेजर (GM) द्वारे चालवले जाते.';
+
+  @override
+  String s05WeekNumberLabel(int week, int year) {
+    return 'आठवडा $week, $year';
+  }
+
+  @override
   String get s05AuditHistoryTitle => 'ऑडिट इतिहास';
 
   @override
@@ -367,6 +397,9 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s06Title => 'दैनिक ऑडिट सुरू करा';
 
   @override
+  String get s06WeeklyTitle => 'साप्ताहिक ऑडिट सुरू करा';
+
+  @override
   String get s06AuditDate => 'ऑडिट तारीख';
 
   @override
@@ -381,6 +414,21 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s06BeginAudit => 'ऑडिट सुरू करा';
+
+  @override
+  String get s10WeeklyScoreTitle => 'साप्ताहिक ऑडिट गुण';
+
+  @override
+  String get s10DailyAvgContribution => 'दैनंदिन सरासरी योगदान';
+
+  @override
+  String get s10WeeklyCheckpointsScore => 'साप्ताहिक तपासणी बिंदू गुण';
+
+  @override
+  String get s10CashVarianceTitle => 'एकूण संचित रोख तफावत (CW.7)';
+
+  @override
+  String get s11WeeklyTitle => 'साप्ताहिक ऑडिट सादर झाले';
 
   @override
   String s07CheckpointNumber(int current, int total) {
@@ -1434,7 +1482,7 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s12FilterUnverified => 'अपडताळलेले';
 
   @override
-  String get s12FilterWeekly => 'साप्ताहिक (टप्पा २)';
+  String get s12FilterWeekly => 'साप्ताहिक';
 
   @override
   String get s12FilterMonthly => 'मासिक (टप्पा ३)';

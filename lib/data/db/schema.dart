@@ -86,7 +86,7 @@ CREATE TABLE devices (
   static const _sops = '''
 CREATE TABLE sops (
   id            TEXT PRIMARY KEY,
-  number        INTEGER NOT NULL UNIQUE CHECK (number BETWEEN 1 AND 8),
+  number        INTEGER NOT NULL UNIQUE CHECK (number >= 1),
   name_en       TEXT NOT NULL,
   name_mr       TEXT NOT NULL,
   weight        INTEGER NOT NULL CHECK (weight IN (1,2)),

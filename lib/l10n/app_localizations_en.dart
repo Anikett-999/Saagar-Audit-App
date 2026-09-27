@@ -335,6 +335,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s05StatusSubmitted => 'Submitted';
 
   @override
+  String get s05ThisWeekWeeklyAudit => 'This week\'s weekly audit';
+
+  @override
+  String get s05WeeklyNotStartedYet =>
+      'You haven\'t started this week\'s audit yet.';
+
+  @override
+  String get s05WeeklyNotStartedAdmin =>
+      'This week\'s weekly audit has not been started yet.';
+
+  @override
+  String get s05StartWeeklyAudit => 'Start weekly audit';
+
+  @override
+  String get s05ResumeWeeklyDraft => 'Resume weekly draft';
+
+  @override
+  String get s05WeeklyDraftInProgress =>
+      'A weekly draft audit is in progress. Resume to continue marking checkpoints.';
+
+  @override
+  String get s05WeeklyAuditsRunByGm =>
+      'Weekly audits are run by the General Manager.';
+
+  @override
+  String s05WeekNumberLabel(int week, int year) {
+    return 'Week $week, $year';
+  }
+
+  @override
   String get s05AuditHistoryTitle => 'Audit history';
 
   @override
@@ -368,6 +398,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s06Title => 'Start Daily Audit';
 
   @override
+  String get s06WeeklyTitle => 'Start Weekly Audit';
+
+  @override
   String get s06AuditDate => 'Audit Date';
 
   @override
@@ -382,6 +415,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s06BeginAudit => 'Begin Audit';
+
+  @override
+  String get s10WeeklyScoreTitle => 'Weekly Audit Score';
+
+  @override
+  String get s10DailyAvgContribution => 'Daily Average Contribution';
+
+  @override
+  String get s10WeeklyCheckpointsScore => 'Weekly Checkpoints Score';
+
+  @override
+  String get s10CashVarianceTitle => 'Cumulative Cash Variance (CW.7)';
+
+  @override
+  String get s11WeeklyTitle => 'Weekly Audit Submitted';
 
   @override
   String s07CheckpointNumber(int current, int total) {
@@ -1433,7 +1481,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s12FilterUnverified => 'Unverified';
 
   @override
-  String get s12FilterWeekly => 'Weekly (Phase 2)';
+  String get s12FilterWeekly => 'Weekly';
 
   @override
   String get s12FilterMonthly => 'Monthly (Phase 3)';

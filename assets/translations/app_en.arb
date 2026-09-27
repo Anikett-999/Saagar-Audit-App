@@ -123,6 +123,20 @@
   "s05StatusNotStarted": "Not started",
   "s05StatusInProgress": "In progress",
   "s05StatusSubmitted": "Submitted",
+  "s05ThisWeekWeeklyAudit": "This week's weekly audit",
+  "s05WeeklyNotStartedYet": "You haven't started this week's audit yet.",
+  "s05WeeklyNotStartedAdmin": "This week's weekly audit has not been started yet.",
+  "s05StartWeeklyAudit": "Start weekly audit",
+  "s05ResumeWeeklyDraft": "Resume weekly draft",
+  "s05WeeklyDraftInProgress": "A weekly draft audit is in progress. Resume to continue marking checkpoints.",
+  "s05WeeklyAuditsRunByGm": "Weekly audits are run by the General Manager.",
+  "s05WeekNumberLabel": "Week {week}, {year}",
+  "@s05WeekNumberLabel": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "year": {"type": "int"}
+    }
+  },
   "s05AuditHistoryTitle": "Audit history",
   "s05AuditHistorySubtitle": "View past daily audits",
   "s05CapsTitle": "CAPs",
@@ -135,11 +149,18 @@
   "@s05ComingSoon": {"placeholders": {"feature": {"type": "String"}}},
 
   "s06Title": "Start Daily Audit",
+  "s06WeeklyTitle": "Start Weekly Audit",
   "s06AuditDate": "Audit Date",
   "s06StoreLabel": "Store",
   "s06CrosOnDuty": "CROs on Duty",
   "s06SelectAtLeastOneCro": "Please select at least one CRO on duty.",
   "s06BeginAudit": "Begin Audit",
+
+  "s10WeeklyScoreTitle": "Weekly Audit Score",
+  "s10DailyAvgContribution": "Daily Average Contribution",
+  "s10WeeklyCheckpointsScore": "Weekly Checkpoints Score",
+  "s10CashVarianceTitle": "Cumulative Cash Variance (CW.7)",
+  "s11WeeklyTitle": "Weekly Audit Submitted",
 
   "s07CheckpointNumber": "Checkpoint {current} of {total}",
   "@s07CheckpointNumber": {"placeholders": {"current": {"type": "int"}, "total": {"type": "int"}}},
@@ -618,7 +639,7 @@
   "s12FilterAll": "All",
   "s12FilterDaily": "Daily",
   "s12FilterUnverified": "Unverified",
-  "s12FilterWeekly": "Weekly (Phase 2)",
+  "s12FilterWeekly": "Weekly",
   "s12FilterMonthly": "Monthly (Phase 3)",
   "s12NoAuditsFound": "No audits found",
   "s12NoAuditsMatchFilter": "No audits match the selected filter.",

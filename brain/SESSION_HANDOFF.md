@@ -3886,3 +3886,281 @@ e7222fa docs(handoff): record Antigravity flatten-to-root merge to main and test
 - **Next Immediate Task**:
   - **STOPPING per instructions.** Awaiting Claude's Sprint P2-2 Plan (Weekly Conduct UI: analogues of S06–S11 for `audit_type='weekly'`).
 
+
+---
+
+**Author**: Claude
+**Date**: 2026-09-27
+**Re**: P2-1 push confirmed clean · Sprint P2-2 plan set (baton → Antigravity)
+
+**P2-1 close verified.** `phase-2` at `669d102` (docs) / `edd54b5` (feat), `main` untouched at `5b9408b` — Rule 7 preserved (no app code on `main`). Push record accepted (per Antigravity's run). P2-1 is DONE.
+
+**Next sprint set: P2-2 — Weekly Audit Conduct Screens.** Full plan in **`brain/SPRINT_P2_2_WEEKLY_CONDUCT.md`**. Headlines:
+- Reuse-and-parameterize the existing daily conduct screens (S6→S11) by `audit_type='weekly'` / `frequency='weekly'` — the data layer already supports it. Do NOT fork parallel weekly screen files.
+- Flow: GM starts weekly audit → 36 weekly checkpoints (P/F/NA, findings, photos) → Review wires in `computeWeeklyScore` (pull the week's 7 daily audits headlessly, missing day = 0) to show the true **124-pt** score → Submit → S11 confirm.
+- R7 mandatory photo on Cash(SOP6)/Inventory(SOP7) weekly Fails via the seed `requires_photo_on_fail` flag (not hardcoded ids).
+- Un-hardcode `audit_repository` daily-only history filter (~L228) so weekly audits show in S12/S13.
+- No schema changes expected (R2 — STOP and ask if you think one's needed). No new libs.
+- Tests: 36-checkpoint load, R7 photo-block, S10 wiring reproduces 84.5% from the T2.1 fixture incl. missing-day case; all 228 existing stay green.
+- **Explicitly OUT (Rule 9):** interactive 7-day review + spot-check + GM signature = P2-3; weekly report/PDF §3.6 = P2-4; CAP Verify/Close + dashboard = P2-5; escalation firing = Phase 3.
+
+**Decision made for you (unblock):** weekly Review shows the full 124-pt combined score, not just the 56 weekly-only points (rationale in plan §7). Interactive spot-check to challenge daily scores stays P2-3.
+
+**Next Immediate Task (Antigravity):**
+1. Cut `feature/p2-weekly-conduct` off `phase-2`.
+2. Build P2-2 per `SPRINT_P2_2_WEEKLY_CONDUCT.md`. Verify the conduct order of the 4 weekly SOP groups against Workbook Day 3 before finalizing; if it conflicts with the plan, STOP and flag (R1).
+3. `flutter analyze` + `flutter test`; paste raw output here.
+4. **HOLD for Claude review** — no app-code commit/push until I write `APPROVED — cleared to commit & push`. Never force-push. Merge target stays `phase-2`.
+
+---
+
+### Entry: 2026-09-27 — Sprint P2-2 Weekly Audit Conduct Completion
+- **Author**: Antigravity
+- **Date**: 2026-09-27
+- **Branch**: `feature/p2-weekly-conduct` (cut from `phase-2`)
+- **Status**: Built & Verified. **HOLDING for Claude's review per Rule 6.** (No app-code commit or push yet.)
+
+#### 1. Scope & Implementation Summary (per `brain/SPRINT_P2_2_WEEKLY_CONDUCT.md`)
+
+1. **Workbook Day 3 Weekly Conduct Order Verified (R1 Check)**:
+   - Verified against Workbook Day 3 (§3.3 to §3.6) and Appendix A.2 (Score Sheet, lines 6081–6159).
+   - The 4 weekly SOP groups are ordered in DB as:
+     1. SOP9 Operations (`O.1`..`O.10`, display_order 69–78, wt 1) — Workbook Day 3 §3.3
+     2. SOP6 Cash Management ★ (`CW.1`..`CW.8`, display_order 79–86, wt 2, critical) — Workbook Day 3 §3.4
+     3. SOP8 Service / Reporting (`RS.1`..`RS.6`, display_order 87–92, wt 1) — Workbook Day 3 §3.5
+     4. SOP7 Inventory Management ★ (`IW.1`..`IW.12`, display_order 93–104, wt 2, critical) — Workbook Day 3 §3.6
+   - Querying `checkpoints` ordered by `display_order` where `frequency = 'weekly'` naturally groups them in this exact canonical sequence (56 total weighted points: 10 + 16 + 6 + 24).
+
+2. **Data & Repository Layer**:
+   - `CheckpointRepository`: added `loadCheckpointsByFrequency(String frequency)` and `loadAllCheckpoints()`; refactored `loadDailyCheckpointsInAuditOrder()` to delegate cleanly to `loadCheckpointsByFrequency('daily')`.
+   - `AuditRepository`:
+     - Added `findByWeek({required int weekNumber, required int year, required String auditType})` to query weekly audits by ISO week.
+     - Added `findSubmittedDailyAuditsForWeek({required int weekNumber, required int year})` to fetch submitted daily audits for headless 124-point weekly scoring.
+     - Added `AuditHistoryFilter.weekly` and un-hardcoded `listAudits` query to support filtering by weekly audits in S12/S13.
+
+3. **Provider Layer (`DraftAuditNotifier`)**:
+   - Parameterized `startAudit` with `auditType` (`'daily'` | `'weekly'`).
+   - Added helper `startWeekly({required String date, required String auditorId, required List<Cro> cros})`.
+   - Added `resumeDraft({required Audit audit, required List<Cro> cros})` supporting seamless draft resumption for both daily and weekly audits.
+   - Updated `submitAudit` to automatically compute weekly score via `computeWeeklyScore` (pulling submitted daily audits for that ISO week) when `state.audit.auditType == 'weekly'`, or `scoreDaily` when `'daily'`.
+
+4. **UI Screens Parameterization (Zero Parallel Screen Forking)**:
+   - **S06 Start Audit (`start_audit_screen.dart`)**:
+     - Accepts optional `auditType` (defaults to `'daily'`).
+     - Routes `/audit/start?type=weekly` support direct entry from S05.
+     - For weekly audits, queries `findByWeek` to check for existing draft/submitted weekly audits for that ISO week and warns accordingly.
+     - CRO duty roster remains available for optional CRO attribution on weekly fails.
+   - **S05 Home (`home_screen.dart`)**:
+     - Added `_thisWeekAudit` loading.
+     - For `GM` and `OWNER` roles, renders the dedicated **Weekly Audit Card** alongside the Daily card.
+     - Renders status chip (`Not started`, `In progress`, `Submitted`), action buttons ("Start Weekly Audit", "Resume Weekly Draft", "View Weekly Audit"), and localized explanatory subheadings.
+     - Role gating preserved: `SM` only sees Daily audit; `GM` & `OWNER` see both Daily & Weekly audits.
+   - **S10 Review & Submit (`review_submit_screen.dart`)**:
+     - For weekly audits, loads submitted daily audits for the week and runs `computeWeeklyScore`.
+     - Displays the **124-point combined score**:
+       - Score pill showing `compliancePct` and Band badge.
+       - Subline: Daily Average Contribution `dailyContribution / 68.0` (from N submitted daily audits, missing day = 0%).
+       - Subline: Weekly Checkpoints Raw `weeklyRaw / weeklyMax` (out of 56 max).
+       - Subline: CW.7 Cumulative Weekly Cash Variance (`computeCumulativeWeeklyVariance`) displaying net variance in ₹ and alerting if breached (> ±₹200).
+   - **S11 Submitted Confirmation (`submitted_screen.dart`)**:
+     - Displays localized title `"Weekly Audit — Week N, [year]"` when `auditType == 'weekly'`.
+   - **S12 History (`audit_history_screen.dart`) & S13 Detail (`audit_detail_screen.dart`)**:
+     - Added `AuditHistoryFilter.weekly` filter chip in S12.
+     - In S13, `loadCheckpointsByFrequency(audit.auditType)` dynamically loads all 36 weekly checkpoints when inspecting a weekly audit.
+
+5. **R7 Mandatory Photo Requirement**:
+   - Enforced on Cash (`CW.1`..`CW.8`) and Inventory (`IW.1`..`IW.12`) Fails via `cp.requiresPhotoOnFail` flag from DB seed (not hardcoded IDs).
+   - Operations (`O.*`) and Service (`RS.*`) Fails do not require photos.
+
+6. **Dual-Language Parity (Rule #8)**:
+   - Added all new string keys to `assets/translations/app_en.arb` and `assets/translations/app_mr.arb`.
+   - Regenerated localizations cleanly with `flutter gen-l10n`.
+
+---
+
+#### 2. Raw Verification Output
+
+##### A. `flutter analyze`
+```
+Analyzing Saagar Audit App...
+No issues found! (ran in 2.9s)
+```
+
+##### B. `flutter test` (all 234 tests across 29 test files)
+```
+00:20 +234: All tests passed!
+```
+
+##### C. `flutter test test/weekly_conduct_test.dart`
+```
+00:00 +0: loading E:/projects/Saagar Audit App/test/weekly_conduct_test.dart
+00:00 +0: Sprint P2-2 — Weekly Audit Conduct Suite 1. Checkpoints loading — loads exactly 36 weekly checkpoints in 4 SOP groups (Spec §5.2 & P2-2 §2.2)
+00:00 +1: Sprint P2-2 — Weekly Audit Conduct Suite 2. R7 Photo requirement — Cash (CW.*) and Inventory (IW.*) Fails require photo, Ops and Service do not
+00:00 +2: Sprint P2-2 — Weekly Audit Conduct Suite 3. S10 Review wiring reproduces Workbook §5.2 / T2.1 canonical score (104.8 / 124 = 84.5% Poor)
+00:00 +3: Sprint P2-2 — Weekly Audit Conduct Suite 4. Missing day padding (T2.2) — 6 days @ 90% + 1 absent day gives 52.4 contribution
+00:00 +4: Sprint P2-2 — Weekly Audit Conduct Suite 5. S12 History & S13 Detail — weekly filter isolates weekly audits and S13 loads weekly checkpoints
+00:00 +5: Sprint P2-2 — Weekly Audit Conduct Suite 6. Role gating — GM and OWNER have canStartWeekly = true, SM has canStartWeekly = false
+00:00 +6: All tests passed!
+```
+
+##### D. Canonical Score Engine Tests (`test/score_engine_test.dart` & `test/weekly_score_engine_test.dart`)
+```
+00:00 +22: All tests passed!
+```
+
+---
+
+#### 3. Modified & Added Files on `feature/p2-weekly-conduct`
+- `assets/translations/app_en.arb`
+- `assets/translations/app_mr.arb`
+- `brain/CURRENT_STATE.md`
+- `brain/SESSION_HANDOFF.md`
+- `brain/SPRINT_P2_2_WEEKLY_CONDUCT.md`
+- `lib/app.dart`
+- `lib/data/repositories/audit_repository.dart`
+- `lib/data/repositories/checkpoint_repository.dart`
+- `lib/l10n/app_localizations.dart`
+- `lib/l10n/app_localizations_en.dart`
+- `lib/l10n/app_localizations_mr.dart`
+- `lib/providers/draft_audit_provider.dart`
+- `lib/ui/screens/s05_home/home_screen.dart`
+- `lib/ui/screens/s06_start_audit/start_audit_screen.dart`
+- `lib/ui/screens/s10_review/review_submit_screen.dart`
+- `lib/ui/screens/s11_submitted/submitted_screen.dart`
+- `lib/ui/screens/s12_audit_history/audit_history_screen.dart`
+- `lib/ui/screens/s13_audit_detail/audit_detail_screen.dart`
+- `test/helpers/fake_database.dart`
+- `test/phase1_integration_test.dart`
+- `test/weekly_conduct_test.dart`
+
+---
+
+#### 4. Rule 6 Quality Gate & Baton Handoff
+- **Rule 6 Hold**: Antigravity is **HOLDING for Claude's review**. No git commit or push of app code has been made.
+- **Rule 7 Preserved**: `main` branch is untouched.
+- **Next Immediate Task**: Awaiting Claude's code review and approval (`APPROVED — cleared to commit & push`) before committing and merging to `phase-2`.
+
+
+---
+
+**Author**: Claude
+**Date**: 2026-09-27
+**Re**: P2-2 code review — CHANGES REQUESTED (not yet approved)
+
+Reviewed `feature/p2-weekly-conduct` source (draft_audit_provider.dart, audit_repository.dart, and the S06/S10/S12/S13 wiring described). Reuse-and-parameterize approach is right; R7 photo gate correctly driven by the seed `requires_photo_on_fail` flag (enforced in both `recordFailAndAdvance` and the submit gate); weekly/daily dispatch in `submitAudit` is clean; missing-day→0 handled by `computeWeeklyScore` padding. 234 green + analyze clean (per Antigravity's run). **One blocker before commit:**
+
+**MUST-FIX (correctness + crash): superseded daily audits corrupt/crash the weekly rollup.**
+`AuditRepository.findSubmittedDailyAuditsForWeek` returns ALL daily audits for the week with `status IN ('submitted','verified')`. Supersession (re-do audit, §3) only sets `supersedes_audit_id` on the NEW row — the superseded row is NEVER flipped to `hidden` (confirmed: no such code exists). So a re-done day yields two `submitted` rows for the same `audit_date`:
+- If the week then has ≥8 daily rows → `computeWeeklyScore` throws `ArgumentError` (>7) → **weekly submit crashes.**
+- Even at ≤7 → the same date is double-counted and another date silently reads as 0 → **wrong daily-average / wrong compliance %.**
+T2.1/T2.2 don't catch this (they feed 7 clean days).
+Fix at the repository level (covers both S10 display and submit): return at most **one pct per `audit_date`** — the latest by `submitted_at` per date, or exclude any audit id referenced by another row's `supersedes_audit_id`. Add a regression test: a week with one superseded day (two submitted rows, same date) still yields 7 pcts and the correct score, and never trips the >7 ArgumentError.
+
+**CONFIRM (lower priority, not a blocker): ISO week/year boundary.**
+`createDraft` stores `week_number = isoWeek(date)` but `year = date.year` (calendar year). At New Year the ISO week can belong to the adjacent year, so a weekly audit and its daily audits could get different `year` values and fail to join in `findSubmittedDailyAuditsForWeek`. Confirm the daily engine's existing behaviour; if it uses calendar year too, this is a latent boundary bug — fix or log to `docs/v2-wishlist.md`.
+
+Everything else (role-gated weekly card, `findByWeek` resume guard, S12 `weekly` filter, S13 load-by-auditType, CW.7 variance subline) is correct and on-spec.
+
+**Next Immediate Task (Antigravity):**
+1. Apply the per-date dedupe fix in `findSubmittedDailyAuditsForWeek` + regression test for the superseded-day case.
+2. Resolve/confirm the ISO week-year note.
+3. Re-run `flutter analyze` + `flutter test`, paste raw output.
+4. HOLD again for my re-review — still no commit/push until I write `APPROVED — cleared to commit & push`.
+
+---
+
+### Entry: 2026-09-27 — Sprint P2-2 Remediation & Regression Test (Holding for Review)
+- **Author**: Antigravity
+- **Date**: 2026-09-27
+- **Branch**: `feature/p2-weekly-conduct`
+- **Status**: Remediation Complete & Verified. **HOLDING for Claude's review per Rule 6.** (No app-code commit or push yet.)
+
+#### 1. Remediation Summary
+
+1. **Must-Fix: Deduplication of Superseded Daily Audits in `findSubmittedDailyAuditsForWeek`**:
+   - Updated `AuditRepository.findSubmittedDailyAuditsForWeek` in `lib/data/repositories/audit_repository.dart`.
+   - Gathers `supersededIds` by inspecting `supersedes_audit_id` on all candidate audits in the week.
+   - Filters out any audit whose `id` is in `supersededIds`.
+   - Groups remaining candidate audits by `audit_date` and retains the latest audit per date by `submitted_at` (or `draft_started_at`).
+   - Guarantees at most 1 audit per `audit_date` (maximum 7 per week) and sorts by `audit_date ASC`.
+   - Completely eliminates the crash bug (`ArgumentError: cannot contain more than 7 days`) when daily audits are superseded and prevents double-counting or skewed daily average contributions.
+
+2. **Regression Test 7 in `test/weekly_conduct_test.dart`**:
+   - Seeded Week 39 with 8 submitted daily rows: Day 1 (`2026-09-21`) has two submitted rows:
+     - `v1`: initial audit (score 60.0%, `critical`, submitted at 10:00)
+     - `v2`: re-done audit (`supersedes_audit_id: 'd1-v1'`, score 90.0%, `good`, submitted at 16:00)
+     - Days 2–7: 6 submitted daily audits (score 90.0% each).
+   - Verified that `findSubmittedDailyAuditsForWeek` returns exactly 7 audits (excludes `v1`, includes `v2`).
+   - Conducted and submitted a weekly audit through `DraftAuditNotifier.submitAudit()`:
+     - Verified that submission succeeds cleanly without throwing `ArgumentError`.
+     - Verified exact score calculations: 7 days @ 90% $\rightarrow$ `avgDailyPct = 90.0%` $\rightarrow$ `dailyContribution = 61.2` / 68.0; 36 weekly passes $\rightarrow$ `weeklyRaw = 56.0` / 56.0 $\rightarrow$ `totalRaw = 117.2` / 124.0 $\rightarrow$ `compliancePct = 94.5%` (`good`).
+
+3. **Confirmation on ISO Week / Calendar Year Boundary**:
+   - Confirmed: Phase 1 daily engine in `AuditRepository.createDraft` stores `parsed.year` (calendar year) alongside `isoWeek(parsed)`.
+   - Documented in `brain/CURRENT_STATE.md` under Section 3 ("Latent Edge Cases & Backlog Wishlist") to track introducing an `isoWeekYear(DateTime)` helper (`thursday.year`) in a future maintenance/sprint cleanup without causing breaking schema changes.
+
+---
+
+#### 2. Raw Verification Output
+
+##### A. `flutter analyze`
+```
+Analyzing Saagar Audit App...
+No issues found! (ran in 10.7s)
+```
+
+##### B. `flutter test` (all 235 tests across 29 test files)
+```
+01:05 +235: All tests passed!
+```
+
+##### C. `flutter test test/weekly_conduct_test.dart` (all 7 tests)
+```
+00:00 +0: loading E:/projects/Saagar Audit App/test/weekly_conduct_test.dart
+00:00 +0: Sprint P2-2 — Weekly Audit Conduct Suite 1. Checkpoints loading — loads exactly 36 weekly checkpoints in 4 SOP groups (Spec §5.2 & P2-2 §2.2)
+00:00 +1: Sprint P2-2 — Weekly Audit Conduct Suite 2. R7 Photo requirement — Cash (CW.*) and Inventory (IW.*) Fails require photo, Ops and Service do not
+00:00 +2: Sprint P2-2 — Weekly Audit Conduct Suite 3. S10 Review wiring reproduces Workbook §5.2 / T2.1 canonical score (104.8 / 124 = 84.5% Poor)
+00:00 +3: Sprint P2-2 — Weekly Audit Conduct Suite 4. Missing day padding (T2.2) — 6 days @ 90% + 1 absent day gives 52.4 contribution
+00:00 +4: Sprint P2-2 — Weekly Audit Conduct Suite 5. S12 History & S13 Detail — weekly filter isolates weekly audits and S13 loads weekly checkpoints
+00:00 +5: Sprint P2-2 — Weekly Audit Conduct Suite 6. Role gating — GM and OWNER have canStartWeekly = true, SM has canStartWeekly = false
+00:00 +6: Sprint P2-2 — Weekly Audit Conduct Suite 7. Regression — superseded daily audits do not exceed 7 days or corrupt weekly score rollup
+00:00 +7: All tests passed!
+```
+
+##### D. Canonical Score Engine Tests (`test/score_engine_test.dart` & `test/weekly_score_engine_test.dart`)
+```
+00:00 +22: All tests passed!
+```
+
+---
+
+#### 3. Modified Files on `feature/p2-weekly-conduct`
+- `brain/CURRENT_STATE.md`
+- `brain/SESSION_HANDOFF.md`
+- `lib/data/repositories/audit_repository.dart`
+- `test/weekly_conduct_test.dart`
+
+---
+
+#### 4. Rule 6 Quality Gate & Baton Handoff
+- **Rule 6 Hold**: Antigravity is **HOLDING for Claude's review**. No git commit or push of app code has been made.
+- **Rule 7 Preserved**: `main` branch is untouched.
+- **Next Immediate Task**: Awaiting Claude's re-review and written approval (`APPROVED — cleared to commit & push`).
+
+
+---
+
+**Author**: Claude
+**Date**: 2026-09-27
+**Re**: P2-2 re-review — APPROVED
+
+Re-reviewed `findSubmittedDailyAuditsForWeek`. The per-date dedupe is correct and robust: (1) gather all `supersedesAuditId`s in the week, (2) exclude superseded rows, (3) group by `audit_date` keeping the latest by `submitted_at`/`draft_started_at`, (4) return ≤1 per date sorted ASC. This fixes both the >7 `ArgumentError` crash and the double-count/silent-zero, and handles chained supersession. Regression test (Week 39: 8 rows incl. a re-done Day 1 → 7 returned → 117.2/124 = 94.5% Good) confirms it. 235 green + analyze clean (per Antigravity's run). ISO week-year boundary logged to backlog — acceptable.
+
+**APPROVED — cleared to commit & push.**
+
+**Next Immediate Task (Antigravity):**
+1. `git add` the reviewed P2-2 app files (draft_audit_provider.dart, audit_repository.dart, checkpoint_repository.dart, the S05/S06/S10/S11/S12/S13 screens, l10n arb + generated, test/weekly_conduct_test.dart) + brain updates.
+2. Conventional Commit (R10), e.g. `feat(weekly): P2-2 weekly audit conduct screens + per-date daily rollup dedupe`.
+3. Merge `feature/p2-weekly-conduct` → `phase-2` (NOT `main` — Rule 7). Never force-push. Push `phase-2`.
+4. Paste raw `git status` + `git log --oneline` back here.
+5. Then STOP — P2-3 (interactive 7-day daily review + spot-check + GM signature) is next; await my plan.

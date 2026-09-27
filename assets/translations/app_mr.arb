@@ -122,6 +122,20 @@
   "s05StatusNotStarted": "सुरू नाही",
   "s05StatusInProgress": "प्रगतीपथावर",
   "s05StatusSubmitted": "सादर केले",
+  "s05ThisWeekWeeklyAudit": "या आठवड्याचे साप्ताहिक ऑडिट",
+  "s05WeeklyNotStartedYet": "तुम्ही या आठवड्याचे ऑडिट अद्याप सुरू केलेले नाही.",
+  "s05WeeklyNotStartedAdmin": "या आठवड्याचे साप्ताहिक ऑडिट अद्याप सुरू झालेले नाही.",
+  "s05StartWeeklyAudit": "साप्ताहिक ऑडिट सुरू करा",
+  "s05ResumeWeeklyDraft": "साप्ताहिक मसुदा पुन्हा सुरू करा",
+  "s05WeeklyDraftInProgress": "साप्ताहिक मसुदा ऑडिट सुरू आहे. तपासणी पुढे चालू ठेवण्यासाठी पुन्हा सुरू करा.",
+  "s05WeeklyAuditsRunByGm": "साप्ताहिक ऑडिट जनरल मॅनेजर (GM) द्वारे चालवले जाते.",
+  "s05WeekNumberLabel": "आठवडा {week}, {year}",
+  "@s05WeekNumberLabel": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "year": {"type": "int"}
+    }
+  },
   "s05AuditHistoryTitle": "ऑडिट इतिहास",
   "s05AuditHistorySubtitle": "मागील दैनिक ऑडिट पहा",
   "s05CapsTitle": "सीएपी (CAPs)",
@@ -134,11 +148,18 @@
   "@s05ComingSoon": {"placeholders": {"feature": {"type": "String"}}},
 
   "s06Title": "दैनिक ऑडिट सुरू करा",
+  "s06WeeklyTitle": "साप्ताहिक ऑडिट सुरू करा",
   "s06AuditDate": "ऑडिट तारीख",
   "s06StoreLabel": "स्टोअर",
   "s06CrosOnDuty": "ड्युटीवरील कर्मचारी (CRO)",
   "s06SelectAtLeastOneCro": "कृपया किमान एक ड्युटीवरील कर्मचारी निवडा.",
   "s06BeginAudit": "ऑडिट सुरू करा",
+
+  "s10WeeklyScoreTitle": "साप्ताहिक ऑडिट गुण",
+  "s10DailyAvgContribution": "दैनंदिन सरासरी योगदान",
+  "s10WeeklyCheckpointsScore": "साप्ताहिक तपासणी बिंदू गुण",
+  "s10CashVarianceTitle": "एकूण संचित रोख तफावत (CW.7)",
+  "s11WeeklyTitle": "साप्ताहिक ऑडिट सादर झाले",
 
   "s07CheckpointNumber": "चेकपॉइंट {current} / {total}",
   "@s07CheckpointNumber": {"placeholders": {"current": {"type": "int"}, "total": {"type": "int"}}},
@@ -514,7 +535,7 @@
   "s12FilterAll": "सर्व",
   "s12FilterDaily": "दैनंदिन",
   "s12FilterUnverified": "अपडताळलेले",
-  "s12FilterWeekly": "साप्ताहिक (टप्पा २)",
+  "s12FilterWeekly": "साप्ताहिक",
   "s12FilterMonthly": "मासिक (टप्पा ३)",
   "s12NoAuditsFound": "कोणतेही ऑडिट आढळले नाही",
   "s12NoAuditsMatchFilter": "निवडलेल्या फिल्टरशी जुळणारे कोणतेही ऑडिट आढळले नाही.",

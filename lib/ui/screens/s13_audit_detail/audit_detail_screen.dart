@@ -92,8 +92,8 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
 
       // Load SOPs and checkpoints
       final sops = await CheckpointRepository.instance.loadAllSops();
-      final checkpoints =
-          await CheckpointRepository.instance.loadDailyCheckpointsInAuditOrder();
+      final checkpoints = await CheckpointRepository.instance
+          .loadCheckpointsByFrequency(audit.auditType);
       final cpMap = <String, Checkpoint>{
         for (final cp in checkpoints) cp.id: cp,
       };

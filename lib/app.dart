@@ -68,7 +68,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/audit/start',
         name: 's06_start_audit',
-        builder: (_, __) => const StartAuditScreen(),
+        builder: (context, state) {
+          final auditType = state.uri.queryParameters['type'] ??
+              (state.extra as Map<String, dynamic>?)?['auditType'] as String? ??
+              'daily';
+          return StartAuditScreen(auditType: auditType);
+        },
       ),
       GoRoute(
         path: '/audit/checkpoint',

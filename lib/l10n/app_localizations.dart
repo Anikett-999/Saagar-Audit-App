@@ -716,6 +716,54 @@ abstract class AppLocalizations {
   /// **'Submitted'**
   String get s05StatusSubmitted;
 
+  /// No description provided for @s05ThisWeekWeeklyAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'This week\'s weekly audit'**
+  String get s05ThisWeekWeeklyAudit;
+
+  /// No description provided for @s05WeeklyNotStartedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t started this week\'s audit yet.'**
+  String get s05WeeklyNotStartedYet;
+
+  /// No description provided for @s05WeeklyNotStartedAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'This week\'s weekly audit has not been started yet.'**
+  String get s05WeeklyNotStartedAdmin;
+
+  /// No description provided for @s05StartWeeklyAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'Start weekly audit'**
+  String get s05StartWeeklyAudit;
+
+  /// No description provided for @s05ResumeWeeklyDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume weekly draft'**
+  String get s05ResumeWeeklyDraft;
+
+  /// No description provided for @s05WeeklyDraftInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'A weekly draft audit is in progress. Resume to continue marking checkpoints.'**
+  String get s05WeeklyDraftInProgress;
+
+  /// No description provided for @s05WeeklyAuditsRunByGm.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly audits are run by the General Manager.'**
+  String get s05WeeklyAuditsRunByGm;
+
+  /// No description provided for @s05WeekNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Week {week}, {year}'**
+  String s05WeekNumberLabel(int week, int year);
+
   /// No description provided for @s05AuditHistoryTitle.
   ///
   /// In en, this message translates to:
@@ -776,6 +824,12 @@ abstract class AppLocalizations {
   /// **'Start Daily Audit'**
   String get s06Title;
 
+  /// No description provided for @s06WeeklyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Weekly Audit'**
+  String get s06WeeklyTitle;
+
   /// No description provided for @s06AuditDate.
   ///
   /// In en, this message translates to:
@@ -805,6 +859,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Begin Audit'**
   String get s06BeginAudit;
+
+  /// No description provided for @s10WeeklyScoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Audit Score'**
+  String get s10WeeklyScoreTitle;
+
+  /// No description provided for @s10DailyAvgContribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Average Contribution'**
+  String get s10DailyAvgContribution;
+
+  /// No description provided for @s10WeeklyCheckpointsScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Checkpoints Score'**
+  String get s10WeeklyCheckpointsScore;
+
+  /// No description provided for @s10CashVarianceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cumulative Cash Variance (CW.7)'**
+  String get s10CashVarianceTitle;
+
+  /// No description provided for @s11WeeklyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Audit Submitted'**
+  String get s11WeeklyTitle;
 
   /// No description provided for @s07CheckpointNumber.
   ///
@@ -2730,7 +2814,7 @@ abstract class AppLocalizations {
   /// No description provided for @s12FilterWeekly.
   ///
   /// In en, this message translates to:
-  /// **'Weekly (Phase 2)'**
+  /// **'Weekly'**
   String get s12FilterWeekly;
 
   /// No description provided for @s12FilterMonthly.

@@ -257,7 +257,8 @@ void main() {
     expect(find.byType(HomeScreen), findsOneWidget);
     expect(find.text('Hello, Sunil Patil'), findsOneWidget);
     expect(find.text('OWNER'), findsOneWidget);
-    expect(find.text('Not started'), findsOneWidget);
+    // In Phase 2, OWNER sees both Daily & Weekly cards; both begin as 'Not started'
+    expect(find.text('Not started'), findsAtLeastNWidgets(1));
     expect(find.text('Start daily audit'), findsOneWidget);
 
     // Rule #8 in-flow toggle: switch to Marathi

@@ -7,19 +7,26 @@ import '../../../data/models/audit.dart';
 import '../../../data/models/cro.dart';
 import '../../../data/repositories/audit_repository.dart';
 import '../../../data/repositories/cro_repository.dart';
+import '../../../domain/iso_week.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/draft_audit_provider.dart';
 import '../../theme/app_colors.dart';
 
-/// S6 Start Daily Audit — date + CROs on duty, then routes to S7.
+/// S6 Start Audit — date + CROs on duty, then routes to S7.
+/// Parameterized by [auditType] ('daily' | 'weekly').
 ///
 /// Per Spec §5 S6:
 ///   * Default date = today. Backdate allowed up to 30 days; future blocked.
 ///   * CROs on duty: multi-select, minimum 1.
-///   * If an audit already exists for this date, warn and allow supersession.
+///   * If an audit already exists for this date/week, warn and allow supersession.
 class StartAuditScreen extends ConsumerStatefulWidget {
-  const StartAuditScreen({super.key});
+  const StartAuditScreen({
+    super.key,
+    this.auditType = 'daily',
+  });
+
+  final String auditType;
 
   @override
   ConsumerState<StartAuditScreen> createState() => _StartAuditScreenState();
@@ -43,10 +50,19 @@ class _StartAuditScreenState extends ConsumerState<StartAuditScreen> {
   Future<void> _refresh() async {
     setState(() => _loading = true);
     final cros = await CroRepository.instance.listActive();
-    final existing = await AuditRepository.instance.findByDate(
-      date: DateFormat('yyyy-MM-dd').format(_date),
-      auditType: 'daily',
-    );
+    final Audit? existing;
+    if (widget.auditType == 'weekly') {
+      existing = await AuditRepository.instance.findByWeek(
+        weekNumber: isoWeek(_date),
+        year: _date.year,
+        auditType: 'weekly',
+      );
+    } else {
+      existing = await AuditRepository.instance.findByDate(
+        date: DateFormat('yyyy-MM-dd').format(_date),
+        auditType: 'daily',
+      );
+    }
     if (!mounted) return;
     setState(() {
       _allCros = cros;
@@ -136,8 +152,9 @@ class _StartAuditScreenState extends ConsumerState<StartAuditScreen> {
     final selectedCros =
         _allCros.where((c) => _selectedCroIds.contains(c.id)).toList();
 
-    await ref.read(draftAuditProvider.notifier).startDaily(
+    await ref.read(draftAuditProvider.notifier).startAudit(
           date: DateFormat('yyyy-MM-dd').format(_date),
+          auditType: widget.auditType,
           auditorId: user.id,
           cros: selectedCros,
           supersedesAuditId:
@@ -155,13 +172,20 @@ class _StartAuditScreenState extends ConsumerState<StartAuditScreen> {
     }
 
     final l10n = AppLocalizations.of(context)!;
+    final isWeekly = widget.auditType == 'weekly';
     final dateLabel = DateFormat('EEEE, d MMMM yyyy').format(_date);
     final isToday =
         DateFormat('yyyy-MM-dd').format(_date) ==
             DateFormat('yyyy-MM-dd').format(DateTime.now());
 
+    final calendarSubtitle = isWeekly
+        ? '${l10n.s05WeekNumberLabel(isoWeek(_date), _date.year)}  ·  $dateLabel'
+        : dateLabel + (isToday ? '  ·  today' : '');
+
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.s06Title)),
+      appBar: AppBar(
+        title: Text(isWeekly ? l10n.s06WeeklyTitle : l10n.s06Title),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -169,7 +193,7 @@ class _StartAuditScreenState extends ConsumerState<StartAuditScreen> {
             child: ListTile(
               leading: const Icon(Icons.calendar_today, color: AppColors.navy),
               title: Text(l10n.s06AuditDate),
-              subtitle: Text(dateLabel + (isToday ? '  ·  today' : '')),
+              subtitle: Text(calendarSubtitle),
               trailing: const Icon(Icons.edit_calendar_outlined),
               onTap: _pickDate,
             ),
@@ -193,8 +217,12 @@ class _StartAuditScreenState extends ConsumerState<StartAuditScreen> {
                   Expanded(
                     child: Text(
                       _existingAudit!.isSubmitted
-                          ? 'A submitted audit exists for this date. Starting a new one will supersede it (history preserved).'
-                          : 'A draft audit exists for this date. Starting a new one will replace it.',
+                          ? (isWeekly
+                              ? 'A submitted weekly audit exists for Week ${isoWeek(_date)}, ${_date.year}. Starting a new one will supersede it.'
+                              : 'A submitted audit exists for this date. Starting a new one will supersede it (history preserved).')
+                          : (isWeekly
+                              ? 'A draft weekly audit exists for Week ${isoWeek(_date)}, ${_date.year}. Starting a new one will replace it.'
+                              : 'A draft audit exists for this date. Starting a new one will replace it.'),
                       style: const TextStyle(color: AppColors.amber),
                     ),
                   ),

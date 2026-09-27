@@ -10,7 +10,7 @@ import '../data/repositories/checkpoint_repository.dart';
 import '../domain/score_engine.dart';
 
 export '../domain/score_engine.dart'
-    show Band, CheckpointMark, ScoreResult, Verdict;
+    show Band, CheckpointMark, ScoreResult, Verdict, WeeklyScoreResult;
 
 String verdictCode(Verdict v) => switch (v) {
       Verdict.pass => 'P',
@@ -32,7 +32,7 @@ class DraftAuditState {
   /// Null if no draft is active.
   final Audit? audit;
 
-  /// All 68 daily checkpoints in audit order, loaded once at draft start.
+  /// Checkpoints in audit order, loaded once at draft start (68 daily or 36 weekly).
   final List<Checkpoint> checkpoints;
 
   /// Index into [checkpoints] — what the user is currently looking at.
@@ -80,6 +80,33 @@ class DraftAuditState {
 class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
   DraftAuditNotifier() : super(const DraftAuditState());
 
+  /// Start a brand-new audit (daily or weekly). Loads checkpoints in audit
+  /// order and creates a draft row in SQLite.
+  Future<void> startAudit({
+    required String date,
+    required String auditType,
+    required String auditorId,
+    required List<Cro> cros,
+    String? supersedesAuditId,
+  }) async {
+    final audit = await AuditRepository.instance.createDraft(
+      date: date,
+      auditType: auditType,
+      auditorId: auditorId,
+      supersedesAuditId: supersedesAuditId,
+    );
+    final checkpoints = auditType == 'weekly'
+        ? await CheckpointRepository.instance.loadCheckpointsByFrequency('weekly')
+        : await CheckpointRepository.instance.loadDailyCheckpointsInAuditOrder();
+    state = DraftAuditState(
+      audit: audit,
+      checkpoints: checkpoints,
+      currentIndex: 0,
+      results: const {},
+      cros: cros,
+    );
+  }
+
   /// Start a brand-new daily audit. Loads the 68 checkpoints in time-block
   /// order and creates a draft row in SQLite.
   Future<void> startDaily({
@@ -87,20 +114,64 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
     required String auditorId,
     required List<Cro> cros,
     String? supersedesAuditId,
+  }) =>
+      startAudit(
+        date: date,
+        auditType: 'daily',
+        auditorId: auditorId,
+        cros: cros,
+        supersedesAuditId: supersedesAuditId,
+      );
+
+  /// Start a brand-new weekly audit. Loads the 36 weekly checkpoints
+  /// and creates a draft row in SQLite.
+  Future<void> startWeekly({
+    required String date,
+    required String auditorId,
+    required List<Cro> cros,
+    String? supersedesAuditId,
+  }) =>
+      startAudit(
+        date: date,
+        auditType: 'weekly',
+        auditorId: auditorId,
+        cros: cros,
+        supersedesAuditId: supersedesAuditId,
+      );
+
+  /// Resumes an existing in-progress draft audit and loads any already-saved results.
+  Future<void> resumeDraft({
+    required Audit audit,
+    required List<Cro> cros,
   }) async {
-    final audit = await AuditRepository.instance.createDraft(
-      date: date,
-      auditType: 'daily',
-      auditorId: auditorId,
-      supersedesAuditId: supersedesAuditId,
-    );
-    final checkpoints = await CheckpointRepository.instance
-        .loadDailyCheckpointsInAuditOrder();
+    final checkpoints = audit.auditType == 'weekly'
+        ? await CheckpointRepository.instance.loadCheckpointsByFrequency('weekly')
+        : await CheckpointRepository.instance.loadDailyCheckpointsInAuditOrder();
+    final dbResults = await AuditRepository.instance.resultsForAudit(audit.id);
+    final resultsMap = <String, Verdict>{};
+    for (final r in dbResults) {
+      if (r.result == 'P') resultsMap[r.checkpointId] = Verdict.pass;
+      if (r.result == 'F') resultsMap[r.checkpointId] = Verdict.fail;
+      if (r.result == 'NA') resultsMap[r.checkpointId] = Verdict.na;
+    }
+    var firstUnmarked = 0;
+    for (var i = 0; i < checkpoints.length; i++) {
+      if (!resultsMap.containsKey(checkpoints[i].id)) {
+        firstUnmarked = i;
+        break;
+      }
+      if (i == checkpoints.length - 1) {
+        firstUnmarked = checkpoints.length - 1;
+      }
+    }
     state = DraftAuditState(
       audit: audit,
       checkpoints: checkpoints,
-      currentIndex: 0,
-      results: const {},
+      currentIndex: firstUnmarked.clamp(
+        0,
+        checkpoints.isNotEmpty ? checkpoints.length - 1 : 0,
+      ),
+      results: resultsMap,
       cros: cros,
     );
   }
@@ -191,8 +262,8 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
     );
   }
 
-  /// Calculates final score using `scoreDaily(List<CheckpointMark>)` and submits
-  /// the audit to SQLite, locking status to 'submitted'.
+  /// Calculates final score and submits the audit to SQLite, locking status to 'submitted'.
+  /// Dispatches to `computeWeeklyScore` for weekly audits and `scoreDaily` for daily audits.
   Future<ScoreResult> submitAudit({String? notes}) async {
     final audit = state.audit;
     if (audit == null) {
@@ -237,35 +308,79 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
       );
     }).toList();
 
-    final scoreResult = scoreDaily(marks);
+    double rawScore;
+    double maxScore;
+    double compliancePct;
+    String band;
+    int passCount;
+    int failCount;
+    int naCount;
+
+    if (audit.auditType == 'weekly') {
+      final dailyAudits = await AuditRepository.instance
+          .findSubmittedDailyAuditsForWeek(
+        weekNumber: audit.weekNumber,
+        year: audit.year,
+      );
+      final dailyPcts =
+          dailyAudits.map((a) => a.compliancePct ?? 0.0).toList();
+      final weeklyResult = computeWeeklyScore(
+        dailyPcts: dailyPcts,
+        weeklyMarks: marks,
+      );
+      rawScore = weeklyResult.totalRaw;
+      maxScore = weeklyResult.totalMax;
+      compliancePct = weeklyResult.compliancePct;
+      band = weeklyResult.band.name;
+      passCount = weeklyResult.passCount;
+      failCount = weeklyResult.failCount;
+      naCount = weeklyResult.naCount;
+    } else {
+      final scoreResult = scoreDaily(marks);
+      rawScore = scoreResult.rawScore;
+      maxScore = scoreResult.maxScore;
+      compliancePct = scoreResult.compliancePct;
+      band = scoreResult.band.name;
+      passCount = scoreResult.passCount;
+      failCount = scoreResult.failCount;
+      naCount = scoreResult.naCount;
+    }
 
     await AuditRepository.instance.submitAudit(
       auditId: audit.id,
-      rawScore: scoreResult.rawScore,
-      maxScore: scoreResult.maxScore,
-      compliancePct: scoreResult.compliancePct,
-      band: scoreResult.band.name,
-      passCount: scoreResult.passCount,
-      failCount: scoreResult.failCount,
-      naCount: scoreResult.naCount,
+      rawScore: rawScore,
+      maxScore: maxScore,
+      compliancePct: compliancePct,
+      band: band,
+      passCount: passCount,
+      failCount: failCount,
+      naCount: naCount,
       notes: notes,
     );
 
     final updatedAudit = audit.copyWith(
       status: 'submitted',
       submittedAt: DateTime.now().toUtc().toIso8601String(),
-      rawScore: scoreResult.rawScore,
-      maxScore: scoreResult.maxScore,
-      compliancePct: scoreResult.compliancePct,
-      band: scoreResult.band.name,
-      passCount: scoreResult.passCount,
-      failCount: scoreResult.failCount,
-      naCount: scoreResult.naCount,
+      rawScore: rawScore,
+      maxScore: maxScore,
+      compliancePct: compliancePct,
+      band: band,
+      passCount: passCount,
+      failCount: failCount,
+      naCount: naCount,
       notes: notes,
     );
 
     state = state.copyWith(audit: updatedAudit);
-    return scoreResult;
+    return ScoreResult(
+      rawScore: rawScore,
+      maxScore: maxScore,
+      compliancePct: compliancePct,
+      band: bandFromCompliance(compliancePct),
+      passCount: passCount,
+      failCount: failCount,
+      naCount: naCount,
+    );
   }
 
   void goBack() {
