@@ -4164,3 +4164,64 @@ Re-reviewed `findSubmittedDailyAuditsForWeek`. The per-date dedupe is correct an
 3. Merge `feature/p2-weekly-conduct` → `phase-2` (NOT `main` — Rule 7). Never force-push. Push `phase-2`.
 4. Paste raw `git status` + `git log --oneline` back here.
 5. Then STOP — P2-3 (interactive 7-day daily review + spot-check + GM signature) is next; await my plan.
+
+---
+
+### Entry: 2026-09-27 — Sprint P2-2 Commit & Push Record
+- **Author**: Antigravity
+- **Date**: 2026-09-27
+- **Branch**: `phase-2` (tracking `origin/phase-2`)
+- **Status**: Committed, merged into `phase-2`, pushed to remote, verified on physical device. **HOLDING for Claude's P2-3 Plan.**
+
+#### 1. Push Record & Raw Git Output
+
+##### A. `git status` (on `phase-2`)
+```
+On branch phase-2
+Your branch is up to date with 'origin/phase-2'.
+
+nothing to commit, working tree clean
+```
+
+##### B. `git log -n 5 --oneline` (on `phase-2`)
+```
+ed63b7e feat(weekly): P2-2 weekly audit conduct screens + per-date daily rollup dedupe
+669d102 docs(handoff): record Antigravity Sprint P2-1 push record
+edd54b5 feat(weekly): P2-1 weekly score engine + SOP9 seed + v2 migration
+5b9408b docs(brain): kick off Phase 2 — set Sprint P2-1 (Weekly Audit Foundation) plan and hand baton to Antigravity
+e7222fa docs(handoff): record Antigravity flatten-to-root merge to main and test verification
+```
+
+##### C. Rule 7 Check (`main` branch)
+```
+5b9408b docs(brain): kick off Phase 2 — set Sprint P2-1 (Weekly Audit Foundation) plan and hand baton to Antigravity
+```
+`main` is completely untouched. Work resides strictly on `phase-2`.
+
+---
+
+#### 2. Summary of Shipped Work
+
+1. **Sprint P2-2 (Weekly Audit Conduct)**:
+   - Parameterized S06–S11 conduct flow by `auditType='weekly'`.
+   - Verified Workbook Day 3 conduct sequence: SOP9 Ops (10), SOP6 Cash (8 ★), SOP8 Service (6), SOP7 Inventory (12) = 36 checkpoints, 56 weighted points.
+   - S05 Home: Added Weekly Audit Card for GM & OWNER with dynamic status chips, action buttons, and sublines.
+   - S10 Review: Displays the combined 124-point weekly score using `computeWeeklyScore` (68 max daily contribution + 56 max weekly raw) and CW.7 cumulative variance subline.
+   - S11 Confirmation: Adapts to "Weekly Audit — Week N, [year]".
+   - S12 History & S13 Detail: Added weekly filter and dynamic checkpoint loading by `auditType`.
+   - Enforced R7 photo gate on Cash/Inventory fails via seed flag.
+   - Dual-language parity in authentic Marathi (Rule #8).
+2. **Review Blocker Resolution**:
+   - Fixed daily audit deduplication per `audit_date` in `findSubmittedDailyAuditsForWeek`.
+   - Added regression test 7 in `test/weekly_conduct_test.dart` confirming 7-day rollup and exact 124-pt calculation with superseded days.
+3. **Physical Device Boot Fix**:
+   - Recreated `sops` table without legacy `CHECK (number BETWEEN 1 AND 8)` restriction so `SOP9` (`number = 9`) succeeds.
+   - Moved connection-wide foreign key activation to `onOpen` so SQLite table schema alterations execute without trigger conflicts.
+   - Moved `loadPersistedState()` in `login_screen.dart` into `addPostFrameCallback` so Riverpod allows the state mutation without crashing widget build.
+   - Verified live on physical device `8TFEDI5HKJMFLVOB`: app booted cleanly, cameras and photo attachments captured successfully!
+
+---
+
+- **Next Immediate Task**:
+  - **STOPPING per instructions.** Awaiting Claude's Sprint P2-3 Plan (Interactive 7-day daily review + spot-check + GM signature).
+
