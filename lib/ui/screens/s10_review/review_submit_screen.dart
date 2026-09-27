@@ -398,26 +398,28 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${compliancePct.toStringAsFixed(1)}%',
-                    style: TextStyle(
-                      fontFamily: 'DMSerifDisplay',
-                      fontSize: 42,
-                      fontWeight: FontWeight.bold,
-                      color: color,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${compliancePct.toStringAsFixed(1)}%',
+                      style: TextStyle(
+                        fontFamily: 'DMSerifDisplay',
+                        fontSize: 42,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
                     ),
-                  ),
-                  Text(
-                    isWeekly ? l10n.s10WeeklyScoreTitle : l10n.s10ScoreCard,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.gray600,
+                    Text(
+                      isWeekly ? l10n.s10WeeklyScoreTitle : l10n.s10ScoreCard,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.gray600,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -466,16 +468,18 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        l10n.s10DailyAvgContribution,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: AppColors.gray800,
-                          fontWeight: FontWeight.w500,
+                      Expanded(
+                        child: Text(
+                          l10n.s10DailyAvgContribution,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.gray800,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 8),
                       Text(
                         '${weeklyScore.dailyContribution.toStringAsFixed(1)} / 68.0 (${weeklyScore.avgDailyPct.toStringAsFixed(1)}%)',
                         style: const TextStyle(
@@ -488,16 +492,18 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
                   ),
                   const SizedBox(height: 6),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        l10n.s10WeeklyCheckpointsScore,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: AppColors.gray800,
-                          fontWeight: FontWeight.w500,
+                      Expanded(
+                        child: Text(
+                          l10n.s10WeeklyCheckpointsScore,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.gray800,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 8),
                       Text(
                         '${weeklyScore.weeklyRaw.toStringAsFixed(1)} / ${weeklyScore.weeklyMax.toStringAsFixed(1)}',
                         style: const TextStyle(
@@ -528,15 +534,21 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
       return Padding(
         padding: const EdgeInsets.only(top: 6),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              l10n.s10CashVarianceTitle,
-              style: const TextStyle(fontSize: 13, color: AppColors.gray600),
+            Expanded(
+              child: Text(
+                l10n.s10CashVarianceTitle,
+                style: const TextStyle(fontSize: 13, color: AppColors.gray600),
+              ),
             ),
+            const SizedBox(width: 8),
             const Text(
               '—',
-              style: TextStyle(fontSize: 13, color: AppColors.gray600),
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: AppColors.gray600,
+              ),
             ),
           ],
         ),
@@ -550,16 +562,18 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
     return Padding(
       padding: const EdgeInsets.only(top: 6),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            l10n.s10CashVarianceTitle,
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppColors.gray800,
-              fontWeight: FontWeight.w500,
+          Expanded(
+            child: Text(
+              l10n.s10CashVarianceTitle,
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.gray800,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
+          const SizedBox(width: 8),
           Text(
             cumVar.isBreached ? '$formatted ⚠️' : '$formatted ✓',
             style: TextStyle(
@@ -626,8 +640,8 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: DataTable(
-              columnSpacing: 20,
-              horizontalMargin: 16,
+              columnSpacing: 12,
+              horizontalMargin: 12,
               headingRowHeight: 40,
               dataRowMinHeight: 40,
               dataRowMaxHeight: 44,
@@ -728,9 +742,11 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
               children: [
                 Icon(Icons.check_circle_outline, color: AppColors.green),
                 SizedBox(width: 12),
-                Text(
-                  'No failures recorded in this audit!',
-                  style: TextStyle(color: AppColors.green, fontWeight: FontWeight.w600),
+                Expanded(
+                  child: Text(
+                    'No failures recorded in this audit!',
+                    style: TextStyle(color: AppColors.green, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ],
             ),
@@ -786,6 +802,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(

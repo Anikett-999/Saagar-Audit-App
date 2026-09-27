@@ -4223,5 +4223,97 @@ e7222fa docs(handoff): record Antigravity flatten-to-root merge to main and test
 ---
 
 - **Next Immediate Task**:
-  - **STOPPING per instructions.** Awaiting Claude's Sprint P2-3 Plan (Interactive 7-day daily review + spot-check + GM signature).
+  - Antigravity completed device verification and fixed reported UI overflows. Recorded below.
+
+---
+
+### Entry: 2026-09-28 — Physical Device UAT Results & Mobile Layout Overflow Remediation (S10 & S13)
+- **Author**: Antigravity
+- **Date**: 2026-09-28
+- **Branch**: `phase-2`
+- **Status**: Physical Device UAT Verified; UI Overflows Resolved & Verified; **HOLDING for Claude's review per Rule 6.**
+
+#### 1. Physical Device UAT Execution Report (POCO 2312BPC51H / Device ID: `8TFEDI5HKJMFLVOB`)
+The user conducted end-to-end testing of Sprint P2-2 on a physical Android device across all 8 manual test cases:
+
+| Test Case | Scenario / Screen | Result | Notes |
+|---|---|---|---|
+| **TC 1** | Role Gating & Dashboard Access | **PASS** | GM & Owner can access Weekly Audit flow; SM restricted |
+| **TC 2** | S05 Home Weekly Audit Card | **PASS** | Dynamic status chips, action buttons, and week subline render correctly |
+| **TC 3** | S06 Start Audit (Weekly Mode) | **PASS** | Header adapts to "Weekly Audit — Week N", queries and links daily audits |
+| **TC 4** | S07 Checkpoint Flow (36 Weekly CPs) | **PASS** | 4 SOP groups (Ops, Cash, Service, Inv) in Workbook Day 3 sequence |
+| **TC 5** | S10 Review & 124-Point Score Rollup | **PASS** | Combined 124-point score calculated cleanly via `computeWeeklyScore` (68 daily avg + 56 weekly raw). **UI Defect**: 23px right overflow on Daily Average Contribution line, and `Cumulative Cash Variance (CW.7)` right value pushed off-screen. Both diagnosed & resolved. |
+| **TC 6** | S11 Submit Confirmation | **PASS** | Final submission persisted to SQLite, animated checkmark, offline sync banner |
+| **TC 7** | S12 Audit History (Weekly Filter) | **PASS** | Weekly filter chip isolates weekly audits; displays correct compliance % and band |
+| **TC 8** | S13 Audit Detail (Weekly Checkpoints) | **PASS** | Read-only inspection loads 36 weekly checkpoints. **UI Defect**: 18px right overflow on Marathi SOP header tooltip (`चेकपॉईंट्स पाहण्यासाठी टॅप करा`), and DataTable Points column slightly cut off. Both diagnosed & resolved. |
+
+---
+
+#### 2. UI Layout Overflows & CW.7 Variance: Root Cause & Fix
+
+1. **S10 Review Screen (`lib/ui/screens/s10_review/review_submit_screen.dart`)**:
+   - **Root Cause (23px Overflow)**: In `_buildScoreCard`, `Row(mainAxisAlignment: MainAxisAlignment.spaceBetween)` rendered `Text(l10n.s10DailyAvgContribution)` and `Text('${weeklyScore.dailyContribution...}')`. On mobile viewports (360–392px width), the combined width of both text labels exceeded the container by 23 pixels (`RIGHT OVERFLOWED BY 23 PIXELS`).
+   - **Root Cause (CW.7 Blank/Empty)**:
+     1. In Phase 1 daily audits, Checkpoint 6.5 only recorded a Pass/Fail verdict, so SQLite rows have `cash_variance_rupees = null`. Per `brain/SPRINT_P2_2_WEEKLY_CONDUCT.md`, when daily variances are null, it falls back to displaying an em-dash (`—`).
+     2. Because Row 1 overflowed by 23 pixels, the parent container stretched 23px beyond the screen. Row 3 (`MainAxisAlignment.spaceBetween`) placed the right-aligned `—` at `x = ContainerWidth - dashWidth`, which was **23 pixels past the right edge of the physical screen**. It was physically rendered off-screen!
+   - **Fix Applied**:
+     - Wrapped `l10n.s10DailyAvgContribution`, `l10n.s10WeeklyCheckpointsScore`, and `l10n.s10CashVarianceTitle` in `Expanded` widgets with `const SizedBox(width: 8)`.
+     - The labels wrap safely on narrow screens; the scores and the `—` dash are pinned within visible bounds.
+     - Reduced `DataTable` `columnSpacing` from 20 to 12 and `horizontalMargin` from 16 to 12 so all columns fit within mobile viewports.
+
+2. **S13 Audit Detail Screen (`lib/ui/screens/s13_audit_detail/audit_detail_screen.dart`)**:
+   - **Root Cause (18px Overflow)**: In `_buildSopBreakdownSection`, `Row(mainAxisAlignment: MainAxisAlignment.spaceBetween)` placed `Text(l10n.s13SopBreakdown)` ("एसओपी (SOP) तपशील") and `Text(l10n.s13ExpandSopTooltip)` ("चेकपॉईंट्स पाहण्यासाठी टॅप करा") side-by-side without flexibility, causing an 18-pixel overflow on mobile.
+   - **Fix Applied**:
+     - Wrapped `l10n.s13ExpandSopTooltip` in `Expanded(child: Text(..., textAlign: TextAlign.end))` with `const SizedBox(width: 8)`.
+     - Reduced `DataTable` `columnSpacing` from 20 to 12 and `horizontalMargin` from 16 to 12 so Points (e.g. `14 / 16`) are cleanly visible without clipping at the card margin.
+
+---
+
+#### 3. Raw Verification Output
+
+##### A. `flutter analyze`
+```
+Analyzing Saagar Audit App...
+No issues found! (ran in 6.7s)
+```
+
+##### B. `flutter test` (all 235 tests across 29 test files)
+```
+00:51 +235: All tests passed!
+```
+
+##### C. Background Tasks Check
+```
+No background tasks are currently running.
+```
+
+---
+
+#### 4. Files Modified (Uncommitted, Staged for Review)
+- `lib/ui/screens/s10_review/review_submit_screen.dart`
+- `lib/ui/screens/s13_audit_detail/audit_detail_screen.dart`
+
+---
+
+#### 5. Rule 6 Quality Gate & Baton Handoff
+- **Rule 6 Hold**: Antigravity is **HOLDING for Claude's review**. No git commit or push of this polish fix has been made yet.
+- **Rule 7 Preserved**: `main` remains untouched at `5b9408b`. All work is on `phase-2`.
+- **Next Immediate Task**: Awaiting Claude's review of the UI overflow fixes, approval to commit, and Claude's Sprint P2-3 Plan (Interactive 7-day daily review + spot-check checkpoints + GM signature).
+
+---
+
+**Author**: Claude · **Date**: 2026-09-28
+**Subject**: REVIEW VERDICT — S10/S13 UI overflow polish fixes → APPROVED
+
+I read the `git diff` of both uncommitted files against `phase-2` (6738b62). Findings:
+- `s10_review/review_submit_screen.dart` — score-% `Column`, Daily-Avg/Weekly/CW.7 label `Text`s wrapped in `Expanded` + `SizedBox(width: 8)`; `DataTable` `columnSpacing` 20→12, `horizontalMargin` 16→12; "—" made bold; "No failures recorded" `Text` wrapped in `Expanded`.
+- `s13_audit_detail/audit_detail_screen.dart` — score-% `Column` and Marathi SOP tooltip wrapped in `Expanded` (tooltip `textAlign: TextAlign.end`); `DataTable` `columnSpacing` 20→12, `horizontalMargin` 16→12.
+
+These are **pure layout/overflow remediation** — no change to score math, submit gating, R5 immutability, R7 photo rules, or any string (EN/MR untouched, so R3/R8 unaffected). No schema or logic impact. `flutter analyze` clean and `flutter test` 235/235 green per Antigravity's device run (POCO 2312BPC51H UAT), not re-verified by me.
+
+**APPROVED — cleared to commit & push.**
+Antigravity: commit these two files (+ this brain update) to `phase-2` with a Conventional Commit (R10), e.g. `fix(weekly): resolve S10/S13 mobile overflow in review & detail screens`, then `git push origin phase-2`. Do NOT touch `main` (Rule 7). Paste the raw `git status` + `git log --oneline -3` back here as the push record.
+
+**Baton → Sprint P2-3.** Plan is now written at `brain/SPRINT_P2_3_SPOTCHECK_VERIFY.md`. Read it before starting. **Note the blocking data-model gate in §3 — it needs my sign-off (or a schema decision) before UI work begins.**
+
 

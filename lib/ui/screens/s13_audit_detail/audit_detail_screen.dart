@@ -477,26 +477,28 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${compliance.toStringAsFixed(1)}%',
-                    style: TextStyle(
-                      fontFamily: 'DMSerifDisplay',
-                      fontSize: 42,
-                      fontWeight: FontWeight.bold,
-                      color: color,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${compliance.toStringAsFixed(1)}%',
+                      style: TextStyle(
+                        fontFamily: 'DMSerifDisplay',
+                        fontSize: 42,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
                     ),
-                  ),
-                  Text(
-                    l10n.s13ScoreCard,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.gray600,
+                    Text(
+                      l10n.s13ScoreCard,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.gray600,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -586,7 +588,6 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   l10n.s13SopBreakdown,
@@ -596,11 +597,15 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
                     color: AppColors.navy,
                   ),
                 ),
-                Text(
-                  l10n.s13ExpandSopTooltip,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.gray600,
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l10n.s13ExpandSopTooltip,
+                    textAlign: TextAlign.end,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.gray600,
+                    ),
                   ),
                 ),
               ],
@@ -611,8 +616,8 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: DataTable(
-              columnSpacing: 20,
-              horizontalMargin: 16,
+              columnSpacing: 12,
+              horizontalMargin: 12,
               headingRowHeight: 40,
               dataRowMinHeight: 40,
               dataRowMaxHeight: 44,
