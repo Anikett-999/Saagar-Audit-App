@@ -30,6 +30,20 @@ Add 36 rows to `assets/seed/checkpoints.json` with `frequency='weekly'`, verifie
 - Weekly-only weighted total = **56**. (Daily-average contributes the other 68 → 124 max.)
 - Set `allows_na`, `requires_photo_on_fail` per each checkpoint's nature; Cash/Inventory weekly Fails follow the same mandatory-photo rule as daily Cash/Inventory (R7) — confirm the exact list with Claude before finalizing.
 
+### 2.2a sop_id mapping — FINALIZED by Owner (2026-09-27)
+Owner decided **Option B**: Operations Weekly gets its **own dedicated SOP folder (SOP9 "Operations")**, not folded into Service. Rationale: keep a clean, standalone Operations health trend line (rent, licences, fire-safety AMC, POS uptime, staff training) for the Phase-3 dashboards — the high-value money/compliance early-warning zone. Owner accepted the small one-time setup cost of the §4.4 update.
+
+Finalized `sop_id` foreign keys for the 36 weekly-only checkpoints:
+- **CW.1–CW.8** (Cash Weekly ★) → **SOP6** (Cash Management, critical, 2×) — per Spec §4.4 sample rows.
+- **IW.1–IW.12** (Inventory Weekly ★) → **SOP7** (Inventory Management, critical, 2×) — per Spec §4.4 sample rows.
+- **RS.1–RS.6** (Reporting & Service Weekly) → **SOP8** (Service Intake).
+- **O.1–O.10** (Operations Weekly) → **new SOP9 "Operations"** (non-critical, 1×, no mandatory photo).
+
+**New SOP9 row is a §4.4 four-way change (Workbook + Spec + seed JSON + migration), NOT schema drift** (no new columns — just one new row in `sops` seed + a migration to insert it for existing installs). Add SOP9 to `assets/seed/sops.json`: `id:"SOP9"`, `name_en:"Operations"`, weight 1, `is_critical:0`. Do NOT mark it critical and do NOT set `requires_photo_on_fail` on its checkpoints (Operations items are 1× admin/compliance checks, not Cash/Inventory).
+
+> **R3 status — SOP9 folder name RESOLVED (2026-09-27):** owner supplied Marathi `name_mr` = **"कार्यात्मक कामकाज"** for SOP9 "Operations". Seed `sops.json` row: `id:"SOP9"`, `name_en:"Operations"`, `name_mr:"कार्यात्मक कामकाज"`, weight 1, `is_critical:0`. **Still open:** real EN+MR for each O.1–O.10 checkpoint (and their evidence strings), plus EN+MR for CW/IW/RS rows per Appendix A.2. Claude will NOT guess (R3) — if any are missing at insertion, STOP and post the list.
+> Spec §4.3 has been updated with the SOP9 CHANGE RECORD (four-way step b done). Remaining four-way steps: (a) annotate Workbook Day 2 §2.9, (c) sops.json row, (d) migration.
+
 > **R3 HARD STOP — Marathi is required at insertion, no placeholders.**
 > The existing daily seed rows still carry English text in `text_mr` (e.g. 1.1 "Uniform clean and well-fitted" duplicated). Do **NOT** replicate that placeholder pattern for the 36 weekly rows. Every new weekly checkpoint needs real EN **and** MR (`text_en`/`text_mr`, `evidence_en`/`evidence_mr`) at the moment the row is added. If you do not have Sagar's Marathi for any weekly checkpoint, **STOP and ask** — do not guess, do not English-duplicate. (Separately flagged to Sagar: the pre-existing daily `text_mr` placeholders are a Phase-1 debt to clean up; tracked, not part of P2-1.)
 

@@ -56,9 +56,14 @@ class AppDatabase {
         await SeedLoader.loadAll(db);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        // Per spec §4.15, migrations go through sqflite_migration_plan when
-        // we cross schema versions. v1 → v1 is a no-op; real migrations land
-        // when the first column or table change ships.
+        if (oldVersion < 2) {
+          // Migration v1 -> v2: insert SOP9 into sops table and seed weekly checkpoints
+          await db.execute('''
+            INSERT OR IGNORE INTO sops (id, number, name_en, name_mr, weight, is_critical, display_order)
+            VALUES ('SOP9', 9, 'Operations', 'कार्यात्मक कामकाज', 1, 0, 9);
+          ''');
+          await SeedLoader.loadCheckpoints(db);
+        }
       },
     );
   }

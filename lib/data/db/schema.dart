@@ -12,7 +12,9 @@
 class Schema {
   Schema._();
 
-  static const int currentVersion = 1;
+  /// Schema version. Bumped to 2 for Phase 2: addition of SOP9 (Operations)
+  /// and 36 weekly checkpoints.
+  static const int currentVersion = 2;
 
   /// All CREATE statements, executed in order on first install or upgrade.
   /// Order matters because of foreign key dependencies — `users` and `sops`
