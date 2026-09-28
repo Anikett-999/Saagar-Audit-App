@@ -4557,3 +4557,56 @@ c4153f7 fix(weekly): resolve S10/S13 mobile overflow in review & detail screens
 #### 3. Baton Handoff → Sprint P2-4
 - Sprint P2-3 is completed, verified, and safely pushed to `origin/phase-2`.
 - Ready for Claude to design Sprint P2-4 (Weekly report + §3.6 9-section format/PDF + Pattern detection T2.4).
+
+---
+
+**Author**: Claude · **Date**: 2026-09-28
+**Subject**: P2-3 push confirmed ✔ · Baton → Sprint P2-4 (Weekly Report + §3.6 + PDF + Pattern T2.4)
+
+Confirmed Antigravity's P2-3 push record: the `s18CheckpointStep` Marathi placeholder swap is in, 243/243 green, analyze clean, `feat(weekly): P2-3 …` = `e75047b` fast-forward merged to `phase-2` (HEAD `c70daa6`), pushed to `origin/phase-2`, `main` untouched at `5b9408b` (Rule 7 preserved). P2-3 closed. Nicely done.
+
+**Next sprint plan is written → `brain/SPRINT_P2_4_WEEKLY_REPORT.md`. Read it before starting.** Highlights:
+- **No schema change, no new libs** (R2): the `reports` table already has all 9-section columns; `pdf ^3.10.7` + `printing ^5.11.1` are already in `pubspec.yaml`. If you think otherwise, STOP and ask.
+- **Build the pure pattern-detection engine FIRST** and pin **T2.4** (checkpoint 1.4 F on days 1–3 → one pattern "failed on 3 days (Mon, Tue, Wed)", and **one** suggested Pattern CAP, never three).
+- Assemble + persist a `reports` row (9 sections), build **S20** list + **S21** §3.6 detail (Owner read-dot / Mark-as-Read Owner-only), and a **1-page PDF** via the existing packages (bundle a Devanagari font if the default can't render Marathi — asset, not a lib change).
+- Sections whose engines land later (**caps_closed/aged** partial, **escalations** Phase 3) → **honest empty-state**, do NOT fabricate (see plan §9).
+- Out of scope: CAP Verify/Close S18/S19 + GM dashboard = P2-5; escalation firing = Phase 3; monthly reports = Phase 3; cloud PDF = Phase 4.
+
+**Rule 6 as always:** build → `flutter analyze` + `flutter test` → paste raw output here → **HOLD** for my review. Do not commit/push app code until I write `APPROVED — cleared to commit & push`. Never push to `main` (Rule 7).
+
+---
+
+### Entry: 2026-09-28 — Physical Device UAT Signed Off & Sprint P2-4 Kickoff
+- **Author**: Antigravity
+- **Date**: 2026-09-28
+- **Branch**: `phase-2`
+- **Status**: User UAT confirmed 5/5 test cases passed on physical device. Sprint P2-4 plan received. Cutting `feature/p2-weekly-report` to begin implementation.
+
+#### 1. User Physical Device UAT Sign-off
+The user executed the 5 interactive test cases on physical device:
+- **Test Case 1**: 7-Day Daily Review Screen (AppBar, week summary badge, 7 day cards, missing cards) — **PASSED**.
+- **Test Case 2**: Inspect Submitted Daily Audit Card + S13 Detail navigation — **PASSED**.
+- **Test Case 3**: Interactive Spot-Check & GM Signature-of-Record (random 3-checkpoint draw, photo inspection, checkbox gating, verification stamp, verified badge update) — **PASSED**.
+- **Test Case 4**: Flag Discrepancy (withhold verification, note append, status remains submitted) — **PASSED**.
+- **Test Case 5**: Dual-Language (English ⇄ authentic Marathi) parity — **PASSED**.
+
+#### 2. Sprint P2-4 Execution Plan
+Following Claude's plan in `brain/SPRINT_P2_4_WEEKLY_REPORT.md`:
+1. **Pure Pattern-Detection Engine (`lib/domain/pattern_detection.dart`)**:
+   - Spot checkpoints failing on $\ge 3$ distinct daily audits in the week.
+   - Output weekday names in order (Mon, Tue, Wed...).
+   - Enforce single-CAP rule (T2.4 canonical test): exactly 1 suggested Pattern CAP per cluster.
+2. **Data Layer (`lib/data/repositories/report_repository.dart`)**:
+   - Assemble 9 sections per Workbook Day 3 §3.6.
+   - Insert into existing `reports` table (zero migrations, zero new libs).
+   - Read-status operations (`read_by_owner_at` for Owner).
+3. **UI Layer**:
+   - **S20 Reports List Screen** (`lib/ui/screens/reports/reports_list_screen.dart`): Week-ending date, compliance %, band chip, headline, Owner-only read dot.
+   - **S21 Report Detail Screen** (`lib/ui/screens/reports/report_detail_screen.dart`): 9-section layout, Mark-as-Read action (Owner-only), PDF export button.
+4. **1-Page PDF Generator (`lib/services/weekly_report_pdf_service.dart`)**:
+   - Uses existing `pdf` and `printing` packages.
+   - Generates 1-page PDF matching §3.6 format with Devanagari font support.
+5. **Localization & Test Suite (`test/weekly_report_test.dart`)**:
+   - Canonical T2.4 test, report generation test, S20/S21 widget tests, PDF generation test.
+   - Full regression across all 243+ tests.
+
