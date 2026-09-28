@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../data/db/database.dart';
 import '../../../data/models/report.dart';
 import '../../../data/repositories/report_repository.dart';
 import '../../../l10n/app_localizations.dart';
@@ -31,15 +33,110 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen> {
   Future<void> _loadReports() async {
     setState(() => _loading = true);
     try {
-      final reports = await ReportRepository.instance.listReports(
+      var reports = await ReportRepository.instance.listReports(
         reportType: 'weekly',
         year: _selectedYear,
       );
+
+      // If reports is empty, check if there are submitted weekly audits that haven't generated a report row yet
+      if (reports.isEmpty) {
+        final db = AppDatabase.instance.db;
+        final submittedWeekly = await db.query(
+          'audits',
+          where: "status = 'submitted' AND audit_type = 'weekly'",
+          orderBy: 'audit_date DESC',
+        );
+        for (final w in submittedWeekly) {
+          final auditId = w['id'].toString();
+          final existing = await ReportRepository.instance.getByAuditId(auditId);
+          if (existing == null) {
+            try {
+              await ReportRepository.instance.generateWeeklyReport(
+                weeklyAuditId: auditId,
+                authorUserId: w['auditor_id']?.toString() ?? 'GM Auditor',
+              );
+            } catch (_) {}
+          }
+        }
+        reports = await ReportRepository.instance.listReports(
+          reportType: 'weekly',
+          year: _selectedYear,
+        );
+      }
+
       if (!mounted) return;
       setState(() {
         _reports = reports;
         _loading = false;
       });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _generateSampleReport(String authorName) async {
+    setState(() => _loading = true);
+    try {
+      final db = AppDatabase.instance.db;
+      final reportId = 'rep-${DateTime.now().millisecondsSinceEpoch}';
+      final auditId = 'audit-sample-${DateTime.now().millisecondsSinceEpoch}';
+
+      await db.insert('reports', {
+        'id': reportId,
+        'audit_id': auditId,
+        'report_type': 'weekly',
+        'headline': 'आठवडा ३९ समाप्त २०२६-०९-२७ · ८४.५% निकृष्ट · २ त्रुटी · १ पॅटर्न',
+        'compliance_table_json': jsonEncode({
+          'avg_daily_pct': 84.1,
+          'daily_contribution': 57.2,
+          'weekly_raw': 47.6,
+          'weekly_max': 56.0,
+          'total_raw': 104.8,
+          'total_max': 124.0,
+          'compliance_pct': 84.5,
+          'band': 'poor',
+          'sop_rows': [
+            {'sop_id': 'SOP9', 'sop_number': 9, 'name_en': 'Store Operations', 'name_mr': 'स्टोअर ऑपरेशन्स', 'raw_score': 10.0, 'max_score': 10.0, 'compliance_pct': 100.0},
+            {'sop_id': 'SOP1', 'sop_number': 1, 'name_en': 'Cash Counter', 'name_mr': 'कॅश काउंटर', 'raw_score': 14.0, 'max_score': 16.0, 'compliance_pct': 87.5},
+            {'sop_id': 'SOP2', 'sop_number': 2, 'name_en': 'Customer Service', 'name_mr': 'ग्राहक सेवा', 'raw_score': 6.0, 'max_score': 6.0, 'compliance_pct': 100.0},
+            {'sop_id': 'SOP7', 'sop_number': 7, 'name_en': 'Inventory', 'name_mr': 'इन्व्हेंटरी', 'raw_score': 17.6, 'max_score': 24.0, 'compliance_pct': 73.3},
+          ],
+        }),
+        'trend_block_json': jsonEncode({
+          'daily_pcts': [90.0, 85.0, 80.0, 95.0, 75.0, 88.0, 75.7],
+          'wow_delta': -2.1,
+        }),
+        'findings_json': jsonEncode([
+          {'checkpoint_id': 'IW.11', 'sop_name_en': 'Inventory', 'sop_name_mr': 'इन्व्हेंटरी', 'finding_text': 'अग्निशामक टॅग गहाळ (Missing extinguisher tag)', 'photo_count': 1},
+          {'checkpoint_id': 'CW.4', 'sop_name_en': 'Cash Counter', 'sop_name_mr': 'कॅश काउंटर', 'finding_text': 'हस्तलिखित बिल आढळले (Handwritten slip in cash drawer)', 'photo_count': 1},
+        ]),
+        'patterns_json': jsonEncode([
+          {
+            'checkpoint_id': 'CP.4',
+            'fail_count': 3,
+            'dates': ['2026-09-21', '2026-09-22', '2026-09-23'],
+            'weekdays_en': ['Mon', 'Tue', 'Wed'],
+            'weekdays_mr': ['सोम', 'मंगळ', 'बुध'],
+            'findings': ['काचेवर धूळ आढळली (Dirty counter glass)'],
+          }
+        ]),
+        'caps_opened_json': jsonEncode([
+          {
+            'is_pattern': true,
+            'checkpoint_id': 'CP.4',
+            'problem_statement_en': 'Recurring failure on Checkpoint CP.4 (Display Glass)',
+            'problem_statement_mr': 'तपासणी बिंदू CP.4 वर वारंवार अयशस्वी (डिस्प्ले काच)',
+            'action_plan_en': 'Brief morning shift CROs and inspect daily before 10 AM',
+            'action_plan_mr': 'सकाळच्या शिफ्टमधील CRO ना सूचना द्या आणि सकाळी १० पूर्वी दररोज तपासणी करा',
+          }
+        ]),
+        'author_user_id': authorName,
+        'submitted_at': '2026-09-27T18:00:00Z',
+        'read_by_owner_at': null,
+      });
+
+      await _loadReports();
     } catch (_) {
       if (!mounted) return;
       setState(() => _loading = false);
@@ -135,6 +232,21 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen> {
                                           color: AppColors.gray600,
                                         ),
                                         textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 24),
+                                      ElevatedButton.icon(
+                                        icon: const Icon(Icons.play_arrow_rounded),
+                                        label: Text(l10n.s05StartWeeklyAudit),
+                                        onPressed: () async {
+                                          await context.push('/audit/start?type=weekly');
+                                          if (mounted) _loadReports();
+                                        },
+                                      ),
+                                      const SizedBox(height: 12),
+                                      OutlinedButton.icon(
+                                        icon: const Icon(Icons.auto_awesome),
+                                        label: const Text('Generate Sample Weekly Report'),
+                                        onPressed: () => _generateSampleReport(currentUser?.name ?? 'Aniket (Owner)'),
                                       ),
                                     ],
                                   ),

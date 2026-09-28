@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../data/models/audit.dart';
 import '../../../data/repositories/audit_repository.dart';
+import '../../../data/repositories/report_repository.dart';
 import '../../../domain/iso_week.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
@@ -315,6 +316,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Text(
                 '${l10n.s05SubmittedStatus} • ${audit.compliancePct?.toStringAsFixed(1) ?? "—"}% (${audit.band ?? "—"})',
                 style: const TextStyle(color: AppColors.gray600),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.assessment_outlined, size: 18),
+                label: const Text('View Weekly Report (S21)'),
+                onPressed: () async {
+                  final existing = await ReportRepository.instance.getByAuditId(audit.id);
+                  if (existing != null) {
+                    if (context.mounted) {
+                      context.pushNamed('s21_report_detail', pathParameters: {'id': existing.id});
+                    }
+                  } else {
+                    final newRep = await ReportRepository.instance.generateWeeklyReport(
+                      weeklyAuditId: audit.id,
+                      authorUserId: audit.auditorId,
+                    );
+                    if (context.mounted) {
+                      context.pushNamed('s21_report_detail', pathParameters: {'id': newRep.id});
+                    }
+                  }
+                },
               ),
               const SizedBox(height: 8),
               OutlinedButton.icon(
