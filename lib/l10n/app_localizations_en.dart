@@ -1999,4 +1999,186 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s18Cancel => 'Cancel';
+
+  @override
+  String get s20ScreenTitle => 'Weekly Reports';
+
+  @override
+  String get s20ScreenSubtitle => 'Workbook §3.6 reports & 1-page PDF export';
+
+  @override
+  String get s20FilterAll => 'All';
+
+  @override
+  String get s20EmptyTitle => 'No Weekly Reports Yet';
+
+  @override
+  String get s20EmptySubtitle =>
+      'Weekly reports are generated upon completing weekly compliance audits.';
+
+  @override
+  String get s20OwnerRead => 'Read';
+
+  @override
+  String get s20OwnerUnread => 'Unread';
+
+  @override
+  String s20WeekEndingHeader(int week, String date) {
+    return 'Week $week · Ending $date';
+  }
+
+  @override
+  String s20ReportCardScore(String pct, String band) {
+    return '$pct% $band';
+  }
+
+  @override
+  String get s20GenerateReport => 'Generate Weekly Report';
+
+  @override
+  String get s21ScreenTitle => 'Weekly Audit Report';
+
+  @override
+  String get s21WorkbookSubtitle => 'Workbook Day 3 §3.6 Nine-Section Format';
+
+  @override
+  String get s21HeadlineSection => 'Section 1: Executive Headline';
+
+  @override
+  String get s21ComplianceSection => 'Section 2: 124-Point Compliance Table';
+
+  @override
+  String get s21DailyAvgContribution => 'Daily Average Contribution';
+
+  @override
+  String get s21WeeklyOnlyCheckpoints => 'Weekly-Only Checkpoints';
+
+  @override
+  String get s21CombinedTotal => 'Combined Total Score';
+
+  @override
+  String get s21SopBreakdownHeader => 'SOP Compliance Breakdown';
+
+  @override
+  String get s21TrendSection => 'Section 3: 7-Day Trend & WoW Delta';
+
+  @override
+  String s21DayLabel(String day, String date, String pct) {
+    return '$day ($date): $pct%';
+  }
+
+  @override
+  String s21DayAbsent(String day, String date) {
+    return '$day ($date): 0.0% (Absent)';
+  }
+
+  @override
+  String s21WeeklyRollup(String pct) {
+    return 'Weekly Total: $pct%';
+  }
+
+  @override
+  String s21WowDelta(String delta) {
+    return 'Week-over-Week Delta: $delta%';
+  }
+
+  @override
+  String get s21WowDeltaNa => 'Week-over-Week Delta: — (First report)';
+
+  @override
+  String s21FindingsSection(int count) {
+    return 'Section 4: Weekly Non-Compliances ($count)';
+  }
+
+  @override
+  String get s21NoFindings => 'No weekly non-compliances recorded.';
+
+  @override
+  String s21PhotosCount(int count) {
+    return '$count Photos';
+  }
+
+  @override
+  String s21PatternsSection(int count) {
+    return 'Section 5: Detected Patterns ($count)';
+  }
+
+  @override
+  String get s21NoPatterns => 'No cross-day patterns detected this week.';
+
+  @override
+  String s21PatternDetectedOnDays(int count, String days) {
+    return 'Failed on $count days: $days';
+  }
+
+  @override
+  String get s21SuggestedPatternCap =>
+      'Suggested Pattern CAP (Single-CAP Rule):';
+
+  @override
+  String get s21CapsSection => 'Section 6: Corrective Action Plans (CAPs)';
+
+  @override
+  String s21CapsOpenedHeader(int count) {
+    return 'CAPs Opened This Week ($count)';
+  }
+
+  @override
+  String get s21CapsClosedHeader => 'Section 7: CAPs Closed This Week';
+
+  @override
+  String get s21CapsClosedEmpty =>
+      'No CAPs closed this week (Verification & Close workflow active in P2-5).';
+
+  @override
+  String get s21CapsAgedHeader => 'Section 8: Aged / Overdue CAPs';
+
+  @override
+  String get s21CapsAgedEmpty =>
+      'No aged CAPs recorded (Lifecycle tracking active in P2-5).';
+
+  @override
+  String get s21EscalationsSection => 'Section 9: Escalation Log';
+
+  @override
+  String get s21EscalationsEmpty =>
+      'No escalations triggered (Escalation engine active in Phase 3).';
+
+  @override
+  String get s21SignatureSection => 'Signature of Record';
+
+  @override
+  String s21AuditorSignature(String author, String time) {
+    return 'GM / Auditor Signature: $author · Submitted $time';
+  }
+
+  @override
+  String s21OwnerSignature(String time) {
+    return 'Owner Review: Read on $time';
+  }
+
+  @override
+  String get s21OwnerSignaturePending => 'Owner Review: Pending Owner Review';
+
+  @override
+  String get s21MarkAsReadButton => 'Mark as Read (Owner)';
+
+  @override
+  String get s21MarkedAsReadSuccess => 'Weekly report marked as read by Owner.';
+
+  @override
+  String get s21ExportPdfButton => 'Export 1-Page PDF';
+
+  @override
+  String get s21PdfGenerating => 'Generating 1-page PDF...';
+
+  @override
+  String s21PdfSaved(String path) {
+    return 'PDF saved: $path';
+  }
+
+  @override
+  String s21PdfExportError(String error) {
+    return 'Failed to export PDF: $error';
+  }
 }

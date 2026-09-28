@@ -737,7 +737,138 @@
   "s18VerifySuccess": "दैनंदिन ऑडिट GM द्वारे यशस्वीरित्या पडताळले गेले.",
   "s18AllCheckpointsMustBeVerified": "कृपया स्वाक्षरी करण्यापूर्वी सर्व ३ तपासणी बिंदू पडताळा.",
   "s18ConfirmDiscrepancy": "नोंद सबमिट करा",
-  "s18Cancel": "रद्द करा"
+  "s18Cancel": "रद्द करा",
+  "s20ScreenTitle": "साप्ताहिक अहवाल",
+  "s20ScreenSubtitle": "कार्यपुस्तिका §3.6 अहवाल आणि 1-पान PDF निर्यात",
+  "s20FilterAll": "सर्व",
+  "s20EmptyTitle": "अद्याप कोणतेही साप्ताहिक अहवाल नाहीत",
+  "s20EmptySubtitle": "साप्ताहिक अनुपालन ऑडिट पूर्ण झाल्यावर साप्ताहिक अहवाल तयार केले जातात.",
+  "s20OwnerRead": "वाचले",
+  "s20OwnerUnread": "वाचले नाही",
+  "s20WeekEndingHeader": "आठवडा {week} · समाप्त {date}",
+  "@s20WeekEndingHeader": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "date": {"type": "String"}
+    }
+  },
+  "s20ReportCardScore": "{pct}% {band}",
+  "@s20ReportCardScore": {
+    "placeholders": {
+      "pct": {"type": "String"},
+      "band": {"type": "String"}
+    }
+  },
+  "s20GenerateReport": "साप्ताहिक अहवाल तयार करा",
+  "s21ScreenTitle": "साप्ताहिक ऑडिट अहवाल",
+  "s21WorkbookSubtitle": "कार्यपुस्तिका दिवस ३ §३.६ नऊ-विभाग स्वरूप",
+  "s21HeadlineSection": "विभाग १: मुख्य मथळा",
+  "s21ComplianceSection": "विभाग २: १२४-गुण अनुपालन तक्ता",
+  "s21DailyAvgContribution": "दैनिक सरासरी योगदान",
+  "s21WeeklyOnlyCheckpoints": "केवळ-साप्ताहिक तपासणी बिंदू",
+  "s21CombinedTotal": "एकत्रित एकूण गुण",
+  "s21SopBreakdownHeader": "एसओपी अनुपालन तपशील",
+  "s21TrendSection": "विभाग ३: ७-दिवस कल आणि आठवडा-दर-आठवडा बदल",
+  "s21DayLabel": "{day} ({date}): {pct}%",
+  "@s21DayLabel": {
+    "placeholders": {
+      "day": {"type": "String"},
+      "date": {"type": "String"},
+      "pct": {"type": "String"}
+    }
+  },
+  "s21DayAbsent": "{day} ({date}): 0.0% (अनुपस्थित)",
+  "@s21DayAbsent": {
+    "placeholders": {
+      "day": {"type": "String"},
+      "date": {"type": "String"}
+    }
+  },
+  "s21WeeklyRollup": "साप्ताहिक एकूण: {pct}%",
+  "@s21WeeklyRollup": {
+    "placeholders": {
+      "pct": {"type": "String"}
+    }
+  },
+  "s21WowDelta": "आठवडा-दर-आठवडा बदल: {delta}%",
+  "@s21WowDelta": {
+    "placeholders": {
+      "delta": {"type": "String"}
+    }
+  },
+  "s21WowDeltaNa": "आठवडा-दर-आठवडा बदल: — (पहिला अहवाल)",
+  "s21FindingsSection": "विभाग ४: साप्ताहिक गैर-अनुपालन ({count})",
+  "@s21FindingsSection": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21NoFindings": "कोणतेही साप्ताहिक गैर-अनुपालन नोंदवले नाही.",
+  "s21PhotosCount": "{count} फोटो",
+  "@s21PhotosCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21PatternsSection": "विभाग ५: आढळलेले नमुने ({count})",
+  "@s21PatternsSection": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21NoPatterns": "या आठवड्यात कोणतेही नमुना दोष आढळले नाहीत.",
+  "s21PatternDetectedOnDays": "{count} दिवस अयशस्वी: {days}",
+  "@s21PatternDetectedOnDays": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "days": {"type": "String"}
+    }
+  },
+  "s21SuggestedPatternCap": "सुचवलेला पॅटर्न कॅप (एकल-कॅप नियम):",
+  "s21CapsSection": "विभाग ६: सुधारात्मक कृती योजना (CAPs)",
+  "s21CapsOpenedHeader": "या आठवड्यात सुरू झालेले कॅप ({count})",
+  "@s21CapsOpenedHeader": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21CapsClosedHeader": "विभाग ७: या आठवड्यात बंद झालेले कॅप",
+  "s21CapsClosedEmpty": "या आठवड्यात कोणतेही कॅप बंद झाले नाहीत (सत्यापन आणि बंद करणे P2-5 मध्ये उपलब्ध).",
+  "s21CapsAgedHeader": "विभाग ८: जुने / मुदत संपलेले कॅप",
+  "s21CapsAgedEmpty": "कोणतेही जुने कॅप नोंदवले नाहीत (P2-5 मध्ये उपलब्ध).",
+  "s21EscalationsSection": "विभाग ९: एस्केलेशन नोंद",
+  "s21EscalationsEmpty": "कोणतेही एस्केलेशन ट्रिगर झाले नाही (फेज ३ मध्ये उपलब्ध).",
+  "s21SignatureSection": "अधिकृत स्वाक्षरी",
+  "s21AuditorSignature": "जीएम / ऑडिटर स्वाक्षरी: {author} · सादर {time}",
+  "@s21AuditorSignature": {
+    "placeholders": {
+      "author": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "s21OwnerSignature": "मालक पुनरावलोकन: {time} रोजी वाचले",
+  "@s21OwnerSignature": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "s21OwnerSignaturePending": "मालक पुनरावलोकन: प्रलंबित",
+  "s21MarkAsReadButton": "वाचले म्हणून चिन्हांकित करा (मालक)",
+  "s21MarkedAsReadSuccess": "साप्ताहिक अहवाल मालकाने वाचला म्हणून चिन्हांकित केला.",
+  "s21ExportPdfButton": "१-पान PDF निर्यात करा",
+  "s21PdfGenerating": "१-पान PDF तयार करत आहे...",
+  "s21PdfSaved": "PDF जतन केले: {path}",
+  "@s21PdfSaved": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "s21PdfExportError": "PDF निर्यात अयशस्वी: {error}",
+  "@s21PdfExportError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  }
 }
 
 

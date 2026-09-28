@@ -391,6 +391,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           onTap: () => context.pushNamed('s14_cap_list'),
         ),
         _navTile(
+          icon: Icons.assessment_outlined,
+          title: l10n.s20ScreenTitle,
+          subtitle: l10n.s20ScreenSubtitle,
+          enabled: true,
+          onTap: () => context.pushNamed('s20_reports_list'),
+        ),
+        _navTile(
           icon: Icons.menu_book_outlined,
           title: l10n.s05ReferenceTitle,
           subtitle: l10n.s05ReferenceSubtitle,

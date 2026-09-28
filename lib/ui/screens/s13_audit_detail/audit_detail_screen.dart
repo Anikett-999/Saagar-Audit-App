@@ -15,6 +15,7 @@ import '../../../data/repositories/audit_repository.dart';
 import '../../../data/repositories/cap_repository.dart';
 import '../../../data/repositories/checkpoint_repository.dart';
 import '../../../data/repositories/cro_repository.dart';
+import '../../../data/repositories/report_repository.dart';
 import '../../../data/repositories/user_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
@@ -299,6 +300,20 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
           },
         ),
         actions: [
+          if (audit.auditType == 'weekly')
+            IconButton(
+              icon: const Icon(Icons.assessment_outlined),
+              tooltip: 'Weekly Report',
+              onPressed: () async {
+                final report = await ReportRepository.instance.getByAuditId(audit.id);
+                if (!context.mounted) return;
+                if (report != null) {
+                  context.pushNamed('s21_report_detail', pathParameters: {'id': report.id});
+                } else {
+                  context.pushNamed('s20_reports_list');
+                }
+              },
+            ),
           const LanguageToggleButton(),
           IconButton(
             icon: const Icon(Icons.refresh),

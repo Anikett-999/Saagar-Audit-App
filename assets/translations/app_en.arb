@@ -910,7 +910,138 @@
   "s18VerifySuccess": "Daily audit successfully verified by GM.",
   "s18AllCheckpointsMustBeVerified": "Please verify all 3 checkpoints before signing off.",
   "s18ConfirmDiscrepancy": "Submit Flag",
-  "s18Cancel": "Cancel"
+  "s18Cancel": "Cancel",
+  "s20ScreenTitle": "Weekly Reports",
+  "s20ScreenSubtitle": "Workbook §3.6 reports & 1-page PDF export",
+  "s20FilterAll": "All",
+  "s20EmptyTitle": "No Weekly Reports Yet",
+  "s20EmptySubtitle": "Weekly reports are generated upon completing weekly compliance audits.",
+  "s20OwnerRead": "Read",
+  "s20OwnerUnread": "Unread",
+  "s20WeekEndingHeader": "Week {week} · Ending {date}",
+  "@s20WeekEndingHeader": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "date": {"type": "String"}
+    }
+  },
+  "s20ReportCardScore": "{pct}% {band}",
+  "@s20ReportCardScore": {
+    "placeholders": {
+      "pct": {"type": "String"},
+      "band": {"type": "String"}
+    }
+  },
+  "s20GenerateReport": "Generate Weekly Report",
+  "s21ScreenTitle": "Weekly Audit Report",
+  "s21WorkbookSubtitle": "Workbook Day 3 §3.6 Nine-Section Format",
+  "s21HeadlineSection": "Section 1: Executive Headline",
+  "s21ComplianceSection": "Section 2: 124-Point Compliance Table",
+  "s21DailyAvgContribution": "Daily Average Contribution",
+  "s21WeeklyOnlyCheckpoints": "Weekly-Only Checkpoints",
+  "s21CombinedTotal": "Combined Total Score",
+  "s21SopBreakdownHeader": "SOP Compliance Breakdown",
+  "s21TrendSection": "Section 3: 7-Day Trend & WoW Delta",
+  "s21DayLabel": "{day} ({date}): {pct}%",
+  "@s21DayLabel": {
+    "placeholders": {
+      "day": {"type": "String"},
+      "date": {"type": "String"},
+      "pct": {"type": "String"}
+    }
+  },
+  "s21DayAbsent": "{day} ({date}): 0.0% (Absent)",
+  "@s21DayAbsent": {
+    "placeholders": {
+      "day": {"type": "String"},
+      "date": {"type": "String"}
+    }
+  },
+  "s21WeeklyRollup": "Weekly Total: {pct}%",
+  "@s21WeeklyRollup": {
+    "placeholders": {
+      "pct": {"type": "String"}
+    }
+  },
+  "s21WowDelta": "Week-over-Week Delta: {delta}%",
+  "@s21WowDelta": {
+    "placeholders": {
+      "delta": {"type": "String"}
+    }
+  },
+  "s21WowDeltaNa": "Week-over-Week Delta: — (First report)",
+  "s21FindingsSection": "Section 4: Weekly Non-Compliances ({count})",
+  "@s21FindingsSection": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21NoFindings": "No weekly non-compliances recorded.",
+  "s21PhotosCount": "{count} Photos",
+  "@s21PhotosCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21PatternsSection": "Section 5: Detected Patterns ({count})",
+  "@s21PatternsSection": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21NoPatterns": "No cross-day patterns detected this week.",
+  "s21PatternDetectedOnDays": "Failed on {count} days: {days}",
+  "@s21PatternDetectedOnDays": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "days": {"type": "String"}
+    }
+  },
+  "s21SuggestedPatternCap": "Suggested Pattern CAP (Single-CAP Rule):",
+  "s21CapsSection": "Section 6: Corrective Action Plans (CAPs)",
+  "s21CapsOpenedHeader": "CAPs Opened This Week ({count})",
+  "@s21CapsOpenedHeader": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21CapsClosedHeader": "Section 7: CAPs Closed This Week",
+  "s21CapsClosedEmpty": "No CAPs closed this week (Verification & Close workflow active in P2-5).",
+  "s21CapsAgedHeader": "Section 8: Aged / Overdue CAPs",
+  "s21CapsAgedEmpty": "No aged CAPs recorded (Lifecycle tracking active in P2-5).",
+  "s21EscalationsSection": "Section 9: Escalation Log",
+  "s21EscalationsEmpty": "No escalations triggered (Escalation engine active in Phase 3).",
+  "s21SignatureSection": "Signature of Record",
+  "s21AuditorSignature": "GM / Auditor Signature: {author} · Submitted {time}",
+  "@s21AuditorSignature": {
+    "placeholders": {
+      "author": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "s21OwnerSignature": "Owner Review: Read on {time}",
+  "@s21OwnerSignature": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "s21OwnerSignaturePending": "Owner Review: Pending Owner Review",
+  "s21MarkAsReadButton": "Mark as Read (Owner)",
+  "s21MarkedAsReadSuccess": "Weekly report marked as read by Owner.",
+  "s21ExportPdfButton": "Export 1-Page PDF",
+  "s21PdfGenerating": "Generating 1-page PDF...",
+  "s21PdfSaved": "PDF saved: {path}",
+  "@s21PdfSaved": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "s21PdfExportError": "Failed to export PDF: {error}",
+  "@s21PdfExportError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  }
 }
 
 

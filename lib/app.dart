@@ -22,6 +22,8 @@ import 'ui/screens/s15_cap_create/cap_create_screen.dart';
 import 'ui/screens/s16_cap_detail/cap_detail_screen.dart';
 import 'ui/screens/s17_cap_mark_done/cap_mark_done_screen.dart';
 import 'ui/screens/seven_day_review/seven_day_review_screen.dart';
+import 'ui/screens/reports/reports_list_screen.dart';
+import 'ui/screens/reports/report_detail_screen.dart';
 import 'ui/screens/s22_reference/reference_index_screen.dart';
 import 'ui/screens/s23_rating_scale/rating_scale_screen.dart';
 import 'ui/screens/s24_escalation_triggers/escalation_triggers_screen.dart';
@@ -205,6 +207,32 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
         builder: (context, state) => CapMarkDoneScreen(
           capId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
+        path: '/reports',
+        name: 's20_reports_list',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          return null;
+        },
+        builder: (_, __) => const ReportsListScreen(),
+      ),
+      GoRoute(
+        path: '/reports/:id',
+        name: 's21_report_detail',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          return null;
+        },
+        builder: (context, state) => ReportDetailScreen(
+          reportId: state.pathParameters['id']!,
         ),
       ),
       GoRoute(

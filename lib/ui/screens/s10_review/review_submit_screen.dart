@@ -11,8 +11,10 @@ import '../../../data/models/photo.dart';
 import '../../../data/models/sop.dart';
 import '../../../data/repositories/audit_repository.dart';
 import '../../../data/repositories/checkpoint_repository.dart';
+import '../../../data/repositories/report_repository.dart';
 import '../../../domain/score_engine.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../providers/auth_provider.dart';
 import '../../../providers/draft_audit_provider.dart';
 import '../../theme/app_colors.dart';
 
@@ -164,6 +166,18 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
       await ref
           .read(draftAuditProvider.notifier)
           .submitAudit(notes: notes.isEmpty ? null : notes);
+
+      if (audit.auditType == 'weekly') {
+        try {
+          final currentUser = ref.read(authProvider).user;
+          await ReportRepository.instance.generateWeeklyReport(
+            weeklyAuditId: audit.id,
+            authorUserId: currentUser?.id ?? audit.auditorId,
+          );
+        } catch (_) {
+          // Non-blocking per plan
+        }
+      }
 
       if (!mounted) return;
       context.goNamed('s11_submitted');

@@ -1999,4 +1999,187 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s18Cancel => 'रद्द करा';
+
+  @override
+  String get s20ScreenTitle => 'साप्ताहिक अहवाल';
+
+  @override
+  String get s20ScreenSubtitle =>
+      'कार्यपुस्तिका §3.6 अहवाल आणि 1-पान PDF निर्यात';
+
+  @override
+  String get s20FilterAll => 'सर्व';
+
+  @override
+  String get s20EmptyTitle => 'अद्याप कोणतेही साप्ताहिक अहवाल नाहीत';
+
+  @override
+  String get s20EmptySubtitle =>
+      'साप्ताहिक अनुपालन ऑडिट पूर्ण झाल्यावर साप्ताहिक अहवाल तयार केले जातात.';
+
+  @override
+  String get s20OwnerRead => 'वाचले';
+
+  @override
+  String get s20OwnerUnread => 'वाचले नाही';
+
+  @override
+  String s20WeekEndingHeader(int week, String date) {
+    return 'आठवडा $week · समाप्त $date';
+  }
+
+  @override
+  String s20ReportCardScore(String pct, String band) {
+    return '$pct% $band';
+  }
+
+  @override
+  String get s20GenerateReport => 'साप्ताहिक अहवाल तयार करा';
+
+  @override
+  String get s21ScreenTitle => 'साप्ताहिक ऑडिट अहवाल';
+
+  @override
+  String get s21WorkbookSubtitle => 'कार्यपुस्तिका दिवस ३ §३.६ नऊ-विभाग स्वरूप';
+
+  @override
+  String get s21HeadlineSection => 'विभाग १: मुख्य मथळा';
+
+  @override
+  String get s21ComplianceSection => 'विभाग २: १२४-गुण अनुपालन तक्ता';
+
+  @override
+  String get s21DailyAvgContribution => 'दैनिक सरासरी योगदान';
+
+  @override
+  String get s21WeeklyOnlyCheckpoints => 'केवळ-साप्ताहिक तपासणी बिंदू';
+
+  @override
+  String get s21CombinedTotal => 'एकत्रित एकूण गुण';
+
+  @override
+  String get s21SopBreakdownHeader => 'एसओपी अनुपालन तपशील';
+
+  @override
+  String get s21TrendSection => 'विभाग ३: ७-दिवस कल आणि आठवडा-दर-आठवडा बदल';
+
+  @override
+  String s21DayLabel(String day, String date, String pct) {
+    return '$day ($date): $pct%';
+  }
+
+  @override
+  String s21DayAbsent(String day, String date) {
+    return '$day ($date): 0.0% (अनुपस्थित)';
+  }
+
+  @override
+  String s21WeeklyRollup(String pct) {
+    return 'साप्ताहिक एकूण: $pct%';
+  }
+
+  @override
+  String s21WowDelta(String delta) {
+    return 'आठवडा-दर-आठवडा बदल: $delta%';
+  }
+
+  @override
+  String get s21WowDeltaNa => 'आठवडा-दर-आठवडा बदल: — (पहिला अहवाल)';
+
+  @override
+  String s21FindingsSection(int count) {
+    return 'विभाग ४: साप्ताहिक गैर-अनुपालन ($count)';
+  }
+
+  @override
+  String get s21NoFindings => 'कोणतेही साप्ताहिक गैर-अनुपालन नोंदवले नाही.';
+
+  @override
+  String s21PhotosCount(int count) {
+    return '$count फोटो';
+  }
+
+  @override
+  String s21PatternsSection(int count) {
+    return 'विभाग ५: आढळलेले नमुने ($count)';
+  }
+
+  @override
+  String get s21NoPatterns => 'या आठवड्यात कोणतेही नमुना दोष आढळले नाहीत.';
+
+  @override
+  String s21PatternDetectedOnDays(int count, String days) {
+    return '$count दिवस अयशस्वी: $days';
+  }
+
+  @override
+  String get s21SuggestedPatternCap => 'सुचवलेला पॅटर्न कॅप (एकल-कॅप नियम):';
+
+  @override
+  String get s21CapsSection => 'विभाग ६: सुधारात्मक कृती योजना (CAPs)';
+
+  @override
+  String s21CapsOpenedHeader(int count) {
+    return 'या आठवड्यात सुरू झालेले कॅप ($count)';
+  }
+
+  @override
+  String get s21CapsClosedHeader => 'विभाग ७: या आठवड्यात बंद झालेले कॅप';
+
+  @override
+  String get s21CapsClosedEmpty =>
+      'या आठवड्यात कोणतेही कॅप बंद झाले नाहीत (सत्यापन आणि बंद करणे P2-5 मध्ये उपलब्ध).';
+
+  @override
+  String get s21CapsAgedHeader => 'विभाग ८: जुने / मुदत संपलेले कॅप';
+
+  @override
+  String get s21CapsAgedEmpty =>
+      'कोणतेही जुने कॅप नोंदवले नाहीत (P2-5 मध्ये उपलब्ध).';
+
+  @override
+  String get s21EscalationsSection => 'विभाग ९: एस्केलेशन नोंद';
+
+  @override
+  String get s21EscalationsEmpty =>
+      'कोणतेही एस्केलेशन ट्रिगर झाले नाही (फेज ३ मध्ये उपलब्ध).';
+
+  @override
+  String get s21SignatureSection => 'अधिकृत स्वाक्षरी';
+
+  @override
+  String s21AuditorSignature(String author, String time) {
+    return 'जीएम / ऑडिटर स्वाक्षरी: $author · सादर $time';
+  }
+
+  @override
+  String s21OwnerSignature(String time) {
+    return 'मालक पुनरावलोकन: $time रोजी वाचले';
+  }
+
+  @override
+  String get s21OwnerSignaturePending => 'मालक पुनरावलोकन: प्रलंबित';
+
+  @override
+  String get s21MarkAsReadButton => 'वाचले म्हणून चिन्हांकित करा (मालक)';
+
+  @override
+  String get s21MarkedAsReadSuccess =>
+      'साप्ताहिक अहवाल मालकाने वाचला म्हणून चिन्हांकित केला.';
+
+  @override
+  String get s21ExportPdfButton => '१-पान PDF निर्यात करा';
+
+  @override
+  String get s21PdfGenerating => '१-पान PDF तयार करत आहे...';
+
+  @override
+  String s21PdfSaved(String path) {
+    return 'PDF जतन केले: $path';
+  }
+
+  @override
+  String s21PdfExportError(String error) {
+    return 'PDF निर्यात अयशस्वी: $error';
+  }
 }

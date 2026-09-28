@@ -3710,6 +3710,300 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get s18Cancel;
+
+  /// No description provided for @s20ScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Reports'**
+  String get s20ScreenTitle;
+
+  /// No description provided for @s20ScreenSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Workbook §3.6 reports & 1-page PDF export'**
+  String get s20ScreenSubtitle;
+
+  /// No description provided for @s20FilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get s20FilterAll;
+
+  /// No description provided for @s20EmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No Weekly Reports Yet'**
+  String get s20EmptyTitle;
+
+  /// No description provided for @s20EmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly reports are generated upon completing weekly compliance audits.'**
+  String get s20EmptySubtitle;
+
+  /// No description provided for @s20OwnerRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get s20OwnerRead;
+
+  /// No description provided for @s20OwnerUnread.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get s20OwnerUnread;
+
+  /// No description provided for @s20WeekEndingHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Week {week} · Ending {date}'**
+  String s20WeekEndingHeader(int week, String date);
+
+  /// No description provided for @s20ReportCardScore.
+  ///
+  /// In en, this message translates to:
+  /// **'{pct}% {band}'**
+  String s20ReportCardScore(String pct, String band);
+
+  /// No description provided for @s20GenerateReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Weekly Report'**
+  String get s20GenerateReport;
+
+  /// No description provided for @s21ScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Audit Report'**
+  String get s21ScreenTitle;
+
+  /// No description provided for @s21WorkbookSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Workbook Day 3 §3.6 Nine-Section Format'**
+  String get s21WorkbookSubtitle;
+
+  /// No description provided for @s21HeadlineSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 1: Executive Headline'**
+  String get s21HeadlineSection;
+
+  /// No description provided for @s21ComplianceSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 2: 124-Point Compliance Table'**
+  String get s21ComplianceSection;
+
+  /// No description provided for @s21DailyAvgContribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Average Contribution'**
+  String get s21DailyAvgContribution;
+
+  /// No description provided for @s21WeeklyOnlyCheckpoints.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly-Only Checkpoints'**
+  String get s21WeeklyOnlyCheckpoints;
+
+  /// No description provided for @s21CombinedTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Combined Total Score'**
+  String get s21CombinedTotal;
+
+  /// No description provided for @s21SopBreakdownHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'SOP Compliance Breakdown'**
+  String get s21SopBreakdownHeader;
+
+  /// No description provided for @s21TrendSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 3: 7-Day Trend & WoW Delta'**
+  String get s21TrendSection;
+
+  /// No description provided for @s21DayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{day} ({date}): {pct}%'**
+  String s21DayLabel(String day, String date, String pct);
+
+  /// No description provided for @s21DayAbsent.
+  ///
+  /// In en, this message translates to:
+  /// **'{day} ({date}): 0.0% (Absent)'**
+  String s21DayAbsent(String day, String date);
+
+  /// No description provided for @s21WeeklyRollup.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Total: {pct}%'**
+  String s21WeeklyRollup(String pct);
+
+  /// No description provided for @s21WowDelta.
+  ///
+  /// In en, this message translates to:
+  /// **'Week-over-Week Delta: {delta}%'**
+  String s21WowDelta(String delta);
+
+  /// No description provided for @s21WowDeltaNa.
+  ///
+  /// In en, this message translates to:
+  /// **'Week-over-Week Delta: — (First report)'**
+  String get s21WowDeltaNa;
+
+  /// No description provided for @s21FindingsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 4: Weekly Non-Compliances ({count})'**
+  String s21FindingsSection(int count);
+
+  /// No description provided for @s21NoFindings.
+  ///
+  /// In en, this message translates to:
+  /// **'No weekly non-compliances recorded.'**
+  String get s21NoFindings;
+
+  /// No description provided for @s21PhotosCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Photos'**
+  String s21PhotosCount(int count);
+
+  /// No description provided for @s21PatternsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 5: Detected Patterns ({count})'**
+  String s21PatternsSection(int count);
+
+  /// No description provided for @s21NoPatterns.
+  ///
+  /// In en, this message translates to:
+  /// **'No cross-day patterns detected this week.'**
+  String get s21NoPatterns;
+
+  /// No description provided for @s21PatternDetectedOnDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed on {count} days: {days}'**
+  String s21PatternDetectedOnDays(int count, String days);
+
+  /// No description provided for @s21SuggestedPatternCap.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested Pattern CAP (Single-CAP Rule):'**
+  String get s21SuggestedPatternCap;
+
+  /// No description provided for @s21CapsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 6: Corrective Action Plans (CAPs)'**
+  String get s21CapsSection;
+
+  /// No description provided for @s21CapsOpenedHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'CAPs Opened This Week ({count})'**
+  String s21CapsOpenedHeader(int count);
+
+  /// No description provided for @s21CapsClosedHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 7: CAPs Closed This Week'**
+  String get s21CapsClosedHeader;
+
+  /// No description provided for @s21CapsClosedEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No CAPs closed this week (Verification & Close workflow active in P2-5).'**
+  String get s21CapsClosedEmpty;
+
+  /// No description provided for @s21CapsAgedHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 8: Aged / Overdue CAPs'**
+  String get s21CapsAgedHeader;
+
+  /// No description provided for @s21CapsAgedEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No aged CAPs recorded (Lifecycle tracking active in P2-5).'**
+  String get s21CapsAgedEmpty;
+
+  /// No description provided for @s21EscalationsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 9: Escalation Log'**
+  String get s21EscalationsSection;
+
+  /// No description provided for @s21EscalationsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No escalations triggered (Escalation engine active in Phase 3).'**
+  String get s21EscalationsEmpty;
+
+  /// No description provided for @s21SignatureSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Signature of Record'**
+  String get s21SignatureSection;
+
+  /// No description provided for @s21AuditorSignature.
+  ///
+  /// In en, this message translates to:
+  /// **'GM / Auditor Signature: {author} · Submitted {time}'**
+  String s21AuditorSignature(String author, String time);
+
+  /// No description provided for @s21OwnerSignature.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner Review: Read on {time}'**
+  String s21OwnerSignature(String time);
+
+  /// No description provided for @s21OwnerSignaturePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner Review: Pending Owner Review'**
+  String get s21OwnerSignaturePending;
+
+  /// No description provided for @s21MarkAsReadButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Read (Owner)'**
+  String get s21MarkAsReadButton;
+
+  /// No description provided for @s21MarkedAsReadSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly report marked as read by Owner.'**
+  String get s21MarkedAsReadSuccess;
+
+  /// No description provided for @s21ExportPdfButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Export 1-Page PDF'**
+  String get s21ExportPdfButton;
+
+  /// No description provided for @s21PdfGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating 1-page PDF...'**
+  String get s21PdfGenerating;
+
+  /// No description provided for @s21PdfSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF saved: {path}'**
+  String s21PdfSaved(String path);
+
+  /// No description provided for @s21PdfExportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to export PDF: {error}'**
+  String s21PdfExportError(String error);
 }
 
 class _AppLocalizationsDelegate

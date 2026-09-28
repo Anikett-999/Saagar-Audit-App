@@ -354,6 +354,10 @@ void main() {
       final referenceTileFinder = find.widgetWithText(ListTile, 'Reference');
       expect(referenceTileFinder, findsOneWidget);
 
+      // Ensure tile is visible in scrollable Home before tapping
+      await tester.ensureVisible(referenceTileFinder);
+      await tester.pumpAndSettle();
+
       // Tap Reference tile
       await tester.tap(referenceTileFinder);
       await tester.pumpAndSettle();

@@ -41,8 +41,8 @@
 |---|---|---|---|
 | **S18** | CAP Verify | ⏳ Planned (P2-5) | GM verifies a done CAP against re-run checkpoint |
 | **S19** | CAP Close | ⏳ Planned (P2-5) | GM closes verified CAP; cap_log timeline entry |
-| **S20** | Reports List | ⏳ Planned (P2-4) | Weekly report list |
-| **S21** | Report Detail | ⏳ Planned (P2-4) | 1-page weekly report, Workbook §3.6 9-section format, PDF export |
+| **S20** | Reports List | ✅ Complete (P2-4) | Weekly report list with week-ending date, compliance %, band chip, headline, Owner-only read dot (green/gray), filter chips |
+| **S21** | Report Detail | ✅ Complete (P2-4) | 1-page weekly report, Workbook §3.6 9-section format (headline, 124-pt rollup compliance table, 7-day trend block + WoW delta, weekly fails findings, patterns, caps opened with single pattern CAP, honest empty states for caps closed, caps aged, escalations), Owner-only Mark-as-Read action, 1-page PDF export |
 | **Weekly conduct** | S6–S11 analogues | ✅ Complete (P2-2) | Parameterized S06–S11 by `audit_type='weekly'`, 36 weekly checkpoints in 4 SOP groups (display_order 69–104), S05 GM/Owner Weekly card, S10 124-pt combined score with missing-day-as-zero & CW.7 variance subline, S12 history & S13 detail support |
 | **7-day review** | Daily review + spot check | ✅ Complete (P2-3) | 7 daily cards, 3 random spot-check checkpoints/day, GM signature of record (Option A: `verifier_id` + `verified_at`), discrepancy flagging with note preservation, full Marathi parity |
 
@@ -50,7 +50,10 @@
 
 ## 2. Verified Baseline Health
 - `flutter analyze`: **0 issues found (Clean baseline)**
-- `flutter test`: **243/243 tests passing across 30 test files**:
+- `flutter test`: **254/254 tests passing across 33 test files**:
+  - `weekly_report_test.dart` (6 tests) — Sprint P2-4 Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite: T2.4 spec canonical pattern detection & single CAP generation; 9-section report assembly with honest empty states for future phases; 1-page PDF export matching §3.6 layout; S20 Reports List Screen with Owner-only read dot & role scoping; S21 Report Detail Screen with 9 sections, Owner Mark-as-Read action, & PDF export; dual-language parity in authentic Marathi.
+  - `pattern_detection_test.dart` (4 tests) — Pure domain pattern detection engine: T2.4 canonical trigger ($\ge 3$ distinct daily audit fails in the week $\rightarrow$ single pattern and single CAP); duplicate failure deduplication on same day; frequency-based ordering; JSON serialization round-trip.
+  - `report_repository_test.dart` (1 test) — Report repository integration: SQLite persistence, 124-point rollup calculation, 7-day trend calculation, findings & pattern integration, Mark-as-Read mutation.
   - `spotcheck_verify_test.dart` (8 tests) — Sprint P2-3 7-Day Review & GM Spot-Check Suite (Spec §5 T2.3 / Phase-2 Day 6): `isoWeekDates` exact 7 Monday-Sunday dates calculation; T2.3 spec scenario (Day 3 verified with GM signature of record); R5 immutability (verifying daily audit leaves scores, counts, and results strictly identical); R5 guards (throws StateError on re-verifying, hidden, or weekly audits); score stability (124-point weekly score invariant across spot checks); discrepancy handling (preserves submitted status and appends discrepancy note); SevenDayReviewScreen widget rendering with status chips & spot check; dual-language parity in authentic Marathi.
   - `weekly_conduct_test.dart` (7 tests) — Sprint P2-2 Weekly Audit Conduct Suite: 36 weekly checkpoints load in 4 SOP groups in Workbook Day 3 §3.3..§3.6 order (Ops 10, Cash 8 ★, Service 6, Inv 12 ★; 56 weighted pts); R7 photo requirement enforced on Cash/Inventory fails via seed flag; S10 Review wiring reproduces Workbook §5.2 / T2.1 canonical score (104.8 / 124 = 84.5% Poor); T2.2 missing-day padding (6 days @ 90% + 1 absent day = 52.4 contribution); S12 History weekly filter & S13 Detail weekly checkpoints loading; GM/Owner role gating; Regression test 7: deduplication of superseded daily audits per `audit_date` preventing double-counting and >7 days ArgumentError on weekly submit.
   - `weekly_score_engine_test.dart` (10 tests) — T2.1 canonical Workbook §5.2 reproduction (104.8 / 124 = 84.5% Poor exact match), T2.2 missing day = 0% -> 52.4 contribution, day padding, boundary checks, NA-exclusion, CW.7 cumulative variance calculation and threshold breach detection.
