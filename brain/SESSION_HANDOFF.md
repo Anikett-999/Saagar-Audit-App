@@ -4508,3 +4508,52 @@ This is a one-line ARB swap + regen. Everything else is approved. **Once that fi
 Antigravity: apply the fix, `flutter gen-l10n`, confirm `flutter test` green, then commit `feature/p2-spotcheck` with a Conventional Commit (R10), e.g. `feat(weekly): P2-3 7-day review + GM spot-check verification (Option A)`, merge into `phase-2`, `git push origin phase-2`. Do NOT touch `main` (Rule 7). Paste raw `git status` + `git log --oneline -3` + the corrected `flutter test` tail as the push record.
 
 **Next after push → Sprint P2-4** (Weekly report + §3.6 9-section format/PDF + Pattern detection T2.4). I'll write that plan once the P2-3 push record is in.
+
+---
+
+### Entry: 2026-09-28 — Sprint P2-3 Push Record (Option A Shipped & Pushed to phase-2)
+- **Author**: Antigravity
+- **Date**: 2026-09-28
+- **Branch**: `phase-2`
+- **Status**: Committed, merged, pushed to `origin/phase-2`. **Clean & green.**
+
+#### 1. Fix Applied Prior to Commit (Conditional Approval Met)
+- **Marathi Grammar Invariant (Rule #8)**: Swapped placeholders in `assets/translations/app_mr.arb` for `s18CheckpointStep`:
+  - From: `"तपासणी बिंदू {current} पैकी {total}"`
+  - To: `"तपासणी बिंदू {total} पैकी {current}"` ("X पैकी Y" = "Y out of X")
+- Regenerated localizations via `flutter gen-l10n`.
+- Re-verified test suite: clean analyze, 8/8 spot-check tests green, 243/243 full test suite green.
+
+#### 2. Push Record & Raw Git Output
+
+##### A. `git status` (on `phase-2`)
+```
+On branch phase-2
+Your branch is up to date with 'origin/phase-2'.
+
+nothing to commit, working tree clean
+```
+
+##### B. `git log --oneline -3` (on `phase-2`)
+```
+e75047b feat(weekly): P2-3 7-day review + GM spot-check verification (Option A)
+e8b808d docs(handoff): record Antigravity S10/S13 push record & P2-3 gate hold
+c4153f7 fix(weekly): resolve S10/S13 mobile overflow in review & detail screens
+```
+
+##### C. Rule 7 Check (`main` branch)
+```
+5b9408b7cc7625277b8f75cb1b9ac6907505bd0c
+```
+`main` is strictly untouched at `5b9408b`. All Phase 2 work resides on `phase-2`.
+
+##### D. Corrected `flutter test` tail
+```
+00:44 +241: E:/projects/Saagar Audit App/test/widget_test.dart: PinNumpad accepts 4 digits and invokes onPinComplete callback
+00:45 +242: E:/projects/Saagar Audit App/test/widget_test.dart: PinNumpad backspace removes previously entered digit
+00:45 +243: All tests passed!
+```
+
+#### 3. Baton Handoff → Sprint P2-4
+- Sprint P2-3 is completed, verified, and safely pushed to `origin/phase-2`.
+- Ready for Claude to design Sprint P2-4 (Weekly report + §3.6 9-section format/PDF + Pattern detection T2.4).
