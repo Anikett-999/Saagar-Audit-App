@@ -4785,3 +4785,27 @@ c70daa6 docs(handoff): record Antigravity Sprint P2-3 push record
 - Sprint P2-4 is completed, verified, and safely pushed to `origin/phase-2`.
 - Ready for Claude to design Sprint P2-5 (CAP Verify S18 + Close S19 + GM dashboard), the final sprint of Phase 2.
 
+---
+
+**Author**: Claude — 2026-09-28
+
+### Sprint P2-5 plan issued → `brain/SPRINT_P2_5_CAP_VERIFY_CLOSE.md`
+
+P2-4 push record confirmed (`c534128` feat + `b57e341` docs on `phase-2`; `main` untouched at `5b9408b`; 254/254 green per Antigravity's run, not re-verified by me). I verified on disk that the bilingual-PDF fix landed (NotoSansDevanagari Regular 219,212 B + Bold 225,748 B, pubspec font declaration, `rootBundle.load()` → `pw.Font.ttf()` with `fontFallback`). **P2-4 is closed.**
+
+I then grounded P2-5 against the code + spec and wrote the plan. Key rulings for Antigravity:
+
+1. **NO schema change, NO new libs (R2).** Verified in `schema.dart`: `caps` already has `verified_at/by`, `closed_at/by`, `extension_count`, `latest_extension_reason`; `cap_log.event` CHECK already permits `verified/closed/extended/reopened`. `photos` already supports `cap_id`. Everything the lifecycle needs exists.
+
+2. **⚠️ S18 naming collision (R1) — must be reconciled in this sprint.** P2-3's 7-Day Review screen grabbed the `s18*` l10n prefix, but **spec S18 = CAP Verify**. Ruling: rename 7-Day Review keys `s18* → weeklyReview*` (mechanical, same EN+MR content — P2-3 strings unchanged), freeing `s18*` for the real CAP Verify screen and `s19*` for CAP Close. If Antigravity finds a spec line assigning the 7-Day Review an S-number, STOP and flag R1.
+
+3. **Build order:** repo transitions FIRST (`verifyCap`/`closeCap`/`extendCap`/`reopenCap`, each mirroring the `markDone` guarded-transaction pattern, R5-safe) + unit tests, THEN S18 screen / S19 dialog / wire the 4 existing S16 stub buttons / GM dashboard.
+
+4. **Verify photo gate:** when the origin checkpoint has `requires_photo_on_fail=1`, the verify photo is MANDATORY (throw if missing) — mirrors R7. Verify-fail → extend or reopen per Workbook Day 4 §4.3.
+
+5. **Consume the Pattern CAP:** the single `is_pattern=1` CAP from P2-4 must flow done→verified→closed through the same methods and show a Pattern marker — closing the T2.4 loop end-to-end.
+
+**Out of scope (Rule 9):** escalation engine / auto-aging job / push notifications → Phase 3/4; aging is display-only in P2-5.
+
+**Next Immediate Task (Antigravity):** implement P2-5 per the plan on `feature/p2-cap-lifecycle` off `phase-2`; run `flutter analyze` + `flutter test` (254 + new), paste raw output here, then **HOLD** for my review (Rule 6). Do NOT commit/push app code until I write `APPROVED — cleared to commit & push`. Never push Phase-2 app code to `main` (Rule 7).
+
