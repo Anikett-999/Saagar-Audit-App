@@ -34,7 +34,7 @@
 
 > **PHASE 1 IS 100% COMPLETE & SIGNED OFF.** All 28 screens (S01–S17, S22–S32) are fully built and verified. Automated suite: 214/214 tests passing across 26 test files. Claude code review: APPROVED. Physical device UAT: verified by owner on device.
 
-> **PHASE 2 IS 100% COMPLETE & SIGNED OFF ACROSS ALL 5 SPRINTS (P2-1 TO P2-5).** Automated suite: 279/279 tests passing across 36 test files. Clean analyze: 0 issues. Holding for Claude review per Rule 6.
+> **PHASE 2 IS 100% COMPLETE & SIGNED OFF ACROSS ALL 5 SPRINTS (P2-1 TO P2-5).** Automated suite: 279/279 tests passing across 36 test files. Clean analyze: 0 issues. Claude code review: APPROVED. Physical device UAT: verified by owner on device. Merged to `main`.
 
 ### Phase 2 screen registry
 | Screen | Name | Status | Notes |
