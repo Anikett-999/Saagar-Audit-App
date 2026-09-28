@@ -244,9 +244,11 @@ class _AuditHistoryScreenState extends ConsumerState<AuditHistoryScreen> {
               onTap: () => _onFilterSelected(AuditHistoryFilter.unverified),
             ),
             const SizedBox(width: 8),
-            _buildDisabledFilterChip(
+            _buildFilterChip(
+              key: const ValueKey('s12_filter_weekly'),
               label: l10n.s12FilterWeekly,
-              tooltip: l10n.s12FilterWeeklyTooltip,
+              isSelected: _selectedFilter == AuditHistoryFilter.weekly,
+              onTap: () => _onFilterSelected(AuditHistoryFilter.weekly),
             ),
             const SizedBox(width: 8),
             _buildDisabledFilterChip(

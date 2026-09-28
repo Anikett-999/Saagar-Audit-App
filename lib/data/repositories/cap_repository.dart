@@ -451,4 +451,324 @@ class CapRepository {
     if (rows.isEmpty) return null;
     return Cap.fromMap(rows.first);
   }
+
+  /// Transitions a CAP from `done` to `verified` (Spec §5 S18).
+  ///
+  /// Enforces:
+  /// - Current status must be `done` (throws StateError).
+  /// - If the origin checkpoint has `requires_photo_on_fail == 1`, `photoPath` is mandatory (throws ArgumentError).
+  /// - Atomically updates `caps` (status = 'verified', verified_at = now, verified_by = verifierId).
+  /// - Inserts `cap_log` entry with event 'verified' (from_status = 'done', to_status = 'verified').
+  /// - If `photoPath` is provided, inserts photo row with `context = 'cap_verification'`.
+  Future<void> verifyCap({
+    required String capId,
+    required String verifierId,
+    String? photoPath,
+  }) async {
+    final cap = await getById(capId);
+    if (cap == null) {
+      throw StateError('CAP $capId not found');
+    }
+    if (cap.status != 'done') {
+      throw StateError(
+        'Cannot verify: CAP $capId has status ${cap.status} (expected done)',
+      );
+    }
+
+    // Check if origin checkpoint requires photo on fail
+    final cpRows = await AppDatabase.instance.db.query(
+      'checkpoints',
+      columns: ['requires_photo_on_fail'],
+      where: 'id = ?',
+      whereArgs: [cap.originCheckpointId],
+      limit: 1,
+    );
+    final requiresPhoto = cpRows.isNotEmpty &&
+        (cpRows.first['requires_photo_on_fail'] as int? ?? 0) == 1;
+
+    if (requiresPhoto && (photoPath == null || photoPath.trim().isEmpty)) {
+      throw ArgumentError(
+        'Verification photo is mandatory for checkpoint ${cap.originCheckpointId}',
+      );
+    }
+
+    final now = DateTime.now().toUtc().toIso8601String();
+    final deviceId = await DeviceService.instance.getId();
+
+    await AppDatabase.instance.db.transaction((txn) async {
+      await txn.update(
+        'caps',
+        {
+          'status': 'verified',
+          'verified_at': now,
+          'verified_by': verifierId,
+        },
+        where: 'id = ?',
+        whereArgs: [capId],
+      );
+
+      await txn.insert('cap_log', {
+        'id': const Uuid().v4(),
+        'cap_id': capId,
+        'event': 'verified',
+        'from_status': 'done',
+        'to_status': 'verified',
+        'actor_user_id': verifierId,
+        'device_id': deviceId,
+        'timestamp': now,
+        'note': 'CAP verified by GM/Owner',
+      });
+
+      if (photoPath != null && photoPath.trim().isNotEmpty) {
+        int? bytes;
+        try {
+          final f = File(photoPath);
+          if (f.existsSync()) {
+            bytes = f.lengthSync();
+          }
+        } catch (_) {
+          bytes = null;
+        }
+
+        await txn.insert('photos', {
+          'id': const Uuid().v4(),
+          'audit_result_id': null,
+          'cap_id': capId,
+          'context': 'cap_verification',
+          'local_path': photoPath,
+          'cloud_url': null,
+          'thumb_local_path': null,
+          'upload_status': 'pending',
+          'captured_at': now,
+          'captured_lat': null,
+          'captured_lng': null,
+          'uploaded_by': verifierId,
+          'file_size_bytes': bytes,
+        });
+      }
+    });
+  }
+
+  /// Transitions a CAP from `verified` to `closed` (Spec §5 S19).
+  ///
+  /// Enforces:
+  /// - Current status must be `verified` (throws StateError).
+  /// - Atomically updates `caps` (status = 'closed', closed_at = now, closed_by = closerId).
+  /// - Inserts `cap_log` entry with event 'closed' (from_status = 'verified', to_status = 'closed').
+  Future<void> closeCap({
+    required String capId,
+    required String closerId,
+  }) async {
+    final cap = await getById(capId);
+    if (cap == null) {
+      throw StateError('CAP $capId not found');
+    }
+    if (cap.status != 'verified') {
+      throw StateError(
+        'Cannot close: CAP $capId has status ${cap.status} (expected verified)',
+      );
+    }
+
+    final now = DateTime.now().toUtc().toIso8601String();
+    final deviceId = await DeviceService.instance.getId();
+
+    await AppDatabase.instance.db.transaction((txn) async {
+      await txn.update(
+        'caps',
+        {
+          'status': 'closed',
+          'closed_at': now,
+          'closed_by': closerId,
+        },
+        where: 'id = ?',
+        whereArgs: [capId],
+      );
+
+      await txn.insert('cap_log', {
+        'id': const Uuid().v4(),
+        'cap_id': capId,
+        'event': 'closed',
+        'from_status': 'verified',
+        'to_status': 'closed',
+        'actor_user_id': closerId,
+        'device_id': deviceId,
+        'timestamp': now,
+        'note': 'CAP permanently closed',
+      });
+    });
+  }
+
+  /// Extends a CAP's deadline (Workbook Day 4 §4.3).
+  ///
+  /// Enforces:
+  /// - Current status must be `open`, `done`, or `reopened` (throws StateError).
+  /// - Reason must not be blank (throws ArgumentError).
+  /// - New deadline must not be blank (throws ArgumentError).
+  /// - Bumps `extension_count = extension_count + 1`, stores `latest_extension_reason`.
+  /// - Keeps the current status (e.g. verify-fail -> extend leaves it `done`; open stays `open`).
+  /// - Inserts `cap_log` entry with event 'extended'.
+  Future<void> extendCap({
+    required String capId,
+    required String actorId,
+    required String newDeadline,
+    required String reason,
+  }) async {
+    final cap = await getById(capId);
+    if (cap == null) {
+      throw StateError('CAP $capId not found');
+    }
+    if (cap.status != 'open' && cap.status != 'done' && cap.status != 'reopened') {
+      throw StateError(
+        'Cannot extend: CAP $capId has status ${cap.status} (expected open, done, or reopened)',
+      );
+    }
+    if (reason.trim().isEmpty) {
+      throw ArgumentError('Extension reason must not be blank');
+    }
+    if (newDeadline.trim().isEmpty) {
+      throw ArgumentError('New deadline must not be blank');
+    }
+
+    final now = DateTime.now().toUtc().toIso8601String();
+    final deviceId = await DeviceService.instance.getId();
+    final trimmedReason = reason.trim();
+    final trimmedDeadline = newDeadline.trim();
+
+    await AppDatabase.instance.db.transaction((txn) async {
+      await txn.update(
+        'caps',
+        {
+          'deadline': trimmedDeadline,
+          'extension_count': cap.extensionCount + 1,
+          'latest_extension_reason': trimmedReason,
+        },
+        where: 'id = ?',
+        whereArgs: [capId],
+      );
+
+      await txn.insert('cap_log', {
+        'id': const Uuid().v4(),
+        'cap_id': capId,
+        'event': 'extended',
+        'from_status': cap.status,
+        'to_status': cap.status,
+        'actor_user_id': actorId,
+        'device_id': deviceId,
+        'timestamp': now,
+        'note': 'Deadline extended to $trimmedDeadline: $trimmedReason',
+      });
+    });
+  }
+
+  /// Reopens a CAP at Plan phase (Workbook Day 4 §4.3 & S16).
+  ///
+  /// Enforces:
+  /// - Current status must be `done` (verify-fail) or `closed` (Owner reopen) (throws StateError).
+  /// - Reason must not be blank (throws ArgumentError).
+  /// - Updates status to `reopened`.
+  /// - Inserts `cap_log` entry with event 'reopened'.
+  Future<void> reopenCap({
+    required String capId,
+    required String actorId,
+    required String reason,
+  }) async {
+    final cap = await getById(capId);
+    if (cap == null) {
+      throw StateError('CAP $capId not found');
+    }
+    if (cap.status != 'done' && cap.status != 'closed') {
+      throw StateError(
+        'Cannot reopen: CAP $capId has status ${cap.status} (expected done or closed)',
+      );
+    }
+    if (reason.trim().isEmpty) {
+      throw ArgumentError('Reopen reason must not be blank');
+    }
+
+    final now = DateTime.now().toUtc().toIso8601String();
+    final deviceId = await DeviceService.instance.getId();
+    final trimmedReason = reason.trim();
+
+    await AppDatabase.instance.db.transaction((txn) async {
+      await txn.update(
+        'caps',
+        {
+          'status': 'reopened',
+        },
+        where: 'id = ?',
+        whereArgs: [capId],
+      );
+
+      await txn.insert('cap_log', {
+        'id': const Uuid().v4(),
+        'cap_id': capId,
+        'event': 'reopened',
+        'from_status': cap.status,
+        'to_status': 'reopened',
+        'actor_user_id': actorId,
+        'device_id': deviceId,
+        'timestamp': now,
+        'note': 'CAP reopened: $trimmedReason',
+      });
+    });
+  }
+
+  /// Computes summary counts of CAPs by status and overdue count for GM Dashboard.
+  Future<CapDashboardCounts> getCapCounts({AuthUser? viewer}) async {
+    final caps = await listCaps(
+      viewer: viewer ??
+          const AuthUser(id: 'gm', name: 'GM', role: 'GM', languagePref: 'en'),
+    );
+    final todayStr = DateTime.now().toIso8601String().substring(0, 10);
+
+    var openCount = 0;
+    var awaitingCount = 0;
+    var verifiedCount = 0;
+    var closedCount = 0;
+    var overdueCount = 0;
+
+    for (final c in caps) {
+      if (c.status == 'open' || c.status == 'reopened') {
+        openCount++;
+      } else if (c.status == 'done') {
+        awaitingCount++;
+      } else if (c.status == 'verified') {
+        verifiedCount++;
+      } else if (c.status == 'closed') {
+        closedCount++;
+      }
+
+      // Overdue: not closed, not verified, deadline strictly before today
+      if (c.status != 'closed' &&
+          c.status != 'verified' &&
+          c.deadline.compareTo(todayStr) < 0) {
+        overdueCount++;
+      }
+    }
+
+    return CapDashboardCounts(
+      open: openCount,
+      awaitingVerification: awaitingCount,
+      verified: verifiedCount,
+      closed: closedCount,
+      overdue: overdueCount,
+    );
+  }
+}
+
+/// Summary counts for GM CAP oversight dashboard.
+class CapDashboardCounts {
+  const CapDashboardCounts({
+    required this.open,
+    required this.awaitingVerification,
+    required this.verified,
+    required this.closed,
+    required this.overdue,
+  });
+
+  final int open;
+  final int awaitingVerification;
+  final int verified;
+  final int closed;
+  final int overdue;
 }

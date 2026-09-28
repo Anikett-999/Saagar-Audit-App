@@ -15,6 +15,7 @@ import '../../../data/repositories/audit_repository.dart';
 import '../../../data/repositories/cap_repository.dart';
 import '../../../data/repositories/checkpoint_repository.dart';
 import '../../../data/repositories/cro_repository.dart';
+import '../../../data/repositories/report_repository.dart';
 import '../../../data/repositories/user_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
@@ -48,6 +49,7 @@ class AuditDetailScreen extends ConsumerStatefulWidget {
 class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
   Audit? _audit;
   String _auditorName = '';
+  String? _verifierName;
   List<Sop> _sops = const [];
   Map<String, Checkpoint> _checkpointsById = const {};
   List<AuditResult> _results = const [];
@@ -90,10 +92,19 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
         // Keep fallback
       }
 
+      // Load verifier name if verified
+      String? verifierName;
+      if (audit.verifierId != null) {
+        try {
+          final verifier = await UserRepository.instance.getById(audit.verifierId!);
+          if (verifier != null) verifierName = verifier.name;
+        } catch (_) {}
+      }
+
       // Load SOPs and checkpoints
       final sops = await CheckpointRepository.instance.loadAllSops();
-      final checkpoints =
-          await CheckpointRepository.instance.loadDailyCheckpointsInAuditOrder();
+      final checkpoints = await CheckpointRepository.instance
+          .loadCheckpointsByFrequency(audit.auditType);
       final cpMap = <String, Checkpoint>{
         for (final cp in checkpoints) cp.id: cp,
       };
@@ -134,6 +145,7 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
       setState(() {
         _audit = audit;
         _auditorName = auditorName;
+        _verifierName = verifierName;
         _sops = sops;
         _checkpointsById = cpMap;
         _results = results;
@@ -288,6 +300,20 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
           },
         ),
         actions: [
+          if (audit.auditType == 'weekly')
+            IconButton(
+              icon: const Icon(Icons.assessment_outlined),
+              tooltip: 'Weekly Report',
+              onPressed: () async {
+                final report = await ReportRepository.instance.getByAuditId(audit.id);
+                if (!context.mounted) return;
+                if (report != null) {
+                  context.pushNamed('s21_report_detail', pathParameters: {'id': report.id});
+                } else {
+                  context.pushNamed('s20_reports_list');
+                }
+              },
+            ),
           const LanguageToggleButton(),
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -444,6 +470,22 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
                     ),
                   ],
                 ),
+                if (audit.status == 'verified')
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.verified, size: 14, color: AppColors.green),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Verified: ${_verifierName ?? audit.verifierId ?? "GM"}${audit.verifiedAt != null && audit.verifiedAt!.length >= 10 ? " (${audit.verifiedAt!.substring(0, 10)})" : ""}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.green,
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),
@@ -477,26 +519,28 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${compliance.toStringAsFixed(1)}%',
-                    style: TextStyle(
-                      fontFamily: 'DMSerifDisplay',
-                      fontSize: 42,
-                      fontWeight: FontWeight.bold,
-                      color: color,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${compliance.toStringAsFixed(1)}%',
+                      style: TextStyle(
+                        fontFamily: 'DMSerifDisplay',
+                        fontSize: 42,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
                     ),
-                  ),
-                  Text(
-                    l10n.s13ScoreCard,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.gray600,
+                    Text(
+                      l10n.s13ScoreCard,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.gray600,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -586,7 +630,6 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   l10n.s13SopBreakdown,
@@ -596,11 +639,15 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
                     color: AppColors.navy,
                   ),
                 ),
-                Text(
-                  l10n.s13ExpandSopTooltip,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.gray600,
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l10n.s13ExpandSopTooltip,
+                    textAlign: TextAlign.end,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.gray600,
+                    ),
                   ),
                 ),
               ],
@@ -611,8 +658,8 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: DataTable(
-              columnSpacing: 20,
-              horizontalMargin: 16,
+              columnSpacing: 12,
+              horizontalMargin: 12,
               headingRowHeight: 40,
               dataRowMinHeight: 40,
               dataRowMaxHeight: 44,

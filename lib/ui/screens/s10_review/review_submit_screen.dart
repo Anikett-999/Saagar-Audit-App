@@ -4,18 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../data/models/audit.dart';
 import '../../../data/models/audit_result.dart';
 import '../../../data/models/checkpoint.dart';
 import '../../../data/models/photo.dart';
 import '../../../data/models/sop.dart';
 import '../../../data/repositories/audit_repository.dart';
 import '../../../data/repositories/checkpoint_repository.dart';
+import '../../../data/repositories/report_repository.dart';
 import '../../../domain/score_engine.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../providers/auth_provider.dart';
 import '../../../providers/draft_audit_provider.dart';
 import '../../theme/app_colors.dart';
 
-/// Screen S10 — Daily Audit — Review & Submit (Spec §5 S10).
+/// Screen S10 — Review & Submit (Spec §5 S10).
+/// Supports both Daily (90-pt / 68-pt) and Weekly (124-pt) audit models.
 ///
 /// Shows live computed score card, SOP-by-SOP breakdown table, full fails list
 /// with evidence thumbnails and CAP deferred status, 500-char notes field,
@@ -30,6 +34,7 @@ class ReviewSubmitScreen extends ConsumerStatefulWidget {
 class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
   final _notesController = TextEditingController();
   List<Sop> _sops = const [];
+  List<Audit> _dailyAudits = const [];
   Map<String, AuditResult> _failResults = const {};
   Map<String, List<Photo>> _failPhotos = const {};
   bool _loading = true;
@@ -69,9 +74,18 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
       }
     }
 
+    List<Audit> dailyAudits = const [];
+    if (audit.auditType == 'weekly') {
+      dailyAudits = await AuditRepository.instance.findSubmittedDailyAuditsForWeek(
+        weekNumber: audit.weekNumber,
+        year: audit.year,
+      );
+    }
+
     if (!mounted) return;
     setState(() {
       _sops = sops;
+      _dailyAudits = dailyAudits;
       _failResults = failResultsMap;
       _failPhotos = failPhotosMap;
       _loading = false;
@@ -153,6 +167,18 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
           .read(draftAuditProvider.notifier)
           .submitAudit(notes: notes.isEmpty ? null : notes);
 
+      if (audit.auditType == 'weekly') {
+        try {
+          final currentUser = ref.read(authProvider).user;
+          await ReportRepository.instance.generateWeeklyReport(
+            weeklyAuditId: audit.id,
+            authorUserId: currentUser?.id ?? audit.auditorId,
+          );
+        } catch (_) {
+          // Non-blocking per plan
+        }
+      }
+
       if (!mounted) return;
       context.goNamed('s11_submitted');
     } catch (e) {
@@ -197,7 +223,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
       );
     }
 
-    // Build marks for scoreDaily calculation.
+    // Build marks for score calculation.
     // Only include checkpoints that have actually been marked — unmarked
     // checkpoints must NOT default to PASS, or an incomplete audit's preview
     // score is inflated. (Submit path already blocks on incomplete audits.)
@@ -212,16 +238,37 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
       );
     }).toList();
 
-    final score = scoreDaily(marks);
+    final isWeekly = audit.auditType == 'weekly';
+    WeeklyScoreResult? weeklyScore;
+    ScoreResult? dailyScore;
+
+    if (isWeekly) {
+      final dailyPcts = _dailyAudits.map((a) => a.compliancePct ?? 0.0).toList();
+      weeklyScore = computeWeeklyScore(
+        dailyPcts: dailyPcts,
+        weeklyMarks: marks,
+      );
+    } else {
+      dailyScore = scoreDaily(marks);
+    }
+
+    final compliancePct =
+        isWeekly ? weeklyScore!.compliancePct : dailyScore!.compliancePct;
     final failCheckpoints = state.checkpoints
         .where((cp) => state.results[cp.id] == Verdict.fail)
         .toList();
 
-    final color = bandColor(score.compliancePct);
+    final color = bandColor(compliancePct);
+    final titleDate = isWeekly
+        ? l10n.s05WeekNumberLabel(
+            audit.weekNumber,
+            audit.year,
+          )
+        : audit.auditDate;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${l10n.s10Title} — ${audit.auditDate}'),
+        title: Text('${l10n.s10Title} — $titleDate'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.goNamed('s07_checkpoint'),
@@ -265,7 +312,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
                 const SizedBox(height: 16),
               ],
               // 1. Score Card (large, prominent)
-              _buildScoreCard(l10n, score, color),
+              _buildScoreCard(l10n, isWeekly, weeklyScore, dailyScore, color, audit),
               const SizedBox(height: 24),
 
               // 2. Breakdown by SOP
@@ -323,7 +370,29 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
     );
   }
 
-  Widget _buildScoreCard(AppLocalizations l10n, ScoreResult score, Color color) {
+  Widget _buildScoreCard(
+    AppLocalizations l10n,
+    bool isWeekly,
+    WeeklyScoreResult? weeklyScore,
+    ScoreResult? dailyScore,
+    Color color,
+    Audit audit,
+  ) {
+    final compliancePct =
+        isWeekly ? weeklyScore!.compliancePct : dailyScore!.compliancePct;
+    final band = isWeekly ? weeklyScore!.band : dailyScore!.band;
+    final rawScoreStr = isWeekly
+        ? weeklyScore!.totalRaw.toStringAsFixed(1)
+        : dailyScore!.rawScore.toStringAsFixed(0);
+    final maxScoreStr = isWeekly
+        ? weeklyScore!.totalMax.toStringAsFixed(1)
+        : dailyScore!.maxScore.toStringAsFixed(0);
+    final passCount =
+        isWeekly ? weeklyScore!.passCount : dailyScore!.passCount;
+    final failCount =
+        isWeekly ? weeklyScore!.failCount : dailyScore!.failCount;
+    final naCount = isWeekly ? weeklyScore!.naCount : dailyScore!.naCount;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -339,30 +408,33 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${score.compliancePct.toStringAsFixed(1)}%',
-                    style: TextStyle(
-                      fontFamily: 'DMSerifDisplay',
-                      fontSize: 42,
-                      fontWeight: FontWeight.bold,
-                      color: color,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${compliancePct.toStringAsFixed(1)}%',
+                      style: TextStyle(
+                        fontFamily: 'DMSerifDisplay',
+                        fontSize: 42,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
                     ),
-                  ),
-                  Text(
-                    l10n.s10ScoreCard,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.gray600,
+                    Text(
+                      isWeekly ? l10n.s10WeeklyScoreTitle : l10n.s10ScoreCard,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.gray600,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -375,7 +447,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
                   border: Border.all(color: color),
                 ),
                 child: Text(
-                  score.band.name.toUpperCase(),
+                  band.name.toUpperCase(),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
@@ -392,12 +464,162 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
             children: [
               _metricItem(
                 l10n.s10ScoreCard,
-                '${score.rawScore.toStringAsFixed(0)} / ${score.maxScore.toStringAsFixed(0)}',
+                '$rawScoreStr / $maxScoreStr',
               ),
-              _metricItem(l10n.btnPass, '${score.passCount}', color: AppColors.green),
-              _metricItem(l10n.btnFail, '${score.failCount}', color: AppColors.red),
-              _metricItem(l10n.btnNa, '${score.naCount}', color: AppColors.gray600),
+              _metricItem(l10n.btnPass, '$passCount', color: AppColors.green),
+              _metricItem(l10n.btnFail, '$failCount', color: AppColors.red),
+              _metricItem(l10n.btnNa, '$naCount', color: AppColors.gray600),
             ],
+          ),
+          if (isWeekly && weeklyScore != null) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.gray100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          l10n.s10DailyAvgContribution,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.gray800,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${weeklyScore.dailyContribution.toStringAsFixed(1)} / 68.0 (${weeklyScore.avgDailyPct.toStringAsFixed(1)}%)',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.navy,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          l10n.s10WeeklyCheckpointsScore,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.gray800,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${weeklyScore.weeklyRaw.toStringAsFixed(1)} / ${weeklyScore.weeklyMax.toStringAsFixed(1)}',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.navy,
+                        ),
+                      ),
+                    ],
+                  ),
+                  _buildVarianceLine(l10n),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  context.pushNamed(
+                    'seven_day_review',
+                    queryParameters: {
+                      'week': '${audit.weekNumber}',
+                      'year': '${audit.year}',
+                    },
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.navy),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                icon: const Icon(Icons.fact_check_outlined, size: 18),
+                label: Text(
+                  l10n.s10SevenDayReviewButton,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVarianceLine(AppLocalizations l10n) {
+    final dailyVariances = _dailyAudits
+        .where((a) => a.cashVarianceRupees != null)
+        .map((a) => a.cashVarianceRupees!)
+        .toList();
+
+    if (dailyVariances.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 6),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                l10n.s10CashVarianceTitle,
+                style: const TextStyle(fontSize: 13, color: AppColors.gray600),
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              '—',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: AppColors.gray600,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final cumVar = computeCumulativeWeeklyVariance(dailyVariances);
+    final sign = cumVar.netVarianceRupees >= 0 ? '+' : '';
+    final formatted = '$sign₹${cumVar.netVarianceRupees.toStringAsFixed(2)}';
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              l10n.s10CashVarianceTitle,
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.gray800,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            cumVar.isBreached ? '$formatted ⚠️' : '$formatted ✓',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: cumVar.isBreached ? AppColors.red : AppColors.green,
+            ),
           ),
         ],
       ),
@@ -457,8 +679,8 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: DataTable(
-              columnSpacing: 20,
-              horizontalMargin: 16,
+              columnSpacing: 12,
+              horizontalMargin: 12,
               headingRowHeight: 40,
               dataRowMinHeight: 40,
               dataRowMaxHeight: 44,
@@ -559,9 +781,11 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
               children: [
                 Icon(Icons.check_circle_outline, color: AppColors.green),
                 SizedBox(width: 12),
-                Text(
-                  'No failures recorded in this audit!',
-                  style: TextStyle(color: AppColors.green, fontWeight: FontWeight.w600),
+                Expanded(
+                  child: Text(
+                    'No failures recorded in this audit!',
+                    style: TextStyle(color: AppColors.green, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ],
             ),
@@ -617,6 +841,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(

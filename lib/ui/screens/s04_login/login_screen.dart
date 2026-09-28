@@ -39,14 +39,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void initState() {
     super.initState();
     _loadUsers();
-    ref.read(authProvider.notifier).loadPersistedState().then((_) {
-      if (mounted) {
-        _syncLockoutTimer(ref.read(authProvider));
-      }
-    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        _syncLockoutTimer(ref.read(authProvider));
+        ref.read(authProvider.notifier).loadPersistedState().then((_) {
+          if (mounted) {
+            _syncLockoutTimer(ref.read(authProvider));
+          }
+        });
       }
     });
   }

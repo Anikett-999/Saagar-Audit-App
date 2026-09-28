@@ -335,6 +335,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s05StatusSubmitted => 'Submitted';
 
   @override
+  String get s05ThisWeekWeeklyAudit => 'This week\'s weekly audit';
+
+  @override
+  String get s05WeeklyNotStartedYet =>
+      'You haven\'t started this week\'s audit yet.';
+
+  @override
+  String get s05WeeklyNotStartedAdmin =>
+      'This week\'s weekly audit has not been started yet.';
+
+  @override
+  String get s05StartWeeklyAudit => 'Start weekly audit';
+
+  @override
+  String get s05ResumeWeeklyDraft => 'Resume weekly draft';
+
+  @override
+  String get s05WeeklyDraftInProgress =>
+      'A weekly draft audit is in progress. Resume to continue marking checkpoints.';
+
+  @override
+  String get s05WeeklyAuditsRunByGm =>
+      'Weekly audits are run by the General Manager.';
+
+  @override
+  String s05WeekNumberLabel(int week, int year) {
+    return 'Week $week, $year';
+  }
+
+  @override
   String get s05AuditHistoryTitle => 'Audit history';
 
   @override
@@ -368,6 +398,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s06Title => 'Start Daily Audit';
 
   @override
+  String get s06WeeklyTitle => 'Start Weekly Audit';
+
+  @override
   String get s06AuditDate => 'Audit Date';
 
   @override
@@ -382,6 +415,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s06BeginAudit => 'Begin Audit';
+
+  @override
+  String get s10WeeklyScoreTitle => 'Weekly Audit Score';
+
+  @override
+  String get s10DailyAvgContribution => 'Daily Average Contribution';
+
+  @override
+  String get s10WeeklyCheckpointsScore => 'Weekly Checkpoints Score';
+
+  @override
+  String get s10CashVarianceTitle => 'Cumulative Cash Variance (CW.7)';
+
+  @override
+  String get s11WeeklyTitle => 'Weekly Audit Submitted';
 
   @override
   String s07CheckpointNumber(int current, int total) {
@@ -1325,6 +1373,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String s16CloseError(String error) {
+    return 'Error closing CAP: $error';
+  }
+
+  @override
+  String s16ExtendError(String error) {
+    return 'Error extending CAP: $error';
+  }
+
+  @override
+  String s16ReopenError(String error) {
+    return 'Error reopening CAP: $error';
+  }
+
+  @override
   String get s16RefreshTooltip => 'Refresh';
 
   @override
@@ -1433,7 +1496,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s12FilterUnverified => 'Unverified';
 
   @override
-  String get s12FilterWeekly => 'Weekly (Phase 2)';
+  String get s12FilterWeekly => 'Weekly';
 
   @override
   String get s12FilterMonthly => 'Monthly (Phase 3)';
@@ -1863,4 +1926,445 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s26MarathiLabel => 'मराठी';
+
+  @override
+  String get s10SevenDayReviewButton => '7-Day Daily Review & Spot-Check';
+
+  @override
+  String get s05SevenDayReview => '7-Day Review';
+
+  @override
+  String get weeklyReviewTitle => '7-Day Daily Review';
+
+  @override
+  String get weeklyReviewSubtitle =>
+      'Review daily audits & perform GM spot-checks';
+
+  @override
+  String weeklyReviewDayCardHeader(int day, String weekday) {
+    return 'Day $day — $weekday';
+  }
+
+  @override
+  String get weeklyReviewNoAuditSubmitted => 'No audit submitted';
+
+  @override
+  String get weeklyReviewStatusSubmitted => 'Submitted (Pending Verification)';
+
+  @override
+  String get weeklyReviewStatusVerified => 'GM-Verified';
+
+  @override
+  String get weeklyReviewStatusMissing => 'Missing';
+
+  @override
+  String get weeklyReviewStartSpotCheck => 'Spot-Check';
+
+  @override
+  String weeklyReviewVerifiedBadge(String name, String time) {
+    return 'Verified by $name · $time';
+  }
+
+  @override
+  String get weeklyReviewSpotCheckTitle =>
+      'GM Spot-Check — 3 Random Checkpoints';
+
+  @override
+  String get weeklyReviewSpotCheckSubtitle =>
+      'Validate recorded results against original store registers & evidence photos.';
+
+  @override
+  String weeklyReviewCheckpointStep(int current, int total) {
+    return 'Checkpoint $current of $total';
+  }
+
+  @override
+  String weeklyReviewSmRecordedResult(String verdict) {
+    return 'SM Result: $verdict';
+  }
+
+  @override
+  String get weeklyReviewMarkVerified => 'Mark Verified';
+
+  @override
+  String get weeklyReviewFlagDiscrepancy => 'Flag Discrepancy';
+
+  @override
+  String get weeklyReviewVerifyAndSignButton => 'Verify & Sign Daily Audit';
+
+  @override
+  String get weeklyReviewDiscrepancyDialogTitle => 'Flag Discrepancy';
+
+  @override
+  String get weeklyReviewDiscrepancyHint =>
+      'Describe discrepancy (e.g. evidence missing on register)';
+
+  @override
+  String get weeklyReviewDiscrepancySuccess =>
+      'Discrepancy flagged. Audit remains unverified.';
+
+  @override
+  String get weeklyReviewVerifySuccess =>
+      'Daily audit successfully verified by GM.';
+
+  @override
+  String get weeklyReviewAllCheckpointsMustBeVerified =>
+      'Please verify all 3 checkpoints before signing off.';
+
+  @override
+  String get weeklyReviewConfirmDiscrepancy => 'Submit Flag';
+
+  @override
+  String get weeklyReviewCancel => 'Cancel';
+
+  @override
+  String get s18CapVerifyTitle => 'Verify CAP';
+
+  @override
+  String get s18CapVerifySubtitle => 'Verify resolution of corrective action';
+
+  @override
+  String get s18ProblemStatement => 'Problem Statement';
+
+  @override
+  String get s18VerificationMethod => 'Verification Method';
+
+  @override
+  String get s18OriginCheckpoint => 'Origin Checkpoint';
+
+  @override
+  String get s18Deadline => 'Deadline';
+
+  @override
+  String get s18QuestionAffirmation =>
+      'Does the corrective action pass verification?';
+
+  @override
+  String get s18PhotoRequiredNotice =>
+      'Mandatory photo evidence is required to verify this checkpoint.';
+
+  @override
+  String get s18TakePhoto => 'Take Verification Photo';
+
+  @override
+  String get s18PhotoAttached => 'Verification photo attached';
+
+  @override
+  String get s18PassAndVerify => 'Pass & Verify';
+
+  @override
+  String get s18VerificationFailed => 'Verification Failed';
+
+  @override
+  String get s18VerifySuccess => 'CAP successfully verified by GM.';
+
+  @override
+  String get s18FailDialogTitle => 'Verification Failed';
+
+  @override
+  String get s18FailDialogMessage =>
+      'Verification was marked as failed. Select next action per SOP Day 4 §4.3: Extend the deadline or Reopen at Plan phase.';
+
+  @override
+  String get s18ActionExtend => 'Extend Deadline';
+
+  @override
+  String get s18ActionReopen => 'Reopen at Plan';
+
+  @override
+  String get s18ExtendTitle => 'Extend CAP Deadline';
+
+  @override
+  String get s18ExtendNewDeadline => 'New Deadline';
+
+  @override
+  String get s18ExtendReason => 'Reason for Extension';
+
+  @override
+  String get s18ExtendReasonHint =>
+      'Explain why extension is needed (mandatory)';
+
+  @override
+  String get s18ConfirmExtend => 'Confirm Extension';
+
+  @override
+  String get s18ExtendSuccess => 'CAP deadline successfully extended.';
+
+  @override
+  String get s18ReopenTitle => 'Reopen CAP at Plan';
+
+  @override
+  String get s18ReopenReason => 'Reason for Reopening';
+
+  @override
+  String get s18ReopenReasonHint =>
+      'Explain why CAP is being reopened (mandatory)';
+
+  @override
+  String get s18ConfirmReopen => 'Confirm Reopen';
+
+  @override
+  String get s18ReopenSuccess => 'CAP reopened at Plan phase.';
+
+  @override
+  String get s18PhotoRequiredError =>
+      'Please capture a verification photo before verifying.';
+
+  @override
+  String get s18MissingReasonError => 'Please provide a valid reason.';
+
+  @override
+  String get s18PatternMarker => 'Pattern Issue';
+
+  @override
+  String get s18AccessDenied =>
+      'Access Denied. Only GM and Owner may verify CAPs.';
+
+  @override
+  String get s18Back => 'Back';
+
+  @override
+  String get s18PhotoRequiredBadge => 'REQUIRED';
+
+  @override
+  String s18PhotoCaptureError(String error) {
+    return 'Failed to capture photo: $error';
+  }
+
+  @override
+  String s18VerifyError(String error) {
+    return 'Verification error: $error';
+  }
+
+  @override
+  String get s19CapCloseTitle => 'Close CAP';
+
+  @override
+  String s19CapCloseConfirmMessage(String id) {
+    return 'Are you sure you want to permanently close CAP #$id? This confirms all actions and GM verifications are complete.';
+  }
+
+  @override
+  String get s19ConfirmClose => 'Confirm & Close';
+
+  @override
+  String get s19Cancel => 'Cancel';
+
+  @override
+  String s19CloseSuccess(String id) {
+    return 'CAP #$id successfully closed.';
+  }
+
+  @override
+  String get capOversightTitle => 'CAP Oversight';
+
+  @override
+  String get capOversightSubtitle =>
+      'Monitor and verify store corrective actions';
+
+  @override
+  String get capOversightCountOpen => 'Open';
+
+  @override
+  String get capOversightCountAwaiting => 'Awaiting Verify';
+
+  @override
+  String get capOversightCountVerified => 'Verified';
+
+  @override
+  String get capOversightCountClosed => 'Closed';
+
+  @override
+  String get capOversightCountOverdue => 'Overdue';
+
+  @override
+  String get capOversightAwaitingSection => 'Awaiting My Verification';
+
+  @override
+  String get capOversightNoAwaiting => 'No CAPs awaiting verification';
+
+  @override
+  String get capOversightVerifyNow => 'Verify Now';
+
+  @override
+  String get s20ScreenTitle => 'Weekly Reports';
+
+  @override
+  String get s20ScreenSubtitle => 'Workbook §3.6 reports & 1-page PDF export';
+
+  @override
+  String get s20FilterAll => 'All';
+
+  @override
+  String get s20EmptyTitle => 'No Weekly Reports Yet';
+
+  @override
+  String get s20EmptySubtitle =>
+      'Weekly reports are generated upon completing weekly compliance audits.';
+
+  @override
+  String get s20OwnerRead => 'Read';
+
+  @override
+  String get s20OwnerUnread => 'Unread';
+
+  @override
+  String s20WeekEndingHeader(int week, String date) {
+    return 'Week $week · Ending $date';
+  }
+
+  @override
+  String s20ReportCardScore(String pct, String band) {
+    return '$pct% $band';
+  }
+
+  @override
+  String get s20GenerateReport => 'Generate Weekly Report';
+
+  @override
+  String get s21ScreenTitle => 'Weekly Audit Report';
+
+  @override
+  String get s21WorkbookSubtitle => 'Workbook Day 3 §3.6 Nine-Section Format';
+
+  @override
+  String get s21HeadlineSection => 'Section 1: Executive Headline';
+
+  @override
+  String get s21ComplianceSection => 'Section 2: 124-Point Compliance Table';
+
+  @override
+  String get s21DailyAvgContribution => 'Daily Average Contribution';
+
+  @override
+  String get s21WeeklyOnlyCheckpoints => 'Weekly-Only Checkpoints';
+
+  @override
+  String get s21CombinedTotal => 'Combined Total Score';
+
+  @override
+  String get s21SopBreakdownHeader => 'SOP Compliance Breakdown';
+
+  @override
+  String get s21TrendSection => 'Section 3: 7-Day Trend & WoW Delta';
+
+  @override
+  String s21DayLabel(String day, String date, String pct) {
+    return '$day ($date): $pct%';
+  }
+
+  @override
+  String s21DayAbsent(String day, String date) {
+    return '$day ($date): 0.0% (Absent)';
+  }
+
+  @override
+  String s21WeeklyRollup(String pct) {
+    return 'Weekly Total: $pct%';
+  }
+
+  @override
+  String s21WowDelta(String delta) {
+    return 'Week-over-Week Delta: $delta%';
+  }
+
+  @override
+  String get s21WowDeltaNa => 'Week-over-Week Delta: — (First report)';
+
+  @override
+  String s21FindingsSection(int count) {
+    return 'Section 4: Weekly Non-Compliances ($count)';
+  }
+
+  @override
+  String get s21NoFindings => 'No weekly non-compliances recorded.';
+
+  @override
+  String s21PhotosCount(int count) {
+    return '$count Photos';
+  }
+
+  @override
+  String s21PatternsSection(int count) {
+    return 'Section 5: Detected Patterns ($count)';
+  }
+
+  @override
+  String get s21NoPatterns => 'No cross-day patterns detected this week.';
+
+  @override
+  String s21PatternDetectedOnDays(int count, String days) {
+    return 'Failed on $count days: $days';
+  }
+
+  @override
+  String get s21SuggestedPatternCap =>
+      'Suggested Pattern CAP (Single-CAP Rule):';
+
+  @override
+  String get s21CapsSection => 'Section 6: Corrective Action Plans (CAPs)';
+
+  @override
+  String s21CapsOpenedHeader(int count) {
+    return 'CAPs Opened This Week ($count)';
+  }
+
+  @override
+  String get s21CapsClosedHeader => 'Section 7: CAPs Closed This Week';
+
+  @override
+  String get s21CapsClosedEmpty =>
+      'No CAPs closed this week (Verification & Close workflow active in P2-5).';
+
+  @override
+  String get s21CapsAgedHeader => 'Section 8: Aged / Overdue CAPs';
+
+  @override
+  String get s21CapsAgedEmpty =>
+      'No aged CAPs recorded (Lifecycle tracking active in P2-5).';
+
+  @override
+  String get s21EscalationsSection => 'Section 9: Escalation Log';
+
+  @override
+  String get s21EscalationsEmpty =>
+      'No escalations triggered (Escalation engine active in Phase 3).';
+
+  @override
+  String get s21SignatureSection => 'Signature of Record';
+
+  @override
+  String s21AuditorSignature(String author, String time) {
+    return 'GM / Auditor Signature: $author · Submitted $time';
+  }
+
+  @override
+  String s21OwnerSignature(String time) {
+    return 'Owner Review: Read on $time';
+  }
+
+  @override
+  String get s21OwnerSignaturePending => 'Owner Review: Pending Owner Review';
+
+  @override
+  String get s21MarkAsReadButton => 'Mark as Read (Owner)';
+
+  @override
+  String get s21MarkedAsReadSuccess => 'Weekly report marked as read by Owner.';
+
+  @override
+  String get s21ExportPdfButton => 'Export 1-Page PDF';
+
+  @override
+  String get s21PdfGenerating => 'Generating 1-page PDF...';
+
+  @override
+  String s21PdfSaved(String path) {
+    return 'PDF saved: $path';
+  }
+
+  @override
+  String s21PdfExportError(String error) {
+    return 'Failed to export PDF: $error';
+  }
 }

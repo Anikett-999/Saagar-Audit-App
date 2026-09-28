@@ -133,6 +133,7 @@ class Cap {
   bool get isVerified => status == 'verified';
   bool get isClosed => status == 'closed';
   bool get isAged => status == 'aged';
+  bool get isReopened => status == 'reopened';
 
   /// Computes deadline status relative to [now]:
   /// - overdue: deadline is strictly before today

@@ -117,8 +117,15 @@ class _CapListScreenState extends ConsumerState<CapListScreen> {
             ),
           ],
         ),
-        actions: const [
-          LanguageToggleButton(),
+        actions: [
+          if (auth.user != null && (auth.user!.isGm || auth.user!.isOwner))
+            IconButton(
+              key: const ValueKey('s14_oversight_button'),
+              icon: const Icon(Icons.dashboard_outlined),
+              tooltip: l10n.capOversightTitle,
+              onPressed: () => context.push('/caps/oversight'),
+            ),
+          const LanguageToggleButton(),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(

@@ -18,13 +18,39 @@ class CheckpointRepository {
   /// All daily checkpoints in Workbook §2.10 time-block order.
   /// Returns 68 rows on a healthy seed.
   Future<List<Checkpoint>> loadDailyCheckpointsInAuditOrder() async {
+    return loadCheckpointsByFrequency('daily');
+  }
+
+  /// Loads checkpoints filtered by frequency ('daily' or 'weekly') in display_order.
+  Future<List<Checkpoint>> loadCheckpointsByFrequency(String frequency) async {
     final rows = await AppDatabase.instance.db.query(
       'checkpoints',
       where: 'frequency = ?',
-      whereArgs: ['daily'],
+      whereArgs: [frequency],
       orderBy: 'display_order',
     );
     return rows.map(Checkpoint.fromMap).toList();
+  }
+
+  /// Loads all checkpoints across frequencies in display_order.
+  Future<List<Checkpoint>> loadAllCheckpoints() async {
+    final rows = await AppDatabase.instance.db.query(
+      'checkpoints',
+      orderBy: 'display_order',
+    );
+    return rows.map(Checkpoint.fromMap).toList();
+  }
+
+  /// Loads a single checkpoint by its ID.
+  Future<Checkpoint?> getById(String id) async {
+    final rows = await AppDatabase.instance.db.query(
+      'checkpoints',
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return Checkpoint.fromMap(rows.first);
   }
 
   Future<Sop> loadSop(String sopId) async {

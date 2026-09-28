@@ -48,6 +48,7 @@ class _SubmittedScreenState extends ConsumerState<SubmittedScreen>
     final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(draftAuditProvider);
     final audit = state.audit;
+    final isWeekly = audit?.auditType == 'weekly';
 
     final scorePct = audit?.compliancePct ?? 0.0;
     final bandName = audit?.band?.toUpperCase() ?? 'PENDING';
@@ -97,7 +98,7 @@ class _SubmittedScreenState extends ConsumerState<SubmittedScreen>
                 const SizedBox(height: 24),
 
                 Text(
-                  l10n.s11Title,
+                  isWeekly ? l10n.s11WeeklyTitle : l10n.s11Title,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontFamily: 'DMSerifDisplay',
@@ -107,7 +108,9 @@ class _SubmittedScreenState extends ConsumerState<SubmittedScreen>
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  '${l10n.s05SubmittedStatus} $submittedTime  ·  ${audit?.auditDate ?? ''}',
+                  isWeekly
+                      ? '${l10n.s05SubmittedStatus} $submittedTime  ·  ${l10n.s05WeekNumberLabel(audit?.weekNumber ?? 0, audit?.year ?? 0)}'
+                      : '${l10n.s05SubmittedStatus} $submittedTime  ·  ${audit?.auditDate ?? ''}',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 14,

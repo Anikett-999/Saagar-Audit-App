@@ -5,15 +5,18 @@ import 'package:intl/intl.dart';
 
 import '../../../data/models/audit.dart';
 import '../../../data/repositories/audit_repository.dart';
+import '../../../data/repositories/report_repository.dart';
+import '../../../domain/iso_week.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../providers/draft_audit_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
 
 /// S5 Home / Dashboard — role-aware landing after login.
 ///
 /// SM sees a big "Start Daily Audit" CTA and today's audit status.
-/// GM/Owner see audit overview cards (deeper functionality lands in W3+).
+/// GM/Owner see audit overview cards + "Start Weekly Audit" card.
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -23,23 +26,31 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   Audit? _todayAudit;
+  Audit? _thisWeekAudit;
   bool _loading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadTodayAudit();
+    _loadAudits();
   }
 
-  Future<void> _loadTodayAudit() async {
-    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final audit = await AuditRepository.instance.findByDate(
+  Future<void> _loadAudits() async {
+    final now = DateTime.now();
+    final today = DateFormat('yyyy-MM-dd').format(now);
+    final todayAudit = await AuditRepository.instance.findByDate(
       date: today,
       auditType: 'daily',
     );
+    final weekAudit = await AuditRepository.instance.findByWeek(
+      weekNumber: isoWeek(now),
+      year: now.year,
+      auditType: 'weekly',
+    );
     if (!mounted) return;
     setState(() {
-      _todayAudit = audit;
+      _todayAudit = todayAudit;
+      _thisWeekAudit = weekAudit;
       _loading = false;
     });
   }
@@ -57,7 +68,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     final l10n = AppLocalizations.of(context)!;
-    final canStartAudit = user.role == 'SM' || user.role == 'OWNER';
+    final canStartDaily = user.role == 'SM' || user.role == 'OWNER';
+    final canStartWeekly = user.role == 'GM' || user.role == 'OWNER';
     final today = DateFormat('EEEE, d MMMM').format(DateTime.now());
 
     return Scaffold(
@@ -78,7 +90,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
-              onRefresh: _loadTodayAudit,
+              onRefresh: _loadAudits,
               child: ListView(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -95,7 +107,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  _todayCard(l10n, canStartAudit),
+                  _todayCard(l10n, canStartDaily),
+                  if (canStartWeekly) ...[
+                    const SizedBox(height: 12),
+                    _weeklyCard(context, l10n),
+                  ],
                   const SizedBox(height: 12),
                   _navTiles(context, l10n, user.role),
                 ],
@@ -168,7 +184,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   onPressed: () async {
                     await context.pushNamed('s06_start_audit');
                     if (!mounted) return;
-                    await _loadTodayAudit();
+                    await _loadAudits();
                   },
                 )
               else
@@ -191,6 +207,155 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Text(
                 '${l10n.s05SubmittedStatus} • ${audit.compliancePct?.toStringAsFixed(1) ?? "—"}% (${audit.band ?? "—"})',
                 style: const TextStyle(color: AppColors.gray600),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _weeklyCard(BuildContext context, AppLocalizations l10n) {
+    final audit = _thisWeekAudit;
+    final now = DateTime.now();
+    final weekNumber = isoWeek(now);
+    final year = now.year;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.s05ThisWeekWeeklyAudit,
+                        style: const TextStyle(
+                          fontFamily: 'DMSerifDisplay',
+                          fontSize: 20,
+                          color: AppColors.navy,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        l10n.s05WeekNumberLabel(weekNumber, year),
+                        style: const TextStyle(
+                          color: AppColors.gray600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                _statusChip(l10n, audit),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (audit == null) ...[
+              Text(
+                l10n.s05WeeklyNotStartedYet,
+                style: const TextStyle(color: AppColors.gray600),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.play_arrow_rounded),
+                label: Text(l10n.s05StartWeeklyAudit),
+                onPressed: () async {
+                  await context.push('/audit/start?type=weekly');
+                  if (!mounted) return;
+                  await _loadAudits();
+                },
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.fact_check_outlined, size: 18),
+                label: Text(l10n.s05SevenDayReview),
+                onPressed: () async {
+                  await context.push('/audit/7-day-review?week=$weekNumber&year=$year');
+                  if (!mounted) return;
+                  await _loadAudits();
+                },
+              ),
+            ] else if (audit.isDraft) ...[
+              Text(
+                l10n.s05WeeklyDraftInProgress,
+                style: const TextStyle(color: AppColors.gray600),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.edit_outlined),
+                label: Text(l10n.s05ResumeWeeklyDraft),
+                onPressed: () async {
+                  await ref.read(draftAuditProvider.notifier).resumeDraft(
+                        audit: audit,
+                        cros: const [],
+                      );
+                  if (!context.mounted) return;
+                  await context.pushNamed('s07_checkpoint');
+                  if (!mounted) return;
+                  await _loadAudits();
+                },
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.fact_check_outlined, size: 18),
+                label: Text(l10n.s05SevenDayReview),
+                onPressed: () async {
+                  await context.push('/audit/7-day-review?week=$weekNumber&year=$year');
+                  if (!mounted) return;
+                  await _loadAudits();
+                },
+              ),
+            ] else ...[
+              Text(
+                '${l10n.s05SubmittedStatus} • ${audit.compliancePct?.toStringAsFixed(1) ?? "—"}% (${audit.band ?? "—"})',
+                style: const TextStyle(color: AppColors.gray600),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.assessment_outlined, size: 18),
+                label: const Text('View Weekly Report (S21)'),
+                onPressed: () async {
+                  final existing = await ReportRepository.instance.getByAuditId(audit.id);
+                  if (existing != null) {
+                    if (context.mounted) {
+                      context.pushNamed('s21_report_detail', pathParameters: {'id': existing.id});
+                    }
+                  } else {
+                    final newRep = await ReportRepository.instance.generateWeeklyReport(
+                      weeklyAuditId: audit.id,
+                      authorUserId: audit.auditorId,
+                    );
+                    if (context.mounted) {
+                      context.pushNamed('s21_report_detail', pathParameters: {'id': newRep.id});
+                    }
+                  }
+                },
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.visibility_outlined, size: 18),
+                label: const Text('View Weekly Audit'),
+                onPressed: () => context.pushNamed(
+                  's13_audit_detail',
+                  pathParameters: {'id': audit.id},
+                ),
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.fact_check_outlined, size: 18),
+                label: Text(l10n.s05SevenDayReview),
+                onPressed: () async {
+                  await context.push('/audit/7-day-review?week=$weekNumber&year=$year');
+                  if (!mounted) return;
+                  await _loadAudits();
+                },
               ),
             ],
           ],
@@ -246,6 +411,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           subtitle: l10n.s05CapsSubtitle,
           enabled: true,
           onTap: () => context.pushNamed('s14_cap_list'),
+        ),
+        if (role == 'GM' || role == 'OWNER')
+          _navTile(
+            icon: Icons.dashboard_customize_outlined,
+            title: l10n.capOversightTitle,
+            subtitle: l10n.capOversightSubtitle,
+            enabled: true,
+            onTap: () => context.push('/caps/oversight'),
+          ),
+        _navTile(
+          icon: Icons.assessment_outlined,
+          title: l10n.s20ScreenTitle,
+          subtitle: l10n.s20ScreenSubtitle,
+          enabled: true,
+          onTap: () => context.pushNamed('s20_reports_list'),
         ),
         _navTile(
           icon: Icons.menu_book_outlined,

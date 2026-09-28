@@ -877,6 +877,276 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
     );
   }
 
+  void _showCloseConfirmDialog(AppLocalizations l10n, Cap cap) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.lock_outline, color: AppColors.navy),
+            const SizedBox(width: 8),
+            Text(l10n.s19CapCloseTitle),
+          ],
+        ),
+        content: Text(l10n.s19CapCloseConfirmMessage(cap.id)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.s19Cancel),
+          ),
+          FilledButton(
+            key: const ValueKey('s16_confirm_close_button'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _handleClose(cap);
+            },
+            style: FilledButton.styleFrom(backgroundColor: AppColors.navy),
+            child: Text(l10n.s19ConfirmClose),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleClose(Cap cap) async {
+    final authUser = ref.read(authProvider).user;
+    if (authUser == null) return;
+    try {
+      await CapRepository.instance.closeCap(
+        capId: cap.id,
+        closerId: authUser.id,
+      );
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s19CloseSuccess(cap.id)),
+          backgroundColor: AppColors.green,
+        ),
+      );
+      _loadData();
+    } catch (e) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s16CloseError(e.toString())),
+          backgroundColor: AppColors.red,
+        ),
+      );
+    }
+  }
+
+  void _showExtensionDialog(AppLocalizations l10n, Cap cap) {
+    final reasonController = TextEditingController();
+    DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
+
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final dateStr = selectedDate.toIso8601String().substring(0, 10);
+          return AlertDialog(
+            title: Text(l10n.s18ExtendTitle),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.s18ExtendNewDeadline,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                  const SizedBox(height: 6),
+                  InkWell(
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
+                      );
+                      if (picked != null) {
+                        setDialogState(() => selectedDate = picked);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.gray300),
+                        borderRadius: BorderRadius.circular(8),
+                        color: AppColors.gray100,
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.calendar_today, size: 16, color: AppColors.navy),
+                          const SizedBox(width: 8),
+                          Text(dateStr, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.s18ExtendReason,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                  const SizedBox(height: 6),
+                  TextField(
+                    key: const ValueKey('s16_extend_reason_input'),
+                    controller: reasonController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: l10n.s18ExtendReasonHint,
+                      border: const OutlineInputBorder(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(l10n.weeklyReviewCancel),
+              ),
+              FilledButton(
+                key: const ValueKey('s16_confirm_extend_button'),
+                onPressed: () {
+                  final reason = reasonController.text.trim();
+                  if (reason.isEmpty) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      SnackBar(content: Text(l10n.s18MissingReasonError)),
+                    );
+                    return;
+                  }
+                  Navigator.of(ctx).pop();
+                  _handleExtend(cap, dateStr, reason);
+                },
+                child: Text(l10n.s18ConfirmExtend),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _handleExtend(Cap cap, String dateStr, String reason) async {
+    final authUser = ref.read(authProvider).user;
+    if (authUser == null) return;
+    try {
+      await CapRepository.instance.extendCap(
+        capId: cap.id,
+        actorId: authUser.id,
+        newDeadline: dateStr,
+        reason: reason,
+      );
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s18ExtendSuccess),
+          backgroundColor: AppColors.green,
+        ),
+      );
+      _loadData();
+    } catch (e) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s16ExtendError(e.toString())),
+          backgroundColor: AppColors.red,
+        ),
+      );
+    }
+  }
+
+  void _showReopenDialog(AppLocalizations l10n, Cap cap) {
+    final reasonController = TextEditingController();
+
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.s18ReopenTitle),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.s18ReopenReason,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              const SizedBox(height: 6),
+              TextField(
+                key: const ValueKey('s16_reopen_reason_input'),
+                controller: reasonController,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: l10n.s18ReopenReasonHint,
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.weeklyReviewCancel),
+          ),
+          FilledButton(
+            key: const ValueKey('s16_confirm_reopen_button'),
+            onPressed: () {
+              final reason = reasonController.text.trim();
+              if (reason.isEmpty) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  SnackBar(content: Text(l10n.s18MissingReasonError)),
+                );
+                return;
+              }
+              Navigator.of(ctx).pop();
+              _handleReopen(cap, reason);
+            },
+            style: FilledButton.styleFrom(backgroundColor: Colors.deepOrange),
+            child: Text(l10n.s18ConfirmReopen),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleReopen(Cap cap, String reason) async {
+    final authUser = ref.read(authProvider).user;
+    if (authUser == null) return;
+    try {
+      await CapRepository.instance.reopenCap(
+        capId: cap.id,
+        actorId: authUser.id,
+        reason: reason,
+      );
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s18ReopenSuccess),
+          backgroundColor: Colors.deepOrange,
+        ),
+      );
+      _loadData();
+    } catch (e) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s16ReopenError(e.toString())),
+          backgroundColor: AppColors.red,
+        ),
+      );
+    }
+  }
+
   Widget _buildActionButtonsCard(AppLocalizations l10n, AuthUser? currentUser) {
     final cap = _cap!;
     final allActionsDone = _actions.isNotEmpty && _actions.every((a) => a.isDone);
@@ -917,106 +1187,88 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
               ),
             ),
           const SizedBox(height: 8),
-
-          // Request Extension (Phase 2 stub)
-          OutlinedButton.icon(
-            key: const ValueKey('s16_request_extension_button'),
-            onPressed: null, // Disabled per Phase 1 scope
-            icon: const Icon(Icons.access_time),
-            label: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(l10n.s16RequestExtensionButton),
-                  const SizedBox(width: 8),
-                  _phase2Badge(l10n),
-                ],
-              ),
-            ),
-          ),
         ],
 
-        // 2. Verify button (for done status, GM/Owner)
+        // 2. Request Extension (for open/done/reopened status, GM/Owner)
+        if ((cap.isOpen || cap.isDone) && isGmOrOwner) ...[
+          OutlinedButton.icon(
+            key: const ValueKey('s16_request_extension_button'),
+            onPressed: () => _showExtensionDialog(l10n, cap),
+            icon: const Icon(Icons.access_time),
+            label: Text(l10n.s16RequestExtensionButton),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.navy,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+
+        // 3. Verify button (for done status, GM/Owner)
         if (cap.isDone && isGmOrOwner) ...[
           ElevatedButton.icon(
             key: const ValueKey('s16_verify_button'),
-            onPressed: null, // Disabled per Phase 1 scope
+            onPressed: () async {
+              final res = await context.push<bool>('/caps/${cap.id}/verify');
+              if (res == true) {
+                _loadData();
+              }
+            },
             icon: const Icon(Icons.verified),
-            label: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(l10n.s16VerifyButton),
-                  const SizedBox(width: 8),
-                  _phase2Badge(l10n),
-                ],
-              ),
+            label: Text(
+              l10n.s16VerifyButton,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
             ),
             style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.navy,
+              foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
+          const SizedBox(height: 8),
         ],
 
-        // 3. Close button (for verified status, GM/Owner)
+        // 4. Close button (for verified status, GM/Owner)
         if (cap.isVerified && isGmOrOwner) ...[
           ElevatedButton.icon(
             key: const ValueKey('s16_close_button'),
-            onPressed: null, // Disabled per Phase 1 scope
+            onPressed: () => _showCloseConfirmDialog(l10n, cap),
             icon: const Icon(Icons.lock),
-            label: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(l10n.s16CloseButton),
-                  const SizedBox(width: 8),
-                  _phase2Badge(l10n),
-                ],
-              ),
+            label: Text(
+              l10n.s16CloseButton,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
             ),
             style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.navy,
+              foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
+          const SizedBox(height: 8),
         ],
 
-        // 4. Reopen button (for closed status, Owner)
+        // 5. Reopen button (for closed status, Owner only)
         if (cap.isClosed && isOwner) ...[
           OutlinedButton.icon(
             key: const ValueKey('s16_reopen_button'),
-            onPressed: null, // Disabled per Phase 1 scope
+            onPressed: () => _showReopenDialog(l10n, cap),
             icon: const Icon(Icons.replay),
-            label: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(l10n.s16ReopenButton),
-                  const SizedBox(width: 8),
-                  _phase2Badge(l10n),
-                ],
-              ),
+            label: Text(
+              l10n.s16ReopenButton,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.deepOrange,
+              side: const BorderSide(color: Colors.deepOrange),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
         ],
       ],
-    );
-  }
-
-  Widget _phase2Badge(AppLocalizations l10n) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: AppColors.gray300,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        l10n.s16Phase2Notice,
-        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.gray800),
-      ),
     );
   }
 

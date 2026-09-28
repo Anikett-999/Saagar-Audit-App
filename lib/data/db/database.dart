@@ -43,9 +43,8 @@ class AppDatabase {
       dbPath,
       version: Schema.currentVersion,
       onConfigure: (db) async {
-        // sqflite disables FK enforcement by default — turn it on per spec
-        // §4 (every cross-table relation has ON DELETE semantics declared).
-        await db.execute('PRAGMA foreign_keys = ON');
+        // FK enforcement is enabled in onOpen after migrations/seeds complete,
+        // so table schema restructures can run safely.
       },
       onCreate: (db, version) async {
         final batch = db.batch();
@@ -56,9 +55,61 @@ class AppDatabase {
         await SeedLoader.loadAll(db);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        // Per spec §4.15, migrations go through sqflite_migration_plan when
-        // we cross schema versions. v1 → v1 is a no-op; real migrations land
-        // when the first column or table change ships.
+        if (oldVersion < 2) {
+          // Migration v1 -> v2:
+          // In v1, sops table was created with CHECK (number BETWEEN 1 AND 8).
+          // Recreate sops table to allow number >= 1 for SOP9 (Operations).
+          await db.execute('''
+            CREATE TABLE sops_v2 (
+              id            TEXT PRIMARY KEY,
+              number        INTEGER NOT NULL UNIQUE CHECK (number >= 1),
+              name_en       TEXT NOT NULL,
+              name_mr       TEXT NOT NULL,
+              weight        INTEGER NOT NULL CHECK (weight IN (1,2)),
+              is_critical   INTEGER NOT NULL DEFAULT 0 CHECK (is_critical IN (0,1)),
+              display_order INTEGER NOT NULL
+            );
+          ''');
+          await db.execute('INSERT OR IGNORE INTO sops_v2 SELECT * FROM sops');
+          await db.execute('DROP TABLE sops');
+          await db.execute('ALTER TABLE sops_v2 RENAME TO sops');
+
+          await db.execute('''
+            INSERT OR IGNORE INTO sops (id, number, name_en, name_mr, weight, is_critical, display_order)
+            VALUES ('SOP9', 9, 'Operations', 'कार्यात्मक कामकाज', 1, 0, 9);
+          ''');
+          await SeedLoader.loadCheckpoints(db);
+        }
+      },
+      onOpen: (db) async {
+        // Defensive check: ensure SOP9 exists in sops table in case a device
+        // encountered a failed partial migration or legacy constraint.
+        final sops = await db.rawQuery("SELECT id FROM sops WHERE id = 'SOP9'");
+        if (sops.isEmpty) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS sops_v2 (
+              id            TEXT PRIMARY KEY,
+              number        INTEGER NOT NULL UNIQUE CHECK (number >= 1),
+              name_en       TEXT NOT NULL,
+              name_mr       TEXT NOT NULL,
+              weight        INTEGER NOT NULL CHECK (weight IN (1,2)),
+              is_critical   INTEGER NOT NULL DEFAULT 0 CHECK (is_critical IN (0,1)),
+              display_order INTEGER NOT NULL
+            );
+          ''');
+          await db.execute('INSERT OR IGNORE INTO sops_v2 SELECT * FROM sops');
+          await db.execute('DROP TABLE sops');
+          await db.execute('ALTER TABLE sops_v2 RENAME TO sops');
+
+          await db.execute('''
+            INSERT OR IGNORE INTO sops (id, number, name_en, name_mr, weight, is_critical, display_order)
+            VALUES ('SOP9', 9, 'Operations', 'कार्यात्मक कामकाज', 1, 0, 9);
+          ''');
+          await SeedLoader.loadCheckpoints(db);
+        }
+
+        // Enable foreign key enforcement for all app queries per Spec §4
+        await db.execute('PRAGMA foreign_keys = ON');
       },
     );
   }

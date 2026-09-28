@@ -77,6 +77,14 @@ class FakeDatabase extends Fake implements Database, Transaction {
         } else if (where == 'audit_id = ?' && whereArgs != null && whereArgs.isNotEmpty) {
           results = results.where((r) => r['id'] == whereArgs[0]).toList();
         } else {
+          if (where.contains('week_number = ?') && whereArgs != null && argIdx < whereArgs.length) {
+            final weekVal = whereArgs[argIdx++];
+            results = results.where((r) => r['week_number'] == weekVal).toList();
+          }
+          if (where.contains('year = ?') && whereArgs != null && argIdx < whereArgs.length) {
+            final yearVal = whereArgs[argIdx++];
+            results = results.where((r) => r['year'] == yearVal).toList();
+          }
           if (where.contains('audit_date = ?') && whereArgs != null && argIdx < whereArgs.length) {
             final dateVal = whereArgs[argIdx++];
             results = results.where((r) => r['audit_date'] == dateVal).toList();
@@ -95,6 +103,9 @@ class FakeDatabase extends Fake implements Database, Transaction {
           }
           if (where.contains("audit_type = 'daily'")) {
             results = results.where((r) => r['audit_type'] == 'daily').toList();
+          }
+          if (where.contains("audit_type = 'weekly'")) {
+            results = results.where((r) => r['audit_type'] == 'weekly').toList();
           }
           if (where.contains("status = 'submitted'")) {
             results = results.where((r) => r['status'] == 'submitted').toList();
@@ -196,6 +207,10 @@ class FakeDatabase extends Fake implements Database, Transaction {
           results = results.where((r) => r['audit_result_id'] == whereArgs[0]).toList();
         } else if (where == 'frequency = ?' && whereArgs != null && whereArgs.isNotEmpty) {
           results = results.where((r) => r['frequency'] == whereArgs[0]).toList();
+        } else if (where == 'report_type = ?' && whereArgs != null && whereArgs.isNotEmpty) {
+          results = results.where((r) => r['report_type'] == whereArgs[0]).toList();
+        } else if (where == 'report_type = ? AND id != ?' && whereArgs != null && whereArgs.length >= 2) {
+          results = results.where((r) => r['report_type'] == whereArgs[0] && r['id'] != whereArgs[1]).toList();
         }
       }
     }
@@ -276,6 +291,8 @@ class FakeDatabase extends Fake implements Database, Transaction {
       if (where != null && whereArgs != null && whereArgs.isNotEmpty) {
         if (where == "id = ? AND status = 'draft'") {
           match = list[i]['id'] == whereArgs[0] && list[i]['status'] == 'draft';
+        } else if (where == "id = ? AND status = 'submitted'") {
+          match = list[i]['id'] == whereArgs[0] && list[i]['status'] == 'submitted';
         } else if (where == 'id = ?') {
           match = list[i]['id'] == whereArgs[0];
         }

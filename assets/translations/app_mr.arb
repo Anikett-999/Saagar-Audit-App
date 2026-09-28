@@ -122,6 +122,20 @@
   "s05StatusNotStarted": "सुरू नाही",
   "s05StatusInProgress": "प्रगतीपथावर",
   "s05StatusSubmitted": "सादर केले",
+  "s05ThisWeekWeeklyAudit": "या आठवड्याचे साप्ताहिक ऑडिट",
+  "s05WeeklyNotStartedYet": "तुम्ही या आठवड्याचे ऑडिट अद्याप सुरू केलेले नाही.",
+  "s05WeeklyNotStartedAdmin": "या आठवड्याचे साप्ताहिक ऑडिट अद्याप सुरू झालेले नाही.",
+  "s05StartWeeklyAudit": "साप्ताहिक ऑडिट सुरू करा",
+  "s05ResumeWeeklyDraft": "साप्ताहिक मसुदा पुन्हा सुरू करा",
+  "s05WeeklyDraftInProgress": "साप्ताहिक मसुदा ऑडिट सुरू आहे. तपासणी पुढे चालू ठेवण्यासाठी पुन्हा सुरू करा.",
+  "s05WeeklyAuditsRunByGm": "साप्ताहिक ऑडिट जनरल मॅनेजर (GM) द्वारे चालवले जाते.",
+  "s05WeekNumberLabel": "आठवडा {week}, {year}",
+  "@s05WeekNumberLabel": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "year": {"type": "int"}
+    }
+  },
   "s05AuditHistoryTitle": "ऑडिट इतिहास",
   "s05AuditHistorySubtitle": "मागील दैनिक ऑडिट पहा",
   "s05CapsTitle": "सीएपी (CAPs)",
@@ -134,11 +148,18 @@
   "@s05ComingSoon": {"placeholders": {"feature": {"type": "String"}}},
 
   "s06Title": "दैनिक ऑडिट सुरू करा",
+  "s06WeeklyTitle": "साप्ताहिक ऑडिट सुरू करा",
   "s06AuditDate": "ऑडिट तारीख",
   "s06StoreLabel": "स्टोअर",
   "s06CrosOnDuty": "ड्युटीवरील कर्मचारी (CRO)",
   "s06SelectAtLeastOneCro": "कृपया किमान एक ड्युटीवरील कर्मचारी निवडा.",
   "s06BeginAudit": "ऑडिट सुरू करा",
+
+  "s10WeeklyScoreTitle": "साप्ताहिक ऑडिट गुण",
+  "s10DailyAvgContribution": "दैनंदिन सरासरी योगदान",
+  "s10WeeklyCheckpointsScore": "साप्ताहिक तपासणी बिंदू गुण",
+  "s10CashVarianceTitle": "एकूण संचित रोख तफावत (CW.7)",
+  "s11WeeklyTitle": "साप्ताहिक ऑडिट सादर झाले",
 
   "s07CheckpointNumber": "चेकपॉइंट {current} / {total}",
   "@s07CheckpointNumber": {"placeholders": {"current": {"type": "int"}, "total": {"type": "int"}}},
@@ -480,6 +501,9 @@
   "s16ActorSystem": "प्रणाली",
   "s16ActorPrefix": "{user} द्वारे",
   "s16ActionToggleFailed": "कृती पाऊल अद्यतनित करण्यात अयशस्वी: {error}",
+  "s16CloseError": "CAP बंद करताना त्रुटी: {error}",
+  "s16ExtendError": "मुदतवाढ करताना त्रुटी: {error}",
+  "s16ReopenError": "CAP पुन्हा उघडताना त्रुटी: {error}",
   "s16RefreshTooltip": "रिफ्रेश करा",
   "s16WhysSubheader": "५ का? (५ व्हाय)",
   "s16NoTimelineEntries": "कोणत्याही टाइमलाइन नोंदी नाहीत",
@@ -514,7 +538,7 @@
   "s12FilterAll": "सर्व",
   "s12FilterDaily": "दैनंदिन",
   "s12FilterUnverified": "अपडताळलेले",
-  "s12FilterWeekly": "साप्ताहिक (टप्पा २)",
+  "s12FilterWeekly": "साप्ताहिक",
   "s12FilterMonthly": "मासिक (टप्पा ३)",
   "s12NoAuditsFound": "कोणतेही ऑडिट आढळले नाही",
   "s12NoAuditsMatchFilter": "निवडलेल्या फिल्टरशी जुळणारे कोणतेही ऑडिट आढळले नाही.",
@@ -667,8 +691,253 @@
   "s26Error": "शब्दकोश लोड करण्यात अयशस्वी",
   "s26Retry": "पुन्हा प्रयत्न करा",
   "s26EnglishLabel": "EN",
-  "s26MarathiLabel": "मराठी"
+  "s26MarathiLabel": "मराठी",
+
+  "s10SevenDayReviewButton": "७-दिवसीय दैनिक आढावा व स्पॉट चेक",
+  "s05SevenDayReview": "७-दिवसीय आढावा",
+  "weeklyReviewTitle": "७-दिवसीय दैनिक आढावा",
+  "weeklyReviewSubtitle": "दैनंदिन ऑडिट तपासा आणि GM स्पॉट चेक करा",
+  "weeklyReviewDayCardHeader": "दिवस {day} — {weekday}",
+  "@weeklyReviewDayCardHeader": {
+    "placeholders": {
+      "day": {"type": "int"},
+      "weekday": {"type": "String"}
+    }
+  },
+  "weeklyReviewNoAuditSubmitted": "ऑडिट सादर केलेले नाही",
+  "weeklyReviewStatusSubmitted": "सादर केले (पडताळणी प्रलंबित)",
+  "weeklyReviewStatusVerified": "GM-पडताळलेले",
+  "weeklyReviewStatusMissing": "अनुपस्थित",
+  "weeklyReviewStartSpotCheck": "स्पॉट चेक",
+  "weeklyReviewVerifiedBadge": "{name} द्वारे पडताळलेले · {time}",
+  "@weeklyReviewVerifiedBadge": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "weeklyReviewSpotCheckTitle": "GM स्पॉट चेक — ३ यादृच्छिक तपासणी बिंदू",
+  "weeklyReviewSpotCheckSubtitle": "स्टोअर रजिस्टर आणि फोटो पुराव्यांशी नोंदवलेले निकाल तपासा.",
+  "weeklyReviewCheckpointStep": "तपासणी बिंदू {total} पैकी {current}",
+  "@weeklyReviewCheckpointStep": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "weeklyReviewSmRecordedResult": "SM निकाल: {verdict}",
+  "@weeklyReviewSmRecordedResult": {
+    "placeholders": {
+      "verdict": {"type": "String"}
+    }
+  },
+  "weeklyReviewMarkVerified": "पडताळले",
+  "weeklyReviewFlagDiscrepancy": "तफावत नोंदवा",
+  "weeklyReviewVerifyAndSignButton": "दैनंदिन ऑडिट पडताळणी व स्वाक्षरी करा",
+  "weeklyReviewDiscrepancyDialogTitle": "तफावत नोंदवा",
+  "weeklyReviewDiscrepancyHint": "तफावतीचे तपशील प्रविष्ट करा (उदा. रजिस्टरवर स्वाक्षरी गहाळ)",
+  "weeklyReviewDiscrepancySuccess": "तफावत नोंदवली. ऑडिट अपडताळलेले राहील.",
+  "weeklyReviewVerifySuccess": "दैनंदिन ऑडिट GM द्वारे यशस्वीरित्या पडताळले गेले.",
+  "weeklyReviewAllCheckpointsMustBeVerified": "कृपया स्वाक्षरी करण्यापूर्वी सर्व ३ तपासणी बिंदू पडताळा.",
+  "weeklyReviewConfirmDiscrepancy": "नोंद सबमिट करा",
+  "weeklyReviewCancel": "रद्द करा",
+
+  "s18CapVerifyTitle": "CAP पडताळणी",
+  "s18CapVerifySubtitle": "सुधारात्मक कृतीचे निराकरण पडताळा",
+  "s18ProblemStatement": "समस्येचे विधान",
+  "s18VerificationMethod": "पडताळणी पद्धत",
+  "s18OriginCheckpoint": "मूळ तपासणी बिंदू",
+  "s18Deadline": "मुदत",
+  "s18QuestionAffirmation": "सुधारात्मक कृती पडताळणीत उत्तीर्ण झाली आहे का?",
+  "s18PhotoRequiredNotice": "या तपासणी बिंदूची पडताळणी करण्यासाठी फोटो पुरावा अनिवार्य आहे.",
+  "s18TakePhoto": "पडताळणी फोटो घ्या",
+  "s18PhotoAttached": "पडताळणी फोटो जोडला",
+  "s18PassAndVerify": "उत्तीर्ण व पडताळा",
+  "s18VerificationFailed": "पडताळणी अयशस्वी",
+  "s18VerifySuccess": "CAP चे GM द्वारे यशस्वीरित्या प्रमाणीकरण झाले.",
+  "s18FailDialogTitle": "पडताळणी अयशस्वी",
+  "s18FailDialogMessage": "पडताळणी अयशस्वी म्हणून नोंदवली गेली. SOP दिवस ४ §४.३ नुसार पुढील कृती निवडा: मुदत वाढवा किंवा योजना टप्प्यात पुन्हा उघडा.",
+  "s18ActionExtend": "मुदत वाढवा",
+  "s18ActionReopen": "योजना टप्प्यात पुन्हा उघडा",
+  "s18ExtendTitle": "CAP मुदत वाढवा",
+  "s18ExtendNewDeadline": "नवीन मुदत",
+  "s18ExtendReason": "मुदतवाढीचे कारण",
+  "s18ExtendReasonHint": "मुदतवाढ का आवश्यक आहे ते स्पष्ट करा (अनिवार्य)",
+  "s18ConfirmExtend": "मुदतवाढ निश्चित करा",
+  "s18ExtendSuccess": "CAP ची मुदत यशस्वीरित्या वाढवली गेली.",
+  "s18ReopenTitle": "योजना टप्प्यात CAP पुन्हा उघडा",
+  "s18ReopenReason": "पुन्हा उघडण्याचे कारण",
+  "s18ReopenReasonHint": "CAP पुन्हा का उघडले जात आहे ते स्पष्ट करा (अनिवार्य)",
+  "s18ConfirmReopen": "पुन्हा उघडणे निश्चित करा",
+  "s18ReopenSuccess": "CAP योजना टप्प्यात पुन्हा उघडले गेले.",
+  "s18PhotoRequiredError": "कृपया पडताळणी करण्यापूर्वी पडताळणी फोटो घ्या.",
+  "s18MissingReasonError": "कृपया वैध कारण प्रविष्ट करा.",
+  "s18PatternMarker": "वारंवार आढळलेली समस्या",
+  "s18AccessDenied": "प्रवेश नाकारला. केवळ GM आणि मालकच CAP पडताळणी करू शकतात.",
+  "s18Back": "मागे",
+  "s18PhotoRequiredBadge": "आवश्यक",
+  "s18PhotoCaptureError": "फोटो काढण्यात अयशस्वी: {error}",
+  "s18VerifyError": "पडताळणी त्रुटी: {error}",
+
+  "s19CapCloseTitle": "CAP बंद करा",
+  "s19CapCloseConfirmMessage": "तुम्हाला खात्री आहे की तुम्ही CAP #{id} कायमचे बंद करू इच्छिता? हे सर्व कृती आणि GM पडताळणी पूर्ण झाल्याची पुष्टी करते.",
+  "@s19CapCloseConfirmMessage": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+  "s19ConfirmClose": "निश्चित करा व बंद करा",
+  "s19Cancel": "रद्द करा",
+  "s19CloseSuccess": "CAP #{id} यशस्वीरित्या बंद झाले.",
+  "@s19CloseSuccess": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+
+  "capOversightTitle": "CAP व्यवस्थापन",
+  "capOversightSubtitle": "स्टोअर सुधारात्मक कृतींचे निरीक्षण व पडताळणी करा",
+  "capOversightCountOpen": "उघडे",
+  "capOversightCountAwaiting": "पडताळणी प्रलंबित",
+  "capOversightCountVerified": "पडताळलेले",
+  "capOversightCountClosed": "बंद",
+  "capOversightCountOverdue": "मुदत संपलेले",
+  "capOversightAwaitingSection": "माझ्या पडताळणीसाठी प्रलंबित",
+  "capOversightNoAwaiting": "पडताळणीसाठी कोणतेही CAP प्रलंबित नाहीत",
+  "capOversightVerifyNow": "आता पडताळा",
+  "s20ScreenTitle": "साप्ताहिक अहवाल",
+  "s20ScreenSubtitle": "कार्यपुस्तिका §3.6 अहवाल आणि 1-पान PDF निर्यात",
+  "s20FilterAll": "सर्व",
+  "s20EmptyTitle": "अद्याप कोणतेही साप्ताहिक अहवाल नाहीत",
+  "s20EmptySubtitle": "साप्ताहिक अनुपालन ऑडिट पूर्ण झाल्यावर साप्ताहिक अहवाल तयार केले जातात.",
+  "s20OwnerRead": "वाचले",
+  "s20OwnerUnread": "वाचले नाही",
+  "s20WeekEndingHeader": "आठवडा {week} · समाप्त {date}",
+  "@s20WeekEndingHeader": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "date": {"type": "String"}
+    }
+  },
+  "s20ReportCardScore": "{pct}% {band}",
+  "@s20ReportCardScore": {
+    "placeholders": {
+      "pct": {"type": "String"},
+      "band": {"type": "String"}
+    }
+  },
+  "s20GenerateReport": "साप्ताहिक अहवाल तयार करा",
+  "s21ScreenTitle": "साप्ताहिक ऑडिट अहवाल",
+  "s21WorkbookSubtitle": "कार्यपुस्तिका दिवस ३ §३.६ नऊ-विभाग स्वरूप",
+  "s21HeadlineSection": "विभाग १: मुख्य मथळा",
+  "s21ComplianceSection": "विभाग २: १२४-गुण अनुपालन तक्ता",
+  "s21DailyAvgContribution": "दैनिक सरासरी योगदान",
+  "s21WeeklyOnlyCheckpoints": "केवळ-साप्ताहिक तपासणी बिंदू",
+  "s21CombinedTotal": "एकत्रित एकूण गुण",
+  "s21SopBreakdownHeader": "एसओपी अनुपालन तपशील",
+  "s21TrendSection": "विभाग ३: ७-दिवस कल आणि आठवडा-दर-आठवडा बदल",
+  "s21DayLabel": "{day} ({date}): {pct}%",
+  "@s21DayLabel": {
+    "placeholders": {
+      "day": {"type": "String"},
+      "date": {"type": "String"},
+      "pct": {"type": "String"}
+    }
+  },
+  "s21DayAbsent": "{day} ({date}): 0.0% (अनुपस्थित)",
+  "@s21DayAbsent": {
+    "placeholders": {
+      "day": {"type": "String"},
+      "date": {"type": "String"}
+    }
+  },
+  "s21WeeklyRollup": "साप्ताहिक एकूण: {pct}%",
+  "@s21WeeklyRollup": {
+    "placeholders": {
+      "pct": {"type": "String"}
+    }
+  },
+  "s21WowDelta": "आठवडा-दर-आठवडा बदल: {delta}%",
+  "@s21WowDelta": {
+    "placeholders": {
+      "delta": {"type": "String"}
+    }
+  },
+  "s21WowDeltaNa": "आठवडा-दर-आठवडा बदल: — (पहिला अहवाल)",
+  "s21FindingsSection": "विभाग ४: साप्ताहिक गैर-अनुपालन ({count})",
+  "@s21FindingsSection": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21NoFindings": "कोणतेही साप्ताहिक गैर-अनुपालन नोंदवले नाही.",
+  "s21PhotosCount": "{count} फोटो",
+  "@s21PhotosCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21PatternsSection": "विभाग ५: आढळलेले नमुने ({count})",
+  "@s21PatternsSection": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21NoPatterns": "या आठवड्यात कोणतेही नमुना दोष आढळले नाहीत.",
+  "s21PatternDetectedOnDays": "{count} दिवस अयशस्वी: {days}",
+  "@s21PatternDetectedOnDays": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "days": {"type": "String"}
+    }
+  },
+  "s21SuggestedPatternCap": "सुचवलेला पॅटर्न कॅप (एकल-कॅप नियम):",
+  "s21CapsSection": "विभाग ६: सुधारात्मक कृती योजना (CAPs)",
+  "s21CapsOpenedHeader": "या आठवड्यात सुरू झालेले कॅप ({count})",
+  "@s21CapsOpenedHeader": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21CapsClosedHeader": "विभाग ७: या आठवड्यात बंद झालेले कॅप",
+  "s21CapsClosedEmpty": "या आठवड्यात कोणतेही कॅप बंद झाले नाहीत (सत्यापन आणि बंद करणे P2-5 मध्ये उपलब्ध).",
+  "s21CapsAgedHeader": "विभाग ८: जुने / मुदत संपलेले कॅप",
+  "s21CapsAgedEmpty": "कोणतेही जुने कॅप नोंदवले नाहीत (P2-5 मध्ये उपलब्ध).",
+  "s21EscalationsSection": "विभाग ९: एस्केलेशन नोंद",
+  "s21EscalationsEmpty": "कोणतेही एस्केलेशन ट्रिगर झाले नाही (फेज ३ मध्ये उपलब्ध).",
+  "s21SignatureSection": "अधिकृत स्वाक्षरी",
+  "s21AuditorSignature": "जीएम / ऑडिटर स्वाक्षरी: {author} · सादर {time}",
+  "@s21AuditorSignature": {
+    "placeholders": {
+      "author": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "s21OwnerSignature": "मालक पुनरावलोकन: {time} रोजी वाचले",
+  "@s21OwnerSignature": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "s21OwnerSignaturePending": "मालक पुनरावलोकन: प्रलंबित",
+  "s21MarkAsReadButton": "वाचले म्हणून चिन्हांकित करा (मालक)",
+  "s21MarkedAsReadSuccess": "साप्ताहिक अहवाल मालकाने वाचला म्हणून चिन्हांकित केला.",
+  "s21ExportPdfButton": "१-पान PDF निर्यात करा",
+  "s21PdfGenerating": "१-पान PDF तयार करत आहे...",
+  "s21PdfSaved": "PDF जतन केले: {path}",
+  "@s21PdfSaved": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "s21PdfExportError": "PDF निर्यात अयशस्वी: {error}",
+  "@s21PdfExportError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  }
 }
+
 
 
 

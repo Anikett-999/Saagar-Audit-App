@@ -12,7 +12,9 @@
 class Schema {
   Schema._();
 
-  static const int currentVersion = 1;
+  /// Schema version. Bumped to 2 for Phase 2: addition of SOP9 (Operations)
+  /// and 36 weekly checkpoints.
+  static const int currentVersion = 2;
 
   /// All CREATE statements, executed in order on first install or upgrade.
   /// Order matters because of foreign key dependencies — `users` and `sops`
@@ -84,7 +86,7 @@ CREATE TABLE devices (
   static const _sops = '''
 CREATE TABLE sops (
   id            TEXT PRIMARY KEY,
-  number        INTEGER NOT NULL UNIQUE CHECK (number BETWEEN 1 AND 8),
+  number        INTEGER NOT NULL UNIQUE CHECK (number >= 1),
   name_en       TEXT NOT NULL,
   name_mr       TEXT NOT NULL,
   weight        INTEGER NOT NULL CHECK (weight IN (1,2)),

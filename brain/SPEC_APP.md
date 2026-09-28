@@ -481,6 +481,9 @@ The 8 Priority 1 SOPs. Seeded once at app install; can be modified only by Owner
 | SOP6 | Cash Management ★ | रोख व्यवस्थापन ★ | 2 |
 | SOP7 | Inventory Management ★ | स्टॉक व्यवस्थापन ★ | 2 |
 | SOP8 | Watch Service Intake | घड्याळ सर्व्हिस इनटेक | 1 |
+| SOP9 | Operations | कार्यात्मक कामकाज | 1 |
+
+> **CHANGE RECORD — SOP9 added in Phase 2 (owner-approved, 2026-09-27).** The original Workbook (Day 2 §2.9 / §1) fixes **8** Priority-1 SOPs. SOP9 "Operations" (कार्यात्मक कामकाज) is a **deliberate, owner-approved extension** for the weekly audit, created so the 10 weekly Operations checks (O.1–O.10: rent/lease, licences, fire-safety AMC, POS/billing uptime, staff training, statutory renewals, etc.) get their own clean trend line instead of being folded into SOP8 Service. It is **non-critical, weight 1, no mandatory photo on fail** (unlike ★SOP6 Cash / ★SOP7 Inventory). This is logged here per R1 (Workbook is ground truth — deviations are recorded, never silent) and completes step (b) of the §4.4 four-way update. Remaining steps: (a) Workbook Day 2 §2.9 to be annotated with the SOP9 addition; (c) add SOP9 row to `assets/seed/sops.json`; (d) versioned migration to insert SOP9 into existing installs (Antigravity, Sprint P2-1). Weekly `sop_id` mapping is now fixed: CW.*→SOP6, IW.*→SOP7, RS.*→SOP8, O.*→SOP9.
 
 
 ## Table 4.4 — checkpoints
@@ -4240,6 +4243,7 @@ This glossary is written for Sagar — owner-operator, not a developer. When Cla
 | --- | --- |
 | S1, S5, S7 … | Screen IDs. Defined in Spec Section 5. |
 | SOP1 … SOP8 | The 8 Priority 1 SOPs. Defined in Workbook Day 2 Section 2.9. |
+| SOP9 | Operations (कार्यात्मक कामकाज). Owner-approved Phase-2 extension for the 10 weekly Operations checks (O.1–O.10). Non-critical, weight 1. See §4.3 CHANGE RECORD. |
 | CW.1, CW.7 … | Cash Weekly checkpoints. Workbook Day 3 Section 3.4. |
 | IW.1, IW.11 … | Inventory Weekly checkpoints. Workbook Day 3 Section 3.4. |
 | Trigger 1 … Trigger 7 | The 7 mandatory escalation triggers. Workbook Day 4 Section 4.6. |

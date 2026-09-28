@@ -123,6 +123,20 @@
   "s05StatusNotStarted": "Not started",
   "s05StatusInProgress": "In progress",
   "s05StatusSubmitted": "Submitted",
+  "s05ThisWeekWeeklyAudit": "This week's weekly audit",
+  "s05WeeklyNotStartedYet": "You haven't started this week's audit yet.",
+  "s05WeeklyNotStartedAdmin": "This week's weekly audit has not been started yet.",
+  "s05StartWeeklyAudit": "Start weekly audit",
+  "s05ResumeWeeklyDraft": "Resume weekly draft",
+  "s05WeeklyDraftInProgress": "A weekly draft audit is in progress. Resume to continue marking checkpoints.",
+  "s05WeeklyAuditsRunByGm": "Weekly audits are run by the General Manager.",
+  "s05WeekNumberLabel": "Week {week}, {year}",
+  "@s05WeekNumberLabel": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "year": {"type": "int"}
+    }
+  },
   "s05AuditHistoryTitle": "Audit history",
   "s05AuditHistorySubtitle": "View past daily audits",
   "s05CapsTitle": "CAPs",
@@ -135,11 +149,18 @@
   "@s05ComingSoon": {"placeholders": {"feature": {"type": "String"}}},
 
   "s06Title": "Start Daily Audit",
+  "s06WeeklyTitle": "Start Weekly Audit",
   "s06AuditDate": "Audit Date",
   "s06StoreLabel": "Store",
   "s06CrosOnDuty": "CROs on Duty",
   "s06SelectAtLeastOneCro": "Please select at least one CRO on duty.",
   "s06BeginAudit": "Begin Audit",
+
+  "s10WeeklyScoreTitle": "Weekly Audit Score",
+  "s10DailyAvgContribution": "Daily Average Contribution",
+  "s10WeeklyCheckpointsScore": "Weekly Checkpoints Score",
+  "s10CashVarianceTitle": "Cumulative Cash Variance (CW.7)",
+  "s11WeeklyTitle": "Weekly Audit Submitted",
 
   "s07CheckpointNumber": "Checkpoint {current} of {total}",
   "@s07CheckpointNumber": {"placeholders": {"current": {"type": "int"}, "total": {"type": "int"}}},
@@ -564,6 +585,24 @@
       "error": {"type": "String"}
     }
   },
+  "s16CloseError": "Error closing CAP: {error}",
+  "@s16CloseError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "s16ExtendError": "Error extending CAP: {error}",
+  "@s16ExtendError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "s16ReopenError": "Error reopening CAP: {error}",
+  "@s16ReopenError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   "s16RefreshTooltip": "Refresh",
   "s16WhysSubheader": "5 Whys",
   "s16NoTimelineEntries": "No timeline entries",
@@ -618,7 +657,7 @@
   "s12FilterAll": "All",
   "s12FilterDaily": "Daily",
   "s12FilterUnverified": "Unverified",
-  "s12FilterWeekly": "Weekly (Phase 2)",
+  "s12FilterWeekly": "Weekly",
   "s12FilterMonthly": "Monthly (Phase 3)",
   "s12NoAuditsFound": "No audits found",
   "s12NoAuditsMatchFilter": "No audits match the selected filter.",
@@ -840,8 +879,263 @@
   "s26Error": "Failed to load glossary",
   "s26Retry": "Retry",
   "s26EnglishLabel": "EN",
-  "s26MarathiLabel": "मराठी"
+  "s26MarathiLabel": "मराठी",
+
+  "s10SevenDayReviewButton": "7-Day Daily Review & Spot-Check",
+  "s05SevenDayReview": "7-Day Review",
+  "weeklyReviewTitle": "7-Day Daily Review",
+  "weeklyReviewSubtitle": "Review daily audits & perform GM spot-checks",
+  "weeklyReviewDayCardHeader": "Day {day} — {weekday}",
+  "@weeklyReviewDayCardHeader": {
+    "placeholders": {
+      "day": {"type": "int"},
+      "weekday": {"type": "String"}
+    }
+  },
+  "weeklyReviewNoAuditSubmitted": "No audit submitted",
+  "weeklyReviewStatusSubmitted": "Submitted (Pending Verification)",
+  "weeklyReviewStatusVerified": "GM-Verified",
+  "weeklyReviewStatusMissing": "Missing",
+  "weeklyReviewStartSpotCheck": "Spot-Check",
+  "weeklyReviewVerifiedBadge": "Verified by {name} · {time}",
+  "@weeklyReviewVerifiedBadge": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "weeklyReviewSpotCheckTitle": "GM Spot-Check — 3 Random Checkpoints",
+  "weeklyReviewSpotCheckSubtitle": "Validate recorded results against original store registers & evidence photos.",
+  "weeklyReviewCheckpointStep": "Checkpoint {current} of {total}",
+  "@weeklyReviewCheckpointStep": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "weeklyReviewSmRecordedResult": "SM Result: {verdict}",
+  "@weeklyReviewSmRecordedResult": {
+    "placeholders": {
+      "verdict": {"type": "String"}
+    }
+  },
+  "weeklyReviewMarkVerified": "Mark Verified",
+  "weeklyReviewFlagDiscrepancy": "Flag Discrepancy",
+  "weeklyReviewVerifyAndSignButton": "Verify & Sign Daily Audit",
+  "weeklyReviewDiscrepancyDialogTitle": "Flag Discrepancy",
+  "weeklyReviewDiscrepancyHint": "Describe discrepancy (e.g. evidence missing on register)",
+  "weeklyReviewDiscrepancySuccess": "Discrepancy flagged. Audit remains unverified.",
+  "weeklyReviewVerifySuccess": "Daily audit successfully verified by GM.",
+  "weeklyReviewAllCheckpointsMustBeVerified": "Please verify all 3 checkpoints before signing off.",
+  "weeklyReviewConfirmDiscrepancy": "Submit Flag",
+  "weeklyReviewCancel": "Cancel",
+
+  "s18CapVerifyTitle": "Verify CAP",
+  "s18CapVerifySubtitle": "Verify resolution of corrective action",
+  "s18ProblemStatement": "Problem Statement",
+  "s18VerificationMethod": "Verification Method",
+  "s18OriginCheckpoint": "Origin Checkpoint",
+  "s18Deadline": "Deadline",
+  "s18QuestionAffirmation": "Does the corrective action pass verification?",
+  "s18PhotoRequiredNotice": "Mandatory photo evidence is required to verify this checkpoint.",
+  "s18TakePhoto": "Take Verification Photo",
+  "s18PhotoAttached": "Verification photo attached",
+  "s18PassAndVerify": "Pass & Verify",
+  "s18VerificationFailed": "Verification Failed",
+  "s18VerifySuccess": "CAP successfully verified by GM.",
+  "s18FailDialogTitle": "Verification Failed",
+  "s18FailDialogMessage": "Verification was marked as failed. Select next action per SOP Day 4 §4.3: Extend the deadline or Reopen at Plan phase.",
+  "s18ActionExtend": "Extend Deadline",
+  "s18ActionReopen": "Reopen at Plan",
+  "s18ExtendTitle": "Extend CAP Deadline",
+  "s18ExtendNewDeadline": "New Deadline",
+  "s18ExtendReason": "Reason for Extension",
+  "s18ExtendReasonHint": "Explain why extension is needed (mandatory)",
+  "s18ConfirmExtend": "Confirm Extension",
+  "s18ExtendSuccess": "CAP deadline successfully extended.",
+  "s18ReopenTitle": "Reopen CAP at Plan",
+  "s18ReopenReason": "Reason for Reopening",
+  "s18ReopenReasonHint": "Explain why CAP is being reopened (mandatory)",
+  "s18ConfirmReopen": "Confirm Reopen",
+  "s18ReopenSuccess": "CAP reopened at Plan phase.",
+  "s18PhotoRequiredError": "Please capture a verification photo before verifying.",
+  "s18MissingReasonError": "Please provide a valid reason.",
+  "s18PatternMarker": "Pattern Issue",
+  "s18AccessDenied": "Access Denied. Only GM and Owner may verify CAPs.",
+  "s18Back": "Back",
+  "s18PhotoRequiredBadge": "REQUIRED",
+  "s18PhotoCaptureError": "Failed to capture photo: {error}",
+  "@s18PhotoCaptureError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "s18VerifyError": "Verification error: {error}",
+  "@s18VerifyError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "s19CapCloseTitle": "Close CAP",
+  "s19CapCloseConfirmMessage": "Are you sure you want to permanently close CAP #{id}? This confirms all actions and GM verifications are complete.",
+  "@s19CapCloseConfirmMessage": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+  "s19ConfirmClose": "Confirm & Close",
+  "s19Cancel": "Cancel",
+  "s19CloseSuccess": "CAP #{id} successfully closed.",
+  "@s19CloseSuccess": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+
+  "capOversightTitle": "CAP Oversight",
+  "capOversightSubtitle": "Monitor and verify store corrective actions",
+  "capOversightCountOpen": "Open",
+  "capOversightCountAwaiting": "Awaiting Verify",
+  "capOversightCountVerified": "Verified",
+  "capOversightCountClosed": "Closed",
+  "capOversightCountOverdue": "Overdue",
+  "capOversightAwaitingSection": "Awaiting My Verification",
+  "capOversightNoAwaiting": "No CAPs awaiting verification",
+  "capOversightVerifyNow": "Verify Now",
+  "s20ScreenTitle": "Weekly Reports",
+  "s20ScreenSubtitle": "Workbook §3.6 reports & 1-page PDF export",
+  "s20FilterAll": "All",
+  "s20EmptyTitle": "No Weekly Reports Yet",
+  "s20EmptySubtitle": "Weekly reports are generated upon completing weekly compliance audits.",
+  "s20OwnerRead": "Read",
+  "s20OwnerUnread": "Unread",
+  "s20WeekEndingHeader": "Week {week} · Ending {date}",
+  "@s20WeekEndingHeader": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "date": {"type": "String"}
+    }
+  },
+  "s20ReportCardScore": "{pct}% {band}",
+  "@s20ReportCardScore": {
+    "placeholders": {
+      "pct": {"type": "String"},
+      "band": {"type": "String"}
+    }
+  },
+  "s20GenerateReport": "Generate Weekly Report",
+  "s21ScreenTitle": "Weekly Audit Report",
+  "s21WorkbookSubtitle": "Workbook Day 3 §3.6 Nine-Section Format",
+  "s21HeadlineSection": "Section 1: Executive Headline",
+  "s21ComplianceSection": "Section 2: 124-Point Compliance Table",
+  "s21DailyAvgContribution": "Daily Average Contribution",
+  "s21WeeklyOnlyCheckpoints": "Weekly-Only Checkpoints",
+  "s21CombinedTotal": "Combined Total Score",
+  "s21SopBreakdownHeader": "SOP Compliance Breakdown",
+  "s21TrendSection": "Section 3: 7-Day Trend & WoW Delta",
+  "s21DayLabel": "{day} ({date}): {pct}%",
+  "@s21DayLabel": {
+    "placeholders": {
+      "day": {"type": "String"},
+      "date": {"type": "String"},
+      "pct": {"type": "String"}
+    }
+  },
+  "s21DayAbsent": "{day} ({date}): 0.0% (Absent)",
+  "@s21DayAbsent": {
+    "placeholders": {
+      "day": {"type": "String"},
+      "date": {"type": "String"}
+    }
+  },
+  "s21WeeklyRollup": "Weekly Total: {pct}%",
+  "@s21WeeklyRollup": {
+    "placeholders": {
+      "pct": {"type": "String"}
+    }
+  },
+  "s21WowDelta": "Week-over-Week Delta: {delta}%",
+  "@s21WowDelta": {
+    "placeholders": {
+      "delta": {"type": "String"}
+    }
+  },
+  "s21WowDeltaNa": "Week-over-Week Delta: — (First report)",
+  "s21FindingsSection": "Section 4: Weekly Non-Compliances ({count})",
+  "@s21FindingsSection": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21NoFindings": "No weekly non-compliances recorded.",
+  "s21PhotosCount": "{count} Photos",
+  "@s21PhotosCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21PatternsSection": "Section 5: Detected Patterns ({count})",
+  "@s21PatternsSection": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21NoPatterns": "No cross-day patterns detected this week.",
+  "s21PatternDetectedOnDays": "Failed on {count} days: {days}",
+  "@s21PatternDetectedOnDays": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "days": {"type": "String"}
+    }
+  },
+  "s21SuggestedPatternCap": "Suggested Pattern CAP (Single-CAP Rule):",
+  "s21CapsSection": "Section 6: Corrective Action Plans (CAPs)",
+  "s21CapsOpenedHeader": "CAPs Opened This Week ({count})",
+  "@s21CapsOpenedHeader": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21CapsClosedHeader": "Section 7: CAPs Closed This Week",
+  "s21CapsClosedEmpty": "No CAPs closed this week (Verification & Close workflow active in P2-5).",
+  "s21CapsAgedHeader": "Section 8: Aged / Overdue CAPs",
+  "s21CapsAgedEmpty": "No aged CAPs recorded (Lifecycle tracking active in P2-5).",
+  "s21EscalationsSection": "Section 9: Escalation Log",
+  "s21EscalationsEmpty": "No escalations triggered (Escalation engine active in Phase 3).",
+  "s21SignatureSection": "Signature of Record",
+  "s21AuditorSignature": "GM / Auditor Signature: {author} · Submitted {time}",
+  "@s21AuditorSignature": {
+    "placeholders": {
+      "author": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "s21OwnerSignature": "Owner Review: Read on {time}",
+  "@s21OwnerSignature": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "s21OwnerSignaturePending": "Owner Review: Pending Owner Review",
+  "s21MarkAsReadButton": "Mark as Read (Owner)",
+  "s21MarkedAsReadSuccess": "Weekly report marked as read by Owner.",
+  "s21ExportPdfButton": "Export 1-Page PDF",
+  "s21PdfGenerating": "Generating 1-page PDF...",
+  "s21PdfSaved": "PDF saved: {path}",
+  "@s21PdfSaved": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "s21PdfExportError": "Failed to export PDF: {error}",
+  "@s21PdfExportError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  }
 }
+
 
 
 
