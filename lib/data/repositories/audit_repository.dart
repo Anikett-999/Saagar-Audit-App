@@ -326,4 +326,80 @@ class AuditRepository {
     if (rows.isEmpty) return null;
     return Audit.fromMap(rows.first);
   }
+
+  /// Marks a submitted daily audit as GM-verified per Spec §5 T2.3 / §4.3.
+  /// Enforces R5 immutability: transitions status 'submitted' -> 'verified'
+  /// and records verifierId and verifiedAt.
+  /// Throws StateError if audit does not exist or status is not 'submitted'.
+  Future<void> verifyDailyAudit({
+    required String auditId,
+    required String verifierId,
+    String? notes,
+  }) async {
+    final existing = await getById(auditId);
+    if (existing == null) {
+      throw StateError('Audit $auditId not found.');
+    }
+    if (existing.status != 'submitted') {
+      throw StateError(
+        'Cannot verify audit $auditId: status is "${existing.status}", expected "submitted".',
+      );
+    }
+    if (existing.auditType != 'daily') {
+      throw StateError('Only daily audits can be verified through spot-check.');
+    }
+
+    final verifiedAt = DateTime.now().toUtc().toIso8601String();
+    final values = <String, Object?>{
+      'status': 'verified',
+      'verifier_id': verifierId,
+      'verified_at': verifiedAt,
+    };
+    if (notes != null && notes.isNotEmpty) {
+      values['notes'] = existing.notes != null
+          ? '${existing.notes}\n[GM Verification]: $notes'
+          : '[GM Verification]: $notes';
+    }
+
+    final count = await AppDatabase.instance.db.update(
+      'audits',
+      values,
+      where: "id = ? AND status = 'submitted'",
+      whereArgs: [auditId],
+    );
+    if (count == 0) {
+      throw StateError('Failed to verify audit $auditId: status changed or update rejected.');
+    }
+  }
+
+  /// Flags a discrepancy on a submitted daily audit during spot-check.
+  /// Withholds verification: status remains 'submitted', and records
+  /// discrepancy note per Spec §4.2.
+  Future<void> flagDailyAuditDiscrepancy({
+    required String auditId,
+    required String verifierId,
+    required String discrepancyNote,
+  }) async {
+    final existing = await getById(auditId);
+    if (existing == null) {
+      throw StateError('Audit $auditId not found.');
+    }
+    if (existing.status != 'submitted') {
+      throw StateError(
+        'Cannot flag discrepancy on audit $auditId: status is "${existing.status}", expected "submitted".',
+      );
+    }
+
+    final updatedNotes = existing.notes != null && existing.notes!.isNotEmpty
+        ? '${existing.notes}\n[Spot Check Discrepancy by $verifierId]: $discrepancyNote'
+        : '[Spot Check Discrepancy by $verifierId]: $discrepancyNote';
+
+    await AppDatabase.instance.db.update(
+      'audits',
+      {'notes': updatedNotes},
+      where: 'id = ?',
+      whereArgs: [auditId],
+    );
+  }
 }
+

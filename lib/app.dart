@@ -21,6 +21,7 @@ import 'ui/screens/s14_cap_list/cap_list_screen.dart';
 import 'ui/screens/s15_cap_create/cap_create_screen.dart';
 import 'ui/screens/s16_cap_detail/cap_detail_screen.dart';
 import 'ui/screens/s17_cap_mark_done/cap_mark_done_screen.dart';
+import 'ui/screens/seven_day_review/seven_day_review_screen.dart';
 import 'ui/screens/s22_reference/reference_index_screen.dart';
 import 'ui/screens/s23_rating_scale/rating_scale_screen.dart';
 import 'ui/screens/s24_escalation_triggers/escalation_triggers_screen.dart';
@@ -90,6 +91,30 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/audit/review',
         name: 's10_review',
         builder: (_, __) => const ReviewSubmitScreen(),
+      ),
+      GoRoute(
+        path: '/audit/7-day-review',
+        name: 'seven_day_review',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          if (auth.user!.isSm) {
+            return '/home'; // Role-gated: GM/Owner only
+          }
+          return null;
+        },
+        builder: (context, state) {
+          final week = int.tryParse(state.uri.queryParameters['week'] ?? '') ??
+              (state.extra as Map<String, dynamic>?)?['weekNumber'] as int?;
+          final year = int.tryParse(state.uri.queryParameters['year'] ?? '') ??
+              (state.extra as Map<String, dynamic>?)?['year'] as int?;
+          return SevenDayReviewScreen(
+            weekNumber: week,
+            year: year,
+          );
+        },
       ),
       GoRoute(
         path: '/audit/submitted',

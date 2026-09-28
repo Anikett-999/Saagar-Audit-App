@@ -287,6 +287,8 @@ class FakeDatabase extends Fake implements Database, Transaction {
       if (where != null && whereArgs != null && whereArgs.isNotEmpty) {
         if (where == "id = ? AND status = 'draft'") {
           match = list[i]['id'] == whereArgs[0] && list[i]['status'] == 'draft';
+        } else if (where == "id = ? AND status = 'submitted'") {
+          match = list[i]['id'] == whereArgs[0] && list[i]['status'] == 'submitted';
         } else if (where == 'id = ?') {
           match = list[i]['id'] == whereArgs[0];
         }

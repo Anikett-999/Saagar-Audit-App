@@ -271,6 +271,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   await _loadAudits();
                 },
               ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.fact_check_outlined, size: 18),
+                label: Text(l10n.s05SevenDayReview),
+                onPressed: () async {
+                  await context.push('/audit/7-day-review?week=$weekNumber&year=$year');
+                  if (!mounted) return;
+                  await _loadAudits();
+                },
+              ),
             ] else if (audit.isDraft) ...[
               Text(
                 l10n.s05WeeklyDraftInProgress,
@@ -291,6 +301,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   await _loadAudits();
                 },
               ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.fact_check_outlined, size: 18),
+                label: Text(l10n.s05SevenDayReview),
+                onPressed: () async {
+                  await context.push('/audit/7-day-review?week=$weekNumber&year=$year');
+                  if (!mounted) return;
+                  await _loadAudits();
+                },
+              ),
             ] else ...[
               Text(
                 '${l10n.s05SubmittedStatus} • ${audit.compliancePct?.toStringAsFixed(1) ?? "—"}% (${audit.band ?? "—"})',
@@ -304,6 +324,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   's13_audit_detail',
                   pathParameters: {'id': audit.id},
                 ),
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.fact_check_outlined, size: 18),
+                label: Text(l10n.s05SevenDayReview),
+                onPressed: () async {
+                  await context.push('/audit/7-day-review?week=$weekNumber&year=$year');
+                  if (!mounted) return;
+                  await _loadAudits();
+                },
               ),
             ],
           ],

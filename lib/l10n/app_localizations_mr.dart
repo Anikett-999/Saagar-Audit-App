@@ -1911,4 +1911,92 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s26MarathiLabel => 'मराठी';
+
+  @override
+  String get s10SevenDayReviewButton => '७-दिवसीय दैनिक आढावा व स्पॉट चेक';
+
+  @override
+  String get s05SevenDayReview => '७-दिवसीय आढावा';
+
+  @override
+  String get s18SevenDayReviewTitle => '७-दिवसीय दैनिक आढावा';
+
+  @override
+  String get s18SevenDayReviewSubtitle =>
+      'दैनंदिन ऑडिट तपासा आणि GM स्पॉट चेक करा';
+
+  @override
+  String s18DayCardHeader(int day, String weekday) {
+    return 'दिवस $day — $weekday';
+  }
+
+  @override
+  String get s18NoAuditSubmitted => 'ऑडिट सादर केलेले नाही';
+
+  @override
+  String get s18StatusSubmitted => 'सादर केले (पडताळणी प्रलंबित)';
+
+  @override
+  String get s18StatusVerified => 'GM-पडताळलेले';
+
+  @override
+  String get s18StatusMissing => 'अनुपस्थित';
+
+  @override
+  String get s18StartSpotCheck => 'स्पॉट चेक';
+
+  @override
+  String s18VerifiedBadge(String name, String time) {
+    return '$name द्वारे पडताळलेले · $time';
+  }
+
+  @override
+  String get s18SpotCheckTitle => 'GM स्पॉट चेक — ३ यादृच्छिक तपासणी बिंदू';
+
+  @override
+  String get s18SpotCheckSubtitle =>
+      'स्टोअर रजिस्टर आणि फोटो पुराव्यांशी नोंदवलेले निकाल तपासा.';
+
+  @override
+  String s18CheckpointStep(int current, int total) {
+    return 'तपासणी बिंदू $total पैकी $current';
+  }
+
+  @override
+  String s18SmRecordedResult(String verdict) {
+    return 'SM निकाल: $verdict';
+  }
+
+  @override
+  String get s18MarkVerified => 'पडताळले';
+
+  @override
+  String get s18FlagDiscrepancy => 'तफावत नोंदवा';
+
+  @override
+  String get s18VerifyAndSignButton => 'दैनंदिन ऑडिट पडताळणी व स्वाक्षरी करा';
+
+  @override
+  String get s18DiscrepancyDialogTitle => 'तफावत नोंदवा';
+
+  @override
+  String get s18DiscrepancyHint =>
+      'तफावतीचे तपशील प्रविष्ट करा (उदा. रजिस्टरवर स्वाक्षरी गहाळ)';
+
+  @override
+  String get s18DiscrepancySuccess => 'तफावत नोंदवली. ऑडिट अपडताळलेले राहील.';
+
+  @override
+  String get s18VerifySuccess =>
+      'दैनंदिन ऑडिट GM द्वारे यशस्वीरित्या पडताळले गेले.';
+
+  @override
+  String get s18AllCheckpointsMustBeVerified =>
+      'कृपया स्वाक्षरी करण्यापूर्वी सर्व ३ तपासणी बिंदू पडताळा.';
+
+  @override
+  String get s18ConfirmDiscrepancy => 'नोंद सबमिट करा';
+
+  @override
+  String get s18Cancel => 'रद्द करा';
 }

@@ -1911,4 +1911,92 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s26MarathiLabel => 'मराठी';
+
+  @override
+  String get s10SevenDayReviewButton => '7-Day Daily Review & Spot-Check';
+
+  @override
+  String get s05SevenDayReview => '7-Day Review';
+
+  @override
+  String get s18SevenDayReviewTitle => '7-Day Daily Review';
+
+  @override
+  String get s18SevenDayReviewSubtitle =>
+      'Review daily audits & perform GM spot-checks';
+
+  @override
+  String s18DayCardHeader(int day, String weekday) {
+    return 'Day $day — $weekday';
+  }
+
+  @override
+  String get s18NoAuditSubmitted => 'No audit submitted';
+
+  @override
+  String get s18StatusSubmitted => 'Submitted (Pending Verification)';
+
+  @override
+  String get s18StatusVerified => 'GM-Verified';
+
+  @override
+  String get s18StatusMissing => 'Missing';
+
+  @override
+  String get s18StartSpotCheck => 'Spot-Check';
+
+  @override
+  String s18VerifiedBadge(String name, String time) {
+    return 'Verified by $name · $time';
+  }
+
+  @override
+  String get s18SpotCheckTitle => 'GM Spot-Check — 3 Random Checkpoints';
+
+  @override
+  String get s18SpotCheckSubtitle =>
+      'Validate recorded results against original store registers & evidence photos.';
+
+  @override
+  String s18CheckpointStep(int current, int total) {
+    return 'Checkpoint $current of $total';
+  }
+
+  @override
+  String s18SmRecordedResult(String verdict) {
+    return 'SM Result: $verdict';
+  }
+
+  @override
+  String get s18MarkVerified => 'Mark Verified';
+
+  @override
+  String get s18FlagDiscrepancy => 'Flag Discrepancy';
+
+  @override
+  String get s18VerifyAndSignButton => 'Verify & Sign Daily Audit';
+
+  @override
+  String get s18DiscrepancyDialogTitle => 'Flag Discrepancy';
+
+  @override
+  String get s18DiscrepancyHint =>
+      'Describe discrepancy (e.g. evidence missing on register)';
+
+  @override
+  String get s18DiscrepancySuccess =>
+      'Discrepancy flagged. Audit remains unverified.';
+
+  @override
+  String get s18VerifySuccess => 'Daily audit successfully verified by GM.';
+
+  @override
+  String get s18AllCheckpointsMustBeVerified =>
+      'Please verify all 3 checkpoints before signing off.';
+
+  @override
+  String get s18ConfirmDiscrepancy => 'Submit Flag';
+
+  @override
+  String get s18Cancel => 'Cancel';
 }

@@ -33,3 +33,15 @@ String formatCapId({
   final seqStr = sequence.toString().padLeft(2, '0');
   return 'CAP-$year-W$weekStr-$seqStr';
 }
+
+/// Returns the 7 calendar dates (Monday through Sunday) for a given ISO week and year.
+List<DateTime> isoWeekDates({required int year, required int week}) {
+  // Jan 4th is always in ISO week 1 per ISO 8601
+  final jan4 = DateTime(year, 1, 4);
+  // Find Monday of week 1:
+  final mondayOfWeek1 = jan4.subtract(Duration(days: jan4.weekday - 1));
+  // Add (week - 1) weeks:
+  final mondayOfTargetWeek = mondayOfWeek1.add(Duration(days: (week - 1) * 7));
+  return List.generate(7, (i) => mondayOfTargetWeek.add(Duration(days: i)));
+}
+

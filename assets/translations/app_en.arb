@@ -861,8 +861,58 @@
   "s26Error": "Failed to load glossary",
   "s26Retry": "Retry",
   "s26EnglishLabel": "EN",
-  "s26MarathiLabel": "मराठी"
+  "s26MarathiLabel": "मराठी",
+
+  "s10SevenDayReviewButton": "7-Day Daily Review & Spot-Check",
+  "s05SevenDayReview": "7-Day Review",
+  "s18SevenDayReviewTitle": "7-Day Daily Review",
+  "s18SevenDayReviewSubtitle": "Review daily audits & perform GM spot-checks",
+  "s18DayCardHeader": "Day {day} — {weekday}",
+  "@s18DayCardHeader": {
+    "placeholders": {
+      "day": {"type": "int"},
+      "weekday": {"type": "String"}
+    }
+  },
+  "s18NoAuditSubmitted": "No audit submitted",
+  "s18StatusSubmitted": "Submitted (Pending Verification)",
+  "s18StatusVerified": "GM-Verified",
+  "s18StatusMissing": "Missing",
+  "s18StartSpotCheck": "Spot-Check",
+  "s18VerifiedBadge": "Verified by {name} · {time}",
+  "@s18VerifiedBadge": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "s18SpotCheckTitle": "GM Spot-Check — 3 Random Checkpoints",
+  "s18SpotCheckSubtitle": "Validate recorded results against original store registers & evidence photos.",
+  "s18CheckpointStep": "Checkpoint {current} of {total}",
+  "@s18CheckpointStep": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "s18SmRecordedResult": "SM Result: {verdict}",
+  "@s18SmRecordedResult": {
+    "placeholders": {
+      "verdict": {"type": "String"}
+    }
+  },
+  "s18MarkVerified": "Mark Verified",
+  "s18FlagDiscrepancy": "Flag Discrepancy",
+  "s18VerifyAndSignButton": "Verify & Sign Daily Audit",
+  "s18DiscrepancyDialogTitle": "Flag Discrepancy",
+  "s18DiscrepancyHint": "Describe discrepancy (e.g. evidence missing on register)",
+  "s18DiscrepancySuccess": "Discrepancy flagged. Audit remains unverified.",
+  "s18VerifySuccess": "Daily audit successfully verified by GM.",
+  "s18AllCheckpointsMustBeVerified": "Please verify all 3 checkpoints before signing off.",
+  "s18ConfirmDiscrepancy": "Submit Flag",
+  "s18Cancel": "Cancel"
 }
+
 
 
 

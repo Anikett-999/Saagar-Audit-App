@@ -688,8 +688,58 @@
   "s26Error": "शब्दकोश लोड करण्यात अयशस्वी",
   "s26Retry": "पुन्हा प्रयत्न करा",
   "s26EnglishLabel": "EN",
-  "s26MarathiLabel": "मराठी"
+  "s26MarathiLabel": "मराठी",
+
+  "s10SevenDayReviewButton": "७-दिवसीय दैनिक आढावा व स्पॉट चेक",
+  "s05SevenDayReview": "७-दिवसीय आढावा",
+  "s18SevenDayReviewTitle": "७-दिवसीय दैनिक आढावा",
+  "s18SevenDayReviewSubtitle": "दैनंदिन ऑडिट तपासा आणि GM स्पॉट चेक करा",
+  "s18DayCardHeader": "दिवस {day} — {weekday}",
+  "@s18DayCardHeader": {
+    "placeholders": {
+      "day": {"type": "int"},
+      "weekday": {"type": "String"}
+    }
+  },
+  "s18NoAuditSubmitted": "ऑडिट सादर केलेले नाही",
+  "s18StatusSubmitted": "सादर केले (पडताळणी प्रलंबित)",
+  "s18StatusVerified": "GM-पडताळलेले",
+  "s18StatusMissing": "अनुपस्थित",
+  "s18StartSpotCheck": "स्पॉट चेक",
+  "s18VerifiedBadge": "{name} द्वारे पडताळलेले · {time}",
+  "@s18VerifiedBadge": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "s18SpotCheckTitle": "GM स्पॉट चेक — ३ यादृच्छिक तपासणी बिंदू",
+  "s18SpotCheckSubtitle": "स्टोअर रजिस्टर आणि फोटो पुराव्यांशी नोंदवलेले निकाल तपासा.",
+  "s18CheckpointStep": "तपासणी बिंदू {total} पैकी {current}",
+  "@s18CheckpointStep": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "s18SmRecordedResult": "SM निकाल: {verdict}",
+  "@s18SmRecordedResult": {
+    "placeholders": {
+      "verdict": {"type": "String"}
+    }
+  },
+  "s18MarkVerified": "पडताळले",
+  "s18FlagDiscrepancy": "तफावत नोंदवा",
+  "s18VerifyAndSignButton": "दैनंदिन ऑडिट पडताळणी व स्वाक्षरी करा",
+  "s18DiscrepancyDialogTitle": "तफावत नोंदवा",
+  "s18DiscrepancyHint": "तफावतीचे तपशील प्रविष्ट करा (उदा. रजिस्टरवर स्वाक्षरी गहाळ)",
+  "s18DiscrepancySuccess": "तफावत नोंदवली. ऑडिट अपडताळलेले राहील.",
+  "s18VerifySuccess": "दैनंदिन ऑडिट GM द्वारे यशस्वीरित्या पडताळले गेले.",
+  "s18AllCheckpointsMustBeVerified": "कृपया स्वाक्षरी करण्यापूर्वी सर्व ३ तपासणी बिंदू पडताळा.",
+  "s18ConfirmDiscrepancy": "नोंद सबमिट करा",
+  "s18Cancel": "रद्द करा"
 }
+
 
 
 

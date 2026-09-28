@@ -3560,6 +3560,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'मराठी'**
   String get s26MarathiLabel;
+
+  /// No description provided for @s10SevenDayReviewButton.
+  ///
+  /// In en, this message translates to:
+  /// **'7-Day Daily Review & Spot-Check'**
+  String get s10SevenDayReviewButton;
+
+  /// No description provided for @s05SevenDayReview.
+  ///
+  /// In en, this message translates to:
+  /// **'7-Day Review'**
+  String get s05SevenDayReview;
+
+  /// No description provided for @s18SevenDayReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'7-Day Daily Review'**
+  String get s18SevenDayReviewTitle;
+
+  /// No description provided for @s18SevenDayReviewSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review daily audits & perform GM spot-checks'**
+  String get s18SevenDayReviewSubtitle;
+
+  /// No description provided for @s18DayCardHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day} — {weekday}'**
+  String s18DayCardHeader(int day, String weekday);
+
+  /// No description provided for @s18NoAuditSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'No audit submitted'**
+  String get s18NoAuditSubmitted;
+
+  /// No description provided for @s18StatusSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted (Pending Verification)'**
+  String get s18StatusSubmitted;
+
+  /// No description provided for @s18StatusVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'GM-Verified'**
+  String get s18StatusVerified;
+
+  /// No description provided for @s18StatusMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing'**
+  String get s18StatusMissing;
+
+  /// No description provided for @s18StartSpotCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Spot-Check'**
+  String get s18StartSpotCheck;
+
+  /// No description provided for @s18VerifiedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified by {name} · {time}'**
+  String s18VerifiedBadge(String name, String time);
+
+  /// No description provided for @s18SpotCheckTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'GM Spot-Check — 3 Random Checkpoints'**
+  String get s18SpotCheckTitle;
+
+  /// No description provided for @s18SpotCheckSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Validate recorded results against original store registers & evidence photos.'**
+  String get s18SpotCheckSubtitle;
+
+  /// No description provided for @s18CheckpointStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkpoint {current} of {total}'**
+  String s18CheckpointStep(int current, int total);
+
+  /// No description provided for @s18SmRecordedResult.
+  ///
+  /// In en, this message translates to:
+  /// **'SM Result: {verdict}'**
+  String s18SmRecordedResult(String verdict);
+
+  /// No description provided for @s18MarkVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark Verified'**
+  String get s18MarkVerified;
+
+  /// No description provided for @s18FlagDiscrepancy.
+  ///
+  /// In en, this message translates to:
+  /// **'Flag Discrepancy'**
+  String get s18FlagDiscrepancy;
+
+  /// No description provided for @s18VerifyAndSignButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify & Sign Daily Audit'**
+  String get s18VerifyAndSignButton;
+
+  /// No description provided for @s18DiscrepancyDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Flag Discrepancy'**
+  String get s18DiscrepancyDialogTitle;
+
+  /// No description provided for @s18DiscrepancyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe discrepancy (e.g. evidence missing on register)'**
+  String get s18DiscrepancyHint;
+
+  /// No description provided for @s18DiscrepancySuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Discrepancy flagged. Audit remains unverified.'**
+  String get s18DiscrepancySuccess;
+
+  /// No description provided for @s18VerifySuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily audit successfully verified by GM.'**
+  String get s18VerifySuccess;
+
+  /// No description provided for @s18AllCheckpointsMustBeVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Please verify all 3 checkpoints before signing off.'**
+  String get s18AllCheckpointsMustBeVerified;
+
+  /// No description provided for @s18ConfirmDiscrepancy.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Flag'**
+  String get s18ConfirmDiscrepancy;
+
+  /// No description provided for @s18Cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get s18Cancel;
 }
 
 class _AppLocalizationsDelegate

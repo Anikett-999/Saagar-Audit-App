@@ -48,6 +48,7 @@ class AuditDetailScreen extends ConsumerStatefulWidget {
 class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
   Audit? _audit;
   String _auditorName = '';
+  String? _verifierName;
   List<Sop> _sops = const [];
   Map<String, Checkpoint> _checkpointsById = const {};
   List<AuditResult> _results = const [];
@@ -88,6 +89,15 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
         }
       } catch (_) {
         // Keep fallback
+      }
+
+      // Load verifier name if verified
+      String? verifierName;
+      if (audit.verifierId != null) {
+        try {
+          final verifier = await UserRepository.instance.getById(audit.verifierId!);
+          if (verifier != null) verifierName = verifier.name;
+        } catch (_) {}
       }
 
       // Load SOPs and checkpoints
@@ -134,6 +144,7 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
       setState(() {
         _audit = audit;
         _auditorName = auditorName;
+        _verifierName = verifierName;
         _sops = sops;
         _checkpointsById = cpMap;
         _results = results;
@@ -444,6 +455,22 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
                     ),
                   ],
                 ),
+                if (audit.status == 'verified')
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.verified, size: 14, color: AppColors.green),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Verified: ${_verifierName ?? audit.verifierId ?? "GM"}${audit.verifiedAt != null && audit.verifiedAt!.length >= 10 ? " (${audit.verifiedAt!.substring(0, 10)})" : ""}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.green,
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),

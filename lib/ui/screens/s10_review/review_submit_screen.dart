@@ -298,7 +298,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
                 const SizedBox(height: 16),
               ],
               // 1. Score Card (large, prominent)
-              _buildScoreCard(l10n, isWeekly, weeklyScore, dailyScore, color),
+              _buildScoreCard(l10n, isWeekly, weeklyScore, dailyScore, color, audit),
               const SizedBox(height: 24),
 
               // 2. Breakdown by SOP
@@ -362,6 +362,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
     WeeklyScoreResult? weeklyScore,
     ScoreResult? dailyScore,
     Color color,
+    Audit audit,
   ) {
     final compliancePct =
         isWeekly ? weeklyScore!.compliancePct : dailyScore!.compliancePct;
@@ -516,6 +517,30 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
                   ),
                   _buildVarianceLine(l10n),
                 ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  context.pushNamed(
+                    'seven_day_review',
+                    queryParameters: {
+                      'week': '${audit.weekNumber}',
+                      'year': '${audit.year}',
+                    },
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.navy),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                icon: const Icon(Icons.fact_check_outlined, size: 18),
+                label: Text(
+                  l10n.s10SevenDayReviewButton,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],
