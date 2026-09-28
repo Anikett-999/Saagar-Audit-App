@@ -585,6 +585,24 @@
       "error": {"type": "String"}
     }
   },
+  "s16CloseError": "Error closing CAP: {error}",
+  "@s16CloseError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "s16ExtendError": "Error extending CAP: {error}",
+  "@s16ExtendError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "s16ReopenError": "Error reopening CAP: {error}",
+  "@s16ReopenError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   "s16RefreshTooltip": "Refresh",
   "s16WhysSubheader": "5 Whys",
   "s16NoTimelineEntries": "No timeline entries",
@@ -865,52 +883,126 @@
 
   "s10SevenDayReviewButton": "7-Day Daily Review & Spot-Check",
   "s05SevenDayReview": "7-Day Review",
-  "s18SevenDayReviewTitle": "7-Day Daily Review",
-  "s18SevenDayReviewSubtitle": "Review daily audits & perform GM spot-checks",
-  "s18DayCardHeader": "Day {day} — {weekday}",
-  "@s18DayCardHeader": {
+  "weeklyReviewTitle": "7-Day Daily Review",
+  "weeklyReviewSubtitle": "Review daily audits & perform GM spot-checks",
+  "weeklyReviewDayCardHeader": "Day {day} — {weekday}",
+  "@weeklyReviewDayCardHeader": {
     "placeholders": {
       "day": {"type": "int"},
       "weekday": {"type": "String"}
     }
   },
-  "s18NoAuditSubmitted": "No audit submitted",
-  "s18StatusSubmitted": "Submitted (Pending Verification)",
-  "s18StatusVerified": "GM-Verified",
-  "s18StatusMissing": "Missing",
-  "s18StartSpotCheck": "Spot-Check",
-  "s18VerifiedBadge": "Verified by {name} · {time}",
-  "@s18VerifiedBadge": {
+  "weeklyReviewNoAuditSubmitted": "No audit submitted",
+  "weeklyReviewStatusSubmitted": "Submitted (Pending Verification)",
+  "weeklyReviewStatusVerified": "GM-Verified",
+  "weeklyReviewStatusMissing": "Missing",
+  "weeklyReviewStartSpotCheck": "Spot-Check",
+  "weeklyReviewVerifiedBadge": "Verified by {name} · {time}",
+  "@weeklyReviewVerifiedBadge": {
     "placeholders": {
       "name": {"type": "String"},
       "time": {"type": "String"}
     }
   },
-  "s18SpotCheckTitle": "GM Spot-Check — 3 Random Checkpoints",
-  "s18SpotCheckSubtitle": "Validate recorded results against original store registers & evidence photos.",
-  "s18CheckpointStep": "Checkpoint {current} of {total}",
-  "@s18CheckpointStep": {
+  "weeklyReviewSpotCheckTitle": "GM Spot-Check — 3 Random Checkpoints",
+  "weeklyReviewSpotCheckSubtitle": "Validate recorded results against original store registers & evidence photos.",
+  "weeklyReviewCheckpointStep": "Checkpoint {current} of {total}",
+  "@weeklyReviewCheckpointStep": {
     "placeholders": {
       "current": {"type": "int"},
       "total": {"type": "int"}
     }
   },
-  "s18SmRecordedResult": "SM Result: {verdict}",
-  "@s18SmRecordedResult": {
+  "weeklyReviewSmRecordedResult": "SM Result: {verdict}",
+  "@weeklyReviewSmRecordedResult": {
     "placeholders": {
       "verdict": {"type": "String"}
     }
   },
-  "s18MarkVerified": "Mark Verified",
-  "s18FlagDiscrepancy": "Flag Discrepancy",
-  "s18VerifyAndSignButton": "Verify & Sign Daily Audit",
-  "s18DiscrepancyDialogTitle": "Flag Discrepancy",
-  "s18DiscrepancyHint": "Describe discrepancy (e.g. evidence missing on register)",
-  "s18DiscrepancySuccess": "Discrepancy flagged. Audit remains unverified.",
-  "s18VerifySuccess": "Daily audit successfully verified by GM.",
-  "s18AllCheckpointsMustBeVerified": "Please verify all 3 checkpoints before signing off.",
-  "s18ConfirmDiscrepancy": "Submit Flag",
-  "s18Cancel": "Cancel",
+  "weeklyReviewMarkVerified": "Mark Verified",
+  "weeklyReviewFlagDiscrepancy": "Flag Discrepancy",
+  "weeklyReviewVerifyAndSignButton": "Verify & Sign Daily Audit",
+  "weeklyReviewDiscrepancyDialogTitle": "Flag Discrepancy",
+  "weeklyReviewDiscrepancyHint": "Describe discrepancy (e.g. evidence missing on register)",
+  "weeklyReviewDiscrepancySuccess": "Discrepancy flagged. Audit remains unverified.",
+  "weeklyReviewVerifySuccess": "Daily audit successfully verified by GM.",
+  "weeklyReviewAllCheckpointsMustBeVerified": "Please verify all 3 checkpoints before signing off.",
+  "weeklyReviewConfirmDiscrepancy": "Submit Flag",
+  "weeklyReviewCancel": "Cancel",
+
+  "s18CapVerifyTitle": "Verify CAP",
+  "s18CapVerifySubtitle": "Verify resolution of corrective action",
+  "s18ProblemStatement": "Problem Statement",
+  "s18VerificationMethod": "Verification Method",
+  "s18OriginCheckpoint": "Origin Checkpoint",
+  "s18Deadline": "Deadline",
+  "s18QuestionAffirmation": "Does the corrective action pass verification?",
+  "s18PhotoRequiredNotice": "Mandatory photo evidence is required to verify this checkpoint.",
+  "s18TakePhoto": "Take Verification Photo",
+  "s18PhotoAttached": "Verification photo attached",
+  "s18PassAndVerify": "Pass & Verify",
+  "s18VerificationFailed": "Verification Failed",
+  "s18VerifySuccess": "CAP successfully verified by GM.",
+  "s18FailDialogTitle": "Verification Failed",
+  "s18FailDialogMessage": "Verification was marked as failed. Select next action per SOP Day 4 §4.3: Extend the deadline or Reopen at Plan phase.",
+  "s18ActionExtend": "Extend Deadline",
+  "s18ActionReopen": "Reopen at Plan",
+  "s18ExtendTitle": "Extend CAP Deadline",
+  "s18ExtendNewDeadline": "New Deadline",
+  "s18ExtendReason": "Reason for Extension",
+  "s18ExtendReasonHint": "Explain why extension is needed (mandatory)",
+  "s18ConfirmExtend": "Confirm Extension",
+  "s18ExtendSuccess": "CAP deadline successfully extended.",
+  "s18ReopenTitle": "Reopen CAP at Plan",
+  "s18ReopenReason": "Reason for Reopening",
+  "s18ReopenReasonHint": "Explain why CAP is being reopened (mandatory)",
+  "s18ConfirmReopen": "Confirm Reopen",
+  "s18ReopenSuccess": "CAP reopened at Plan phase.",
+  "s18PhotoRequiredError": "Please capture a verification photo before verifying.",
+  "s18MissingReasonError": "Please provide a valid reason.",
+  "s18PatternMarker": "Pattern Issue",
+  "s18AccessDenied": "Access Denied. Only GM and Owner may verify CAPs.",
+  "s18Back": "Back",
+  "s18PhotoRequiredBadge": "REQUIRED",
+  "s18PhotoCaptureError": "Failed to capture photo: {error}",
+  "@s18PhotoCaptureError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "s18VerifyError": "Verification error: {error}",
+  "@s18VerifyError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "s19CapCloseTitle": "Close CAP",
+  "s19CapCloseConfirmMessage": "Are you sure you want to permanently close CAP #{id}? This confirms all actions and GM verifications are complete.",
+  "@s19CapCloseConfirmMessage": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+  "s19ConfirmClose": "Confirm & Close",
+  "s19Cancel": "Cancel",
+  "s19CloseSuccess": "CAP #{id} successfully closed.",
+  "@s19CloseSuccess": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+
+  "capOversightTitle": "CAP Oversight",
+  "capOversightSubtitle": "Monitor and verify store corrective actions",
+  "capOversightCountOpen": "Open",
+  "capOversightCountAwaiting": "Awaiting Verify",
+  "capOversightCountVerified": "Verified",
+  "capOversightCountClosed": "Closed",
+  "capOversightCountOverdue": "Overdue",
+  "capOversightAwaitingSection": "Awaiting My Verification",
+  "capOversightNoAwaiting": "No CAPs awaiting verification",
+  "capOversightVerifyNow": "Verify Now",
   "s20ScreenTitle": "Weekly Reports",
   "s20ScreenSubtitle": "Workbook §3.6 reports & 1-page PDF export",
   "s20FilterAll": "All",

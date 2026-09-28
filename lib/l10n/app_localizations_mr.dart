@@ -1374,6 +1374,21 @@ class AppLocalizationsMr extends AppLocalizations {
   }
 
   @override
+  String s16CloseError(String error) {
+    return 'CAP बंद करताना त्रुटी: $error';
+  }
+
+  @override
+  String s16ExtendError(String error) {
+    return 'मुदतवाढ करताना त्रुटी: $error';
+  }
+
+  @override
+  String s16ReopenError(String error) {
+    return 'CAP पुन्हा उघडताना त्रुटी: $error';
+  }
+
+  @override
   String get s16RefreshTooltip => 'रिफ्रेश करा';
 
   @override
@@ -1919,86 +1934,258 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s05SevenDayReview => '७-दिवसीय आढावा';
 
   @override
-  String get s18SevenDayReviewTitle => '७-दिवसीय दैनिक आढावा';
+  String get weeklyReviewTitle => '७-दिवसीय दैनिक आढावा';
 
   @override
-  String get s18SevenDayReviewSubtitle =>
-      'दैनंदिन ऑडिट तपासा आणि GM स्पॉट चेक करा';
+  String get weeklyReviewSubtitle => 'दैनंदिन ऑडिट तपासा आणि GM स्पॉट चेक करा';
 
   @override
-  String s18DayCardHeader(int day, String weekday) {
+  String weeklyReviewDayCardHeader(int day, String weekday) {
     return 'दिवस $day — $weekday';
   }
 
   @override
-  String get s18NoAuditSubmitted => 'ऑडिट सादर केलेले नाही';
+  String get weeklyReviewNoAuditSubmitted => 'ऑडिट सादर केलेले नाही';
 
   @override
-  String get s18StatusSubmitted => 'सादर केले (पडताळणी प्रलंबित)';
+  String get weeklyReviewStatusSubmitted => 'सादर केले (पडताळणी प्रलंबित)';
 
   @override
-  String get s18StatusVerified => 'GM-पडताळलेले';
+  String get weeklyReviewStatusVerified => 'GM-पडताळलेले';
 
   @override
-  String get s18StatusMissing => 'अनुपस्थित';
+  String get weeklyReviewStatusMissing => 'अनुपस्थित';
 
   @override
-  String get s18StartSpotCheck => 'स्पॉट चेक';
+  String get weeklyReviewStartSpotCheck => 'स्पॉट चेक';
 
   @override
-  String s18VerifiedBadge(String name, String time) {
+  String weeklyReviewVerifiedBadge(String name, String time) {
     return '$name द्वारे पडताळलेले · $time';
   }
 
   @override
-  String get s18SpotCheckTitle => 'GM स्पॉट चेक — ३ यादृच्छिक तपासणी बिंदू';
+  String get weeklyReviewSpotCheckTitle =>
+      'GM स्पॉट चेक — ३ यादृच्छिक तपासणी बिंदू';
 
   @override
-  String get s18SpotCheckSubtitle =>
+  String get weeklyReviewSpotCheckSubtitle =>
       'स्टोअर रजिस्टर आणि फोटो पुराव्यांशी नोंदवलेले निकाल तपासा.';
 
   @override
-  String s18CheckpointStep(int current, int total) {
+  String weeklyReviewCheckpointStep(int current, int total) {
     return 'तपासणी बिंदू $total पैकी $current';
   }
 
   @override
-  String s18SmRecordedResult(String verdict) {
+  String weeklyReviewSmRecordedResult(String verdict) {
     return 'SM निकाल: $verdict';
   }
 
   @override
-  String get s18MarkVerified => 'पडताळले';
+  String get weeklyReviewMarkVerified => 'पडताळले';
 
   @override
-  String get s18FlagDiscrepancy => 'तफावत नोंदवा';
+  String get weeklyReviewFlagDiscrepancy => 'तफावत नोंदवा';
 
   @override
-  String get s18VerifyAndSignButton => 'दैनंदिन ऑडिट पडताळणी व स्वाक्षरी करा';
+  String get weeklyReviewVerifyAndSignButton =>
+      'दैनंदिन ऑडिट पडताळणी व स्वाक्षरी करा';
 
   @override
-  String get s18DiscrepancyDialogTitle => 'तफावत नोंदवा';
+  String get weeklyReviewDiscrepancyDialogTitle => 'तफावत नोंदवा';
 
   @override
-  String get s18DiscrepancyHint =>
+  String get weeklyReviewDiscrepancyHint =>
       'तफावतीचे तपशील प्रविष्ट करा (उदा. रजिस्टरवर स्वाक्षरी गहाळ)';
 
   @override
-  String get s18DiscrepancySuccess => 'तफावत नोंदवली. ऑडिट अपडताळलेले राहील.';
+  String get weeklyReviewDiscrepancySuccess =>
+      'तफावत नोंदवली. ऑडिट अपडताळलेले राहील.';
 
   @override
-  String get s18VerifySuccess =>
+  String get weeklyReviewVerifySuccess =>
       'दैनंदिन ऑडिट GM द्वारे यशस्वीरित्या पडताळले गेले.';
 
   @override
-  String get s18AllCheckpointsMustBeVerified =>
+  String get weeklyReviewAllCheckpointsMustBeVerified =>
       'कृपया स्वाक्षरी करण्यापूर्वी सर्व ३ तपासणी बिंदू पडताळा.';
 
   @override
-  String get s18ConfirmDiscrepancy => 'नोंद सबमिट करा';
+  String get weeklyReviewConfirmDiscrepancy => 'नोंद सबमिट करा';
 
   @override
-  String get s18Cancel => 'रद्द करा';
+  String get weeklyReviewCancel => 'रद्द करा';
+
+  @override
+  String get s18CapVerifyTitle => 'CAP पडताळणी';
+
+  @override
+  String get s18CapVerifySubtitle => 'सुधारात्मक कृतीचे निराकरण पडताळा';
+
+  @override
+  String get s18ProblemStatement => 'समस्येचे विधान';
+
+  @override
+  String get s18VerificationMethod => 'पडताळणी पद्धत';
+
+  @override
+  String get s18OriginCheckpoint => 'मूळ तपासणी बिंदू';
+
+  @override
+  String get s18Deadline => 'मुदत';
+
+  @override
+  String get s18QuestionAffirmation =>
+      'सुधारात्मक कृती पडताळणीत उत्तीर्ण झाली आहे का?';
+
+  @override
+  String get s18PhotoRequiredNotice =>
+      'या तपासणी बिंदूची पडताळणी करण्यासाठी फोटो पुरावा अनिवार्य आहे.';
+
+  @override
+  String get s18TakePhoto => 'पडताळणी फोटो घ्या';
+
+  @override
+  String get s18PhotoAttached => 'पडताळणी फोटो जोडला';
+
+  @override
+  String get s18PassAndVerify => 'उत्तीर्ण व पडताळा';
+
+  @override
+  String get s18VerificationFailed => 'पडताळणी अयशस्वी';
+
+  @override
+  String get s18VerifySuccess =>
+      'CAP चे GM द्वारे यशस्वीरित्या प्रमाणीकरण झाले.';
+
+  @override
+  String get s18FailDialogTitle => 'पडताळणी अयशस्वी';
+
+  @override
+  String get s18FailDialogMessage =>
+      'पडताळणी अयशस्वी म्हणून नोंदवली गेली. SOP दिवस ४ §४.३ नुसार पुढील कृती निवडा: मुदत वाढवा किंवा योजना टप्प्यात पुन्हा उघडा.';
+
+  @override
+  String get s18ActionExtend => 'मुदत वाढवा';
+
+  @override
+  String get s18ActionReopen => 'योजना टप्प्यात पुन्हा उघडा';
+
+  @override
+  String get s18ExtendTitle => 'CAP मुदत वाढवा';
+
+  @override
+  String get s18ExtendNewDeadline => 'नवीन मुदत';
+
+  @override
+  String get s18ExtendReason => 'मुदतवाढीचे कारण';
+
+  @override
+  String get s18ExtendReasonHint =>
+      'मुदतवाढ का आवश्यक आहे ते स्पष्ट करा (अनिवार्य)';
+
+  @override
+  String get s18ConfirmExtend => 'मुदतवाढ निश्चित करा';
+
+  @override
+  String get s18ExtendSuccess => 'CAP ची मुदत यशस्वीरित्या वाढवली गेली.';
+
+  @override
+  String get s18ReopenTitle => 'योजना टप्प्यात CAP पुन्हा उघडा';
+
+  @override
+  String get s18ReopenReason => 'पुन्हा उघडण्याचे कारण';
+
+  @override
+  String get s18ReopenReasonHint =>
+      'CAP पुन्हा का उघडले जात आहे ते स्पष्ट करा (अनिवार्य)';
+
+  @override
+  String get s18ConfirmReopen => 'पुन्हा उघडणे निश्चित करा';
+
+  @override
+  String get s18ReopenSuccess => 'CAP योजना टप्प्यात पुन्हा उघडले गेले.';
+
+  @override
+  String get s18PhotoRequiredError =>
+      'कृपया पडताळणी करण्यापूर्वी पडताळणी फोटो घ्या.';
+
+  @override
+  String get s18MissingReasonError => 'कृपया वैध कारण प्रविष्ट करा.';
+
+  @override
+  String get s18PatternMarker => 'वारंवार आढळलेली समस्या';
+
+  @override
+  String get s18AccessDenied =>
+      'प्रवेश नाकारला. केवळ GM आणि मालकच CAP पडताळणी करू शकतात.';
+
+  @override
+  String get s18Back => 'मागे';
+
+  @override
+  String get s18PhotoRequiredBadge => 'आवश्यक';
+
+  @override
+  String s18PhotoCaptureError(String error) {
+    return 'फोटो काढण्यात अयशस्वी: $error';
+  }
+
+  @override
+  String s18VerifyError(String error) {
+    return 'पडताळणी त्रुटी: $error';
+  }
+
+  @override
+  String get s19CapCloseTitle => 'CAP बंद करा';
+
+  @override
+  String s19CapCloseConfirmMessage(String id) {
+    return 'तुम्हाला खात्री आहे की तुम्ही CAP #$id कायमचे बंद करू इच्छिता? हे सर्व कृती आणि GM पडताळणी पूर्ण झाल्याची पुष्टी करते.';
+  }
+
+  @override
+  String get s19ConfirmClose => 'निश्चित करा व बंद करा';
+
+  @override
+  String get s19Cancel => 'रद्द करा';
+
+  @override
+  String s19CloseSuccess(String id) {
+    return 'CAP #$id यशस्वीरित्या बंद झाले.';
+  }
+
+  @override
+  String get capOversightTitle => 'CAP व्यवस्थापन';
+
+  @override
+  String get capOversightSubtitle =>
+      'स्टोअर सुधारात्मक कृतींचे निरीक्षण व पडताळणी करा';
+
+  @override
+  String get capOversightCountOpen => 'उघडे';
+
+  @override
+  String get capOversightCountAwaiting => 'पडताळणी प्रलंबित';
+
+  @override
+  String get capOversightCountVerified => 'पडताळलेले';
+
+  @override
+  String get capOversightCountClosed => 'बंद';
+
+  @override
+  String get capOversightCountOverdue => 'मुदत संपलेले';
+
+  @override
+  String get capOversightAwaitingSection => 'माझ्या पडताळणीसाठी प्रलंबित';
+
+  @override
+  String get capOversightNoAwaiting => 'पडताळणीसाठी कोणतेही CAP प्रलंबित नाहीत';
+
+  @override
+  String get capOversightVerifyNow => 'आता पडताळा';
 
   @override
   String get s20ScreenTitle => 'साप्ताहिक अहवाल';

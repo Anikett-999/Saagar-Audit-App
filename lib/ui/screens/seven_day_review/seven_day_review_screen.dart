@@ -183,7 +183,7 @@ class _SevenDayReviewScreenState extends ConsumerState<SevenDayReviewScreen> {
           _loadData();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(AppLocalizations.of(context)!.s18VerifySuccess),
+              content: Text(AppLocalizations.of(context)!.weeklyReviewVerifySuccess),
               backgroundColor: AppColors.green,
             ),
           );
@@ -193,7 +193,7 @@ class _SevenDayReviewScreenState extends ConsumerState<SevenDayReviewScreen> {
           _loadData();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(AppLocalizations.of(context)!.s18DiscrepancySuccess),
+              content: Text(AppLocalizations.of(context)!.weeklyReviewDiscrepancySuccess),
               backgroundColor: AppColors.amber,
             ),
           );
@@ -213,7 +213,7 @@ class _SevenDayReviewScreenState extends ConsumerState<SevenDayReviewScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.s18SevenDayReviewTitle),
+        title: Text(l10n.weeklyReviewTitle),
         actions: const [
           LanguageToggleButton(),
         ],
@@ -269,7 +269,7 @@ class _SevenDayReviewScreenState extends ConsumerState<SevenDayReviewScreen> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          l10n.s18SevenDayReviewSubtitle,
+                          l10n.weeklyReviewSubtitle,
                           style: const TextStyle(
                             color: AppColors.cream,
                             fontSize: 13,
@@ -304,7 +304,7 @@ class _SevenDayReviewScreenState extends ConsumerState<SevenDayReviewScreen> {
   }) {
     final dateStr = _formatDate(date);
     final weekdayStr = _localizedWeekday(date.weekday, locale);
-    final headerTitle = l10n.s18DayCardHeader(dayIndex, weekdayStr);
+    final headerTitle = l10n.weeklyReviewDayCardHeader(dayIndex, weekdayStr);
 
     final audit = _dailyAudits.cast<Audit?>().firstWhere(
           (a) => a?.auditDate == dateStr,
@@ -341,7 +341,7 @@ class _SevenDayReviewScreenState extends ConsumerState<SevenDayReviewScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    l10n.s18NoAuditSubmitted,
+                    l10n.weeklyReviewNoAuditSubmitted,
                     style: const TextStyle(
                       fontSize: 12,
                       fontStyle: FontStyle.italic,
@@ -358,7 +358,7 @@ class _SevenDayReviewScreenState extends ConsumerState<SevenDayReviewScreen> {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                l10n.s18StatusMissing,
+                l10n.weeklyReviewStatusMissing,
                 style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
@@ -439,7 +439,7 @@ class _SevenDayReviewScreenState extends ConsumerState<SevenDayReviewScreen> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      isVerified ? l10n.s18StatusVerified : l10n.s18StatusSubmitted,
+                      isVerified ? l10n.weeklyReviewStatusVerified : l10n.weeklyReviewStatusSubmitted,
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -487,7 +487,7 @@ class _SevenDayReviewScreenState extends ConsumerState<SevenDayReviewScreen> {
           if (isVerified && verifierName != null) ...[
             const SizedBox(height: 4),
             Text(
-              l10n.s18VerifiedBadge(
+              l10n.weeklyReviewVerifiedBadge(
                 verifierName,
                 audit.verifiedAt != null && audit.verifiedAt!.length >= 16
                     ? audit.verifiedAt!.substring(0, 16).replaceFirst('T', ' ')
@@ -524,7 +524,7 @@ class _SevenDayReviewScreenState extends ConsumerState<SevenDayReviewScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     ),
                     icon: const Icon(Icons.fact_check_outlined, size: 16),
-                    label: Text(l10n.s18StartSpotCheck),
+                    label: Text(l10n.weeklyReviewStartSpotCheck),
                   ),
               ],
             ),
@@ -570,19 +570,19 @@ class _SpotCheckSheetState extends State<_SpotCheckSheet> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(l10n.s18DiscrepancyDialogTitle),
+        title: Text(l10n.weeklyReviewDiscrepancyDialogTitle),
         content: TextField(
           controller: controller,
           maxLines: 3,
           decoration: InputDecoration(
-            hintText: l10n.s18DiscrepancyHint,
+            hintText: l10n.weeklyReviewDiscrepancyHint,
             border: const OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.s18Cancel),
+            child: Text(l10n.weeklyReviewCancel),
           ),
           FilledButton(
             onPressed: () async {
@@ -601,7 +601,7 @@ class _SpotCheckSheetState extends State<_SpotCheckSheet> {
                 if (mounted) setState(() => _submitting = false);
               }
             },
-            child: Text(l10n.s18ConfirmDiscrepancy),
+            child: Text(l10n.weeklyReviewConfirmDiscrepancy),
           ),
         ],
       ),
@@ -611,7 +611,7 @@ class _SpotCheckSheetState extends State<_SpotCheckSheet> {
   Future<void> _verifyAndSign(AppLocalizations l10n) async {
     if (_verifiedResultIds.length < widget.results.length) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.s18AllCheckpointsMustBeVerified)),
+        SnackBar(content: Text(l10n.weeklyReviewAllCheckpointsMustBeVerified)),
       );
       return;
     }
@@ -695,7 +695,7 @@ class _SpotCheckSheetState extends State<_SpotCheckSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        l10n.s18SpotCheckTitle,
+                        l10n.weeklyReviewSpotCheckTitle,
                         style: const TextStyle(
                           fontFamily: 'DMSerifDisplay',
                           fontSize: 18,
@@ -725,7 +725,7 @@ class _SpotCheckSheetState extends State<_SpotCheckSheet> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                l10n.s18SpotCheckSubtitle,
+                l10n.weeklyReviewSpotCheckSubtitle,
                 style: const TextStyle(fontSize: 12, color: AppColors.gray600),
               ),
             ),
@@ -781,7 +781,7 @@ class _SpotCheckSheetState extends State<_SpotCheckSheet> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              l10n.s18CheckpointStep(idx + 1, widget.results.length),
+                              l10n.weeklyReviewCheckpointStep(idx + 1, widget.results.length),
                               style: const TextStyle(fontSize: 12, color: AppColors.gray600),
                             ),
                           ),
@@ -874,12 +874,12 @@ class _SpotCheckSheetState extends State<_SpotCheckSheet> {
                               isChecked ? Icons.check_box : Icons.check_box_outline_blank,
                               size: 18,
                             ),
-                            label: Text(l10n.s18MarkVerified),
+                            label: Text(l10n.weeklyReviewMarkVerified),
                           ),
                           TextButton(
                             onPressed: () => _showDiscrepancyDialog(l10n),
                             child: Text(
-                              l10n.s18FlagDiscrepancy,
+                              l10n.weeklyReviewFlagDiscrepancy,
                               style: const TextStyle(color: AppColors.amber),
                             ),
                           ),
@@ -921,7 +921,7 @@ class _SpotCheckSheetState extends State<_SpotCheckSheet> {
                         ),
                       )
                     : Text(
-                        l10n.s18VerifyAndSignButton,
+                        l10n.weeklyReviewVerifyAndSignButton,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

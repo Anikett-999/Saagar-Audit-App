@@ -21,6 +21,8 @@ import 'ui/screens/s14_cap_list/cap_list_screen.dart';
 import 'ui/screens/s15_cap_create/cap_create_screen.dart';
 import 'ui/screens/s16_cap_detail/cap_detail_screen.dart';
 import 'ui/screens/s17_cap_mark_done/cap_mark_done_screen.dart';
+import 'ui/screens/cap/s18_cap_verify_screen.dart';
+import 'ui/screens/cap/gm_dashboard_screen.dart';
 import 'ui/screens/seven_day_review/seven_day_review_screen.dart';
 import 'ui/screens/reports/reports_list_screen.dart';
 import 'ui/screens/reports/report_detail_screen.dart';
@@ -182,6 +184,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: '/caps/oversight',
+        name: 'cap_oversight',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          return null;
+        },
+        builder: (_, __) => const GmDashboardScreen(),
+      ),
+      GoRoute(
         path: '/caps/:id',
         name: 's16_cap_detail',
         redirect: (context, state) {
@@ -206,6 +220,23 @@ final routerProvider = Provider<GoRouter>((ref) {
           return null;
         },
         builder: (context, state) => CapMarkDoneScreen(
+          capId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
+        path: '/caps/:id/verify',
+        name: 's18_cap_verify',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          if (!auth.user!.isGm && !auth.user!.isOwner) {
+            return '/caps/${state.pathParameters['id']}';
+          }
+          return null;
+        },
+        builder: (context, state) => S18CapVerifyScreen(
           capId: state.pathParameters['id']!,
         ),
       ),

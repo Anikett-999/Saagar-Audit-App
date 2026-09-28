@@ -41,6 +41,18 @@ class CheckpointRepository {
     return rows.map(Checkpoint.fromMap).toList();
   }
 
+  /// Loads a single checkpoint by its ID.
+  Future<Checkpoint?> getById(String id) async {
+    final rows = await AppDatabase.instance.db.query(
+      'checkpoints',
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return Checkpoint.fromMap(rows.first);
+  }
+
   Future<Sop> loadSop(String sopId) async {
     final rows = await AppDatabase.instance.db.query(
       'sops',

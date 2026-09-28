@@ -501,6 +501,9 @@
   "s16ActorSystem": "प्रणाली",
   "s16ActorPrefix": "{user} द्वारे",
   "s16ActionToggleFailed": "कृती पाऊल अद्यतनित करण्यात अयशस्वी: {error}",
+  "s16CloseError": "CAP बंद करताना त्रुटी: {error}",
+  "s16ExtendError": "मुदतवाढ करताना त्रुटी: {error}",
+  "s16ReopenError": "CAP पुन्हा उघडताना त्रुटी: {error}",
   "s16RefreshTooltip": "रिफ्रेश करा",
   "s16WhysSubheader": "५ का? (५ व्हाय)",
   "s16NoTimelineEntries": "कोणत्याही टाइमलाइन नोंदी नाहीत",
@@ -692,52 +695,116 @@
 
   "s10SevenDayReviewButton": "७-दिवसीय दैनिक आढावा व स्पॉट चेक",
   "s05SevenDayReview": "७-दिवसीय आढावा",
-  "s18SevenDayReviewTitle": "७-दिवसीय दैनिक आढावा",
-  "s18SevenDayReviewSubtitle": "दैनंदिन ऑडिट तपासा आणि GM स्पॉट चेक करा",
-  "s18DayCardHeader": "दिवस {day} — {weekday}",
-  "@s18DayCardHeader": {
+  "weeklyReviewTitle": "७-दिवसीय दैनिक आढावा",
+  "weeklyReviewSubtitle": "दैनंदिन ऑडिट तपासा आणि GM स्पॉट चेक करा",
+  "weeklyReviewDayCardHeader": "दिवस {day} — {weekday}",
+  "@weeklyReviewDayCardHeader": {
     "placeholders": {
       "day": {"type": "int"},
       "weekday": {"type": "String"}
     }
   },
-  "s18NoAuditSubmitted": "ऑडिट सादर केलेले नाही",
-  "s18StatusSubmitted": "सादर केले (पडताळणी प्रलंबित)",
-  "s18StatusVerified": "GM-पडताळलेले",
-  "s18StatusMissing": "अनुपस्थित",
-  "s18StartSpotCheck": "स्पॉट चेक",
-  "s18VerifiedBadge": "{name} द्वारे पडताळलेले · {time}",
-  "@s18VerifiedBadge": {
+  "weeklyReviewNoAuditSubmitted": "ऑडिट सादर केलेले नाही",
+  "weeklyReviewStatusSubmitted": "सादर केले (पडताळणी प्रलंबित)",
+  "weeklyReviewStatusVerified": "GM-पडताळलेले",
+  "weeklyReviewStatusMissing": "अनुपस्थित",
+  "weeklyReviewStartSpotCheck": "स्पॉट चेक",
+  "weeklyReviewVerifiedBadge": "{name} द्वारे पडताळलेले · {time}",
+  "@weeklyReviewVerifiedBadge": {
     "placeholders": {
       "name": {"type": "String"},
       "time": {"type": "String"}
     }
   },
-  "s18SpotCheckTitle": "GM स्पॉट चेक — ३ यादृच्छिक तपासणी बिंदू",
-  "s18SpotCheckSubtitle": "स्टोअर रजिस्टर आणि फोटो पुराव्यांशी नोंदवलेले निकाल तपासा.",
-  "s18CheckpointStep": "तपासणी बिंदू {total} पैकी {current}",
-  "@s18CheckpointStep": {
+  "weeklyReviewSpotCheckTitle": "GM स्पॉट चेक — ३ यादृच्छिक तपासणी बिंदू",
+  "weeklyReviewSpotCheckSubtitle": "स्टोअर रजिस्टर आणि फोटो पुराव्यांशी नोंदवलेले निकाल तपासा.",
+  "weeklyReviewCheckpointStep": "तपासणी बिंदू {total} पैकी {current}",
+  "@weeklyReviewCheckpointStep": {
     "placeholders": {
       "current": {"type": "int"},
       "total": {"type": "int"}
     }
   },
-  "s18SmRecordedResult": "SM निकाल: {verdict}",
-  "@s18SmRecordedResult": {
+  "weeklyReviewSmRecordedResult": "SM निकाल: {verdict}",
+  "@weeklyReviewSmRecordedResult": {
     "placeholders": {
       "verdict": {"type": "String"}
     }
   },
-  "s18MarkVerified": "पडताळले",
-  "s18FlagDiscrepancy": "तफावत नोंदवा",
-  "s18VerifyAndSignButton": "दैनंदिन ऑडिट पडताळणी व स्वाक्षरी करा",
-  "s18DiscrepancyDialogTitle": "तफावत नोंदवा",
-  "s18DiscrepancyHint": "तफावतीचे तपशील प्रविष्ट करा (उदा. रजिस्टरवर स्वाक्षरी गहाळ)",
-  "s18DiscrepancySuccess": "तफावत नोंदवली. ऑडिट अपडताळलेले राहील.",
-  "s18VerifySuccess": "दैनंदिन ऑडिट GM द्वारे यशस्वीरित्या पडताळले गेले.",
-  "s18AllCheckpointsMustBeVerified": "कृपया स्वाक्षरी करण्यापूर्वी सर्व ३ तपासणी बिंदू पडताळा.",
-  "s18ConfirmDiscrepancy": "नोंद सबमिट करा",
-  "s18Cancel": "रद्द करा",
+  "weeklyReviewMarkVerified": "पडताळले",
+  "weeklyReviewFlagDiscrepancy": "तफावत नोंदवा",
+  "weeklyReviewVerifyAndSignButton": "दैनंदिन ऑडिट पडताळणी व स्वाक्षरी करा",
+  "weeklyReviewDiscrepancyDialogTitle": "तफावत नोंदवा",
+  "weeklyReviewDiscrepancyHint": "तफावतीचे तपशील प्रविष्ट करा (उदा. रजिस्टरवर स्वाक्षरी गहाळ)",
+  "weeklyReviewDiscrepancySuccess": "तफावत नोंदवली. ऑडिट अपडताळलेले राहील.",
+  "weeklyReviewVerifySuccess": "दैनंदिन ऑडिट GM द्वारे यशस्वीरित्या पडताळले गेले.",
+  "weeklyReviewAllCheckpointsMustBeVerified": "कृपया स्वाक्षरी करण्यापूर्वी सर्व ३ तपासणी बिंदू पडताळा.",
+  "weeklyReviewConfirmDiscrepancy": "नोंद सबमिट करा",
+  "weeklyReviewCancel": "रद्द करा",
+
+  "s18CapVerifyTitle": "CAP पडताळणी",
+  "s18CapVerifySubtitle": "सुधारात्मक कृतीचे निराकरण पडताळा",
+  "s18ProblemStatement": "समस्येचे विधान",
+  "s18VerificationMethod": "पडताळणी पद्धत",
+  "s18OriginCheckpoint": "मूळ तपासणी बिंदू",
+  "s18Deadline": "मुदत",
+  "s18QuestionAffirmation": "सुधारात्मक कृती पडताळणीत उत्तीर्ण झाली आहे का?",
+  "s18PhotoRequiredNotice": "या तपासणी बिंदूची पडताळणी करण्यासाठी फोटो पुरावा अनिवार्य आहे.",
+  "s18TakePhoto": "पडताळणी फोटो घ्या",
+  "s18PhotoAttached": "पडताळणी फोटो जोडला",
+  "s18PassAndVerify": "उत्तीर्ण व पडताळा",
+  "s18VerificationFailed": "पडताळणी अयशस्वी",
+  "s18VerifySuccess": "CAP चे GM द्वारे यशस्वीरित्या प्रमाणीकरण झाले.",
+  "s18FailDialogTitle": "पडताळणी अयशस्वी",
+  "s18FailDialogMessage": "पडताळणी अयशस्वी म्हणून नोंदवली गेली. SOP दिवस ४ §४.३ नुसार पुढील कृती निवडा: मुदत वाढवा किंवा योजना टप्प्यात पुन्हा उघडा.",
+  "s18ActionExtend": "मुदत वाढवा",
+  "s18ActionReopen": "योजना टप्प्यात पुन्हा उघडा",
+  "s18ExtendTitle": "CAP मुदत वाढवा",
+  "s18ExtendNewDeadline": "नवीन मुदत",
+  "s18ExtendReason": "मुदतवाढीचे कारण",
+  "s18ExtendReasonHint": "मुदतवाढ का आवश्यक आहे ते स्पष्ट करा (अनिवार्य)",
+  "s18ConfirmExtend": "मुदतवाढ निश्चित करा",
+  "s18ExtendSuccess": "CAP ची मुदत यशस्वीरित्या वाढवली गेली.",
+  "s18ReopenTitle": "योजना टप्प्यात CAP पुन्हा उघडा",
+  "s18ReopenReason": "पुन्हा उघडण्याचे कारण",
+  "s18ReopenReasonHint": "CAP पुन्हा का उघडले जात आहे ते स्पष्ट करा (अनिवार्य)",
+  "s18ConfirmReopen": "पुन्हा उघडणे निश्चित करा",
+  "s18ReopenSuccess": "CAP योजना टप्प्यात पुन्हा उघडले गेले.",
+  "s18PhotoRequiredError": "कृपया पडताळणी करण्यापूर्वी पडताळणी फोटो घ्या.",
+  "s18MissingReasonError": "कृपया वैध कारण प्रविष्ट करा.",
+  "s18PatternMarker": "वारंवार आढळलेली समस्या",
+  "s18AccessDenied": "प्रवेश नाकारला. केवळ GM आणि मालकच CAP पडताळणी करू शकतात.",
+  "s18Back": "मागे",
+  "s18PhotoRequiredBadge": "आवश्यक",
+  "s18PhotoCaptureError": "फोटो काढण्यात अयशस्वी: {error}",
+  "s18VerifyError": "पडताळणी त्रुटी: {error}",
+
+  "s19CapCloseTitle": "CAP बंद करा",
+  "s19CapCloseConfirmMessage": "तुम्हाला खात्री आहे की तुम्ही CAP #{id} कायमचे बंद करू इच्छिता? हे सर्व कृती आणि GM पडताळणी पूर्ण झाल्याची पुष्टी करते.",
+  "@s19CapCloseConfirmMessage": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+  "s19ConfirmClose": "निश्चित करा व बंद करा",
+  "s19Cancel": "रद्द करा",
+  "s19CloseSuccess": "CAP #{id} यशस्वीरित्या बंद झाले.",
+  "@s19CloseSuccess": {
+    "placeholders": {
+      "id": {"type": "String"}
+    }
+  },
+
+  "capOversightTitle": "CAP व्यवस्थापन",
+  "capOversightSubtitle": "स्टोअर सुधारात्मक कृतींचे निरीक्षण व पडताळणी करा",
+  "capOversightCountOpen": "उघडे",
+  "capOversightCountAwaiting": "पडताळणी प्रलंबित",
+  "capOversightCountVerified": "पडताळलेले",
+  "capOversightCountClosed": "बंद",
+  "capOversightCountOverdue": "मुदत संपलेले",
+  "capOversightAwaitingSection": "माझ्या पडताळणीसाठी प्रलंबित",
+  "capOversightNoAwaiting": "पडताळणीसाठी कोणतेही CAP प्रलंबित नाहीत",
+  "capOversightVerifyNow": "आता पडताळा",
   "s20ScreenTitle": "साप्ताहिक अहवाल",
   "s20ScreenSubtitle": "कार्यपुस्तिका §3.6 अहवाल आणि 1-पान PDF निर्यात",
   "s20FilterAll": "सर्व",

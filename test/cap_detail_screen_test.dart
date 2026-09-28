@@ -66,6 +66,15 @@ Widget createCapDetailTestWidget({
             ),
           ),
           GoRoute(
+            path: '/caps/:id/verify',
+            name: 's18_cap_verify',
+            builder: (context, state) => Scaffold(
+              body: Center(
+                child: Text('Target S18 Verify: ${state.pathParameters['id']}'),
+              ),
+            ),
+          ),
+          GoRoute(
             path: '/caps',
             name: 's14_cap_list',
             builder: (_, __) => const Scaffold(
@@ -637,7 +646,7 @@ void main() {
   });
 
   testWidgets(
-      'S16 CAP Detail Screen Tests (Spec §5 S16) Phase 2: Open CAP has disabled Request Extension button',
+      'S16 CAP Detail Screen Tests (Spec §5 S16) Phase 2: Open CAP has enabled Request Extension button for GM',
       (tester) async {
     fakeDb.tables['caps'] = [
       {
@@ -657,22 +666,21 @@ void main() {
     fakeDb.tables['cap_actions'] = [];
     fakeDb.tables['cap_log'] = [];
 
+    // GM sees enabled Request Extension button
     await pumpCapDetail(
       tester,
-      authState: const AuthState(user: smUser),
+      authState: const AuthState(user: gmUser),
       capId: 'CAP-P2-OPEN',
     );
-
     expect(find.text('Request Extension'), findsOneWidget);
-    expect(find.text('Phase 2 (Coming Soon)'), findsOneWidget);
     final extButton = tester.widget<OutlinedButton>(
       find.byKey(const ValueKey('s16_request_extension_button')),
     );
-    expect(extButton.onPressed, isNull);
+    expect(extButton.onPressed, isNotNull);
   });
 
   testWidgets(
-      'S16 CAP Detail Screen Tests (Spec §5 S16) Phase 2: Done CAP has disabled Verify CAP button for GM',
+      'S16 CAP Detail Screen Tests (Spec §5 S16) Phase 2: Done CAP has enabled Verify CAP button for GM',
       (tester) async {
     fakeDb.tables['caps'] = [
       {
@@ -702,11 +710,15 @@ void main() {
     final verifyButton = tester.widget<ElevatedButton>(
       find.byKey(const ValueKey('s16_verify_button')),
     );
-    expect(verifyButton.onPressed, isNull);
+    expect(verifyButton.onPressed, isNotNull);
+
+    await tester.tap(find.byKey(const ValueKey('s16_verify_button')));
+    await tester.pumpAndSettle();
+    expect(find.text('Target S18 Verify: CAP-P2-DONE'), findsOneWidget);
   });
 
   testWidgets(
-      'S16 CAP Detail Screen Tests (Spec §5 S16) Phase 2: Verified CAP has disabled Close CAP button for GM',
+      'S16 CAP Detail Screen Tests (Spec §5 S16) Phase 2: Verified CAP has enabled Close CAP button for GM',
       (tester) async {
     fakeDb.tables['caps'] = [
       {
@@ -736,11 +748,18 @@ void main() {
     final closeButton = tester.widget<ElevatedButton>(
       find.byKey(const ValueKey('s16_close_button')),
     );
-    expect(closeButton.onPressed, isNull);
+    expect(closeButton.onPressed, isNotNull);
+
+    // Tap Close button -> opens S19 confirmation dialog
+    await tester.tap(find.byKey(const ValueKey('s16_close_button')));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.text('Close CAP'), findsWidgets);
+    expect(find.byKey(const ValueKey('s16_confirm_close_button')), findsOneWidget);
   });
 
   testWidgets(
-      'S16 CAP Detail Screen Tests (Spec §5 S16) Phase 2: Closed CAP has disabled Reopen CAP button for Owner',
+      'S16 CAP Detail Screen Tests (Spec §5 S16) Phase 2: Closed CAP has enabled Reopen CAP button for Owner',
       (tester) async {
     fakeDb.tables['caps'] = [
       {
@@ -770,7 +789,14 @@ void main() {
     final reopenButton = tester.widget<OutlinedButton>(
       find.byKey(const ValueKey('s16_reopen_button')),
     );
-    expect(reopenButton.onPressed, isNull);
+    expect(reopenButton.onPressed, isNotNull);
+
+    // Tap Reopen button -> opens reopen dialog
+    await tester.tap(find.byKey(const ValueKey('s16_reopen_button')));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.byKey(const ValueKey('s16_reopen_reason_input')), findsOneWidget);
+    expect(find.byKey(const ValueKey('s16_confirm_reopen_button')), findsOneWidget);
   });
 
   testWidgets(

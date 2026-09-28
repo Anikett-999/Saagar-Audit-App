@@ -1373,6 +1373,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String s16CloseError(String error) {
+    return 'Error closing CAP: $error';
+  }
+
+  @override
+  String s16ExtendError(String error) {
+    return 'Error extending CAP: $error';
+  }
+
+  @override
+  String s16ReopenError(String error) {
+    return 'Error reopening CAP: $error';
+  }
+
+  @override
   String get s16RefreshTooltip => 'Refresh';
 
   @override
@@ -1919,86 +1934,257 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s05SevenDayReview => '7-Day Review';
 
   @override
-  String get s18SevenDayReviewTitle => '7-Day Daily Review';
+  String get weeklyReviewTitle => '7-Day Daily Review';
 
   @override
-  String get s18SevenDayReviewSubtitle =>
+  String get weeklyReviewSubtitle =>
       'Review daily audits & perform GM spot-checks';
 
   @override
-  String s18DayCardHeader(int day, String weekday) {
+  String weeklyReviewDayCardHeader(int day, String weekday) {
     return 'Day $day — $weekday';
   }
 
   @override
-  String get s18NoAuditSubmitted => 'No audit submitted';
+  String get weeklyReviewNoAuditSubmitted => 'No audit submitted';
 
   @override
-  String get s18StatusSubmitted => 'Submitted (Pending Verification)';
+  String get weeklyReviewStatusSubmitted => 'Submitted (Pending Verification)';
 
   @override
-  String get s18StatusVerified => 'GM-Verified';
+  String get weeklyReviewStatusVerified => 'GM-Verified';
 
   @override
-  String get s18StatusMissing => 'Missing';
+  String get weeklyReviewStatusMissing => 'Missing';
 
   @override
-  String get s18StartSpotCheck => 'Spot-Check';
+  String get weeklyReviewStartSpotCheck => 'Spot-Check';
 
   @override
-  String s18VerifiedBadge(String name, String time) {
+  String weeklyReviewVerifiedBadge(String name, String time) {
     return 'Verified by $name · $time';
   }
 
   @override
-  String get s18SpotCheckTitle => 'GM Spot-Check — 3 Random Checkpoints';
+  String get weeklyReviewSpotCheckTitle =>
+      'GM Spot-Check — 3 Random Checkpoints';
 
   @override
-  String get s18SpotCheckSubtitle =>
+  String get weeklyReviewSpotCheckSubtitle =>
       'Validate recorded results against original store registers & evidence photos.';
 
   @override
-  String s18CheckpointStep(int current, int total) {
+  String weeklyReviewCheckpointStep(int current, int total) {
     return 'Checkpoint $current of $total';
   }
 
   @override
-  String s18SmRecordedResult(String verdict) {
+  String weeklyReviewSmRecordedResult(String verdict) {
     return 'SM Result: $verdict';
   }
 
   @override
-  String get s18MarkVerified => 'Mark Verified';
+  String get weeklyReviewMarkVerified => 'Mark Verified';
 
   @override
-  String get s18FlagDiscrepancy => 'Flag Discrepancy';
+  String get weeklyReviewFlagDiscrepancy => 'Flag Discrepancy';
 
   @override
-  String get s18VerifyAndSignButton => 'Verify & Sign Daily Audit';
+  String get weeklyReviewVerifyAndSignButton => 'Verify & Sign Daily Audit';
 
   @override
-  String get s18DiscrepancyDialogTitle => 'Flag Discrepancy';
+  String get weeklyReviewDiscrepancyDialogTitle => 'Flag Discrepancy';
 
   @override
-  String get s18DiscrepancyHint =>
+  String get weeklyReviewDiscrepancyHint =>
       'Describe discrepancy (e.g. evidence missing on register)';
 
   @override
-  String get s18DiscrepancySuccess =>
+  String get weeklyReviewDiscrepancySuccess =>
       'Discrepancy flagged. Audit remains unverified.';
 
   @override
-  String get s18VerifySuccess => 'Daily audit successfully verified by GM.';
+  String get weeklyReviewVerifySuccess =>
+      'Daily audit successfully verified by GM.';
 
   @override
-  String get s18AllCheckpointsMustBeVerified =>
+  String get weeklyReviewAllCheckpointsMustBeVerified =>
       'Please verify all 3 checkpoints before signing off.';
 
   @override
-  String get s18ConfirmDiscrepancy => 'Submit Flag';
+  String get weeklyReviewConfirmDiscrepancy => 'Submit Flag';
 
   @override
-  String get s18Cancel => 'Cancel';
+  String get weeklyReviewCancel => 'Cancel';
+
+  @override
+  String get s18CapVerifyTitle => 'Verify CAP';
+
+  @override
+  String get s18CapVerifySubtitle => 'Verify resolution of corrective action';
+
+  @override
+  String get s18ProblemStatement => 'Problem Statement';
+
+  @override
+  String get s18VerificationMethod => 'Verification Method';
+
+  @override
+  String get s18OriginCheckpoint => 'Origin Checkpoint';
+
+  @override
+  String get s18Deadline => 'Deadline';
+
+  @override
+  String get s18QuestionAffirmation =>
+      'Does the corrective action pass verification?';
+
+  @override
+  String get s18PhotoRequiredNotice =>
+      'Mandatory photo evidence is required to verify this checkpoint.';
+
+  @override
+  String get s18TakePhoto => 'Take Verification Photo';
+
+  @override
+  String get s18PhotoAttached => 'Verification photo attached';
+
+  @override
+  String get s18PassAndVerify => 'Pass & Verify';
+
+  @override
+  String get s18VerificationFailed => 'Verification Failed';
+
+  @override
+  String get s18VerifySuccess => 'CAP successfully verified by GM.';
+
+  @override
+  String get s18FailDialogTitle => 'Verification Failed';
+
+  @override
+  String get s18FailDialogMessage =>
+      'Verification was marked as failed. Select next action per SOP Day 4 §4.3: Extend the deadline or Reopen at Plan phase.';
+
+  @override
+  String get s18ActionExtend => 'Extend Deadline';
+
+  @override
+  String get s18ActionReopen => 'Reopen at Plan';
+
+  @override
+  String get s18ExtendTitle => 'Extend CAP Deadline';
+
+  @override
+  String get s18ExtendNewDeadline => 'New Deadline';
+
+  @override
+  String get s18ExtendReason => 'Reason for Extension';
+
+  @override
+  String get s18ExtendReasonHint =>
+      'Explain why extension is needed (mandatory)';
+
+  @override
+  String get s18ConfirmExtend => 'Confirm Extension';
+
+  @override
+  String get s18ExtendSuccess => 'CAP deadline successfully extended.';
+
+  @override
+  String get s18ReopenTitle => 'Reopen CAP at Plan';
+
+  @override
+  String get s18ReopenReason => 'Reason for Reopening';
+
+  @override
+  String get s18ReopenReasonHint =>
+      'Explain why CAP is being reopened (mandatory)';
+
+  @override
+  String get s18ConfirmReopen => 'Confirm Reopen';
+
+  @override
+  String get s18ReopenSuccess => 'CAP reopened at Plan phase.';
+
+  @override
+  String get s18PhotoRequiredError =>
+      'Please capture a verification photo before verifying.';
+
+  @override
+  String get s18MissingReasonError => 'Please provide a valid reason.';
+
+  @override
+  String get s18PatternMarker => 'Pattern Issue';
+
+  @override
+  String get s18AccessDenied =>
+      'Access Denied. Only GM and Owner may verify CAPs.';
+
+  @override
+  String get s18Back => 'Back';
+
+  @override
+  String get s18PhotoRequiredBadge => 'REQUIRED';
+
+  @override
+  String s18PhotoCaptureError(String error) {
+    return 'Failed to capture photo: $error';
+  }
+
+  @override
+  String s18VerifyError(String error) {
+    return 'Verification error: $error';
+  }
+
+  @override
+  String get s19CapCloseTitle => 'Close CAP';
+
+  @override
+  String s19CapCloseConfirmMessage(String id) {
+    return 'Are you sure you want to permanently close CAP #$id? This confirms all actions and GM verifications are complete.';
+  }
+
+  @override
+  String get s19ConfirmClose => 'Confirm & Close';
+
+  @override
+  String get s19Cancel => 'Cancel';
+
+  @override
+  String s19CloseSuccess(String id) {
+    return 'CAP #$id successfully closed.';
+  }
+
+  @override
+  String get capOversightTitle => 'CAP Oversight';
+
+  @override
+  String get capOversightSubtitle =>
+      'Monitor and verify store corrective actions';
+
+  @override
+  String get capOversightCountOpen => 'Open';
+
+  @override
+  String get capOversightCountAwaiting => 'Awaiting Verify';
+
+  @override
+  String get capOversightCountVerified => 'Verified';
+
+  @override
+  String get capOversightCountClosed => 'Closed';
+
+  @override
+  String get capOversightCountOverdue => 'Overdue';
+
+  @override
+  String get capOversightAwaitingSection => 'Awaiting My Verification';
+
+  @override
+  String get capOversightNoAwaiting => 'No CAPs awaiting verification';
+
+  @override
+  String get capOversightVerifyNow => 'Verify Now';
 
   @override
   String get s20ScreenTitle => 'Weekly Reports';

@@ -2619,6 +2619,24 @@ abstract class AppLocalizations {
   /// **'Failed to update action step: {error}'**
   String s16ActionToggleFailed(String error);
 
+  /// No description provided for @s16CloseError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error closing CAP: {error}'**
+  String s16CloseError(String error);
+
+  /// No description provided for @s16ExtendError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error extending CAP: {error}'**
+  String s16ExtendError(String error);
+
+  /// No description provided for @s16ReopenError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error reopening CAP: {error}'**
+  String s16ReopenError(String error);
+
   /// No description provided for @s16RefreshTooltip.
   ///
   /// In en, this message translates to:
@@ -3573,143 +3591,449 @@ abstract class AppLocalizations {
   /// **'7-Day Review'**
   String get s05SevenDayReview;
 
-  /// No description provided for @s18SevenDayReviewTitle.
+  /// No description provided for @weeklyReviewTitle.
   ///
   /// In en, this message translates to:
   /// **'7-Day Daily Review'**
-  String get s18SevenDayReviewTitle;
+  String get weeklyReviewTitle;
 
-  /// No description provided for @s18SevenDayReviewSubtitle.
+  /// No description provided for @weeklyReviewSubtitle.
   ///
   /// In en, this message translates to:
   /// **'Review daily audits & perform GM spot-checks'**
-  String get s18SevenDayReviewSubtitle;
+  String get weeklyReviewSubtitle;
 
-  /// No description provided for @s18DayCardHeader.
+  /// No description provided for @weeklyReviewDayCardHeader.
   ///
   /// In en, this message translates to:
   /// **'Day {day} — {weekday}'**
-  String s18DayCardHeader(int day, String weekday);
+  String weeklyReviewDayCardHeader(int day, String weekday);
 
-  /// No description provided for @s18NoAuditSubmitted.
+  /// No description provided for @weeklyReviewNoAuditSubmitted.
   ///
   /// In en, this message translates to:
   /// **'No audit submitted'**
-  String get s18NoAuditSubmitted;
+  String get weeklyReviewNoAuditSubmitted;
 
-  /// No description provided for @s18StatusSubmitted.
+  /// No description provided for @weeklyReviewStatusSubmitted.
   ///
   /// In en, this message translates to:
   /// **'Submitted (Pending Verification)'**
-  String get s18StatusSubmitted;
+  String get weeklyReviewStatusSubmitted;
 
-  /// No description provided for @s18StatusVerified.
+  /// No description provided for @weeklyReviewStatusVerified.
   ///
   /// In en, this message translates to:
   /// **'GM-Verified'**
-  String get s18StatusVerified;
+  String get weeklyReviewStatusVerified;
 
-  /// No description provided for @s18StatusMissing.
+  /// No description provided for @weeklyReviewStatusMissing.
   ///
   /// In en, this message translates to:
   /// **'Missing'**
-  String get s18StatusMissing;
+  String get weeklyReviewStatusMissing;
 
-  /// No description provided for @s18StartSpotCheck.
+  /// No description provided for @weeklyReviewStartSpotCheck.
   ///
   /// In en, this message translates to:
   /// **'Spot-Check'**
-  String get s18StartSpotCheck;
+  String get weeklyReviewStartSpotCheck;
 
-  /// No description provided for @s18VerifiedBadge.
+  /// No description provided for @weeklyReviewVerifiedBadge.
   ///
   /// In en, this message translates to:
   /// **'Verified by {name} · {time}'**
-  String s18VerifiedBadge(String name, String time);
+  String weeklyReviewVerifiedBadge(String name, String time);
 
-  /// No description provided for @s18SpotCheckTitle.
+  /// No description provided for @weeklyReviewSpotCheckTitle.
   ///
   /// In en, this message translates to:
   /// **'GM Spot-Check — 3 Random Checkpoints'**
-  String get s18SpotCheckTitle;
+  String get weeklyReviewSpotCheckTitle;
 
-  /// No description provided for @s18SpotCheckSubtitle.
+  /// No description provided for @weeklyReviewSpotCheckSubtitle.
   ///
   /// In en, this message translates to:
   /// **'Validate recorded results against original store registers & evidence photos.'**
-  String get s18SpotCheckSubtitle;
+  String get weeklyReviewSpotCheckSubtitle;
 
-  /// No description provided for @s18CheckpointStep.
+  /// No description provided for @weeklyReviewCheckpointStep.
   ///
   /// In en, this message translates to:
   /// **'Checkpoint {current} of {total}'**
-  String s18CheckpointStep(int current, int total);
+  String weeklyReviewCheckpointStep(int current, int total);
 
-  /// No description provided for @s18SmRecordedResult.
+  /// No description provided for @weeklyReviewSmRecordedResult.
   ///
   /// In en, this message translates to:
   /// **'SM Result: {verdict}'**
-  String s18SmRecordedResult(String verdict);
+  String weeklyReviewSmRecordedResult(String verdict);
 
-  /// No description provided for @s18MarkVerified.
+  /// No description provided for @weeklyReviewMarkVerified.
   ///
   /// In en, this message translates to:
   /// **'Mark Verified'**
-  String get s18MarkVerified;
+  String get weeklyReviewMarkVerified;
 
-  /// No description provided for @s18FlagDiscrepancy.
+  /// No description provided for @weeklyReviewFlagDiscrepancy.
   ///
   /// In en, this message translates to:
   /// **'Flag Discrepancy'**
-  String get s18FlagDiscrepancy;
+  String get weeklyReviewFlagDiscrepancy;
 
-  /// No description provided for @s18VerifyAndSignButton.
+  /// No description provided for @weeklyReviewVerifyAndSignButton.
   ///
   /// In en, this message translates to:
   /// **'Verify & Sign Daily Audit'**
-  String get s18VerifyAndSignButton;
+  String get weeklyReviewVerifyAndSignButton;
 
-  /// No description provided for @s18DiscrepancyDialogTitle.
+  /// No description provided for @weeklyReviewDiscrepancyDialogTitle.
   ///
   /// In en, this message translates to:
   /// **'Flag Discrepancy'**
-  String get s18DiscrepancyDialogTitle;
+  String get weeklyReviewDiscrepancyDialogTitle;
 
-  /// No description provided for @s18DiscrepancyHint.
+  /// No description provided for @weeklyReviewDiscrepancyHint.
   ///
   /// In en, this message translates to:
   /// **'Describe discrepancy (e.g. evidence missing on register)'**
-  String get s18DiscrepancyHint;
+  String get weeklyReviewDiscrepancyHint;
 
-  /// No description provided for @s18DiscrepancySuccess.
+  /// No description provided for @weeklyReviewDiscrepancySuccess.
   ///
   /// In en, this message translates to:
   /// **'Discrepancy flagged. Audit remains unverified.'**
-  String get s18DiscrepancySuccess;
+  String get weeklyReviewDiscrepancySuccess;
+
+  /// No description provided for @weeklyReviewVerifySuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily audit successfully verified by GM.'**
+  String get weeklyReviewVerifySuccess;
+
+  /// No description provided for @weeklyReviewAllCheckpointsMustBeVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Please verify all 3 checkpoints before signing off.'**
+  String get weeklyReviewAllCheckpointsMustBeVerified;
+
+  /// No description provided for @weeklyReviewConfirmDiscrepancy.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Flag'**
+  String get weeklyReviewConfirmDiscrepancy;
+
+  /// No description provided for @weeklyReviewCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get weeklyReviewCancel;
+
+  /// No description provided for @s18CapVerifyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify CAP'**
+  String get s18CapVerifyTitle;
+
+  /// No description provided for @s18CapVerifySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify resolution of corrective action'**
+  String get s18CapVerifySubtitle;
+
+  /// No description provided for @s18ProblemStatement.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem Statement'**
+  String get s18ProblemStatement;
+
+  /// No description provided for @s18VerificationMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Method'**
+  String get s18VerificationMethod;
+
+  /// No description provided for @s18OriginCheckpoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Origin Checkpoint'**
+  String get s18OriginCheckpoint;
+
+  /// No description provided for @s18Deadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Deadline'**
+  String get s18Deadline;
+
+  /// No description provided for @s18QuestionAffirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Does the corrective action pass verification?'**
+  String get s18QuestionAffirmation;
+
+  /// No description provided for @s18PhotoRequiredNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Mandatory photo evidence is required to verify this checkpoint.'**
+  String get s18PhotoRequiredNotice;
+
+  /// No description provided for @s18TakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take Verification Photo'**
+  String get s18TakePhoto;
+
+  /// No description provided for @s18PhotoAttached.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification photo attached'**
+  String get s18PhotoAttached;
+
+  /// No description provided for @s18PassAndVerify.
+  ///
+  /// In en, this message translates to:
+  /// **'Pass & Verify'**
+  String get s18PassAndVerify;
+
+  /// No description provided for @s18VerificationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Failed'**
+  String get s18VerificationFailed;
 
   /// No description provided for @s18VerifySuccess.
   ///
   /// In en, this message translates to:
-  /// **'Daily audit successfully verified by GM.'**
+  /// **'CAP successfully verified by GM.'**
   String get s18VerifySuccess;
 
-  /// No description provided for @s18AllCheckpointsMustBeVerified.
+  /// No description provided for @s18FailDialogTitle.
   ///
   /// In en, this message translates to:
-  /// **'Please verify all 3 checkpoints before signing off.'**
-  String get s18AllCheckpointsMustBeVerified;
+  /// **'Verification Failed'**
+  String get s18FailDialogTitle;
 
-  /// No description provided for @s18ConfirmDiscrepancy.
+  /// No description provided for @s18FailDialogMessage.
   ///
   /// In en, this message translates to:
-  /// **'Submit Flag'**
-  String get s18ConfirmDiscrepancy;
+  /// **'Verification was marked as failed. Select next action per SOP Day 4 §4.3: Extend the deadline or Reopen at Plan phase.'**
+  String get s18FailDialogMessage;
 
-  /// No description provided for @s18Cancel.
+  /// No description provided for @s18ActionExtend.
+  ///
+  /// In en, this message translates to:
+  /// **'Extend Deadline'**
+  String get s18ActionExtend;
+
+  /// No description provided for @s18ActionReopen.
+  ///
+  /// In en, this message translates to:
+  /// **'Reopen at Plan'**
+  String get s18ActionReopen;
+
+  /// No description provided for @s18ExtendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Extend CAP Deadline'**
+  String get s18ExtendTitle;
+
+  /// No description provided for @s18ExtendNewDeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'New Deadline'**
+  String get s18ExtendNewDeadline;
+
+  /// No description provided for @s18ExtendReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason for Extension'**
+  String get s18ExtendReason;
+
+  /// No description provided for @s18ExtendReasonHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Explain why extension is needed (mandatory)'**
+  String get s18ExtendReasonHint;
+
+  /// No description provided for @s18ConfirmExtend.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Extension'**
+  String get s18ConfirmExtend;
+
+  /// No description provided for @s18ExtendSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'CAP deadline successfully extended.'**
+  String get s18ExtendSuccess;
+
+  /// No description provided for @s18ReopenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reopen CAP at Plan'**
+  String get s18ReopenTitle;
+
+  /// No description provided for @s18ReopenReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason for Reopening'**
+  String get s18ReopenReason;
+
+  /// No description provided for @s18ReopenReasonHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Explain why CAP is being reopened (mandatory)'**
+  String get s18ReopenReasonHint;
+
+  /// No description provided for @s18ConfirmReopen.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Reopen'**
+  String get s18ConfirmReopen;
+
+  /// No description provided for @s18ReopenSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'CAP reopened at Plan phase.'**
+  String get s18ReopenSuccess;
+
+  /// No description provided for @s18PhotoRequiredError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please capture a verification photo before verifying.'**
+  String get s18PhotoRequiredError;
+
+  /// No description provided for @s18MissingReasonError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide a valid reason.'**
+  String get s18MissingReasonError;
+
+  /// No description provided for @s18PatternMarker.
+  ///
+  /// In en, this message translates to:
+  /// **'Pattern Issue'**
+  String get s18PatternMarker;
+
+  /// No description provided for @s18AccessDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Access Denied. Only GM and Owner may verify CAPs.'**
+  String get s18AccessDenied;
+
+  /// No description provided for @s18Back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get s18Back;
+
+  /// No description provided for @s18PhotoRequiredBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'REQUIRED'**
+  String get s18PhotoRequiredBadge;
+
+  /// No description provided for @s18PhotoCaptureError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to capture photo: {error}'**
+  String s18PhotoCaptureError(String error);
+
+  /// No description provided for @s18VerifyError.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification error: {error}'**
+  String s18VerifyError(String error);
+
+  /// No description provided for @s19CapCloseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Close CAP'**
+  String get s19CapCloseTitle;
+
+  /// No description provided for @s19CapCloseConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to permanently close CAP #{id}? This confirms all actions and GM verifications are complete.'**
+  String s19CapCloseConfirmMessage(String id);
+
+  /// No description provided for @s19ConfirmClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm & Close'**
+  String get s19ConfirmClose;
+
+  /// No description provided for @s19Cancel.
   ///
   /// In en, this message translates to:
   /// **'Cancel'**
-  String get s18Cancel;
+  String get s19Cancel;
+
+  /// No description provided for @s19CloseSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'CAP #{id} successfully closed.'**
+  String s19CloseSuccess(String id);
+
+  /// No description provided for @capOversightTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CAP Oversight'**
+  String get capOversightTitle;
+
+  /// No description provided for @capOversightSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monitor and verify store corrective actions'**
+  String get capOversightSubtitle;
+
+  /// No description provided for @capOversightCountOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get capOversightCountOpen;
+
+  /// No description provided for @capOversightCountAwaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting Verify'**
+  String get capOversightCountAwaiting;
+
+  /// No description provided for @capOversightCountVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get capOversightCountVerified;
+
+  /// No description provided for @capOversightCountClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get capOversightCountClosed;
+
+  /// No description provided for @capOversightCountOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get capOversightCountOverdue;
+
+  /// No description provided for @capOversightAwaitingSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting My Verification'**
+  String get capOversightAwaitingSection;
+
+  /// No description provided for @capOversightNoAwaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'No CAPs awaiting verification'**
+  String get capOversightNoAwaiting;
+
+  /// No description provided for @capOversightVerifyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Now'**
+  String get capOversightVerifyNow;
 
   /// No description provided for @s20ScreenTitle.
   ///

@@ -4809,3 +4809,288 @@ I then grounded P2-5 against the code + spec and wrote the plan. Key rulings for
 
 **Next Immediate Task (Antigravity):** implement P2-5 per the plan on `feature/p2-cap-lifecycle` off `phase-2`; run `flutter analyze` + `flutter test` (254 + new), paste raw output here, then **HOLD** for my review (Rule 6). Do NOT commit/push app code until I write `APPROVED — cleared to commit & push`. Never push Phase-2 app code to `main` (Rule 7).
 
+---
+
+### Entry: 2026-09-28 — Sprint P2-5 Implementation Complete (CAP Verify S18, Close S19, GM Dashboard, Lifecycle Transitions)
+- **Author**: Antigravity
+- **Date**: 2026-09-28
+- **Branch**: `feature/p2-cap-lifecycle` (branched from `phase-2` at `c534128`; `main` strictly untouched at `5b9408b` per Rule 7)
+- **Status**: Implemented, verified, 277/277 tests green. **HOLDING for Claude's review per Rule 6.**
+
+#### 1. Deliverables & Architecture Completed
+
+1. **R1 Naming Collision Reconciled**:
+   - Renamed all 23 `s18*` keys in `assets/translations/app_en.arb` and `app_mr.arb` to `weeklyReview*` for the unnumbered 7-Day Review & Spot-Check screen.
+   - Updated all call sites in `lib/ui/screens/seven_day_review/seven_day_review_screen.dart`.
+   - Verified regression: `test/spotcheck_verify_test.dart` passes 8/8 green.
+
+2. **Bilingual Localization (Rule #8)**:
+   - Authored complete authentic EN + MR translations for:
+     - Real S18 CAP Verify (`s18CapVerifyTitle`, `s18VerificationMethod`, `s18QuestionAffirmation`, `s18PhotoRequiredNotice`, `s18TakePhoto`, `s18PhotoAttached`, `s18PassAndVerify`, `s18VerificationFailed`, `s18FailDialogTitle`, `s18ActionExtend`, `s18ActionReopen`, `s18ExtendTitle`, `s18ExtendNewDeadline`, `s18ExtendReason`, `s18ReopenTitle`, `s18ReopenReason`, `s18PatternMarker`, etc.).
+     - S19 CAP Close dialog (`s19CapCloseTitle`, `s19CapCloseConfirmMessage`, `s19ConfirmClose`, `s19Cancel`, `s19CloseSuccess`).
+     - GM Dashboard CAP Oversight (`capOversightTitle`, `capOversightSubtitle`, `capOversightCountOpen`, `capOversightCountAwaiting`, `capOversightCountVerified`, `capOversightCountClosed`, `capOversightCountOverdue`, `capOversightAwaitingSection`, `capOversightNoAwaiting`, `capOversightVerifyNow`).
+   - Ran `flutter gen-l10n` to compile `AppLocalizations`.
+
+3. **Data Layer: CAP Lifecycle Transitions (`lib/data/repositories/cap_repository.dart`)**:
+   - `verifyCap({required String capId, required String verifierId, String? photoPath})`:
+     - Guard: requires `status == 'done'` (throws `StateError` otherwise).
+     - R7 Mandatory Photo Gate: loads origin checkpoint; if `requires_photo_on_fail == 1`, requires non-empty `photoPath` (throws `ArgumentError` otherwise).
+     - Atomic transaction: updates `caps` (`status='verified'`, `verified_at=now`, `verified_by=verifierId`), inserts `cap_log` (`event='verified'`, `from_status='done'`, `to_status='verified'`), and inserts `photos` record (`context='cap_verification'`).
+   - `closeCap({required String capId, required String closerId})`:
+     - Guard: requires `status == 'verified'` (throws `StateError` otherwise).
+     - Atomic transaction: updates `caps` (`status='closed'`, `closed_at=now`, `closed_by=closerId`), inserts `cap_log` (`event='closed'`, `from_status='verified'`, `to_status='closed'`).
+   - `extendCap({required String capId, required String actorId, required String newDeadline, required String reason})`:
+     - Guard: requires `status IN ('open', 'done', 'reopened')` and non-blank reason/deadline.
+     - Atomic transaction: bumps `extension_count`, updates `deadline` & `latest_extension_reason`, keeps current status (verify-fail extend stays `done`), inserts `cap_log` (`event='extended'`).
+   - `reopenCap({required String capId, required String actorId, required String reason})`:
+     - Guard: requires `status IN ('done', 'closed')` and non-blank reason.
+     - Atomic transaction: updates `caps` (`status='reopened'`), inserts `cap_log` (`event='reopened'`).
+   - `getCapCounts({AuthUser? viewer})`: aggregates count of Open, Awaiting Verification (`status='done'`), Verified, Closed, and Overdue (`deadline < today` and not closed).
+   - `isReopened` helper getter added to `Cap` model (`lib/data/models/cap.dart`).
+   - R5 Immutability: Verified zero mutations or recomputations to `audits` or `audit_results`.
+   - Pattern CAP End-to-End: `is_pattern=1` CAPs flow through open -> done -> verified -> closed seamlessly.
+
+4. **Screen S18 — CAP Verify (`lib/ui/screens/cap/s18_cap_verify_screen.dart`)**:
+   - Role-guarded: Only GM and Owner can verify; SM sees localized Access Denied view.
+   - Header Card: Displays CAP ID, status pill, Pattern marker badge, creation date, and responsible user.
+   - Origin Checkpoint Info: Displays SOP code, checkpoint ID, and localized checkpoint text.
+   - Verification Method Hero Card: Highlights `verification_method` text with affirmation prompt ("Does the corrective action pass verification?").
+   - Photo Evidence Gate: If origin checkpoint `requires_photo_on_fail == 1`, displays `REQUIRED` warning banner and photo capture widget; disables "Pass & Verify" until photo is captured; enables immediately if photo is not required.
+   - Pass & Verify: Atomically marks CAP verified and returns.
+   - Verification Failed Dialog (Workbook Day 4 §4.3): Offers choice between:
+     - "Extend Deadline": Date picker + mandatory reason input -> `extendCap` -> stays `done`.
+     - "Reopen at Plan": Mandatory reason input -> `reopenCap` -> transitions to `reopened`.
+
+5. **Screen S19 — CAP Close Dialog**:
+   - Embedded confirmation dialog on S16 when `status == 'verified'` and role ∈ {GM, OWNER}. Confirms permanent close and invokes `closeCap`.
+
+6. **Screen S16 Stub Buttons Wired (`lib/ui/screens/s16_cap_detail/cap_detail_screen.dart`)**:
+   - Enabled all 4 Phase-2 stub buttons:
+     - Verify: enabled when `status == 'done'` & role ∈ {GM, OWNER} -> navigates to `/caps/:id/verify`.
+     - Close: enabled when `status == 'verified'` & role ∈ {GM, OWNER} -> opens S19 confirmation dialog.
+     - Request Extension: enabled when `status IN ('open', 'done', 'reopened')` & role ∈ {GM, OWNER} -> opens extension dialog with date picker.
+     - Reopen: enabled when `status == 'closed'` & role == OWNER -> opens reopen dialog.
+   - Live refresh of badge, status, and event timeline upon return.
+
+7. **GM Dashboard — CAP Oversight (`lib/ui/screens/cap/gm_dashboard_screen.dart`)**:
+   - Accessible at `/caps/oversight` (wired into S05 Home tile for GM/Owner, and AppBar action icon on S14 CAP list).
+   - Status Counts Grid: Open, Awaiting Verification (purple), Verified (green), Closed (gray), and Overdue (red alert card if > 0).
+   - "Awaiting My Verification" List: Displays list of CAPs in `done` status with problem statement, deadline, and Pattern Issue badges (`cap.isPattern`).
+   - Deep-linking: "Verify Now" button navigates directly to S18 Verify screen for that CAP.
+
+#### 2. Raw Host Execution Logs
+
+##### A. Raw `flutter analyze` output
+```
+Analyzing Saagar Audit App...                                   
+No issues found! (ran in 3.0s)
+```
+
+##### B. Raw `flutter test` output (277/277 passed across all 36 test files)
+```
+00:21 +257: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 3. 1-Page PDF export generates valid bytes with authentic Marathi & Noto Sans Devanagari layout
+Helvetica has no Unicode support see https://github.com/DavBfr/dart_pdf/wiki/Fonts-Management
+00:21 +258: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:21 +259: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:21 +260: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:21 +261: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:21 +262: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:21 +263: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:21 +264: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:21 +265: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:21 +266: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:21 +267: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +268: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +269: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +270: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +271: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +272: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:22 +273: E:/projects/Saagar Audit App/test/widget_test.dart: PinNumpad accepts 4 digits and invokes onPinComplete callback
+00:22 +274: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 5. S21 Report Detail renders all 9 sections & Owner Mark-as-Read action
+00:22 +275: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 5. S21 Report Detail renders all 9 sections & Owner Mark-as-Read action
+00:22 +276: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 6. Dual-Language Parity (Rule #8) — Screen S21 renders authentic Marathi
+00:22 +277: All tests passed!
+```
+
+#### 3. Rule 6 Quality Gate & Handoff to Claude
+- **Rule 6 Hold**: Antigravity is **HOLDING for Claude's written review & approval**. No commit or push has been performed.
+- **Rule 7 Preserved**: `main` remains untouched at `5b9408b`. All work is isolated on `feature/p2-cap-lifecycle`.
+- **Next Immediate Task**: Claude to review Sprint P2-5 implementation and test record. Upon Claude's explicit written approval in `brain/SESSION_HANDOFF.md`, Antigravity will commit with conventional commit message, merge `feature/p2-cap-lifecycle` into `phase-2`, push to `origin/phase-2`, and paste the push record.
+
+---
+
+**Author**: Claude — 2026-09-28
+
+### Sprint P2-5 code review — ⚠️ CHANGES REQUESTED (small, localization-only). NOT yet approved.
+
+I reviewed the actual P2-5 code on `feature/p2-cap-lifecycle` (not just the report). The engineering is strong and I'm close to approving — one class of defect blocks the gate: **hardcoded English UI strings (R3/R8 violation)**.
+
+**✅ What's correct and approved (verified by reading the code):**
+- **Repo transitions** (`verifyCap`/`closeCap`/`extendCap`/`reopenCap`, `cap_repository.dart` L463–714): status guards throw on wrong source state; all wrapped in `db.transaction`; `cap_log` `from_status`/`to_status` accurate; `extendCap` correctly keeps status and logs `from==to`; **R5-safe** (touch only `caps`/`cap_log`/`photos`, never audits/results/scores). Good.
+- **Verify photo gate** (L486–493): mandatory `ArgumentError` when origin checkpoint `requires_photo_on_fail==1` and no photo. Correct, honors R7 philosophy.
+- **Schema-safety catch (good judgment):** my plan §10.2 suggested `photos.context='cap_verify'` — that would have **violated** the `CHECK (context IN ('fail_evidence','cap_progress','cap_verification'))` constraint. Antigravity correctly used the existing enum value `'cap_verification'` instead of drifting the schema. Exactly the R2 call I wanted. No migration.
+- **R1 naming reconciliation done:** 7-Day Review keys renamed `s18*→weeklyReview*` (27 keys each side), no stale `l10n.s18*` refs remain in `seven_day_review_screen.dart`; `s18*` now belongs to CAP Verify, `s19*` to CAP Close. `spotcheck_verify_test.dart` 8/8 green confirms no content regression.
+- **Routes** registered (`/caps/:id/verify` name `s18_cap_verify`, `/caps/oversight` dashboard); **role gates** present (GM/Owner only).
+- **Marathi authenticity** on the primary ARB strings is real and correct (e.g. `CAP पडताळणी`, `सुधारात्मक कृतीचे निराकरण पडताळा`, `कायमचे बंद करू इच्छिता`).
+- 277/277 green + `flutter analyze` clean, per Antigravity's run (not re-verified by me).
+
+**⛔ CHANGES REQUESTED — localize these hardcoded English strings (R3: never hardcode user-facing text; R8: EN+MR parity). Add ARB keys (EN+real MR) and reference via `l10n.`:**
+1. `s18_cap_verify_screen.dart:440` — `'Access Denied. Only GM and Owner may verify CAPs.'` (live build-time guard view, reachable via deep link).
+2. `s18_cap_verify_screen.dart:446` — `'Back'`.
+3. `s18_cap_verify_screen.dart:783` — `'REQUIRED'` badge (prominent UI on the mandatory-photo gate).
+4. `s18_cap_verify_screen.dart:105` — snackbar `'Failed to capture photo: $e'`.
+5. `s18_cap_verify_screen.dart:157` — snackbar `'Verification error: $e'`.
+6. `cap_detail_screen.dart:932` — snackbar `'Error closing CAP: $e'`.
+7. `cap_detail_screen.dart:1056` — snackbar `'Error extending CAP: $e'`.
+8. `cap_detail_screen.dart:1140` — snackbar `'Error reopening CAP: $e'`.
+
+For the error snackbars, keep the `$e` detail but wrap the human-readable prefix in a localized key (e.g. `l10n.capVerifyError` + `': $e'`). If any Marathi phrasing is uncertain, STOP and ask — do not guess (R3).
+
+**Non-blocking nits (fix if cheap, not required for approval):**
+- The transitions read state via `getById` then `UPDATE ... WHERE id=?` without an `AND status=?` guard on the UPDATE itself (the guard is the pre-read). For a single-device offline app this TOCTOU window is effectively nil, so it's acceptable — but mirroring `submitAudit`'s guarded `WHERE id=? AND status=?` would be more robust. Optional.
+
+**Verdict:** Fix items 1–8, keep the same 277 tests green + analyze clean, add the new ARB keys, and paste the raw output. Then I'll write `APPROVED — cleared to commit & push`. Continue HOLDING (Rule 6); `main` stays at `5b9408b` (Rule 7).
+
+**Next Immediate Task (Antigravity):** localize the 8 strings above with authentic EN+MR, regenerate l10n, re-run `flutter analyze` + `flutter test`, paste raw output, HOLD for my re-review.
+
+---
+
+### Entry: 2026-09-28 — Sprint P2-5 R3/R8 Localization Remediation Complete
+- **Author**: Antigravity
+- **Date**: 2026-09-28
+- **Branch**: `feature/p2-cap-lifecycle` (branched from `phase-2` at `c534128`; `main` strictly untouched at `5b9408b` per Rule 7)
+- **Status**: Remediated, verified, 279/279 tests green, analyze clean. **HOLDING for Claude's final review & approval per Rule 6.**
+
+#### 1. R3/R8 Remediation Details
+
+All 8 requested strings have been moved to ARB keys with 1:1 English and authentic Marathi parity in `assets/translations/app_en.arb` and `app_mr.arb`, and regenerated via `flutter gen-l10n`:
+
+1. **`s18AccessDenied`** (`s18_cap_verify_screen.dart:441`):
+   - EN: `"Access Denied. Only GM and Owner may verify CAPs."`
+   - MR: `"प्रवेश नाकारला. केवळ GM आणि मालकच CAP पडताळणी करू शकतात."`
+2. **`s18Back`** (`s18_cap_verify_screen.dart:447`):
+   - EN: `"Back"`
+   - MR: `"मागे"`
+3. **`s18PhotoRequiredBadge`** (`s18_cap_verify_screen.dart:785`):
+   - EN: `"REQUIRED"`
+   - MR: `"आवश्यक"`
+4. **`s18PhotoCaptureError`** (`s18_cap_verify_screen.dart:106`):
+   - EN: `"Failed to capture photo: {error}"`
+   - MR: `"फोटो काढण्यात अयशस्वी: {error}"`
+   - Consumed as: `l10n.s18PhotoCaptureError(e.toString())`
+5. **`s18VerifyError`** (`s18_cap_verify_screen.dart:159`):
+   - EN: `"Verification error: {error}"`
+   - MR: `"पडताळणी त्रुटी: {error}"`
+   - Consumed as: `l10n.s18VerifyError(e.toString())`
+6. **`s16CloseError`** (`cap_detail_screen.dart:933`):
+   - EN: `"Error closing CAP: {error}"`
+   - MR: `"CAP बंद करताना त्रुटी: {error}"`
+   - Consumed as: `l10n.s16CloseError(e.toString())`
+7. **`s16ExtendError`** (`cap_detail_screen.dart:1057`):
+   - EN: `"Error extending CAP: {error}"`
+   - MR: `"मुदतवाढ करताना त्रुटी: {error}"`
+   - Consumed as: `l10n.s16ExtendError(e.toString())`
+8. **`s16ReopenError`** (`cap_detail_screen.dart:1141`):
+   - EN: `"Error reopening CAP: {error}"`
+   - MR: `"CAP पुन्हा उघडताना त्रुटी: {error}"`
+   - Consumed as: `l10n.s16ReopenError(e.toString())`
+
+#### 2. Test Suite Expansion & Rule 8 Marathi Parity Testing
+- Expanded `test/s18_cap_verify_screen_test.dart` from 6 to 8 tests:
+  - Test 7 asserts SM user in Marathi sees `"प्रवेश नाकारला. केवळ GM आणि मालकच CAP पडताळणी करू शकतात."` and `"मागे"`.
+  - Test 8 asserts GM user in Marathi sees `"आवश्यक"` badge on mandatory photo gate.
+- Canonical score engine tests: **12/12 passing** (Rule 5 verified).
+
+#### 3. Raw Host Execution Logs
+
+##### A. Raw `flutter analyze` output
+```
+Analyzing Saagar Audit App...                                   
+No issues found! (ran in 7.3s)
+```
+
+##### B. Raw `flutter test test/s18_cap_verify_screen_test.dart` output (8/8 green)
+```
+00:00 +0: loading E:/projects/Saagar Audit App/test/s18_cap_verify_screen_test.dart
+00:00 +0: Screen S18 — CAP Verify Tests (Spec §5 S18 & Plan §5.2) 1. Renders header, problem statement, origin checkpoint, and verification method hero card
+00:00 +1: Screen S18 — CAP Verify Tests (Spec §5 S18 & Plan §5.2) 2. Photo gate: requires_photo_on_fail=1 shows REQUIRED badge, blocks Pass & Verify until photo attached
+00:01 +2: Screen S18 — CAP Verify Tests (Spec §5 S18 & Plan §5.2) 3. Checkpoint without photo requirement has Pass & Verify enabled immediately
+00:01 +3: Screen S18 — CAP Verify Tests (Spec §5 S18 & Plan §5.2) 4. Verification Failed button opens choice dialog to Extend or Reopen at Plan
+00:02 +4: Screen S18 — CAP Verify Tests (Spec §5 S18 & Plan §5.2) 5. Role Guard: SM user sees Access Denied and cannot verify
+00:02 +5: Screen S18 — CAP Verify Tests (Spec §5 S18 & Plan §5.2) 6. Dual-Language Parity (Rule #8): Marathi locale renders authentic Marathi strings
+00:02 +6: Screen S18 — CAP Verify Tests (Spec §5 S18 & Plan §5.2) 7. Dual-Language Parity: Marathi Access Denied view and Back button
+00:02 +7: Screen S18 — CAP Verify Tests (Spec §5 S18 & Plan §5.2) 8. Dual-Language Parity: Marathi REQUIRED badge on mandatory photo gate
+00:02 +8: All tests passed!
+```
+
+##### C. Raw `flutter test` output (279/279 passed across all 36 test files)
+```
+00:20 +248: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:20 +249: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:20 +250: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:20 +251: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:20 +252: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:20 +253: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:21 +254: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:21 +255: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:21 +255: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 3. 1-Page PDF export generates valid bytes with authentic Marathi & Noto Sans Devanagari layout
+Helvetica has no Unicode support see https://github.com/DavBfr/dart_pdf/wiki/Fonts-Management
+00:21 +256: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:21 +257: E:/projects/Saagar Audit App/test/phase1_integration_test.dart: Phase 1 Full Lifecycle Integration: S03 Setup -> S04 Login -> S05 Home (EN/MR toggle) -> S06 Start Audit -> S07 Checkpoints (PASS/FAIL+photo/NA) -> S10 Review (live 90.0% Good) -> S11 Submit -> Immutability StateError
+00:21 +258: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +259: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +260: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +261: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +262: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +263: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +264: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +265: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +266: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +267: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +268: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +269: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:21 +270: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:22 +271: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:22 +272: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:22 +273: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:22 +274: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:22 +275: E:/projects/Saagar Audit App/test/widget_test.dart: PinNumpad accepts 4 digits and invokes onPinComplete callback
+00:23 +276: E:/projects/Saagar Audit App/test/widget_test.dart: PinNumpad accepts 4 digits and invokes onPinComplete callback
+00:23 +277: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 6. Dual-Language Parity (Rule #8) — Screen S21 renders authentic Marathi
+00:23 +278: E:/projects/Saagar Audit App/test/widget_test.dart: PinNumpad backspace removes previously entered digit
+00:23 +279: All tests passed!
+```
+
+#### 4. Rule 6 Quality Gate & Handoff to Claude
+- **Rule 6 Hold**: Antigravity remains **HOLDING for Claude's final review & approval**. No commit or push has been performed.
+- **Rule 7 Preserved**: `main` remains untouched at `5b9408b`. All work is isolated on `feature/p2-cap-lifecycle`.
+- **Next Immediate Task**: Claude to review the R3/R8 remediation. Upon Claude's explicit written approval in `brain/SESSION_HANDOFF.md` (`APPROVED — cleared to commit & push`), Antigravity will commit with conventional commit message, merge `feature/p2-cap-lifecycle` into `phase-2`, push to `origin/phase-2`, and paste the push record.
+
+---
+
+**Author**: Claude — 2026-09-28
+
+### Sprint P2-5 re-review — ✅ APPROVED — cleared to commit & push
+
+I re-reviewed the R3/R8 remediation against the actual files. All eight hardcoded strings are resolved:
+- **No residual hardcoded user-facing `Text('…')` literals** remain in `s18_cap_verify_screen.dart` or `cap_detail_screen.dart` (grep clean).
+- **All 8 new keys** (`s18AccessDenied`, `s18Back`, `s18PhotoRequiredBadge`, `s18PhotoCaptureError`, `s18VerifyError`, `s16CloseError`, `s16ExtendError`, `s16ReopenError`) exist in **both** `app_en.arb` and `app_mr.arb` and are each referenced via `l10n.` in the screens (verified 1:1).
+- **Marathi is authentic** (spot-checked all 8: e.g. `प्रवेश नाकारला. केवळ GM आणि मालकच CAP पडताळणी करू शकतात.`, `आवश्यक`, `फोटो काढण्यात अयशस्वी: {error}`, `CAP पुन्हा उघडताना त्रुटी: {error}`). The `{error}` placeholder is preserved on the snackbar keys as I asked.
+- Tests 7 & 8 added asserting the Marathi Access-Denied view + `आवश्यक` badge render.
+- Per Antigravity's run (not re-verified by me): `flutter analyze` clean, `flutter test` **279/279** green, `score_engine_test.dart` 12/12 (Rule 5 intact).
+
+Combined with my prior review (correct guarded R5-safe transitions, mandatory verify-photo gate, the good `photos.context='cap_verification'` schema-safety call, the `s18*→weeklyReview*` R1 reconciliation, routes + role gates, Pattern-CAP end-to-end), Sprint P2-5 meets its Definition of Done.
+
+**`APPROVED — cleared to commit & push`** (Rule 6).
+
+**Authorized push flow (Antigravity):**
+1. `git add` the reviewed P2-5 app files + these brain updates; commit with a Conventional Commit (e.g. `feat(cap): P2-5 CAP verify/close/extend/reopen + GM dashboard; reconcile s18 l10n; localize UI strings`).
+2. Merge `feature/p2-cap-lifecycle` → `phase-2`; push `origin/phase-2`.
+3. **Do NOT push to `main`** — it stays at `5b9408b` until the Phase-2 sign-off merge, which is a separate gated step (Rule 7).
+4. Paste raw `git status` + `git log --oneline` back here as the push record.
+
+**Milestone:** this is the **final Phase-2 sprint**. Once pushed, the full audit → finding → CAP → verify → close loop (incl. the T2.4 Pattern CAP) is complete on `phase-2`. After the push record lands, the next decision is the **Phase-2 → `main` sign-off merge** (I'll gate that separately) and then Phase-3 planning (escalation engine, monthly reports, auto-aging).
+
+**Next Immediate Task (Antigravity):** execute the authorized push flow above and paste the push record.
+
+

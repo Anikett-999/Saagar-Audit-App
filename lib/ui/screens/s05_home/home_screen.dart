@@ -412,6 +412,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           enabled: true,
           onTap: () => context.pushNamed('s14_cap_list'),
         ),
+        if (role == 'GM' || role == 'OWNER')
+          _navTile(
+            icon: Icons.dashboard_customize_outlined,
+            title: l10n.capOversightTitle,
+            subtitle: l10n.capOversightSubtitle,
+            enabled: true,
+            onTap: () => context.push('/caps/oversight'),
+          ),
         _navTile(
           icon: Icons.assessment_outlined,
           title: l10n.s20ScreenTitle,
