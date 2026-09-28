@@ -4736,3 +4736,52 @@ Everything else is approved. Once the bilingual-PDF change is in and `flutter an
 Antigravity: apply the fix, re-run analyze + full test, then commit `feature/p2-weekly-report` with a Conventional Commit (R10), e.g. `feat(weekly): P2-4 weekly report S20/S21 + §3.6 bilingual PDF + pattern detection (T2.4)`, merge into `phase-2`, `git push origin phase-2`. Do NOT touch `main` (Rule 7). Paste raw `git status` + `git log --oneline -3` + the updated `flutter test` tail as the push record.
 
 **Next after push → Sprint P2-5** (CAP Verify S18 + Close S19 + GM dashboard) — the last Phase-2 sprint; it consumes the single Pattern CAP this sprint suggests. I'll write that plan once the P2-4 push record is in.
+
+---
+
+### Entry: 2026-09-28 — Sprint P2-4 Push Record (Bilingual PDF Shipped & Pushed to phase-2)
+- **Author**: Antigravity
+- **Date**: 2026-09-28
+- **Branch**: `phase-2`
+- **Status**: Committed, merged, pushed to `origin/phase-2`. **Clean & green.**
+
+#### 1. Bilingual PDF Fix Applied Prior to Commit (Conditional Approval Met)
+- **Devanagari Font Asset**: Bundled `NotoSansDevanagari-Regular.ttf` (219 KB) and `NotoSansDevanagari-Bold.ttf` (225 KB) under `assets/fonts/` and registered in `pubspec.yaml` (R2 asset-only, no new packages).
+- **WeeklyReportPdfService**: Added font loading with `fallbackFonts` ensuring both Latin (English) and Devanagari (Marathi) render seamlessly without missing-glyph exceptions. Emitted bilingual English + authentic Marathi text for all 9 sections.
+- **Test 3 Strengthened**: Provided authentic Marathi fields (headline, SOP name, finding text, pattern weekday names, suggested action) and asserted valid PDF bytes with embedded subset fonts.
+- **Re-verification**: `flutter analyze` passed with 0 issues. Full test suite passed 254/254 green across all 33 test files.
+
+#### 2. Push Record & Raw Git Output
+
+##### A. `git status` (on `phase-2`)
+```
+On branch phase-2
+Your branch is up to date with 'origin/phase-2'.
+
+nothing to commit, working tree clean
+```
+
+##### B. `git log --oneline -3` (on `phase-2`)
+```
+c534128 feat(weekly): P2-4 weekly report S20/S21 + §3.6 bilingual PDF + pattern detection (T2.4)
+e2ee594 docs(handoff): record P2-3 device UAT sign-off and P2-4 kickoff
+c70daa6 docs(handoff): record Antigravity Sprint P2-3 push record
+```
+
+##### C. Rule 7 Check (`main` branch)
+```
+5b9408b7cc7625277b8f75cb1b9ac6907505bd0c
+```
+`main` is strictly untouched at `5b9408b`. All Phase 2 work resides on `phase-2`.
+
+##### D. Test Suite Tail (`flutter test`)
+```
+00:44 +252: E:/projects/Saagar Audit App/test/widget_test.dart: PinNumpad accepts 4 digits and invokes onPinComplete callback
+00:44 +253: E:/projects/Saagar Audit App/test/widget_test.dart: PinNumpad backspace removes previously entered digit
+00:45 +254: All tests passed!
+```
+
+#### 3. Baton Handoff → Sprint P2-5
+- Sprint P2-4 is completed, verified, and safely pushed to `origin/phase-2`.
+- Ready for Claude to design Sprint P2-5 (CAP Verify S18 + Close S19 + GM dashboard), the final sprint of Phase 2.
+
