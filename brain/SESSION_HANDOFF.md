@@ -5329,6 +5329,79 @@ nothing to commit, working tree clean
 - **Baseline**: 285/285 tests passing across 37 test files; 0 analyzer issues; 12/12 canonical score engine invariant tests green.
 - **Next Immediate Task**: Claude (Team Lead) to deliver the architectural plan for **Sprint P3-2 (7-Trigger Escalation Engine, Spec §7 / Appendix A.5)**.
 
+---
+
+### Entry: 2026-09-29 — Sprint P3-2 Plan Delivered (7-Trigger Escalation Engine) + R2 SCHEMA GATE RAISED
+- **Author**: Claude
+- **Date**: 2026-09-29
+- **Artifact**: `brain/SPRINT_P3_2_ESCALATION_ENGINE.md` (full plan).
+- **Status**: 🟡 PLAN delivered. **NOT cleared to build in full.** Engine core + Triggers T1/T2/T3/T7/T6-manual are cleared to design (no schema change). **T4 + T5 are blocked on an R2 schema-drift gate the Owner must rule.**
+
+#### 1. What I verified in code (grounding, per Spec-Reading Protocol)
+- `escalations` table **already exists** and is fully formed (`schema.dart` L283–305: trigger_number 0–7, source_type audit|cap|trend|manual, urgency immediate|same_day|same_night|next_audit, what_happened/evidence/impact/requested_action, status open|acknowledged|resolved, whatsapp_sent, + index `idx_escalations_status`). **No table change needed for the escalation record itself.**
+- `audits.band` ✅ (T1), `audits.cash_variance_rupees` ✅ modelled in `audit.dart` (T3), `audits.compliance_pct` + history ✅ (T7), `audit_results` P/F/NA history ✅ (T2). T6 = manual entry point.
+
+#### 2. ⛔ R2 GATE — two spec-referenced fields DO NOT EXIST in schema
+- **T4** needs `audits.inventory_variance_pct` — **absent.** `audits` has `cash_variance_rupees` but no inventory-variance column.
+- **T5** needs `audit_results.flag_security_concern` — **absent.**
+- Both appear **only in spec text** (`brain/spec/06_SCORING_AND_ESCALATION.md` L299–311), not in `schema.dart`. Per R2 I will not silently add columns.
+- **T3 caveat**: `cash_variance_rupees` is read but I did not confirm daily conduct *writes* it — if never captured, T3 never fires. Antigravity to confirm capture point.
+
+#### 3. My recommendation (Owner to rule)
+- **Split**: P3-2 ships the whole engine + notification/WhatsApp/clipboard machinery + T1/T2/T3/T7 + T6-manual with **zero schema change**. **T4 + T5 → P3-2b**, gated on Owner approving the two-column addition (`audits.inventory_variance_pct REAL`, `audit_results.flag_security_concern INTEGER DEFAULT 0 CHECK (0,1)`) **plus** their conduct-flow capture UI (a §4.4 four-way change). Precedent: `cash_variance_rupees` was itself a documented, spec-sourced addition — clean path exists when Owner approves + it's recorded.
+- Alternative: Owner authorizes both columns now so all 7 ship together.
+
+#### 4. Design highlights (buildable-now scope)
+- Pure `EscalationEngine.evaluateAfterAudit(...)` → `List<EscalationDraft>` (mirror `score_engine.dart` style, fully unit-testable, no side effects).
+- `EscalationRepository.raise()` inserts row (idempotent on trigger_number+source_audit_id), in a transaction; wired **after** submit, **outside** the audit's transaction (R5: delivery failure never rolls back a submitted audit).
+- `buildEscalationMessage` = 4-part **What happened · Evidence · Impact · Requested action**. **Message body ALWAYS English** (forwardable to bank/police/Titan corporate) — in-app chrome bilingual per R8; document the English-only rule in ARB comments so it isn't "fixed" as a parity bug later.
+- Delivery: `flutter_local_notifications` in-app + `url_launcher` `https://wa.me/{phone}?text=...` + clipboard fallback. **R2 check: confirm both packages are in `pubspec.yaml` before use** — a new package is a locked-stack decision to flag, not assume.
+
+#### 5. Baton → Antigravity (do NOT build yet)
+Three confirmations to report back in the handoff before I finalize the buildable spec:
+1. Are `flutter_local_notifications` + `url_launcher` already in `pubspec.yaml`?
+2. What are the seed SOP ids for **cash** and **inventory** (needed for T1/T3 cause detection — plan assumes SOP6 cash / SOP7 inventory)?
+3. Does daily conduct capture `cash_variance_rupees` today (T3 §3.3)?
+Plus: surface the §2 R2 gate to the Owner for a ruling (P3-2/P3-2b split — recommended — vs authorize both columns now). No T4/T5 code and no schema edit until ruled. Work on `feature/p3-escalation-engine` off `phase-3`; Rule 6 HOLD for review before any commit.
+- **Next Immediate Task (Antigravity)**: report the 3 confirmations above + relay the R2 gate to the Owner. **Next Immediate Task (Claude)**: on the Owner's ruling + Antigravity's confirmations, finalize `SPRINT_P3_2_ESCALATION_ENGINE.md` §4 into the buildable spec and clear the engine-core build.
+
+---
+
+### Entry: 2026-09-29 — Antigravity Confirmations for Sprint P3-2 (7-Trigger Escalation Engine)
+- **Author**: Antigravity
+- **Date**: 2026-09-29
+- **Branch**: `feature/p3-escalation-engine` (cut off `phase-3` at `6c4fedb`; `main` strictly untouched at `0cb2e55` per Rule 7)
+- **Status**: Confirmations verified in code/seed. Ready for Owner's R2 gate decision.
+
+#### 1. Factual Confirmations for Claude
+
+1. **Packages in `pubspec.yaml`**:
+   - `flutter_local_notifications`: **YES, already present** (`^22.0.0` at line 49).
+   - `url_launcher`: **YES, already present** (`^6.2.2` at line 50).
+   - **Conclusion**: Zero dependencies or `pubspec.yaml` edits required. The locked stack is 100% preserved (Rule 2).
+
+2. **Seed SOP IDs for Cash and Inventory**:
+   - Cash Management: **`SOP6`** (`assets/seed/sops.json` line 50, weight 2, critical 1). Checkpoints: Daily `6.1`–`6.12`, Weekly `CW.1`–`CW.8`, Monthly `MC.1`.
+   - Inventory Management: **`SOP7`** (`assets/seed/sops.json` line 60, weight 2, critical 1). Checkpoints: Daily `7.1`–`7.11`, Weekly `IW.1`–`IW.12`, Monthly `MC.2`.
+   - **Conclusion**: Plan's assumption of **`SOP6` (cash)** and **`SOP7` (inventory)** is **EXACT and verified against active seed**.
+
+3. **Does Daily Conduct Capture `cash_variance_rupees` Today?**:
+   - **NO.** The column exists in SQLite (`schema.dart` L21) and is modelled in `audit.dart` L28, but **zero conduct screens (S06, S07, S08, S10, S11) prompt for or write it**. In SQLite, `cash_variance_rupees` is currently `null` across all saved/submitted audits.
+   - **Impact on T3**: Without capturing it, T3 (`abs(cash_variance_rupees) > 500`) would never trigger in production.
+   - **Recommendation**: As part of P3-2, add a "Closing Cash Variance (₹)" input field on S10 (Daily Review & Submit) — defaulting to ₹0 — and pass it to `AuditRepository.submitAudit` to populate `audits.cash_variance_rupees`. No schema change needed.
+
+#### 2. R2 Schema Gate for Triggers T4 and T5
+- **T4** (Inventory variance > 2%) requires `audits.inventory_variance_pct` (absent from schema).
+- **T5** (Security concern flag) requires `audit_results.flag_security_concern` (absent from schema).
+- **Recommendation**: Agree with Claude to **Split into P3-2 and P3-2b**:
+  - **P3-2**: EscalationEngine core + 4-part message generator (English body) + in-app notification (`flutter_local_notifications`) + WhatsApp deep link (`url_launcher`) + clipboard copy + Escalations List screen + Triggers **T1, T2, T3 (with S10 capture point), T7, T6-manual** with **ZERO schema change**.
+  - **P3-2b**: Gated on Owner ruling to add the two columns + conduct UI capture points.
+
+#### 3. Next Immediate Task
+- Owner to rule on the **P3-2 / P3-2b split**.
+- Claude to finalize `SPRINT_P3_2_ESCALATION_ENGINE.md` §4 and clear Antigravity to build on `feature/p3-escalation-engine`.
+
+
 
 
 
