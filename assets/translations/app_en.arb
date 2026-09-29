@@ -137,6 +137,22 @@
       "year": {"type": "int"}
     }
   },
+  "s05ThisMonthMonthlyAudit": "This month's strategic audit",
+  "s05MonthlyNotStartedYet": "You haven't started this month's audit yet.",
+  "s05MonthlyNotStartedAdmin": "This month's strategic audit has not been started yet.",
+  "s05StartMonthlyAudit": "Start monthly audit",
+  "s05ResumeMonthlyDraft": "Resume monthly draft",
+  "s05MonthlyDraftInProgress": "A monthly draft audit is in progress. Resume to continue marking checkpoints.",
+  "s05MonthlyAuditsRunByOwner": "Monthly strategic audits are run by the Store Owner.",
+  "s05MonthYearLabel": "{month}, {year}",
+  "@s05MonthYearLabel": {
+    "placeholders": {
+      "month": {"type": "String"},
+      "year": {"type": "int"}
+    }
+  },
+  "s05MonthlySubtitle": "Strategic spot-checks & trend review (Target: 95%+)",
+  "s05ViewWeeklyReport": "View Weekly Report (S21)",
   "s05AuditHistoryTitle": "Audit history",
   "s05AuditHistorySubtitle": "View past daily audits",
   "s05CapsTitle": "CAPs",
@@ -150,17 +166,50 @@
 
   "s06Title": "Start Daily Audit",
   "s06WeeklyTitle": "Start Weekly Audit",
+  "s06MonthlyTitle": "Start Monthly Strategic Audit",
   "s06AuditDate": "Audit Date",
   "s06StoreLabel": "Store",
   "s06CrosOnDuty": "CROs on Duty",
   "s06SelectAtLeastOneCro": "Please select at least one CRO on duty.",
   "s06BeginAudit": "Begin Audit",
+  "s06SubmittedAuditExistsDaily": "A submitted audit exists for this date. Starting a new one will supersede it (history preserved).",
+  "s06DraftAuditExistsDaily": "A draft audit exists for this date. Starting a new one will replace it.",
+  "s06SubmittedAuditExistsWeekly": "A submitted weekly audit exists for Week {week}, {year}. Starting a new one will supersede it.",
+  "@s06SubmittedAuditExistsWeekly": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "year": {"type": "int"}
+    }
+  },
+  "s06DraftAuditExistsWeekly": "A draft weekly audit exists for Week {week}, {year}. Starting a new one will replace it.",
+  "@s06DraftAuditExistsWeekly": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "year": {"type": "int"}
+    }
+  },
+  "s06SubmittedAuditExistsMonthly": "A submitted monthly audit exists for {month}, {year}. Starting a new one will supersede it.",
+  "@s06SubmittedAuditExistsMonthly": {
+    "placeholders": {
+      "month": {"type": "String"},
+      "year": {"type": "int"}
+    }
+  },
+  "s06DraftAuditExistsMonthly": "A draft monthly audit exists for {month}, {year}. Starting a new one will replace it.",
+  "@s06DraftAuditExistsMonthly": {
+    "placeholders": {
+      "month": {"type": "String"},
+      "year": {"type": "int"}
+    }
+  },
 
   "s10WeeklyScoreTitle": "Weekly Audit Score",
+  "s10MonthlyScoreTitle": "Monthly Strategic Audit Score",
   "s10DailyAvgContribution": "Daily Average Contribution",
   "s10WeeklyCheckpointsScore": "Weekly Checkpoints Score",
   "s10CashVarianceTitle": "Cumulative Cash Variance (CW.7)",
   "s11WeeklyTitle": "Weekly Audit Submitted",
+  "s11MonthlyTitle": "Monthly Audit Submitted",
 
   "s07CheckpointNumber": "Checkpoint {current} of {total}",
   "@s07CheckpointNumber": {"placeholders": {"current": {"type": "int"}, "total": {"type": "int"}}},
@@ -658,7 +707,7 @@
   "s12FilterDaily": "Daily",
   "s12FilterUnverified": "Unverified",
   "s12FilterWeekly": "Weekly",
-  "s12FilterMonthly": "Monthly (Phase 3)",
+  "s12FilterMonthly": "Monthly",
   "s12NoAuditsFound": "No audits found",
   "s12NoAuditsMatchFilter": "No audits match the selected filter.",
   "s12CompleteAuditPrompt": "Complete and submit a daily audit to view history here.",

@@ -364,6 +364,43 @@ class AppLocalizationsMr extends AppLocalizations {
   }
 
   @override
+  String get s05ThisMonthMonthlyAudit => 'या महिन्याचे धोरणात्मक ऑडिट';
+
+  @override
+  String get s05MonthlyNotStartedYet =>
+      'तुम्ही या महिन्याचे ऑडिट अद्याप सुरू केलेले नाही.';
+
+  @override
+  String get s05MonthlyNotStartedAdmin =>
+      'या महिन्याचे धोरणात्मक ऑडिट अद्याप सुरू झालेले नाही.';
+
+  @override
+  String get s05StartMonthlyAudit => 'मासिक ऑडिट सुरू करा';
+
+  @override
+  String get s05ResumeMonthlyDraft => 'मासिक मसुदा पुन्हा सुरू करा';
+
+  @override
+  String get s05MonthlyDraftInProgress =>
+      'मासिक मसुदा ऑडिट सुरू आहे. तपासणी पुढे चालू ठेवण्यासाठी पुन्हा सुरू करा.';
+
+  @override
+  String get s05MonthlyAuditsRunByOwner =>
+      'मासिक धोरणात्मक ऑडिट स्टोअर मालकाद्वारे (Owner) चालवले जाते.';
+
+  @override
+  String s05MonthYearLabel(String month, int year) {
+    return '$month, $year';
+  }
+
+  @override
+  String get s05MonthlySubtitle =>
+      'धोरणात्मक स्पॉट-चेक व कल पुनरावलोकन (लक्ष्य: ९५%+)';
+
+  @override
+  String get s05ViewWeeklyReport => 'साप्ताहिक अहवाल पहा (S21)';
+
+  @override
   String get s05AuditHistoryTitle => 'ऑडिट इतिहास';
 
   @override
@@ -400,6 +437,9 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s06WeeklyTitle => 'साप्ताहिक ऑडिट सुरू करा';
 
   @override
+  String get s06MonthlyTitle => 'मासिक धोरणात्मक ऑडिट सुरू करा';
+
+  @override
   String get s06AuditDate => 'ऑडिट तारीख';
 
   @override
@@ -416,7 +456,38 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s06BeginAudit => 'ऑडिट सुरू करा';
 
   @override
+  String get s06SubmittedAuditExistsDaily =>
+      'या तारखेसाठी सादर केलेले ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास ते अधिक्रमित होईल (इतिहास जपला जाईल).';
+
+  @override
+  String get s06DraftAuditExistsDaily =>
+      'या तारखेसाठी मसुदा ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास तो बदलला जाईल.';
+
+  @override
+  String s06SubmittedAuditExistsWeekly(int week, int year) {
+    return 'आठवडा $week, $year साठी सादर केलेले साप्ताहिक ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास ते अधिक्रमित होईल.';
+  }
+
+  @override
+  String s06DraftAuditExistsWeekly(int week, int year) {
+    return 'आठवडा $week, $year साठी साप्ताहिक मसुदा ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास तो बदलला जाईल.';
+  }
+
+  @override
+  String s06SubmittedAuditExistsMonthly(String month, int year) {
+    return '$month, $year साठी सादर केलेले मासिक ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास ते अधिक्रमित होईल.';
+  }
+
+  @override
+  String s06DraftAuditExistsMonthly(String month, int year) {
+    return '$month, $year साठी मासिक मसुदा ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास तो बदलला जाईल.';
+  }
+
+  @override
   String get s10WeeklyScoreTitle => 'साप्ताहिक ऑडिट गुण';
+
+  @override
+  String get s10MonthlyScoreTitle => 'मासिक धोरणात्मक ऑडिट गुण';
 
   @override
   String get s10DailyAvgContribution => 'दैनंदिन सरासरी योगदान';
@@ -429,6 +500,9 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s11WeeklyTitle => 'साप्ताहिक ऑडिट सादर झाले';
+
+  @override
+  String get s11MonthlyTitle => 'मासिक ऑडिट सादर झाले';
 
   @override
   String s07CheckpointNumber(int current, int total) {
@@ -1500,7 +1574,7 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s12FilterWeekly => 'साप्ताहिक';
 
   @override
-  String get s12FilterMonthly => 'मासिक (टप्पा ३)';
+  String get s12FilterMonthly => 'मासिक';
 
   @override
   String get s12NoAuditsFound => 'कोणतेही ऑडिट आढळले नाही';

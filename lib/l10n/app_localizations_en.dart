@@ -365,6 +365,43 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get s05ThisMonthMonthlyAudit => 'This month\'s strategic audit';
+
+  @override
+  String get s05MonthlyNotStartedYet =>
+      'You haven\'t started this month\'s audit yet.';
+
+  @override
+  String get s05MonthlyNotStartedAdmin =>
+      'This month\'s strategic audit has not been started yet.';
+
+  @override
+  String get s05StartMonthlyAudit => 'Start monthly audit';
+
+  @override
+  String get s05ResumeMonthlyDraft => 'Resume monthly draft';
+
+  @override
+  String get s05MonthlyDraftInProgress =>
+      'A monthly draft audit is in progress. Resume to continue marking checkpoints.';
+
+  @override
+  String get s05MonthlyAuditsRunByOwner =>
+      'Monthly strategic audits are run by the Store Owner.';
+
+  @override
+  String s05MonthYearLabel(String month, int year) {
+    return '$month, $year';
+  }
+
+  @override
+  String get s05MonthlySubtitle =>
+      'Strategic spot-checks & trend review (Target: 95%+)';
+
+  @override
+  String get s05ViewWeeklyReport => 'View Weekly Report (S21)';
+
+  @override
   String get s05AuditHistoryTitle => 'Audit history';
 
   @override
@@ -401,6 +438,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s06WeeklyTitle => 'Start Weekly Audit';
 
   @override
+  String get s06MonthlyTitle => 'Start Monthly Strategic Audit';
+
+  @override
   String get s06AuditDate => 'Audit Date';
 
   @override
@@ -417,7 +457,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s06BeginAudit => 'Begin Audit';
 
   @override
+  String get s06SubmittedAuditExistsDaily =>
+      'A submitted audit exists for this date. Starting a new one will supersede it (history preserved).';
+
+  @override
+  String get s06DraftAuditExistsDaily =>
+      'A draft audit exists for this date. Starting a new one will replace it.';
+
+  @override
+  String s06SubmittedAuditExistsWeekly(int week, int year) {
+    return 'A submitted weekly audit exists for Week $week, $year. Starting a new one will supersede it.';
+  }
+
+  @override
+  String s06DraftAuditExistsWeekly(int week, int year) {
+    return 'A draft weekly audit exists for Week $week, $year. Starting a new one will replace it.';
+  }
+
+  @override
+  String s06SubmittedAuditExistsMonthly(String month, int year) {
+    return 'A submitted monthly audit exists for $month, $year. Starting a new one will supersede it.';
+  }
+
+  @override
+  String s06DraftAuditExistsMonthly(String month, int year) {
+    return 'A draft monthly audit exists for $month, $year. Starting a new one will replace it.';
+  }
+
+  @override
   String get s10WeeklyScoreTitle => 'Weekly Audit Score';
+
+  @override
+  String get s10MonthlyScoreTitle => 'Monthly Strategic Audit Score';
 
   @override
   String get s10DailyAvgContribution => 'Daily Average Contribution';
@@ -430,6 +501,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s11WeeklyTitle => 'Weekly Audit Submitted';
+
+  @override
+  String get s11MonthlyTitle => 'Monthly Audit Submitted';
 
   @override
   String s07CheckpointNumber(int current, int total) {
@@ -1499,7 +1573,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s12FilterWeekly => 'Weekly';
 
   @override
-  String get s12FilterMonthly => 'Monthly (Phase 3)';
+  String get s12FilterMonthly => 'Monthly';
 
   @override
   String get s12NoAuditsFound => 'No audits found';

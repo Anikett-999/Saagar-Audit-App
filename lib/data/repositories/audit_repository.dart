@@ -14,6 +14,7 @@ enum AuditHistoryFilter {
   all,
   daily,
   weekly,
+  monthly,
   unverified,
 }
 
@@ -50,6 +51,24 @@ class AuditRepository {
       where:
           "week_number = ? AND year = ? AND audit_type = ? AND status NOT IN ('hidden')",
       whereArgs: [weekNumber, year, auditType],
+      orderBy: 'submitted_at DESC, draft_started_at DESC',
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return Audit.fromMap(rows.first);
+  }
+
+  /// Finds an audit for a specific month and year (used for monthly audits).
+  Future<Audit?> findByMonth({
+    required int monthNumber,
+    required int year,
+    required String auditType,
+  }) async {
+    final rows = await AppDatabase.instance.db.query(
+      'audits',
+      where:
+          "month_number = ? AND year = ? AND audit_type = ? AND status NOT IN ('hidden')",
+      whereArgs: [monthNumber, year, auditType],
       orderBy: 'submitted_at DESC, draft_started_at DESC',
       limit: 1,
     );
@@ -295,6 +314,9 @@ class AuditRepository {
         break;
       case AuditHistoryFilter.weekly:
         whereClauses.add("audit_type = 'weekly'");
+        break;
+      case AuditHistoryFilter.monthly:
+        whereClauses.add("audit_type = 'monthly'");
         break;
       case AuditHistoryFilter.unverified:
         whereClauses.add("status = 'submitted'");

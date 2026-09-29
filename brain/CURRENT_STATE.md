@@ -36,6 +36,16 @@
 
 > **PHASE 2 IS 100% COMPLETE & SIGNED OFF ACROSS ALL 5 SPRINTS (P2-1 TO P2-5).** Automated suite: 279/279 tests passing across 36 test files. Clean analyze: 0 issues. Claude code review: APPROVED. Physical device UAT: verified by owner on device. Merged to `main`.
 
+> **PHASE 3 SPRINT P3-1 (MONTHLY AUDIT FOUNDATION & CONDUCT) IS BUILT & VERIFIED.** Automated suite: 285/285 tests passing across 37 test files. Clean analyze: 0 issues. Holding on `feature/p3-monthly-foundation` off `phase-3` for Claude code review per Rule #6.
+
+### Phase 3 screen & feature registry
+| Screen / Feature | Name | Status | Notes |
+|---|---|---|---|
+| **Monthly conduct** | S06–S11 analogues | ✅ Complete (P3-1) | Parameterized S06–S11 by `audit_type='monthly'`, 3 strategic Owner spot-checks (`MC.1` Safe Cash wt 2, `MC.2` Display Tray wt 2, `MC.3` Customer DB wt 1; total wt 5), S05 Owner Monthly Card, S10 Review & S11 Submitted monthly labels, S12 history & S13 detail support |
+| **Escalation Engine** | 7 Triggers & WhatsApp | ⏳ Next (P3-2) | Appendix A.5 implementation: automated threshold breach detection across metrics, structured 4-part message generator |
+| **CAP Auto-Aging** | 7-day age & overdue flags | ⏳ Scheduled (P3-3) | Workbook Day 4 §4.4: 7-day age tracking, overdue escalation flags |
+| **Monthly Reports** | S21 monthly view & trends | ⏳ Scheduled (P3-4) | Workbook §3.7: Monthly report format, multi-week compliance trends |
+
 ### Phase 2 screen registry
 | Screen | Name | Status | Notes |
 |---|---|---|---|
@@ -47,11 +57,12 @@
 | **Weekly conduct** | S6–S11 analogues | ✅ Complete (P2-2) | Parameterized S06–S11 by `audit_type='weekly'`, 36 weekly checkpoints in 4 SOP groups (display_order 69–104), S05 GM/Owner Weekly card, S10 124-pt combined score with missing-day-as-zero & CW.7 variance subline, S12 history & S13 detail support |
 | **7-day review** | Daily review + spot check | ✅ Complete (P2-3) | 7 daily cards, 3 random spot-check checkpoints/day, GM signature of record (Option A: `verifier_id` + `verified_at`), discrepancy flagging with note preservation, full Marathi parity |
 
-**Score engine (Phase 2):** `computeWeeklyScore` (§6.5, daily-avg ×0.68 + weekly_raw, missing-day-as-zero) and `computeCumulativeWeeklyVariance` (CW.7, §6.7) — added to `lib/domain/score_engine.dart` in P2-1. Canonical target: Workbook §5.2 = 104.8/124 = **84.5% Poor** exact (test T2.1 passed).
+**Score engine (Phase 2 & 3):** `computeWeeklyScore` (§6.5, daily-avg ×0.68 + weekly_raw, missing-day-as-zero) and `computeCumulativeWeeklyVariance` (CW.7, §6.7). Monthly audit scoring uses pure math score engine on 5 weighted points; 5/5 = 100% Excellent (meets 95%+ Owner strategic target), 4/5 = 80% Poor, 3/5 = 60% Critical.
 
 ## 2. Verified Baseline Health
 - `flutter analyze`: **0 issues found (Clean baseline)**
-- `flutter test`: **279/279 tests passing across 36 test files**:
+- `flutter test`: **285/285 tests passing across 37 test files**:
+  - `monthly_audit_test.dart` (6 tests) — Sprint P3-1 Monthly Strategic Audit Foundation Suite: Seed integrity (MC.1 Safe Cash wt 2 SOP2 photo-required, MC.2 Tray recount wt 2 SOP7 photo-required, MC.3 Customer DB wt 1 SOP4, 5 wt total); Scoring logic (5/5 = 100% Excellent meets 95%+ target, 4/5 = 80% Poor, 3/5 = 60% Critical); Conduct flow & mandatory photo gate on MC.1/MC.2 FAIL; Rule #6 Immutability (post-submit modification throws StateError); Role gating (Owner can start monthly, SM and GM restricted); S12 History Monthly filter chip & S13 Detail monthly checkpoint loading; Dual-Language Parity (Rule #8) in authentic Devanagari Marathi.
   - `cap_lifecycle_test.dart` (13 tests) — Sprint P2-5 CAP Lifecycle Transitions Suite: `verifyCap` happy path (done -> verified with cap_log); `verifyCap` mandatory photo gate (`requires_photo_on_fail=1` throws ArgumentError without photo, succeeds with `context='cap_verification'`); invalid status guards (`verifyCap` throws StateError on non-done); `closeCap` happy path (verified -> closed with cap_log); `closeCap` guard (throws StateError on non-verified); `extendCap` happy path (bumps `extension_count`, updates `deadline` & `latest_extension_reason`, keeps status `done`, writes cap_log); `extendCap` validation (throws ArgumentError on blank reason/deadline); `reopenCap` happy path (verify-fail -> reopen at Plan sets status `reopened`, writes cap_log); `reopenCap` happy path (closed -> reopen by Owner sets status `reopened`, writes cap_log); `reopenCap` validation (throws ArgumentError on blank reason, StateError on open); Pattern CAP end-to-end (`is_pattern=1` CAP flows open -> done -> verified -> closed seamlessly); R5 Immutability (CAP transitions touch only `caps`/`cap_log`/`photos`, never audits or audit_results); `getCapCounts` (aggregates open, awaiting verification, verified, closed, and overdue).
   - `s18_cap_verify_screen_test.dart` (8 tests) — Sprint P2-5 Screen S18 CAP Verify Suite: header, problem statement, origin checkpoint, and verification method hero card; mandatory photo gate (`requires_photo_on_fail=1` shows REQUIRED badge, blocks Pass & Verify until photo attached); non-photo checkpoint enables Pass & Verify immediately; Verification Failed action opens choice dialog to Extend or Reopen at Plan; Role guard (SM sees Access Denied and cannot verify; GM/Owner allowed); Dual-language parity in authentic Marathi (including tests 7 and 8 asserting Marathi Access Denied view and REQUIRED badge).
   - `gm_dashboard_screen_test.dart` (4 tests) — Sprint P2-5 GM Dashboard CAP Oversight Suite: title, subtitle, status counts grid, and empty awaiting state; aggregated status counts (Open, Awaiting Verify, Verified, Closed, Overdue); awaiting list rendering with Pattern Issue markers and deep-linking to S18; Dual-language parity in authentic Marathi.

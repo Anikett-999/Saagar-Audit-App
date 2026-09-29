@@ -764,6 +764,66 @@ abstract class AppLocalizations {
   /// **'Week {week}, {year}'**
   String s05WeekNumberLabel(int week, int year);
 
+  /// No description provided for @s05ThisMonthMonthlyAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'This month\'s strategic audit'**
+  String get s05ThisMonthMonthlyAudit;
+
+  /// No description provided for @s05MonthlyNotStartedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t started this month\'s audit yet.'**
+  String get s05MonthlyNotStartedYet;
+
+  /// No description provided for @s05MonthlyNotStartedAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'This month\'s strategic audit has not been started yet.'**
+  String get s05MonthlyNotStartedAdmin;
+
+  /// No description provided for @s05StartMonthlyAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'Start monthly audit'**
+  String get s05StartMonthlyAudit;
+
+  /// No description provided for @s05ResumeMonthlyDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume monthly draft'**
+  String get s05ResumeMonthlyDraft;
+
+  /// No description provided for @s05MonthlyDraftInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'A monthly draft audit is in progress. Resume to continue marking checkpoints.'**
+  String get s05MonthlyDraftInProgress;
+
+  /// No description provided for @s05MonthlyAuditsRunByOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly strategic audits are run by the Store Owner.'**
+  String get s05MonthlyAuditsRunByOwner;
+
+  /// No description provided for @s05MonthYearLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{month}, {year}'**
+  String s05MonthYearLabel(String month, int year);
+
+  /// No description provided for @s05MonthlySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Strategic spot-checks & trend review (Target: 95%+)'**
+  String get s05MonthlySubtitle;
+
+  /// No description provided for @s05ViewWeeklyReport.
+  ///
+  /// In en, this message translates to:
+  /// **'View Weekly Report (S21)'**
+  String get s05ViewWeeklyReport;
+
   /// No description provided for @s05AuditHistoryTitle.
   ///
   /// In en, this message translates to:
@@ -830,6 +890,12 @@ abstract class AppLocalizations {
   /// **'Start Weekly Audit'**
   String get s06WeeklyTitle;
 
+  /// No description provided for @s06MonthlyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Monthly Strategic Audit'**
+  String get s06MonthlyTitle;
+
   /// No description provided for @s06AuditDate.
   ///
   /// In en, this message translates to:
@@ -860,11 +926,53 @@ abstract class AppLocalizations {
   /// **'Begin Audit'**
   String get s06BeginAudit;
 
+  /// No description provided for @s06SubmittedAuditExistsDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'A submitted audit exists for this date. Starting a new one will supersede it (history preserved).'**
+  String get s06SubmittedAuditExistsDaily;
+
+  /// No description provided for @s06DraftAuditExistsDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'A draft audit exists for this date. Starting a new one will replace it.'**
+  String get s06DraftAuditExistsDaily;
+
+  /// No description provided for @s06SubmittedAuditExistsWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'A submitted weekly audit exists for Week {week}, {year}. Starting a new one will supersede it.'**
+  String s06SubmittedAuditExistsWeekly(int week, int year);
+
+  /// No description provided for @s06DraftAuditExistsWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'A draft weekly audit exists for Week {week}, {year}. Starting a new one will replace it.'**
+  String s06DraftAuditExistsWeekly(int week, int year);
+
+  /// No description provided for @s06SubmittedAuditExistsMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'A submitted monthly audit exists for {month}, {year}. Starting a new one will supersede it.'**
+  String s06SubmittedAuditExistsMonthly(String month, int year);
+
+  /// No description provided for @s06DraftAuditExistsMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'A draft monthly audit exists for {month}, {year}. Starting a new one will replace it.'**
+  String s06DraftAuditExistsMonthly(String month, int year);
+
   /// No description provided for @s10WeeklyScoreTitle.
   ///
   /// In en, this message translates to:
   /// **'Weekly Audit Score'**
   String get s10WeeklyScoreTitle;
+
+  /// No description provided for @s10MonthlyScoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Strategic Audit Score'**
+  String get s10MonthlyScoreTitle;
 
   /// No description provided for @s10DailyAvgContribution.
   ///
@@ -889,6 +997,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Weekly Audit Submitted'**
   String get s11WeeklyTitle;
+
+  /// No description provided for @s11MonthlyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Audit Submitted'**
+  String get s11MonthlyTitle;
 
   /// No description provided for @s07CheckpointNumber.
   ///
@@ -2838,7 +2952,7 @@ abstract class AppLocalizations {
   /// No description provided for @s12FilterMonthly.
   ///
   /// In en, this message translates to:
-  /// **'Monthly (Phase 3)'**
+  /// **'Monthly'**
   String get s12FilterMonthly;
 
   /// No description provided for @s12NoAuditsFound.

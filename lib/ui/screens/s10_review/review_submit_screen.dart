@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../../data/models/audit.dart';
 import '../../../data/models/audit_result.dart';
@@ -239,6 +240,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
     }).toList();
 
     final isWeekly = audit.auditType == 'weekly';
+    final isMonthly = audit.auditType == 'monthly';
     WeeklyScoreResult? weeklyScore;
     ScoreResult? dailyScore;
 
@@ -264,7 +266,12 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
             audit.weekNumber,
             audit.year,
           )
-        : audit.auditDate;
+        : isMonthly
+            ? l10n.s05MonthYearLabel(
+                DateFormat('MMMM').format(DateTime.parse(audit.auditDate)),
+                audit.year,
+              )
+            : audit.auditDate;
 
     return Scaffold(
       appBar: AppBar(
@@ -427,7 +434,11 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
                       ),
                     ),
                     Text(
-                      isWeekly ? l10n.s10WeeklyScoreTitle : l10n.s10ScoreCard,
+                      isWeekly
+                          ? l10n.s10WeeklyScoreTitle
+                          : (audit.auditType == 'monthly'
+                              ? l10n.s10MonthlyScoreTitle
+                              : l10n.s10ScoreCard),
                       style: const TextStyle(
                         fontSize: 13,
                         color: AppColors.gray600,

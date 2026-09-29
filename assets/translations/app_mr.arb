@@ -136,6 +136,22 @@
       "year": {"type": "int"}
     }
   },
+  "s05ThisMonthMonthlyAudit": "या महिन्याचे धोरणात्मक ऑडिट",
+  "s05MonthlyNotStartedYet": "तुम्ही या महिन्याचे ऑडिट अद्याप सुरू केलेले नाही.",
+  "s05MonthlyNotStartedAdmin": "या महिन्याचे धोरणात्मक ऑडिट अद्याप सुरू झालेले नाही.",
+  "s05StartMonthlyAudit": "मासिक ऑडिट सुरू करा",
+  "s05ResumeMonthlyDraft": "मासिक मसुदा पुन्हा सुरू करा",
+  "s05MonthlyDraftInProgress": "मासिक मसुदा ऑडिट सुरू आहे. तपासणी पुढे चालू ठेवण्यासाठी पुन्हा सुरू करा.",
+  "s05MonthlyAuditsRunByOwner": "मासिक धोरणात्मक ऑडिट स्टोअर मालकाद्वारे (Owner) चालवले जाते.",
+  "s05MonthYearLabel": "{month}, {year}",
+  "@s05MonthYearLabel": {
+    "placeholders": {
+      "month": {"type": "String"},
+      "year": {"type": "int"}
+    }
+  },
+  "s05MonthlySubtitle": "धोरणात्मक स्पॉट-चेक व कल पुनरावलोकन (लक्ष्य: ९५%+)",
+  "s05ViewWeeklyReport": "साप्ताहिक अहवाल पहा (S21)",
   "s05AuditHistoryTitle": "ऑडिट इतिहास",
   "s05AuditHistorySubtitle": "मागील दैनिक ऑडिट पहा",
   "s05CapsTitle": "सीएपी (CAPs)",
@@ -149,17 +165,50 @@
 
   "s06Title": "दैनिक ऑडिट सुरू करा",
   "s06WeeklyTitle": "साप्ताहिक ऑडिट सुरू करा",
+  "s06MonthlyTitle": "मासिक धोरणात्मक ऑडिट सुरू करा",
   "s06AuditDate": "ऑडिट तारीख",
   "s06StoreLabel": "स्टोअर",
   "s06CrosOnDuty": "ड्युटीवरील कर्मचारी (CRO)",
   "s06SelectAtLeastOneCro": "कृपया किमान एक ड्युटीवरील कर्मचारी निवडा.",
   "s06BeginAudit": "ऑडिट सुरू करा",
+  "s06SubmittedAuditExistsDaily": "या तारखेसाठी सादर केलेले ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास ते अधिक्रमित होईल (इतिहास जपला जाईल).",
+  "s06DraftAuditExistsDaily": "या तारखेसाठी मसुदा ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास तो बदलला जाईल.",
+  "s06SubmittedAuditExistsWeekly": "आठवडा {week}, {year} साठी सादर केलेले साप्ताहिक ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास ते अधिक्रमित होईल.",
+  "@s06SubmittedAuditExistsWeekly": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "year": {"type": "int"}
+    }
+  },
+  "s06DraftAuditExistsWeekly": "आठवडा {week}, {year} साठी साप्ताहिक मसुदा ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास तो बदलला जाईल.",
+  "@s06DraftAuditExistsWeekly": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "year": {"type": "int"}
+    }
+  },
+  "s06SubmittedAuditExistsMonthly": "{month}, {year} साठी सादर केलेले मासिक ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास ते अधिक्रमित होईल.",
+  "@s06SubmittedAuditExistsMonthly": {
+    "placeholders": {
+      "month": {"type": "String"},
+      "year": {"type": "int"}
+    }
+  },
+  "s06DraftAuditExistsMonthly": "{month}, {year} साठी मासिक मसुदा ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास तो बदलला जाईल.",
+  "@s06DraftAuditExistsMonthly": {
+    "placeholders": {
+      "month": {"type": "String"},
+      "year": {"type": "int"}
+    }
+  },
 
   "s10WeeklyScoreTitle": "साप्ताहिक ऑडिट गुण",
+  "s10MonthlyScoreTitle": "मासिक धोरणात्मक ऑडिट गुण",
   "s10DailyAvgContribution": "दैनंदिन सरासरी योगदान",
   "s10WeeklyCheckpointsScore": "साप्ताहिक तपासणी बिंदू गुण",
   "s10CashVarianceTitle": "एकूण संचित रोख तफावत (CW.7)",
   "s11WeeklyTitle": "साप्ताहिक ऑडिट सादर झाले",
+  "s11MonthlyTitle": "मासिक ऑडिट सादर झाले",
 
   "s07CheckpointNumber": "चेकपॉइंट {current} / {total}",
   "@s07CheckpointNumber": {"placeholders": {"current": {"type": "int"}, "total": {"type": "int"}}},
@@ -539,7 +588,7 @@
   "s12FilterDaily": "दैनंदिन",
   "s12FilterUnverified": "अपडताळलेले",
   "s12FilterWeekly": "साप्ताहिक",
-  "s12FilterMonthly": "मासिक (टप्पा ३)",
+  "s12FilterMonthly": "मासिक",
   "s12NoAuditsFound": "कोणतेही ऑडिट आढळले नाही",
   "s12NoAuditsMatchFilter": "निवडलेल्या फिल्टरशी जुळणारे कोणतेही ऑडिट आढळले नाही.",
   "s12CompleteAuditPrompt": "येथे इतिहास पाहण्यासाठी दैनंदिन ऑडिट पूर्ण करा आणि सबमिट करा.",

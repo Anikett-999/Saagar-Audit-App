@@ -1468,5 +1468,53 @@
     "allows_na": 0,
     "requires_photo_on_fail": 1,
     "display_order": 104
+  },
+  {
+    "_HEADER": "Monthly strategic spot-check checkpoints — 3 rows, weighted total = 5.",
+    "_SOURCE": "Workbook §1.4 (Tier 3 Monthly Strategic Audit) & Appendix A.4.",
+    "_NOTE": "Strategic Owner-level spot checks: safe cash recount (wt 2, fail photo required), display tray recount (wt 2, fail photo required), 15 customer DB entries audit (wt 1). Target 95%+",
+    "_IS_COMMENT": true
+  },
+  {
+    "id": "MC.1",
+    "sop_id": "SOP2",
+    "frequency": "monthly",
+    "sequence": 1,
+    "text_en": "Recount safe cash",
+    "text_mr": "सेफ रोख रकमेची पुन्हा मोजणी",
+    "evidence_en": "Physical count of back-office safe cash reconciled against safe ledger",
+    "evidence_mr": "बॅक-ऑफिस सेफमधील रोख रकमेची प्रत्यक्ष मोजणी व लेजरशी ताळमेळ",
+    "weight": 2,
+    "allows_na": 0,
+    "requires_photo_on_fail": 1,
+    "display_order": 105
+  },
+  {
+    "id": "MC.2",
+    "sop_id": "SOP7",
+    "frequency": "monthly",
+    "sequence": 2,
+    "text_en": "Recount one display tray",
+    "text_mr": "एका डिस्प्ले ट्रेची पुन्हा मोजणी",
+    "evidence_en": "Surprise piece-by-piece physical count of one random high-value display tray matched against ERP/tray card",
+    "evidence_mr": "एका यादृच्छिक उच्च-मूल्य डिस्प्ले ट्रेमधील घड्याळांची प्रत्यक्ष मोजणी व टॅगशी पडताळणी",
+    "weight": 2,
+    "allows_na": 0,
+    "requires_photo_on_fail": 1,
+    "display_order": 106
+  },
+  {
+    "id": "MC.3",
+    "sop_id": "SOP4",
+    "frequency": "monthly",
+    "sequence": 3,
+    "text_en": "Audit 15 customer-DB entries",
+    "text_mr": "ग्राहक डेटाबेसमधील १५ नोंदींची पडताळणी",
+    "evidence_en": "Random verification of 15 customer phone numbers and bill records in ERP for authentic details",
+    "evidence_mr": "ERP मधील १५ ग्राहक फोन नंबर आणि बिल नोंदींची खरी माहिती असल्याची पडताळणी",
+    "weight": 1,
+    "allows_na": 0,
+    "requires_photo_on_fail": 0,
+    "display_order": 107
   }
 ]

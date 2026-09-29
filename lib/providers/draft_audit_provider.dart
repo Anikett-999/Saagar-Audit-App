@@ -95,9 +95,11 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
       auditorId: auditorId,
       supersedesAuditId: supersedesAuditId,
     );
-    final checkpoints = auditType == 'weekly'
-        ? await CheckpointRepository.instance.loadCheckpointsByFrequency('weekly')
-        : await CheckpointRepository.instance.loadDailyCheckpointsInAuditOrder();
+    final checkpoints = switch (auditType) {
+      'weekly' => await CheckpointRepository.instance.loadCheckpointsByFrequency('weekly'),
+      'monthly' => await CheckpointRepository.instance.loadCheckpointsByFrequency('monthly'),
+      _ => await CheckpointRepository.instance.loadDailyCheckpointsInAuditOrder(),
+    };
     state = DraftAuditState(
       audit: audit,
       checkpoints: checkpoints,
@@ -139,14 +141,32 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
         supersedesAuditId: supersedesAuditId,
       );
 
+  /// Start a brand-new monthly audit. Loads the 3 monthly checkpoints
+  /// and creates a draft row in SQLite.
+  Future<void> startMonthly({
+    required String date,
+    required String auditorId,
+    required List<Cro> cros,
+    String? supersedesAuditId,
+  }) =>
+      startAudit(
+        date: date,
+        auditType: 'monthly',
+        auditorId: auditorId,
+        cros: cros,
+        supersedesAuditId: supersedesAuditId,
+      );
+
   /// Resumes an existing in-progress draft audit and loads any already-saved results.
   Future<void> resumeDraft({
     required Audit audit,
     required List<Cro> cros,
   }) async {
-    final checkpoints = audit.auditType == 'weekly'
-        ? await CheckpointRepository.instance.loadCheckpointsByFrequency('weekly')
-        : await CheckpointRepository.instance.loadDailyCheckpointsInAuditOrder();
+    final checkpoints = switch (audit.auditType) {
+      'weekly' => await CheckpointRepository.instance.loadCheckpointsByFrequency('weekly'),
+      'monthly' => await CheckpointRepository.instance.loadCheckpointsByFrequency('monthly'),
+      _ => await CheckpointRepository.instance.loadDailyCheckpointsInAuditOrder(),
+    };
     final dbResults = await AuditRepository.instance.resultsForAudit(audit.id);
     final resultsMap = <String, Verdict>{};
     for (final r in dbResults) {

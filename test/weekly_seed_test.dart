@@ -27,12 +27,15 @@ void main() {
           .toList();
     });
 
-    test('Total checkpoints is exactly 104 (68 daily + 36 weekly)', () {
-      expect(allCheckpoints.length, 104);
+    test('Total checkpoints is exactly 107 (68 daily + 36 weekly + 3 monthly)', () {
+      expect(allCheckpoints.length, 107);
       final dailyCount =
           allCheckpoints.where((m) => m['frequency'] == 'daily').length;
+      final monthlyCount =
+          allCheckpoints.where((m) => m['frequency'] == 'monthly').length;
       expect(dailyCount, 68);
       expect(weeklyCheckpoints.length, 36);
+      expect(monthlyCount, 3);
     });
 
     test('SOP9 Operations is present in sops.json', () {

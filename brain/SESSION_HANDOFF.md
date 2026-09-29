@@ -5173,6 +5173,119 @@ Per `OVERVIEW.md` §3 and Workbook / App Spec ground truth, Phase 3 covers:
 - Claude (Senior Developer & Team Lead) to review Phase 3 scope and deliver the architectural plan for **Sprint P3-1 (Monthly Audit Foundation)**.
 - Antigravity to implement against Claude's plan on `feature/p3-*` branches off `phase-3`.
 
+---
+
+### Entry: 2026-09-29 — Sprint P3-1 Delivery: Monthly Strategic Audit Foundation & Conduct Loop (HOLD for Claude Review)
+- **Author**: Antigravity
+- **Date**: 2026-09-29
+- **Branch**: `feature/p3-monthly-foundation` (cut off `phase-3` at `327aa29`; `main` strictly untouched at `0cb2e55` per Rule 7)
+- **Status**: Built & fully tested. **HOLDING for Claude code review** per Rule 6.
+
+#### 1. Scope & Implementation Summary
+1. **R1 Spec Ambiguity Resolution (Option C — Hybrid Model)**:
+   - Owner explicitly ruled in favor of **Option C (Hybrid Model)** per Workbook §1.4 & §1.6:
+     - The Owner does not repeat the SM's 68 daily or GM's 36 weekly operational checks.
+     - Conducts 3 strategic spot-checks: Recount safe cash (wt 2, SOP2, photo required on fail), Recount one display tray (wt 2, SOP7, photo required on fail), Audit 15 customer-DB entries (wt 1, SOP4, no photo required). Total weights = 5.
+     - Pure scoring engine evaluates toward the Owner's strategic 95%+ target (Band.excellent). A single failure drops score to 80% (Poor) or 60% (Critical).
+2. **Seed & Data Layer**:
+   - `assets/seed/checkpoints.json`: Seeded `MC.1`, `MC.2`, `MC.3` (checkpoints total 107 = 68 daily + 36 weekly + 3 monthly).
+   - `AuditRepository`: Added `AuditHistoryFilter.monthly`, implemented `findByMonth(monthNumber, year, auditType)`.
+   - `DraftAuditNotifier`: Added `startMonthly`, parameterized checkpoint loader in `startAudit` and `resumeDraft` to load `loadCheckpointsByFrequency('monthly')`.
+3. **UI Layer**:
+   - `HomeScreen` (S05): Added `_monthlyCard` for Owner role displaying month/year, status chip, strategic subtitle callout, and actions to "Start Monthly Audit" (`/audit/start?type=monthly`) or "Resume Monthly Draft".
+   - `StartAuditScreen` (S06): Parameterized for `audit_type='monthly'`, localized existing audit warnings (draft replace vs submitted supersede).
+   - `ReviewSubmitScreen` (S10): Handles monthly score card title and formatted month date header.
+   - `SubmittedScreen` (S11): Displays `l10n.s11MonthlyTitle` and localized month/year subtitle.
+   - `AuditHistoryScreen` (S12): Enabled `Monthly` filter chip.
+   - `AuditDetailScreen` (S13): Displays monthly checkpoints loaded dynamically by frequency.
+4. **Dual-Language Parity (Rule #8 / Rule #3)**:
+   - 100% 1:1 parity across `app_en.arb` and `app_mr.arb` with authentic Marathi (`s05ThisMonthMonthlyAudit`, `s05StartMonthlyAudit`, `s05ResumeMonthlyDraft`, `s05MonthlyDraftInProgress`, `s05MonthlyAuditsRunByOwner`, `s05MonthYearLabel`, `s05MonthlySubtitle`, `s06MonthlyTitle`, `s10MonthlyScoreTitle`, `s11MonthlyTitle`, `s12FilterMonthly`).
+   - Ran `flutter gen-l10n` cleanly.
+5. **Testing Suite**:
+   - Updated `test/weekly_seed_test.dart` checkpoint count assertion to 107 (68 daily + 36 weekly + 3 monthly).
+   - Authored `test/monthly_audit_test.dart` (6/6 tests green covering Seed Integrity, Scoring Engine, Conduct Flow & Mandatory Photo Gate, Role Gating, History/Detail integration, and Authentic Marathi parity).
+   - Total test suite expanded to **285/285 tests passing across 37 test files**.
+
+#### 2. Raw Host Execution Logs
+
+##### A. Raw `flutter analyze` output
+```
+Analyzing Saagar Audit App...                                   
+No issues found! (ran in 2.9s)
+```
+
+##### B. Raw `flutter test test/score_engine_test.dart` output (Rule 5 invariant)
+```
+00:00 +0: loading E:/projects/Saagar Audit App/test/score_engine_test.dart
+00:00 +0: Band boundaries (Spec §6.2) ≥95.0 is excellent
+00:00 +1: Band boundaries (Spec §6.2) 94.9 is good (not excellent)
+00:00 +2: Band boundaries (Spec §6.2) ≥90.0 is good
+00:00 +3: Band boundaries (Spec §6.2) 89.9 is fair (the most-missed boundary per Workbook §1.5)
+00:00 +4: Band boundaries (Spec §6.2) ≥85.0 is fair
+00:00 +5: Band boundaries (Spec §6.2) 84.9 is poor
+00:00 +6: Band boundaries (Spec §6.2) ≥80.0 is poor
+00:00 +7: Band boundaries (Spec §6.2) 79.9 is critical
+00:00 +8: Band boundaries (Spec §6.2) below 80 is critical
+00:00 +9: NA handling (Spec §6.4) 5 NAs at weight 2 reduce max by 10
+00:00 +10: NA handling (Spec §6.4) Adding NA does not change the percentage
+00:00 +11: Workbook §5.1 canonical daily test (MUST equal 81/90 = 90.0% Good) produces 81/90 = 90.0% Good exactly
+00:00 +12: All tests passed!
+```
+
+##### C. Raw `flutter test test/monthly_audit_test.dart` output (Sprint P3-1 suite)
+```
+00:00 +0: loading E:/projects/Saagar Audit App/test/monthly_audit_test.dart
+00:00 +0: Sprint P3-1 — Monthly Strategic Audit Foundation Suite 1. Seed Integrity — Monthly checkpoints in checkpoints.json match Workbook Tier 3 spec
+00:00 +1: Sprint P3-1 — Monthly Strategic Audit Foundation Suite 2. Scoring Logic — 95%+ target, single fail triggers band drop
+00:00 +2: Sprint P3-1 — Monthly Strategic Audit Foundation Suite 3. Conduct Flow & Photo Enforcement — startMonthly, mandatory photo on MC.1/MC.2 fail
+00:00 +3: Sprint P3-1 — Monthly Strategic Audit Foundation Suite 4. Role Gating — Owner only can start monthly audit, SM and GM are restricted
+00:00 +4: Sprint P3-1 — Monthly Strategic Audit Foundation Suite 5. S12 History & S13 Detail — Monthly filter and checkpoint loading
+00:00 +5: Sprint P3-1 — Monthly Strategic Audit Foundation Suite 6. Dual-Language Parity (Rule #8) — authentic Marathi strings exist for monthly flow
+00:00 +6: All tests passed!
+```
+
+##### D. Raw `flutter test` summary output (Full Suite)
+```
+00:47 +285: All tests passed!
+```
+
+#### 3. Rule 6 Quality Gate & Handoff to Claude
+- **Rule 6 Hold**: Antigravity is **HOLDING for Claude's code review & approval**. No commit or push has been performed.
+- **Rule 7 Preserved**: `main` remains untouched at `0cb2e55`. All work is isolated on `feature/p3-monthly-foundation` cut off `phase-3`.
+- **Next Immediate Task**: Claude (Team Lead) to review Sprint P3-1 implementation, code diffs, and test outputs. Upon Claude's explicit written approval in `brain/SESSION_HANDOFF.md` (`APPROVED — cleared to commit & push`), Antigravity will commit with conventional commit message, merge `feature/p3-monthly-foundation` into `phase-3`, push `origin/phase-3`, and paste the push record.
+
+---
+
+**Author**: Claude — 2026-09-29
+
+### Sprint P3-1 code review — ✅ APPROVED — cleared to commit & push
+
+I reviewed the actual P3-1 code (not just the report) against the Option-C ruling. It's faithful, correct, and meets the Definition of Done.
+
+**✅ Verified by reading the code/tests:**
+- **Seed (Workbook-sourced, not invented):** `checkpoints.json` MC.1 Recount safe cash (SOP2, wt2, photo-on-fail), MC.2 Recount one display tray (SOP7, wt2, photo-on-fail), MC.3 Audit 15 customer-DB entries (SOP4, wt1, no photo) — total wt 5. These are exactly the Workbook's three Tier-3 spot-checks. 104 → 107 checkpoints; `weekly_seed_test` count updated.
+- **Scoring is correct:** monthly reuses the **generic** `scoreDaily(marks)` in `review_submit_screen.dart` (the `else` branch). I confirmed `scoreDaily` sums `weight` over whatever marks are passed with NA excluded from both raw and max — no hardcoded /90 or /68 — so monthly yields a real weighted % against the 95% target: all-pass 5/5=100% (Excellent), MC.3 fail 4/5=80.0% (Poor, correct boundary), MC.1 fail 3/5=60% (Critical). `monthly_audit_test.dart` test 2 asserts all three.
+- **Conduct flow (test 3):** `startMonthly` sets `audit_type='monthly'`, `month_number`, `year`; loads the 3 monthly checkpoints; the **mandatory-photo gate fires on MC.1/MC.2 fail** (`throwsArgumentError` without photo) — honors R7's intent (driven by `requires_photo_on_fail`, correct regardless of SOP number). Submit persists; **R5 immutability** verified (`saveResult` on a submitted audit throws).
+- **Role gate:** monthly is **Owner-only** (`canStartMonthly = role=='OWNER'`), GM/SM excluded (test 4 + Home tile).
+- **Reuse, not fork:** conduct is the existing S06/S07/S10/S11/S12/S13 engine parameterized for `audit_type='monthly'` — no second conduct engine, as required.
+- **Bilingual (R3/R8):** 18 monthly keys present in both `app_en.arb` and `app_mr.arb`; authentic Marathi verified (e.g. `या महिन्याचे धोरणात्मक ऑडिट`, `मासिक ऑडिट सुरू करा`, `मासिक धोरणात्मक ऑडिट सुरू करा`). `gen-l10n` clean.
+- Per Antigravity's run (not re-verified by me): `flutter analyze` 0 issues; `flutter test` **285/285** green; canonical score engine 12/12 (Rule 5 intact).
+
+**Non-blocking notes (address at leisure, NOT gating):**
+1. `scoreDaily`/local var `dailyScore` are reused for monthly — functionally correct but misleadingly named. Consider a thin `scoreChecklist` alias or a comment so a future reader doesn't think monthly is being scored as a "daily." Cosmetic only.
+2. The Home "Start Monthly Audit" tile is gated by **role only**, not hard-locked to the first Sunday (spec L1083 describes first-Sunday as when the *prompt surfaces*). I'm treating always-available-for-Owner as the deliberate, testability-friendly choice — confirm you're happy with that; if you want a soft "first Sunday" hint banner it's a tiny follow-up, not a blocker.
+
+**`APPROVED — cleared to commit & push`** (Rule 6).
+
+**Authorized push flow (Antigravity):**
+1. `git add` the P3-1 app files + brain updates; Conventional Commit (e.g. `feat(monthly): P3-1 Tier-3 monthly strategic audit foundation (Option C) — seed MC.1–3, conduct/scoring/role-gate, EN+MR`).
+2. Merge `feature/p3-monthly-foundation` → `phase-3`; push `origin/phase-3`.
+3. **Do NOT push to `main`** — it stays at `0cb2e55` until the Phase-3 sign-off merge (Rule 7).
+4. Paste raw `git status` + `git log --oneline` as the push record.
+
+**Next after push → Sprint P3-2 (7-Trigger Escalation Engine, Spec §7 / Appendix A.5):** the 7 triggers, the 4-part structured message generator (Trigger · Evidence · Operational Impact · Required Action), and WhatsApp deep-link / clipboard share + in-app notifications. I'll write that plan once the P3-1 push record lands.
+
+
 
 
 

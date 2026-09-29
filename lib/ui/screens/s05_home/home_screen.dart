@@ -27,6 +27,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   Audit? _todayAudit;
   Audit? _thisWeekAudit;
+  Audit? _thisMonthAudit;
   bool _loading = true;
 
   @override
@@ -47,10 +48,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       year: now.year,
       auditType: 'weekly',
     );
+    final monthAudit = await AuditRepository.instance.findByMonth(
+      monthNumber: now.month,
+      year: now.year,
+      auditType: 'monthly',
+    );
     if (!mounted) return;
     setState(() {
       _todayAudit = todayAudit;
       _thisWeekAudit = weekAudit;
+      _thisMonthAudit = monthAudit;
       _loading = false;
     });
   }
@@ -70,6 +77,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final l10n = AppLocalizations.of(context)!;
     final canStartDaily = user.role == 'SM' || user.role == 'OWNER';
     final canStartWeekly = user.role == 'GM' || user.role == 'OWNER';
+    final canStartMonthly = user.role == 'OWNER';
     final today = DateFormat('EEEE, d MMMM').format(DateTime.now());
 
     return Scaffold(
@@ -111,6 +119,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   if (canStartWeekly) ...[
                     const SizedBox(height: 12),
                     _weeklyCard(context, l10n),
+                  ],
+                  if (canStartMonthly) ...[
+                    const SizedBox(height: 12),
+                    _monthlyCard(context, l10n),
                   ],
                   const SizedBox(height: 12),
                   _navTiles(context, l10n, user.role),
@@ -320,7 +332,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 icon: const Icon(Icons.assessment_outlined, size: 18),
-                label: const Text('View Weekly Report (S21)'),
+                label: Text(l10n.s05ViewWeeklyReport),
                 onPressed: () async {
                   final existing = await ReportRepository.instance.getByAuditId(audit.id);
                   if (existing != null) {
@@ -356,6 +368,113 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   if (!mounted) return;
                   await _loadAudits();
                 },
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _monthlyCard(BuildContext context, AppLocalizations l10n) {
+    final audit = _thisMonthAudit;
+    final now = DateTime.now();
+    final monthName = DateFormat('MMMM').format(now);
+    final year = now.year;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.s05ThisMonthMonthlyAudit,
+                        style: const TextStyle(
+                          fontFamily: 'DMSerifDisplay',
+                          fontSize: 20,
+                          color: AppColors.navy,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        l10n.s05MonthYearLabel(monthName, year),
+                        style: const TextStyle(
+                          color: AppColors.gray600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                _statusChip(l10n, audit),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              l10n.s05MonthlySubtitle,
+              style: const TextStyle(
+                color: AppColors.gold,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 16),
+            if (audit == null) ...[
+              Text(
+                l10n.s05MonthlyNotStartedYet,
+                style: const TextStyle(color: AppColors.gray600),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.play_arrow_rounded),
+                label: Text(l10n.s05StartMonthlyAudit),
+                onPressed: () async {
+                  await context.push('/audit/start?type=monthly');
+                  if (!mounted) return;
+                  await _loadAudits();
+                },
+              ),
+            ] else if (audit.isDraft) ...[
+              Text(
+                l10n.s05MonthlyDraftInProgress,
+                style: const TextStyle(color: AppColors.gray600),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.edit_outlined),
+                label: Text(l10n.s05ResumeMonthlyDraft),
+                onPressed: () async {
+                  await ref.read(draftAuditProvider.notifier).resumeDraft(
+                        audit: audit,
+                        cros: const [],
+                      );
+                  if (!context.mounted) return;
+                  await context.pushNamed('s07_checkpoint');
+                  if (!mounted) return;
+                  await _loadAudits();
+                },
+              ),
+            ] else ...[
+              Text(
+                '${l10n.s05SubmittedStatus} • ${audit.compliancePct?.toStringAsFixed(1) ?? "—"}% (${audit.band ?? "—"})',
+                style: const TextStyle(color: AppColors.gray600),
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.visibility_outlined, size: 18),
+                label: Text(l10n.s12Title),
+                onPressed: () => context.pushNamed(
+                  's13_audit_detail',
+                  pathParameters: {'id': audit.id},
+                ),
               ),
             ],
           ],
