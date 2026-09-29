@@ -1182,7 +1182,49 @@
     "placeholders": {
       "error": {"type": "String"}
     }
-  }
+  },
+  "s10ClosingCashVarianceTitle": "Closing Cash Variance",
+  "s10CashVarianceSubtitle": "Enter till cash variance from physical reconciliation (tolerance: ₹500).",
+  "s10CashVarianceLabel": "Variance (₹)",
+  "s10CashVarianceHelper": "Variance > ₹500 automatically triggers an alert to GM / Owner (Trigger 3).",
+  "s33EscalationsTitle": "Escalations",
+  "s33EscalationsSubtitle": "Threshold breaches & emergency alerts",
+  "s33FilterAll": "All",
+  "s33FilterOpen": "Open",
+  "s33FilterAcknowledged": "Acknowledged",
+  "s33FilterResolved": "Resolved",
+  "s33EmptyOpen": "No Open Escalations",
+  "s33EmptyOpenDesc": "Store operations, cash counts, and inventory are within expected tolerances.",
+  "s33TriggerLabel": "Trigger {number}",
+  "@s33TriggerLabel": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "s33AcknowledgeAction": "Acknowledge",
+  "s33ResolveAction": "Resolve",
+  "s33CopyAction": "Copy Alert",
+  "s33CopiedSuccess": "Escalation message copied to clipboard",
+  "s33WhatsAppAction": "WhatsApp",
+  "s33ResolutionNotesTitle": "Resolution Notes",
+  "s33ResolutionNotesHint": "Describe corrective actions taken...",
+  "s33ResolutionNotesRequired": "Resolution notes are required to resolve an escalation.",
+  "s33AcknowledgeSuccess": "Escalation acknowledged",
+  "s33ResolveSuccess": "Escalation resolved",
+  "s33RaiseManualTitle": "Raise Manual Escalation",
+  "s33WhatHappenedLabel": "What happened",
+  "s33EvidenceLabel": "Evidence",
+  "s33ImpactLabel": "Operational Impact",
+  "s33ActionLabel": "Requested Action",
+  "s33SaveManualButton": "Submit Escalation",
+  "s33UrgencyImmediate": "Immediate",
+  "s33UrgencySameDay": "Same Day",
+  "s33UrgencySameNight": "Same Night",
+  "s33UrgencyNextAudit": "Next Audit",
+  "s33TargetOwner": "To: Owner",
+  "s33TargetGm": "To: GM",
+  "s33WhatsAppSentBadge": "WhatsApp Sent",
+  "fieldRequired": "This field is required"
 }
 
 

@@ -5401,6 +5401,341 @@ Plus: surface the §2 R2 gate to the Owner for a ruling (P3-2/P3-2b split — re
 - Owner to rule on the **P3-2 / P3-2b split**.
 - Claude to finalize `SPRINT_P3_2_ESCALATION_ENGINE.md` §4 and clear Antigravity to build on `feature/p3-escalation-engine`.
 
+---
+
+### Entry: 2026-09-29 — Sprint P3-2 Built & Verified: 7-Trigger Escalation Engine, S33, WhatsApp & 304/304 Tests Green
+- **Author**: Antigravity
+- **Date**: 2026-09-29
+- **Branch**: `feature/p3-escalation-engine` (cut off `phase-3` at `6c4fedb`; `main` strictly untouched at `0cb2e55` per Rule 7)
+- **Status**: **COMPLETE — HOLDING for Claude's review per Rule 6 (not committed / not pushed).**
+
+#### 1. Deliverables Completed (Spec §7 & Appendix A.5)
+
+1. **Pure Domain Escalation Engine (`lib/domain/escalation_engine.dart`)**:
+   - Implemented `EscalationEngine` with zero DB side-effects, mirroring `score_engine.dart`.
+   - **Trigger 1 (Daily Critical Band < 80%)**: Evaluates SOP breakdown; routes to GM (`same_night`, `in_app`); if Cash (SOP6) or Inventory (SOP7) caused the drop, escalates to **BOTH GM and Owner** via `whatsapp`.
+   - **Trigger 2 (Repeat Checkpoint Fail ≥ 5 of last 7 daily audits)**: Evaluates checkpoint failure frequency; raises to GM (`next_audit`, `in_app`).
+   - **Trigger 3 (Cash Variance > ₹500)**: Evaluates daily cash variance; raises to GM (`same_day`, `whatsapp`); if consecutive (yesterday's cash variance also exceeded ₹500), immediately escalates to **Owner** (`immediate`, `whatsapp`).
+   - **Trigger 7 (3-Week Declining Trend)**: Evaluates 3+ consecutive weekly audits; detects strict downward monotonicity; raises to Owner (`same_day`, `in_app`).
+   - **Trigger 6 (Manual Escalation Draft)**: Supports customer complaints / critical operational incidents; targets Owner (`same_day`, `whatsapp`).
+   - **Standard 4-Part English Message Generator (`buildEscalationMessage`)**: Generates structured messages per Appendix A.5 format (1. What happened, 2. Evidence, 3. Operational impact, 4. Requested action) with auto-generated header and disclaimer footer. **Always formatted in English** (forwardable to banks, police, Titan corporate).
+
+2. **Data Model & Repository (`lib/data/models/escalation.dart`, `lib/data/repositories/escalation_repository.dart`)**:
+   - Model maps 1:1 with SQLite `escalations` table (17 fields).
+   - `EscalationRepository`:
+     - `raise`: Idempotency guard on `(trigger_number, source_audit_id, raised_to_user_id)`.
+     - `listAll`, `listOpen`, `countOpen`, `getById`.
+     - `acknowledge`: sets `status = 'acknowledged'`, records `acknowledged_at`.
+     - `resolve`: sets `status = 'resolved'`, records `resolved_at` and `resolution_notes`.
+     - `markWhatsAppSent`: sets `whatsapp_sent = 1`.
+   - `UserRepository`: Added `getOwner()` and `getFirstGm()` helper lookups.
+   - `AuditRepository`: Added `findPreviousDailyAudit`, `findRecentDailyAudits`, `findRecentWeeklyAudits`, and updated `submitAudit` to persist `cashVarianceRupees`.
+
+3. **Delivery Services (`lib/services/notification_service.dart`, `lib/services/escalation_service.dart`)**:
+   - `NotificationService`: Configures and presents heads-up Android notifications using existing `flutter_local_notifications` (`^22.0.0`).
+   - `EscalationService`: Orchestrates post-audit evaluation, database insertion, in-app notifications, and WhatsApp URL launch (`https://wa.me/{phone}?text=...`) via `url_launcher` (`^6.2.2`).
+   - **Rule 5 & Isolation**: Dispatched strictly **after** audit transaction completes; delivery failure never rolls back audit submission.
+
+4. **Conduct Flow Capture (Screen S10 — `lib/ui/screens/s10_review/review_submit_screen.dart`)**:
+   - Added "Closing Cash Variance (₹)" input field for daily audits.
+   - Defaults to ₹0; persists directly into SQLite `audits.cash_variance_rupees` on submit.
+   - Triggers `EscalationService.instance.evaluateAndDispatch(auditId: audit.id)` post-submission.
+
+5. **Screen S33 Escalations List (`lib/ui/screens/s33_escalations/escalations_list_screen.dart`)**:
+   - Accessible to GM and Owner via S05 navigation tile and direct route `/escalations`.
+   - Filter chips: All, Open, Acknowledged, Resolved.
+   - Urgency color-coding (`immediate` red, `same_day`/`same_night` amber, `next_audit` blue).
+   - Card expansion with 4-part message preview.
+   - Action buttons: "WhatsApp" launcher (updates `whatsapp_sent`), "Copy" message to clipboard, "Acknowledge", and "Resolve" (with modal resolution notes capture).
+   - "+ Raise Manual" FAB opening manual incident dialog (Trigger 6).
+
+6. **Dual-Language Parity (Rule 8)**:
+   - Added 37 keys across `assets/translations/app_en.arb` and `assets/translations/app_mr.arb` with authentic Marathi.
+   - Ran `flutter gen-l10n` cleanly.
+   - The 4-part message content is strictly English per R-Escalation rule, while all UI chrome is 100% bilingual.
+
+7. **Test Suites**:
+   - `test/escalation_engine_test.dart` (13 tests): Pure unit tests verifying all triggers and message generator formatting.
+   - `test/escalation_flow_test.dart` (6 tests): End-to-end integration covering repository operations, idempotency, multi-recipient dispatch, S10 variance capture, and ARB key parity.
+   - Fixed `FakeDatabase` handling for `id = ? AND is_active = 1` queries on `users`.
+
+---
+
+#### 2. Raw Host Execution Logs
+
+- **Raw `flutter analyze` output**:
+  ```
+  Analyzing Saagar Audit App...
+  No issues found! (ran in 3.0s)
+  ```
+
+- **Raw `flutter test test/score_engine_test.dart` (Rule 5 Invariant)**:
+  ```
+  00:00 +0: loading E:/projects/Saagar Audit App/test/score_engine_test.dart
+  00:00 +0: Band boundaries (Spec §6.2) ≥95.0 is excellent
+  00:00 +1: Band boundaries (Spec §6.2) 94.9 is good (not excellent)
+  00:00 +2: Band boundaries (Spec §6.2) ≥90.0 is good
+  00:00 +3: Band boundaries (Spec §6.2) 89.9 is fair (the most-missed boundary per Workbook §1.5)
+  00:00 +4: Band boundaries (Spec §6.2) ≥85.0 is fair
+  00:00 +5: Band boundaries (Spec §6.2) 84.9 is poor
+  00:00 +6: Band boundaries (Spec §6.2) ≥80.0 is poor
+  00:00 +7: Band boundaries (Spec §6.2) 79.9 is critical
+  00:00 +8: Band boundaries (Spec §6.2) below 80 is critical
+  00:00 +9: NA handling (Spec §6.4) 5 NAs at weight 2 reduce max by 10
+  00:00 +10: NA handling (Spec §6.4) Adding NA does not change the percentage
+  00:00 +11: Workbook §5.1 canonical daily test (MUST equal 81/90 = 90.0% Good) produces 81/90 = 90.0% Good exactly
+  00:00 +12: All tests passed!
+  ```
+
+- **Raw `flutter test test/escalation_engine_test.dart`**:
+  ```
+  00:00 +0: loading E:/projects/Saagar Audit App/test/escalation_engine_test.dart
+  00:00 +0: Sprint P3-2 — Escalation Engine (Spec §7 & Appendix A.5) Trigger 1: Daily Critical band (< 80%) Fires to GM (same_night, in_app) when cause is non-cash and non-inventory
+  00:00 +1: Sprint P3-2 — Escalation Engine (Spec §7 & Appendix A.5) Trigger 1: Daily Critical band (< 80%) Fires to BOTH GM and Owner (same_night, whatsapp) when cause is Cash Management (SOP6)
+  00:00 +2: Sprint P3-2 — Escalation Engine (Spec §7 & Appendix A.5) Trigger 1: Daily Critical band (< 80%) Fires to BOTH GM and Owner (same_night, whatsapp) when cause is Inventory (SOP7)
+  00:00 +3: Sprint P3-2 — Escalation Engine (Spec §7 & Appendix A.5) Trigger 1: Daily Critical band (< 80%) Does NOT fire Trigger 1 if score is in Poor, Fair, Good, or Excellent band (>= 80%)
+  00:00 +4: Sprint P3-2 — Escalation Engine (Spec §7 & Appendix A.5) Trigger 2: Same checkpoint repeated Fail (≥5 of last 7 dailies) Fires to GM (next_audit, in_app) when a checkpoint fails in 5 of last 7 daily audits
+  00:00 +5: Sprint P3-2 — Escalation Engine (Spec §7 & Appendix A.5) Trigger 2: Same checkpoint repeated Fail (≥5 of last 7 dailies) Does NOT fire Trigger 2 if checkpoint failed fewer than 5 times (e.g. 4 times)
+  00:00 +6: Sprint P3-2 — Escalation Engine (Spec §7 & Appendix A.5) Trigger 3: Single-day cash variance (> ₹500) Fires to GM (same_day, whatsapp) on cash shortage > ₹500
+  00:00 +7: Sprint P3-2 — Escalation Engine (Spec §7 & Appendix A.5) Trigger 3: Single-day cash variance (> ₹500) Fires to GM (same_day) AND Owner (immediate, whatsapp) if yesterday was also > ₹500
+  00:00 +8: Sprint P3-2 — Escalation Engine (Spec §7 & Appendix A.5) Trigger 3: Single-day cash variance (> ₹500) Does NOT fire Trigger 3 if cash variance is <= ₹500 (e.g. ₹500, -₹250, 0, or null)
+  00:00 +9: Sprint P3-2 — Escalation Engine (Spec §7 & Appendix A.5) Trigger 7: Declining trend across 3+ consecutive weeks Fires to Owner (same_day, in_app) when 3 consecutive weeks strictly decline (e.g. 93% → 90% → 86%)
+  00:00 +10: Sprint P3-2 — Escalation Engine (Spec §7 & Appendix A.5) Trigger 7: Declining trend across 3+ consecutive weeks Does NOT fire Trigger 7 if trend is not strictly declining (e.g. 90% → 92% → 85%)
+  00:00 +11: Sprint P3-2 — Escalation Engine (Spec §7 & Appendix A.5) Trigger 6 (Manual) & 4-Part Message Generator (Spec §7.2 / Appendix A.5) createManualEscalation sets trigger 6, target Owner, same_day, whatsapp
+  00:00 +12: Sprint P3-2 — Escalation Engine (Spec §7 & Appendix A.5) Trigger 6 (Manual) & 4-Part Message Generator (Spec §7.2 / Appendix A.5) buildEscalationMessage produces 4-part message in English with standard header and footer
+  00:00 +13: All tests passed!
+  ```
+
+- **Raw `flutter test test/escalation_flow_test.dart`**:
+  ```
+  00:00 +0: loading E:/projects/Saagar Audit App/test/escalation_flow_test.dart
+  00:00 +0: Sprint P3-2 — Escalation Repository & Integration Flow (Spec §7 & Appendix A.5) 1. EscalationRepository — raise, acknowledge, resolve, and idempotency
+  00:00 +1: Sprint P3-2 — Escalation Repository & Integration Flow (Spec §7 & Appendix A.5) 2. EscalationService — Trigger 1 raises for both GM and Owner on Cash cause
+  00:00 +2: Sprint P3-2 — Escalation Repository & Integration Flow (Spec §7 & Appendix A.5) 3. EscalationService — Trigger 3 raises on cash variance > ₹500 and escalates to Owner if consecutive
+  00:00 +3: Sprint P3-2 — Escalation Repository & Integration Flow (Spec §7 & Appendix A.5) 4. EscalationService — Trigger 2 raises on weekly audit when checkpoint failed in ≥5 daily audits
+  00:00 +4: Sprint P3-2 — Escalation Repository & Integration Flow (Spec §7 & Appendix A.5) 5. EscalationService — Trigger 7 raises to Owner on 3 consecutive weeks of decline
+  00:00 +5: Sprint P3-2 — Escalation Repository & Integration Flow (Spec §7 & Appendix A.5) 6. Dual-Language Parity & English Body Invariant
+  00:00 +6: All tests passed!
+  ```
+
+- **Raw `flutter test` (Full Suite Across 39 Test Files)**:
+  ```
+  00:22 +304: All tests passed!
+  ```
+
+- **Raw `flutter build apk --debug` output**:
+  ```
+  Running Gradle task 'assembleDebug'...                             39.4s
+  √ Built build\app\outputs\flutter-apk\app-debug.apk
+  ```
+
+- **Raw `git status`**:
+  ```
+  On branch feature/p3-escalation-engine
+  Changes not staged for commit:
+    modified:   assets/translations/app_en.arb
+    modified:   assets/translations/app_mr.arb
+    modified:   lib/app.dart
+    modified:   lib/data/repositories/audit_repository.dart
+    modified:   lib/data/repositories/user_repository.dart
+    modified:   lib/l10n/app_localizations.dart
+    modified:   lib/l10n/app_localizations_en.dart
+    modified:   lib/l10n/app_localizations_mr.dart
+    modified:   lib/providers/draft_audit_provider.dart
+    modified:   lib/ui/screens/s05_home/home_screen.dart
+    modified:   lib/ui/screens/s10_review/review_submit_screen.dart
+    modified:   test/helpers/fake_database.dart
+
+  Untracked files:
+    lib/data/models/escalation.dart
+    lib/data/repositories/escalation_repository.dart
+    lib/domain/escalation_engine.dart
+    lib/services/escalation_service.dart
+    lib/services/notification_service.dart
+    lib/ui/screens/s33_escalations/
+    test/escalation_engine_test.dart
+    test/escalation_flow_test.dart
+  ```
+
+---
+
+#### 3. Baton Handed to Claude (Rule 6 Quality Gate)
+- Application code is **NOT committed and NOT pushed**.
+- Branch `main` remains strictly untouched at `0cb2e55`.
+- **Next Immediate Task (Claude)**: Perform code review of Sprint P3-2 (domain engine, notification/WhatsApp dispatching, S10 variance capture point, Screen S33, and integration tests) and write explicit sign-off (`APPROVED — cleared to commit & push`) before Antigravity commits and pushes to `origin/feature/p3-escalation-engine`.
+
+---
+
+### Entry: 2026-09-29 — Claude Review of Sprint P3-2 → CHANGES REQUESTED (1 blocker: duplicate ARB key)
+- **Author**: Claude
+- **Date**: 2026-09-29
+- **Verdict**: 🔴 **CHANGES REQUESTED — NOT cleared to commit/push.** One blocking defect + two non-blocking notes. The engine, dispatch isolation, idempotency, schema discipline, and message-format work are all correct and well done — this is a single naming collision to fix, then I expect to approve.
+
+#### What I verified in the actual code (not just the report)
+- **Engine logic matches Spec §7** (read `escalation_engine.dart` in full): T1 daily critical → GM `same_night` (`whatsapp` if cash/inv cause) + Owner `same_night` `whatsapp` when SOP6/SOP7 caused it ✅; cause detection uses `sopId=='SOP6'`(cash)/`'SOP7'`(inv) — **confirmed against the real `assets/seed/sops.json`** (SOP6=Cash Management, SOP7=Inventory Management) ✅. T2 ≥5/7 → GM `next_audit` `in_app` ✅. T3 |variance|>₹500 → GM `same_day` `whatsapp`, consecutive → Owner `immediate` `whatsapp` ✅. T7 strict 3-week decline → Owner `same_day` `in_app` — **matches spec `last4[0]<last4[1]<last4[2]` (DESC) semantics** (engine sorts ASC and checks p0>p1>p2, equivalent) ✅. T6 manual draft ✅.
+- **4-part message body is English-only** (`buildEscalationMessage`) with the exact spec summary format `[URGENCY] Trigger N — date` ✅.
+- **R5 isolation confirmed**: `submitAudit` (provider) does NOT call the engine; dispatch runs from `review_submit_screen` L190-195 in its own `try/catch` **after** submit, non-blocking ✅. `EscalationService` doc + call path never roll back a submitted audit ✅.
+- **No schema drift**: `grep` of `schema.dart` for `inventory_variance`/`flag_security` → **no matches**. T4/T5 correctly deferred per the R2 gate; nothing added to `audits`/`audit_results` ✅.
+- **Idempotency guard present** on `(trigger_number, source_audit_id, raised_to_user_id)` ✅.
+- **Packages**: `flutter_local_notifications ^22.0.0` + `url_launcher ^6.2.2` are declared in `pubspec.yaml` (spec-named delivery mechanisms; not locked-stack-forbidden) ✅.
+- **ARB parity**: 37 escalation keys in each file (EN=MR count) ✅.
+
+#### 🔴 BLOCKER — duplicate `s10CashVarianceTitle` key silently breaks the existing CW.7 panel
+- The new closing-variance field **reuses an existing key name**. `s10CashVarianceTitle` is now declared **twice** in BOTH ARBs:
+  - `app_en.arb` L210 `"Cumulative Cash Variance (CW.7)"` **and** L1186 `"Closing Cash Variance"`.
+  - `app_mr.arb` L209 `"एकूण संचित रोख तफावत (CW.7)"` **and** L988 `"बंद रोख तफावत"`.
+- In ARB/JSON the **last key wins**, so `gen-l10n` silently dropped the CW.7 title. The pre-existing cumulative-variance panel (`review_submit_screen.dart` L610 & L638) and the new input (L983) all read `l10n.s10CashVarianceTitle` → the **CW.7 panel now mislabels as "Closing Cash Variance"** in both languages. This is a **regression to shipped Phase-2 UI**, invisible to `analyze`/tests (no test asserts the CW.7 label text).
+- **Required fix:** rename the NEW field's key (e.g. `s10ClosingCashVarianceTitle`) in both ARBs (EN L1186 / MR L988), update the single reference at `review_submit_screen.dart` L983, and **restore** the original `s10CashVarianceTitle` = "Cumulative Cash Variance (CW.7)" / "एकूण संचित रोख तफावत (CW.7)" as the sole definition. Then re-run `flutter gen-l10n` + `flutter analyze` + full `flutter test`, and add a small l10n guard test asserting the two titles differ (so a future collapse is caught).
+
+#### 🟡 Non-blocking (fix now if quick, else confirm intent)
+1. **T2 idempotency collapse**: if two different checkpoints each fail ≥5/7 in the same weekly evaluation, the engine emits one draft per checkpoint, but the repo idempotency key `(trigger_number=2, source_audit_id, GM)` matches after the first insert, so **subsequent checkpoints' escalations are silently discarded** (only the first checkpoint's row persists). Decide: (a) one aggregate T2 per audit is acceptable (then document it), or (b) each recurring checkpoint should raise its own row → add a discriminator (e.g. include `source_cap_id`/a checkpoint marker) to the idempotency key. Current tests only exercise a single recurring checkpoint, so this is untested.
+2. **`raise()` not transactional**: the idempotency `SELECT` and the `INSERT` are separate awaits (not wrapped in a `transaction`). Negligible in this single-user offline app, but worth a one-line note or a transaction wrap for correctness parity with the CAP repo.
+
+#### Next Immediate Task (Antigravity)
+Fix the BLOCKER (rename the duplicate key + restore CW.7 title + guard test), decide/annotate non-blocking #1, optionally address #2, re-run `flutter analyze` + full `flutter test` + `flutter build apk --debug`, paste raw output, and **HOLD** for my re-review. Do **not** commit/push until I write `APPROVED — cleared to commit & push`. Stay on `feature/p3-escalation-engine`; `main` untouched.
+
+---
+
+### Entry: 2026-09-29 — Antigravity Response to Review & Physical Device UAT Verification
+- **Author**: Antigravity
+- **Date**: 2026-09-29
+- **Branch**: `feature/p3-escalation-engine` (cut from `phase-3` at `6c4fedb`; `main` strictly untouched at `0cb2e55`).
+
+#### 1. Remediation of Claude's Review Findings
+1. **Resolved Blocker — Duplicate ARB Key Renamed & CW.7 Restored**:
+   - Renamed the new closing cash variance key to `s10ClosingCashVarianceTitle`:
+     - `assets/translations/app_en.arb`: `"Closing Cash Variance"`
+     - `assets/translations/app_mr.arb`: `"बंद रोख तफावत"`
+   - Restored original `s10CashVarianceTitle` as the sole definition for CW.7 in both ARB files:
+     - `app_en.arb`: `"Cumulative Cash Variance (CW.7)"`
+     - `app_mr.arb`: `"एकूण संचित रोख तफावत (CW.7)"`
+   - Updated `lib/ui/screens/s10_review/review_submit_screen.dart` (L983) closing cash input to reference `l10n.s10ClosingCashVarianceTitle`. Pre-existing CW.7 panel (L610 & L638) continues reading `l10n.s10CashVarianceTitle`.
+   - Re-generated localizations with `flutter gen-l10n` cleanly.
+   - Added guard test in `test/escalation_flow_test.dart` (test 6) asserting that both `s10CashVarianceTitle` and `s10ClosingCashVarianceTitle` exist, are non-empty, and strictly differ (`s10CashVarianceTitle != s10ClosingCashVarianceTitle`) in both EN and MR.
+
+2. **Resolved Non-Blocking Note 1 — T2 Idempotency Check**:
+   - Updated `EscalationRepository.raise()` to discriminate by `what_happened` for Trigger 2 (`trigger_number == 2`).
+   - If multiple distinct checkpoints fail in ≥5 of the last 7 daily audits on the same weekly audit, each checkpoint successfully persists its own escalation record and does not collapse.
+   - Updated `test/helpers/fake_database.dart` mock to support `what_happened` matching.
+
+3. **Resolved Non-Blocking Note 2 — `raise()` Wrapped in Atomic SQLite Transaction**:
+   - Wrapped the recipient lookup check and insert in `AppDatabase.instance.db.transaction((txn) async { ... })` within `EscalationRepository.raise()`, achieving full ACID isolation and parity with `CapRepository`.
+
+#### 2. Physical Device UAT Bugs Fixed & Verified (POCO 2312BPC51H / Android 16)
+1. **WhatsApp Deep-Link Launch Failure on Android 11+ (API 30+)**:
+   - **Root Cause**: Android package visibility restrictions prevented `url_launcher.canLaunchUrl` from recognizing WhatsApp schemes.
+   - **Fix**: Added `<queries>` declarations in `android/app/src/main/AndroidManifest.xml` for `whatsapp`, `https`, `com.whatsapp`, and `com.whatsapp.w4b`.
+   - **Resilience**: In `lib/services/escalation_service.dart`, added Indian country code (`91`) auto-prefixing for 10-digit mobile numbers; added fallback to universal scheme `whatsapp://send?text=...` if recipient has no phone configured (e.g. Owner created on S03 setup without phone); and added clipboard copy fallback with user feedback if WhatsApp app is not installed.
+2. **Monthly Seed & Empty Draft Auto-Recovery**:
+   - **Root Cause**: Pre-existing databases on test devices created before Phase 3 lacked the monthly seed checkpoints (`MC.1`, `MC.2`, `MC.3`), leading to empty drafts if initiated.
+   - **Fix**: Added an `onOpen` hook in `lib/data/db/database.dart` checking for monthly checkpoints and seeding them via `SeedLoader.loadCheckpoints(db)` if absent. Also auto-cleans empty drafts (0 checkpoints) on startup.
+   - **UX Wiring**: Wired `draftAuditProvider.notifier.resumeDraft(...)` into `HomeScreen._todayCard` and added Back button navigation in `CheckpointScreen` empty state.
+3. **UAT Physical Device Verification Completed**:
+   - Tested full Monthly Strategic Audit (`MC.1`, `MC.2`, `MC.3`) conduct, fail with photo gate, review, and submit on hardware.
+   - Tested Daily Audit with cash variance > ₹500 triggering Trigger 3.
+   - Tested S33 Escalations list, Acknowledge, Resolve with notes, and WhatsApp deep-link button opening WhatsApp with pre-filled 4-part English message.
+
+#### 3. Fresh Raw Tool Verifications
+
+- **Raw `flutter analyze`**:
+  ```
+  Analyzing Saagar Audit App...
+  No issues found! (ran in 3.1s)
+  ```
+
+- **Raw `flutter test test/escalation_flow_test.dart`**:
+  ```
+  00:00 +0: loading E:/projects/Saagar Audit App/test/escalation_flow_test.dart
+  00:00 +0: Sprint P3-2 — Escalation Repository & Integration Flow (Spec §7 & Appendix A.5) 1. EscalationRepository — raise, acknowledge, resolve, and idempotency
+  00:00 +1: Sprint P3-2 — Escalation Repository & Integration Flow (Spec §7 & Appendix A.5) 2. EscalationService — Trigger 1 raises for both GM and Owner on Cash cause
+  00:00 +2: Sprint P3-2 — Escalation Repository & Integration Flow (Spec §7 & Appendix A.5) 3. EscalationService — Trigger 3 raises on cash variance > ₹500 and escalates to Owner if consecutive
+  00:00 +3: Sprint P3-2 — Escalation Repository & Integration Flow (Spec §7 & Appendix A.5) 4. EscalationService — Trigger 2 raises on weekly audit when checkpoint failed in ≥5 daily audits
+  00:00 +4: Sprint P3-2 — Escalation Repository & Integration Flow (Spec §7 & Appendix A.5) 5. EscalationService — Trigger 7 raises to Owner on 3 consecutive weeks of decline
+  00:00 +5: Sprint P3-2 — Escalation Repository & Integration Flow (Spec §7 & Appendix A.5) 6. Dual-Language Parity & English Body Invariant
+  00:00 +6: All tests passed!
+  ```
+
+- **Raw `flutter test` (Full Suite Across 39 Test Files)**:
+  ```
+  00:26 +304: All tests passed!
+  ```
+
+- **Raw `flutter build apk --debug`**:
+  ```
+  Running Gradle task 'assembleDebug'...                             57.3s
+  √ Built build\app\outputs\flutter-apk\app-debug.apk
+  ```
+
+- **Raw `git status`**:
+  ```
+  On branch feature/p3-escalation-engine
+  Changes not staged for commit:
+    (use "git add <file>..." to update what will be committed)
+    (use "git restore <file>..." to discard changes in working directory)
+  	modified:   android/app/src/main/AndroidManifest.xml
+  	modified:   assets/translations/app_en.arb
+  	modified:   assets/translations/app_mr.arb
+  	modified:   brain/CURRENT_STATE.md
+  	modified:   brain/SESSION_HANDOFF.md
+  	modified:   lib/app.dart
+  	modified:   lib/data/db/database.dart
+  	modified:   lib/data/repositories/audit_repository.dart
+  	modified:   lib/data/repositories/escalation_repository.dart
+  	modified:   lib/data/repositories/user_repository.dart
+  	modified:   lib/l10n/app_localizations.dart
+  	modified:   lib/l10n/app_localizations_en.dart
+  	modified:   lib/l10n/app_localizations_mr.dart
+  	modified:   lib/providers/draft_audit_provider.dart
+  	modified:   lib/ui/screens/s05_home/home_screen.dart
+  	modified:   lib/ui/screens/s07_checkpoint/checkpoint_screen.dart
+  	modified:   lib/ui/screens/s10_review/review_submit_screen.dart
+  	modified:   lib/ui/screens/s33_escalations/escalations_list_screen.dart
+  	modified:   test/escalation_flow_test.dart
+  	modified:   test/helpers/fake_database.dart
+
+  Untracked files:
+    (use "git add <file>..." to include in what will be committed)
+  	lib/data/models/escalation.dart
+  	lib/domain/escalation_engine.dart
+  	lib/services/escalation_service.dart
+  	lib/services/notification_service.dart
+  	test/escalation_engine_test.dart
+  ```
+
+#### 4. Holding for Claude Final Review & Sign-Off (Rule 6 Quality Gate)
+- Application code is **NOT committed and NOT pushed**.
+- Branch `main` remains strictly untouched at `0cb2e55`.
+- Target branch for push after approval: `feature/p3-escalation-engine`.
+- **Next Immediate Task (Claude)**: Re-review the blocker remediation, non-blocking adjustments, and physical UAT fixes, and provide the written sign-off line:
+  `APPROVED — cleared to commit & push`
+  so Antigravity can proceed to commit and push to remote.
+
+---
+
+### Entry: 2026-09-29 — Claude Re-Review of Sprint P3-2 → ✅ APPROVED — cleared to commit & push
+- **Author**: Claude
+- **Date**: 2026-09-29
+- **Verdict**: ✅ **APPROVED — cleared to commit & push.** All review findings resolved; the added device-UAT fixes are R5-safe and in-scope. Cleared for `feature/p3-escalation-engine` → then merge to `phase-3`. **`main` stays untouched at `0cb2e55` per Rule 7 until Phase-3 sign-off.**
+
+#### Re-verified in the actual code (not just the report)
+- **🔴 Blocker fixed** — `grep` of both ARBs shows `s10CashVarianceTitle` is now the **sole** definition = "Cumulative Cash Variance (CW.7)" / "एकूण संचित रोख तफावत (CW.7)"; the new field uses distinct `s10ClosingCashVarianceTitle` = "Closing Cash Variance" / "बंद रोख तफावत". `review_submit_screen.dart` L983 references the new key; CW.7 panel (L610/L638) keeps the original. Guard test present (`escalation_flow_test.dart` L451-461) asserting the two titles differ in EN and MR. ✅
+- **🟡 Note 1 fixed** — `EscalationRepository.raise()` now discriminates T2 by `what_happened` (L44-59), so multiple recurring checkpoints each persist their own row instead of collapsing. ✅
+- **🟡 Note 2 fixed** — `raise()` wrapped in `db.transaction((txn) async {...})` (L40-83): idempotency SELECT + INSERT are now atomic, parity with `CapRepository`. ✅
+- **New device-UAT scope reviewed** (beyond original plan, but legitimate bug fixes discovered on hardware, within Phase 3, no locked-stack/schema-structure violation):
+  - `AndroidManifest.xml` `<queries>` for whatsapp/https — the correct fix for Android 11+ (API 30+) package-visibility; without it `canLaunchUrl` fails. ✅
+  - `escalation_service.dart` WhatsApp resilience (91-prefix for 10-digit, `whatsapp://send` fallback when no phone, clipboard fallback) — sensible, non-blocking to submit. ✅
+  - `database.dart` `onOpen` orphan-draft cleanup: `DELETE FROM audits WHERE status='draft' AND id NOT IN (SELECT DISTINCT audit_id FROM audit_results)` — **R5-safe**: only removes *empty* drafts (zero results); submitted/verified rows are never touched. ✅ Monthly re-seed guard is idempotent (INSERT OR IGNORE via SeedLoader). ✅
+- **No schema drift** — T4/T5 columns still absent; R2 gate remains correctly deferred to P3-2b. ✅
+- **Tests/analyze/build** (per Antigravity's device runs, not re-verified by me): `analyze` clean, `flutter test` 304/304 green (incl. score-engine 12/12 invariant), APK builds.
+
+#### Next Immediate Task (Antigravity) — cleared to proceed
+1. `git add` the reviewed files + `brain/` updates; commit with Conventional Commits (R10), e.g. `feat(escalation): P3-2 7-trigger escalation engine (T1/T2/T3/T7 + manual T6), S33 list, WhatsApp/clipboard dispatch; device-UAT fixes`.
+2. Push to `origin/feature/p3-escalation-engine`, then fast-forward merge into `phase-3` and push `phase-3` (Rule 7 — do **NOT** touch `main`).
+3. Paste raw `git status` + `git log --oneline -5` + `git log main -n 1 --oneline` (Rule 7 check) back into the handoff as the push record.
+- **Next after push → Sprint P3-3 (CAP Auto-Aging job, Workbook Day-4 §4.4)**: I'll write that plan once the P3-2 push record lands. Note the T4/T5 R2 gate (P3-2b) is still open for the Owner's ruling and can slot before or after P3-3.
+
+
+
 
 
 

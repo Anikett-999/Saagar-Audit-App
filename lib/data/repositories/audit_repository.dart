@@ -24,6 +24,67 @@ class AuditRepository {
   AuditRepository._();
   static final AuditRepository instance = AuditRepository._();
 
+  /// Finds an audit by its primary key ID.
+  Future<Audit?> findById(String id) async {
+    final rows = await AppDatabase.instance.db.query(
+      'audits',
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return Audit.fromMap(rows.first);
+  }
+
+  /// Finds the latest submitted daily audit before a given date (used for T3 consecutive variance).
+  Future<Audit?> findPreviousDailyAudit(String beforeDate) async {
+    final rows = await AppDatabase.instance.db.query(
+      'audits',
+      where: "audit_type = 'daily' AND audit_date < ? AND status IN ('submitted', 'verified')",
+      whereArgs: [beforeDate],
+      orderBy: 'audit_date DESC',
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return Audit.fromMap(rows.first);
+  }
+
+  /// Returns recent submitted daily audits (used for T2 repeated fail detection).
+  Future<List<Audit>> findRecentDailyAudits({int limit = 7, String? beforeDate}) async {
+    final whereClauses = <String>["audit_type = 'daily'", "status IN ('submitted', 'verified')"];
+    final whereArgs = <Object?>[];
+    if (beforeDate != null) {
+      whereClauses.add("audit_date <= ?");
+      whereArgs.add(beforeDate);
+    }
+    final rows = await AppDatabase.instance.db.query(
+      'audits',
+      where: whereClauses.join(' AND '),
+      whereArgs: whereArgs,
+      orderBy: 'audit_date DESC',
+      limit: limit,
+    );
+    return rows.map(Audit.fromMap).toList();
+  }
+
+  /// Returns recent submitted weekly audits (used for T7 declining trend detection).
+  Future<List<Audit>> findRecentWeeklyAudits({int limit = 4, String? beforeDate}) async {
+    final whereClauses = <String>["audit_type = 'weekly'", "status IN ('submitted', 'verified')"];
+    final whereArgs = <Object?>[];
+    if (beforeDate != null) {
+      whereClauses.add("audit_date <= ?");
+      whereArgs.add(beforeDate);
+    }
+    final rows = await AppDatabase.instance.db.query(
+      'audits',
+      where: whereClauses.join(' AND '),
+      whereArgs: whereArgs,
+      orderBy: 'audit_date DESC',
+      limit: limit,
+    );
+    return rows.map(Audit.fromMap).toList();
+  }
+
   Future<Audit?> findByDate({
     required String date, // YYYY-MM-DD
     required String auditType, // 'daily' | 'weekly' | 'monthly'
@@ -212,6 +273,7 @@ class AuditRepository {
     required int passCount,
     required int failCount,
     required int naCount,
+    double? cashVarianceRupees,
     String? notes,
   }) async {
     final now = DateTime.now().toUtc().toIso8601String();
@@ -227,6 +289,7 @@ class AuditRepository {
         'pass_count': passCount,
         'fail_count': failCount,
         'na_count': naCount,
+        'cash_variance_rupees': cashVarianceRupees,
         'notes': notes,
       },
       where: "id = ? AND status = 'draft'",

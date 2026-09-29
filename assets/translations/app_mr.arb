@@ -984,7 +984,49 @@
     "placeholders": {
       "error": {"type": "String"}
     }
-  }
+  },
+  "s10ClosingCashVarianceTitle": "बंद रोख तफावत",
+  "s10CashVarianceSubtitle": "प्रत्यक्ष ताळमेळातील गल्ल्याची रोख तफावत नोंदवा (सहनशीलता: ₹५००).",
+  "s10CashVarianceLabel": "तफावत (₹)",
+  "s10CashVarianceHelper": "> ₹५०० ची तफावत आपोआप GM / मालकांना इशारा पाठवते (ट्रिगर ३).",
+  "s33EscalationsTitle": "एस्केलेशन्स",
+  "s33EscalationsSubtitle": "थ्रेशोल्ड उल्लंघन आणि आपत्कालीन इशारे",
+  "s33FilterAll": "सर्व",
+  "s33FilterOpen": "उघडे",
+  "s33FilterAcknowledged": "मान्य केलेले",
+  "s33FilterResolved": "सोडवलेले",
+  "s33EmptyOpen": "कोणतेही उघडे एस्केलेशन नाही",
+  "s33EmptyOpenDesc": "स्टोअर कामकाज, रोख मोजणी आणि स्टॉक अपेक्षित मर्यादेत आहेत.",
+  "s33TriggerLabel": "ट्रिगर {number}",
+  "@s33TriggerLabel": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "s33AcknowledgeAction": "मान्य करा",
+  "s33ResolveAction": "निवारण करा",
+  "s33CopyAction": "इशारा संदेश कॉपी करा",
+  "s33CopiedSuccess": "एस्केलेशन संदेश क्लिपबोर्डवर कॉपी केला",
+  "s33WhatsAppAction": "व्हॉट्सअॅप",
+  "s33ResolutionNotesTitle": "निवारण नोंदी",
+  "s33ResolutionNotesHint": "केलेल्या सुधारात्मक कृतींचे वर्णन करा...",
+  "s33ResolutionNotesRequired": "एस्केलेशन सोडवण्यासाठी निवारण नोंदी आवश्यक आहेत.",
+  "s33AcknowledgeSuccess": "एस्केलेशन मान्य केले",
+  "s33ResolveSuccess": "एस्केलेशन सोडवले",
+  "s33RaiseManualTitle": "मॅन्युअल एस्केलेशन नोंदवा",
+  "s33WhatHappenedLabel": "काय झाले",
+  "s33EvidenceLabel": "पुरावा",
+  "s33ImpactLabel": "कार्यवाहक परिणाम",
+  "s33ActionLabel": "मागितलेली कृती",
+  "s33SaveManualButton": "एस्केलेशन सादर करा",
+  "s33UrgencyImmediate": "तातडीने",
+  "s33UrgencySameDay": "त्याच दिवशी",
+  "s33UrgencySameNight": "त्याच रात्री",
+  "s33UrgencyNextAudit": "पुढील ऑडिट",
+  "s33TargetOwner": "प्रति: मालक",
+  "s33TargetGm": "प्रति: GM",
+  "s33WhatsAppSentBadge": "व्हॉट्सअॅप पाठवले",
+  "fieldRequired": "हे फील्ड आवश्यक आहे"
 }
 
 

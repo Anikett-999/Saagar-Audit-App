@@ -284,7 +284,7 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
 
   /// Calculates final score and submits the audit to SQLite, locking status to 'submitted'.
   /// Dispatches to `computeWeeklyScore` for weekly audits and `scoreDaily` for daily audits.
-  Future<ScoreResult> submitAudit({String? notes}) async {
+  Future<ScoreResult> submitAudit({String? notes, double? cashVarianceRupees}) async {
     final audit = state.audit;
     if (audit == null) {
       throw StateError('No active audit to submit');
@@ -375,6 +375,7 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
       passCount: passCount,
       failCount: failCount,
       naCount: naCount,
+      cashVarianceRupees: cashVarianceRupees,
       notes: notes,
     );
 
@@ -388,6 +389,7 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
       passCount: passCount,
       failCount: failCount,
       naCount: naCount,
+      cashVarianceRupees: cashVarianceRupees,
       notes: notes,
     );
 

@@ -115,7 +115,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  _todayCard(l10n, canStartDaily),
+                  _todayCard(context, l10n, canStartDaily),
                   if (canStartWeekly) ...[
                     const SizedBox(height: 12),
                     _weeklyCard(context, l10n),
@@ -158,7 +158,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _todayCard(AppLocalizations l10n, bool canStartAudit) {
+  Widget _todayCard(BuildContext context, AppLocalizations l10n, bool canStartAudit) {
     final audit = _todayAudit;
     return Card(
       child: Padding(
@@ -195,7 +195,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   label: Text(l10n.s05StartDailyAudit),
                   onPressed: () async {
                     await context.pushNamed('s06_start_audit');
-                    if (!mounted) return;
+                    if (!context.mounted) return;
                     await _loadAudits();
                   },
                 )
@@ -213,7 +213,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ElevatedButton.icon(
                 icon: const Icon(Icons.edit_outlined),
                 label: Text(l10n.s05ResumeDraft),
-                onPressed: () => context.pushNamed('s07_checkpoint'),
+                onPressed: () async {
+                  await ref.read(draftAuditProvider.notifier).resumeDraft(
+                        audit: audit,
+                        cros: const [],
+                      );
+                  if (!context.mounted) return;
+                  await context.pushNamed('s07_checkpoint');
+                  if (!context.mounted) return;
+                  await _loadAudits();
+                },
               ),
             ] else ...[
               Text(
@@ -538,6 +547,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             subtitle: l10n.capOversightSubtitle,
             enabled: true,
             onTap: () => context.push('/caps/oversight'),
+          ),
+        if (role == 'GM' || role == 'OWNER')
+          _navTile(
+            icon: Icons.campaign_outlined,
+            title: l10n.s33EscalationsTitle,
+            subtitle: l10n.s33EscalationsSubtitle,
+            enabled: true,
+            onTap: () => context.pushNamed('s33_escalations'),
           ),
         _navTile(
           icon: Icons.assessment_outlined,

@@ -116,13 +116,34 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
     final cp = state.currentCheckpoint;
 
     if (!state.isActive || cp == null) {
-      return const Scaffold(
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Audit Checkpoint'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.goNamed('s05_home'),
+          ),
+        ),
         body: Center(
           child: Padding(
-            padding: EdgeInsets.all(24),
-            child: Text(
-              'No active draft audit. Go back to Home and start one.',
-              textAlign: TextAlign.center,
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.assignment_late_outlined, size: 56, color: AppColors.gray400),
+                const SizedBox(height: 16),
+                const Text(
+                  'No active draft audit. Go back to Home and start one.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: AppColors.gray800),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.home_outlined),
+                  label: const Text('Back to Home'),
+                  onPressed: () => context.goNamed('s05_home'),
+                ),
+              ],
             ),
           ),
         ),

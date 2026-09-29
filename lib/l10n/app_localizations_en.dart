@@ -2441,4 +2441,121 @@ class AppLocalizationsEn extends AppLocalizations {
   String s21PdfExportError(String error) {
     return 'Failed to export PDF: $error';
   }
+
+  @override
+  String get s10ClosingCashVarianceTitle => 'Closing Cash Variance';
+
+  @override
+  String get s10CashVarianceSubtitle =>
+      'Enter till cash variance from physical reconciliation (tolerance: ₹500).';
+
+  @override
+  String get s10CashVarianceLabel => 'Variance (₹)';
+
+  @override
+  String get s10CashVarianceHelper =>
+      'Variance > ₹500 automatically triggers an alert to GM / Owner (Trigger 3).';
+
+  @override
+  String get s33EscalationsTitle => 'Escalations';
+
+  @override
+  String get s33EscalationsSubtitle => 'Threshold breaches & emergency alerts';
+
+  @override
+  String get s33FilterAll => 'All';
+
+  @override
+  String get s33FilterOpen => 'Open';
+
+  @override
+  String get s33FilterAcknowledged => 'Acknowledged';
+
+  @override
+  String get s33FilterResolved => 'Resolved';
+
+  @override
+  String get s33EmptyOpen => 'No Open Escalations';
+
+  @override
+  String get s33EmptyOpenDesc =>
+      'Store operations, cash counts, and inventory are within expected tolerances.';
+
+  @override
+  String s33TriggerLabel(int number) {
+    return 'Trigger $number';
+  }
+
+  @override
+  String get s33AcknowledgeAction => 'Acknowledge';
+
+  @override
+  String get s33ResolveAction => 'Resolve';
+
+  @override
+  String get s33CopyAction => 'Copy Alert';
+
+  @override
+  String get s33CopiedSuccess => 'Escalation message copied to clipboard';
+
+  @override
+  String get s33WhatsAppAction => 'WhatsApp';
+
+  @override
+  String get s33ResolutionNotesTitle => 'Resolution Notes';
+
+  @override
+  String get s33ResolutionNotesHint => 'Describe corrective actions taken...';
+
+  @override
+  String get s33ResolutionNotesRequired =>
+      'Resolution notes are required to resolve an escalation.';
+
+  @override
+  String get s33AcknowledgeSuccess => 'Escalation acknowledged';
+
+  @override
+  String get s33ResolveSuccess => 'Escalation resolved';
+
+  @override
+  String get s33RaiseManualTitle => 'Raise Manual Escalation';
+
+  @override
+  String get s33WhatHappenedLabel => 'What happened';
+
+  @override
+  String get s33EvidenceLabel => 'Evidence';
+
+  @override
+  String get s33ImpactLabel => 'Operational Impact';
+
+  @override
+  String get s33ActionLabel => 'Requested Action';
+
+  @override
+  String get s33SaveManualButton => 'Submit Escalation';
+
+  @override
+  String get s33UrgencyImmediate => 'Immediate';
+
+  @override
+  String get s33UrgencySameDay => 'Same Day';
+
+  @override
+  String get s33UrgencySameNight => 'Same Night';
+
+  @override
+  String get s33UrgencyNextAudit => 'Next Audit';
+
+  @override
+  String get s33TargetOwner => 'To: Owner';
+
+  @override
+  String get s33TargetGm => 'To: GM';
+
+  @override
+  String get s33WhatsAppSentBadge => 'WhatsApp Sent';
+
+  @override
+  String get fieldRequired => 'This field is required';
 }

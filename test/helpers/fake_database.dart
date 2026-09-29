@@ -121,6 +121,14 @@ class FakeDatabase extends Fake implements Database, Transaction {
             final auditorId = whereArgs[argIdx++];
             results = results.where((r) => r['auditor_id'] == auditorId).toList();
           }
+          if (where.contains('audit_date < ?') && whereArgs != null && argIdx < whereArgs.length) {
+            final dateVal = whereArgs[argIdx++] as String;
+            results = results.where((r) => (r['audit_date'] as String? ?? '').compareTo(dateVal) < 0).toList();
+          }
+          if (where.contains('audit_date <= ?') && whereArgs != null && argIdx < whereArgs.length) {
+            final dateVal = whereArgs[argIdx++] as String;
+            results = results.where((r) => (r['audit_date'] as String? ?? '').compareTo(dateVal) <= 0).toList();
+          }
         }
       } else if (table == 'caps') {
         var argIdx = 0;
@@ -182,6 +190,46 @@ class FakeDatabase extends Fake implements Database, Transaction {
               return ps.contains(pattern) || id.contains(pattern);
             }).toList();
           }
+        }
+      } else if (table == 'escalations') {
+        var argIdx = 0;
+        if (where == 'id = ?' && whereArgs != null && whereArgs.isNotEmpty) {
+          results = results.where((r) => r['id'] == whereArgs[0]).toList();
+        } else if (where.contains('trigger_number = ?') && whereArgs != null && whereArgs.length >= 3) {
+          final tNum = whereArgs[0];
+          final auditId = whereArgs[1];
+          final userId = whereArgs[2];
+          final whatHappened = whereArgs.length >= 4 ? whereArgs[3] : null;
+          results = results.where((r) =>
+            r['trigger_number'] == tNum &&
+            r['source_audit_id'] == auditId &&
+            r['raised_to_user_id'] == userId &&
+            (whatHappened == null || r['what_happened'] == whatHappened),
+          ).toList();
+        } else {
+          if (where.contains('status = ?') && whereArgs != null && argIdx < whereArgs.length) {
+            final statusVal = whereArgs[argIdx++];
+            results = results.where((r) => r['status'] == statusVal).toList();
+          }
+          if (where.contains('raised_to_user_id = ?') && whereArgs != null && argIdx < whereArgs.length) {
+            final userVal = whereArgs[argIdx++];
+            results = results.where((r) => r['raised_to_user_id'] == userVal).toList();
+          }
+        }
+      } else if (table == 'users') {
+        if (where == 'id = ? AND is_active = 1' && whereArgs != null && whereArgs.isNotEmpty) {
+          results = results.where((r) => r['id'] == whereArgs[0] && (r['is_active'] == 1 || r['is_active'] == true)).toList();
+        } else if (where.contains("role = 'OWNER'")) {
+          results = results.where((r) => r['role'] == 'OWNER' && (r['is_active'] == 1 || r['is_active'] == true)).toList();
+        } else if (where.contains("role = 'GM'")) {
+          results = results.where((r) => r['role'] == 'GM' && (r['is_active'] == 1 || r['is_active'] == true)).toList();
+        } else if (where.contains('role = ?') && whereArgs != null && whereArgs.isNotEmpty) {
+          final roleVal = whereArgs[0];
+          results = results.where((r) => r['role'] == roleVal && (r['is_active'] == 1 || r['is_active'] == true)).toList();
+        } else if (where == 'is_active = 1') {
+          results = results.where((r) => r['is_active'] == 1 || r['is_active'] == true).toList();
+        } else if (where == 'id = ?' && whereArgs != null && whereArgs.isNotEmpty) {
+          results = results.where((r) => r['id'] == whereArgs[0]).toList();
         }
       } else {
         if (where == 'is_active = 1') {

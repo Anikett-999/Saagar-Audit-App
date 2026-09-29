@@ -108,6 +108,20 @@ class AppDatabase {
           await SeedLoader.loadCheckpoints(db);
         }
 
+        // Defensive check: ensure monthly checkpoints exist in checkpoints table
+        // in case an existing device installation upgraded from Phase 1 or 2.
+        final monthlyCps = await db.rawQuery("SELECT id FROM checkpoints WHERE frequency = 'monthly'");
+        if (monthlyCps.isEmpty) {
+          await SeedLoader.loadCheckpoints(db);
+        }
+
+        // Clean up any empty drafts created before checkpoints were seeded
+        await db.execute('''
+          DELETE FROM audits 
+          WHERE status = 'draft' 
+            AND id NOT IN (SELECT DISTINCT audit_id FROM audit_results)
+        ''');
+
         // Enable foreign key enforcement for all app queries per Spec §4
         await db.execute('PRAGMA foreign_keys = ON');
       },

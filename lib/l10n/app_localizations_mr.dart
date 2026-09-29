@@ -2443,4 +2443,122 @@ class AppLocalizationsMr extends AppLocalizations {
   String s21PdfExportError(String error) {
     return 'PDF निर्यात अयशस्वी: $error';
   }
+
+  @override
+  String get s10ClosingCashVarianceTitle => 'बंद रोख तफावत';
+
+  @override
+  String get s10CashVarianceSubtitle =>
+      'प्रत्यक्ष ताळमेळातील गल्ल्याची रोख तफावत नोंदवा (सहनशीलता: ₹५००).';
+
+  @override
+  String get s10CashVarianceLabel => 'तफावत (₹)';
+
+  @override
+  String get s10CashVarianceHelper =>
+      '> ₹५०० ची तफावत आपोआप GM / मालकांना इशारा पाठवते (ट्रिगर ३).';
+
+  @override
+  String get s33EscalationsTitle => 'एस्केलेशन्स';
+
+  @override
+  String get s33EscalationsSubtitle => 'थ्रेशोल्ड उल्लंघन आणि आपत्कालीन इशारे';
+
+  @override
+  String get s33FilterAll => 'सर्व';
+
+  @override
+  String get s33FilterOpen => 'उघडे';
+
+  @override
+  String get s33FilterAcknowledged => 'मान्य केलेले';
+
+  @override
+  String get s33FilterResolved => 'सोडवलेले';
+
+  @override
+  String get s33EmptyOpen => 'कोणतेही उघडे एस्केलेशन नाही';
+
+  @override
+  String get s33EmptyOpenDesc =>
+      'स्टोअर कामकाज, रोख मोजणी आणि स्टॉक अपेक्षित मर्यादेत आहेत.';
+
+  @override
+  String s33TriggerLabel(int number) {
+    return 'ट्रिगर $number';
+  }
+
+  @override
+  String get s33AcknowledgeAction => 'मान्य करा';
+
+  @override
+  String get s33ResolveAction => 'निवारण करा';
+
+  @override
+  String get s33CopyAction => 'इशारा संदेश कॉपी करा';
+
+  @override
+  String get s33CopiedSuccess => 'एस्केलेशन संदेश क्लिपबोर्डवर कॉपी केला';
+
+  @override
+  String get s33WhatsAppAction => 'व्हॉट्सअॅप';
+
+  @override
+  String get s33ResolutionNotesTitle => 'निवारण नोंदी';
+
+  @override
+  String get s33ResolutionNotesHint =>
+      'केलेल्या सुधारात्मक कृतींचे वर्णन करा...';
+
+  @override
+  String get s33ResolutionNotesRequired =>
+      'एस्केलेशन सोडवण्यासाठी निवारण नोंदी आवश्यक आहेत.';
+
+  @override
+  String get s33AcknowledgeSuccess => 'एस्केलेशन मान्य केले';
+
+  @override
+  String get s33ResolveSuccess => 'एस्केलेशन सोडवले';
+
+  @override
+  String get s33RaiseManualTitle => 'मॅन्युअल एस्केलेशन नोंदवा';
+
+  @override
+  String get s33WhatHappenedLabel => 'काय झाले';
+
+  @override
+  String get s33EvidenceLabel => 'पुरावा';
+
+  @override
+  String get s33ImpactLabel => 'कार्यवाहक परिणाम';
+
+  @override
+  String get s33ActionLabel => 'मागितलेली कृती';
+
+  @override
+  String get s33SaveManualButton => 'एस्केलेशन सादर करा';
+
+  @override
+  String get s33UrgencyImmediate => 'तातडीने';
+
+  @override
+  String get s33UrgencySameDay => 'त्याच दिवशी';
+
+  @override
+  String get s33UrgencySameNight => 'त्याच रात्री';
+
+  @override
+  String get s33UrgencyNextAudit => 'पुढील ऑडिट';
+
+  @override
+  String get s33TargetOwner => 'प्रति: मालक';
+
+  @override
+  String get s33TargetGm => 'प्रति: GM';
+
+  @override
+  String get s33WhatsAppSentBadge => 'व्हॉट्सअॅप पाठवले';
+
+  @override
+  String get fieldRequired => 'हे फील्ड आवश्यक आहे';
 }

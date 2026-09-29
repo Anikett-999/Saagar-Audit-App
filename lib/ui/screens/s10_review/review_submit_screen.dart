@@ -17,6 +17,7 @@ import '../../../domain/score_engine.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/draft_audit_provider.dart';
+import '../../../services/escalation_service.dart';
 import '../../theme/app_colors.dart';
 
 /// Screen S10 — Review & Submit (Spec §5 S10).
@@ -34,6 +35,7 @@ class ReviewSubmitScreen extends ConsumerStatefulWidget {
 
 class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
   final _notesController = TextEditingController();
+  final _cashVarianceController = TextEditingController(text: '0');
   List<Sop> _sops = const [];
   List<Audit> _dailyAudits = const [];
   Map<String, AuditResult> _failResults = const {};
@@ -50,6 +52,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
   @override
   void dispose() {
     _notesController.dispose();
+    _cashVarianceController.dispose();
     super.dispose();
   }
 
@@ -164,9 +167,13 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
     setState(() => _submitting = true);
     try {
       final notes = _notesController.text.trim();
-      await ref
-          .read(draftAuditProvider.notifier)
-          .submitAudit(notes: notes.isEmpty ? null : notes);
+      final varianceVal = double.tryParse(_cashVarianceController.text.trim());
+      final cashVariance = audit.auditType == 'daily' ? (varianceVal ?? 0.0) : null;
+
+      await ref.read(draftAuditProvider.notifier).submitAudit(
+            notes: notes.isEmpty ? null : notes,
+            cashVarianceRupees: cashVariance,
+          );
 
       if (audit.auditType == 'weekly') {
         try {
@@ -178,6 +185,13 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
         } catch (_) {
           // Non-blocking per plan
         }
+      }
+
+      // Spec §7 — Evaluate escalation triggers after submission (outside audit transaction)
+      try {
+        await EscalationService.instance.evaluateAndDispatch(auditId: audit.id);
+      } catch (_) {
+        // Non-blocking per Rule 5
       }
 
       if (!mounted) return;
@@ -329,6 +343,12 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
               // 3. Fails List with Evidence & CAP Status
               _buildFailsSection(l10n, locale, failCheckpoints),
               const SizedBox(height: 24),
+
+              // 3.5 Closing Cash Variance (Daily Audits only — Spec §6.7 / T3)
+              if (audit.auditType == 'daily') ...[
+                _buildCashVarianceSection(l10n),
+                const SizedBox(height: 24),
+              ],
 
               // 4. Auditor Notes (max 500 chars)
               _buildNotesSection(l10n),
@@ -940,6 +960,55 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCashVarianceSection(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.gray200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.currency_rupee, color: AppColors.navy, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.s10ClosingCashVarianceTitle,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.navy,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.s10CashVarianceSubtitle,
+            style: const TextStyle(fontSize: 13, color: AppColors.gray600),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _cashVarianceController,
+            keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
+            decoration: InputDecoration(
+              labelText: l10n.s10CashVarianceLabel,
+              hintText: '0 (e.g. -350 or +200)',
+              prefixIcon: const Icon(Icons.calculate_outlined),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              helperText: l10n.s10CashVarianceHelper,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
