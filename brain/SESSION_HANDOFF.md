@@ -5972,6 +5972,181 @@ Fix the BLOCKER (rename the duplicate key + restore CW.7 title + guard test), de
   1. **P3-2b R2 Gate**: Owner ruling on whether to add the two spec-sourced columns (`audits.inventory_variance_pct` and `audit_results.flag_security_concern`) to enable Triggers T4 & T5 now, or proceed to P3-4 first.
   2. **Sprint P3-4 Plan**: Monthly Reports (S21 monthly view) + multi-week compliance trend analytics (`fl_chart`).
 
+---
+
+### Entry: 2026-09-30 — Owner Ruling on P3-2 R2 Gate + Sprint P3-2b Plan Delivered (T4 & T5)
+- **Author**: Claude
+- **Method**: Static code + spec review only (I cannot run Flutter; no build/test numbers in this entry — it is a plan + a recorded Owner decision).
+- **OWNER RULING (R2 gate resolved, 2026-09-30)**: The Owner ruled to **build the two missing alerts — T4 (inventory variance > 2%) and T5 (security-concern flag) — first, then continue the next queued Phase-3 work**. This **explicitly authorises** the two spec-sourced schema columns (`audits.inventory_variance_pct REAL`, `audit_results.flag_security_concern INTEGER NOT NULL DEFAULT 0 CHECK (0,1)`). The Owner also confirmed (correct per `OVERVIEW.md`) that the full 7-trigger engine is **Phase-3 scope**, not deferrable to Phase 4. Per R2, this column addition is now sanctioned and recorded — not silent drift, consistent with the `cash_variance_rupees` precedent.
+- **Delivered**: `brain/SPRINT_P3_2b_T4_T5_TRIGGERS.md` — full buildable plan, **CLEARED TO BUILD**. It is a **§4.4 four-way change**: (1) schema `currentVersion` 2→3 with additive `ALTER TABLE` migration + fresh-install CREATE updates; (2) capture UI — weekly-only inventory-variance % input (mirrors the existing closing-cash-variance input) + per-checkpoint security-concern toggle; (3) `DATABASE_SCHEMA.md` reconciliation; (4) tests (engine truth tables, migration test, capture persistence, idempotency, ARB parity).
+- **Grounding verified**: `audits`/`audit_results` currently lack both columns (schema.dart L130–172); `Schema.currentVersion==2`; engine L64–65 already flags T4/T5 as "deferred to P3-2b" and `evaluateAfterAudit` already receives everything they need; `cash_variance_rupees` gives an exact end-to-end capture template (review_submit → submitAudit → repository → model). T5 must use T2-style `what_happened` idempotency discrimination (one row per flagged checkpoint) — specified in the plan.
+- **One confirmation requested of Antigravity before wiring T4**: confirm against the Workbook **where weekly inventory variance is actually measured/entered** (the review/submit screen vs. a dedicated weekly checkpoint) before choosing the input's home — STOP and ask if ambiguous (R1).
+- **Rules held**: R2 (Owner-authorised + recorded, no new packages, real migration), R4 (score engine must stay green after the version bump — regression test required), R5 (both fields captured at/before submit; submitted audits immutable), R3/R8 (bilingual capture UI, English-only escalation body), R6 (build → analyze/test → HOLD for my review), R7 (`feature/p3-t4-t5-triggers` off `phase-3`, never `main`).
+- **Next Immediate Task (Antigravity)**: Cut `feature/p3-t4-t5-triggers` off `phase-3`; build in the plan's §8 order (schema + migration test first → models → engine T4/T5 tests-first → `raise()` T5 idempotency → capture UI + bilingual keys). Report the §9 Workbook confirmation, run `flutter analyze` + full `flutter test`, paste raw output, and **HOLD** for my review — do not commit until I write `APPROVED — cleared to commit & push`. After P3-2b: **P3-4** (Monthly Reports S21 + `fl_chart` trends), the last Phase-3 build before the Phase-3 sign-off merge to `main`.
+
+---
+
+### Entry: 2026-09-30 — Sprint P3-2b Implementation Complete (T4 & T5 Triggers) — Holding for Claude Review
+- **Author**: Antigravity
+- **Branch**: `feature/p3-t4-t5-triggers` cut off `phase-3` (`ccdbf92`). `main` strictly untouched at `0cb2e55`.
+
+#### 1. Workbook §9 Confirmation on T4 Capture Point
+- Checked Workbook L3574–L3575 & L3744 against `checkpoints.json`:
+  - Checkpoint `IW.1` in `checkpoints.json` is a binary Pass/Fail verification: *"Full storage area count — two signatures (Store Manager + Auditor)"*.
+  - The measured numerical percentage variance is an audit-level metric (Workbook: *"Inventory variance > 2% of stock value at weekly storage count"*), exactly symmetrical to daily closing cash variance at checkpoint 6.5 vs S10 review time.
+  - S10 `ReviewSubmitScreen` is confirmed as the canonical, proper capture point for weekly inventory variance % (`audits.inventory_variance_pct`).
+
+#### 2. §4.4 Four-Way Implementation Delivered
+1. **Schema & Migration (v2 → v3)**:
+   - Bumped `Schema.currentVersion = 3` in `lib/data/db/schema.dart`.
+   - Updated fresh-install CREATE statements: added `inventory_variance_pct REAL` to `audits` and `flag_security_concern INTEGER NOT NULL DEFAULT 0 CHECK (flag_security_concern IN (0,1))` to `audit_results`.
+   - Implemented safe, idempotent `onUpgrade` and defensive `onOpen` PRAGMA table_info migration in `lib/data/db/database.dart`.
+   - Updated `brain/DATABASE_SCHEMA.md` with the new columns.
+2. **Models & Data Layer**:
+   - `lib/data/models/audit.dart`: Added `final double? inventoryVariancePct;`, constructor parameter, `copyWith`, `toMap()`, and `fromMap()`.
+   - `lib/data/models/audit_result.dart`: Added `final bool flagSecurityConcern;`, constructor parameter (default `false`), `copyWith`, `toMap()` (persisting 1/0), and `fromMap()` (decoding `flag_security_concern == 1`).
+   - `lib/data/repositories/audit_repository.dart`: Updated `saveResult` to accept and write `flagSecurityConcern`, and `submitAudit` to accept and write `inventoryVariancePct`.
+   - `lib/providers/draft_audit_provider.dart`: Threaded `flagSecurityConcern` through `mark` and `recordFailAndAdvance`. Threaded `inventoryVariancePct` through `submitAudit`.
+   - `test/helpers/fake_database.dart`: Added default `flag_security_concern: 0` in `insert()` for `audit_results`.
+3. **Escalation Engine & Repository**:
+   - `lib/domain/escalation_engine.dart`: Implemented Trigger 4 (weekly only, variance > 2.0% $\rightarrow$ Owner same_day WhatsApp) and Trigger 5 (per-result `flagSecurityConcern == true` $\rightarrow$ Owner immediate WhatsApp, 1 draft per flagged result). Removed deferred notes from class documentation.
+   - `lib/data/repositories/escalation_repository.dart`: Extended `raise()` idempotency check to discriminate by `what_happened` for triggers 2 and 5 (`draft.triggerNumber == 2 || draft.triggerNumber == 5`), allowing multiple distinct checkpoints on the same audit to each raise their own escalation without collapsing.
+4. **Capture UI & Dual-Language Parity (Rule #8)**:
+   - Added 6 bilingual keys in `assets/translations/app_en.arb` and `assets/translations/app_mr.arb`, followed by clean `flutter gen-l10n`:
+     - `s10InventoryVarianceTitle`, `s10InventoryVarianceSubtitle`, `s10InventoryVarianceLabel`, `s10InventoryVarianceHelper`
+     - `s07SecurityConcernLabel`, `s07SecurityConcernSubtitle`
+   - S10 Review & Submit (`lib/ui/screens/s10_review/review_submit_screen.dart`): Added weekly inventory variance numeric input with helper notes and warning indicators, shown only when `state.audit?.auditType == 'weekly'`, passed into `submitAudit`.
+   - S07 Checkpoint (`lib/ui/screens/s07_checkpoint/checkpoint_screen.dart`): Added Security Concern toggle switch card, reset on advance/back, passed to `mark` and forwarded to S08 via router extra if FAIL.
+   - S08 Fail Detail (`lib/ui/screens/s08_fail_detail/fail_detail_screen.dart`): Added Security Concern toggle switch card, bootstraps from existing result or S07 extra, persists atomically via `recordFailAndAdvance`.
+   - `lib/app.dart`: Updated `s08_fail_detail` GoRoute builder to pass `initialSecurityConcern` from `state.extra`.
+
+#### 3. Verification & Raw Command Outputs
+- **`flutter analyze`**:
+  ```
+  Analyzing Saagar Audit App...
+  No issues found! (ran in 3.2s)
+  ```
+
+- **`flutter test test/score_engine_test.dart` (Rule 5 Mandatory)**:
+  ```
+  00:00 +0: loading E:/projects/Saagar Audit App/test/score_engine_test.dart
+  00:00 +0: Band boundaries (Spec §6.2) ≥95.0 is excellent
+  00:00 +1: Band boundaries (Spec §6.2) 94.9 is good (not excellent)
+  00:00 +2: Band boundaries (Spec §6.2) ≥90.0 is good
+  00:00 +3: Band boundaries (Spec §6.2) 89.9 is fair (the most-missed boundary per Workbook §1.5)
+  00:00 +4: Band boundaries (Spec §6.2) ≥85.0 is fair
+  00:00 +5: Band boundaries (Spec §6.2) 84.9 is poor
+  00:00 +6: Band boundaries (Spec §6.2) ≥80.0 is poor
+  00:00 +7: Band boundaries (Spec §6.2) 79.9 is critical
+  00:00 +8: Band boundaries (Spec §6.2) below 80 is critical
+  00:00 +9: NA handling (Spec §6.4) 5 NAs at weight 2 reduce max by 10
+  00:00 +10: NA handling (Spec §6.4) Adding NA does not change the percentage
+  00:00 +11: Workbook §5.1 canonical daily test (MUST equal 81/90 = 90.0% Good) produces 81/90 = 90.0% Good exactly
+  00:00 +12: All tests passed!
+  ```
+
+- **`test/t4_t5_escalation_test.dart` (20 new tests)**:
+  ```
+  00:00 +0: loading E:/projects/Saagar Audit App/test/t4_t5_escalation_test.dart
+  00:00 +0: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 1. Database Schema & Migration v2 -> v3 Schema.currentVersion is 3
+  00:00 +1: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 1. Database Schema & Migration v2 -> v3 createStatements contains inventory_variance_pct column in audits table
+  00:00 +2: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 1. Database Schema & Migration v2 -> v3 createStatements contains flag_security_concern column with CHECK constraint in audit_results
+  00:00 +3: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 1. Database Schema & Migration v2 -> v3 Audit model serialization round-trip preserves inventoryVariancePct
+  00:00 +4: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 1. Database Schema & Migration v2 -> v3 AuditResult model serialization round-trip preserves flagSecurityConcern
+  00:00 +5: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 2. Trigger T4: Inventory Variance > 2% (Weekly only) Fires when weekly audit has inventoryVariancePct = 2.1% (> 2.0%)
+  00:00 +6: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 2. Trigger T4: Inventory Variance > 2% (Weekly only) Does NOT fire when inventoryVariancePct = 2.0% (strict > boundary)
+  00:00 +7: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 2. Trigger T4: Inventory Variance > 2% (Weekly only) Does NOT fire when inventoryVariancePct = 1.99% (< 2.0%)
+  00:00 +8: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 2. Trigger T4: Inventory Variance > 2% (Weekly only) Does NOT fire when inventoryVariancePct is null
+  00:00 +9: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 2. Trigger T4: Inventory Variance > 2% (Weekly only) Does NOT fire when auditType is daily even if variance > 2%
+  00:00 +10: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 2. Trigger T4: Inventory Variance > 2% (Weekly only) Does NOT fire when auditType is monthly even if variance > 2%
+  00:00 +11: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 3. Trigger T5: Security Concern Flag Fires immediate WhatsApp alert to Owner for result with flagSecurityConcern: true
+  00:00 +12: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 3. Trigger T5: Security Concern Flag Fires distinct T5 drafts for each checkpoint flagged on the same audit
+  00:00 +13: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 3. Trigger T5: Security Concern Flag Does NOT fire T5 when flagSecurityConcern is false for all checkpoints
+  00:00 +14: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 3. Trigger T5: Security Concern Flag T5 fires on PASS or NA if security concern was explicitly flagged
+  00:00 +15: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 4. EscalationRepository Idempotency for T4 & T5 T4: double-raise is deduplicated
+  00:00 +16: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 4. EscalationRepository Idempotency for T4 & T5 T5: two distinct checkpoints on same audit raise two distinct escalations
+  00:00 +17: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 5. ARB Localization Parity for Sprint P3-2b Keys All 6 new keys exist and are non-empty in app_en.arb and app_mr.arb
+  00:00 +18: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 6. AuditRepository Data Layer Persistence saveResult writes flag_security_concern to database
+  00:00 +19: Sprint P3-2b — Triggers T4 & T5 Escalation Suite 6. AuditRepository Data Layer Persistence submitAudit persists inventory_variance_pct to audits table
+  00:00 +20: All tests passed!
+  ```
+
+- **Full Test Suite (`flutter test`)**:
+  ```
+  00:39 +332: All tests passed!
+  ```
+  (332/332 tests green across all 41 test files).
+
+- **Raw `git status`**:
+  ```
+  On branch feature/p3-t4-t5-triggers
+  Changes not staged for commit:
+    (use "git add <file>..." to update what will be committed)
+    (use "git restore <file>..." to discard changes in working directory)
+  	modified:   assets/translations/app_en.arb
+  	modified:   assets/translations/app_mr.arb
+  	modified:   brain/CURRENT_STATE.md
+  	modified:   brain/DATABASE_SCHEMA.md
+  	modified:   brain/SESSION_HANDOFF.md
+  	modified:   lib/app.dart
+  	modified:   lib/data/db/database.dart
+  	modified:   lib/data/db/schema.dart
+  	modified:   lib/data/models/audit.dart
+  	modified:   lib/data/models/audit_result.dart
+  	modified:   lib/data/repositories/audit_repository.dart
+  	modified:   lib/data/repositories/escalation_repository.dart
+  	modified:   lib/domain/escalation_engine.dart
+  	modified:   lib/l10n/app_localizations.dart
+  	modified:   lib/l10n/app_localizations_en.dart
+  	modified:   lib/l10n/app_localizations_mr.dart
+  	modified:   lib/providers/draft_audit_provider.dart
+  	modified:   lib/ui/screens/s07_checkpoint/checkpoint_screen.dart
+  	modified:   lib/ui/screens/s08_fail_detail/fail_detail_screen.dart
+  	modified:   lib/ui/screens/s10_review/review_submit_screen.dart
+  	modified:   test/helpers/fake_database.dart
+
+  Untracked files:
+    (use "git add <file>..." to include in what will be committed)
+  	brain/SPRINT_P3_2b_T4_T5_TRIGGERS.md
+  	test/t4_t5_escalation_test.dart
+
+  no changes added to commit (use "git add" and/or "git commit -a")
+  ```
+
+- **Raw `git log main -n 1 --oneline` (Rule 7 Invariant Check)**:
+  ```
+  0cb2e55 merge(phase-2): sign-off merge of Phase 2 (Sprints P2-1 to P2-5) into main
+  ```
+
+#### 4. Rule 6 Status — Holding for Claude Review
+- **HOLDING**: Per Mandatory Operating Protocol Rule #6, Antigravity has **NOT** committed or pushed application code.
+- All code is built, verified with 0 analyzer issues, and confirmed by 332/332 passing tests.
+- Baton is handed to **Claude** for static code review and explicit written sign-off:
+  `APPROVED — cleared to commit & push`.
+
+---
+
+### Entry: 2026-09-30 — Claude Review of Sprint P3-2b (T4 & T5 Triggers) — ✅ APPROVED
+- **Author**: Claude
+- **Method**: Full static review of the actual diff — I read `schema.dart` (CREATE + version), `database.dart` (v2→v3 migration + defensive onOpen), `escalation_engine.dart` (T4/T5 blocks + hoisted `cpMap`), `escalation_repository.dart` (idempotency), `audit_result.dart` model, and grep-verified the provider threading, ARB parity (EN+MR), and the weekly-only gating in `review_submit_screen.dart`. I cannot run Flutter — the 332/332 green, `analyze` clean, score-engine 12/12, and 20/20 T4/T5 results are Antigravity's device runs, cited as such, not re-verified by me.
+- **Verified GREEN vs plan + rules**:
+  - **Schema (§3)** — `currentVersion` bumped 2→3; fresh-install CREATE adds `audits.inventory_variance_pct REAL` and `audit_results.flag_security_concern INTEGER NOT NULL DEFAULT 0 CHECK (IN (0,1))` (schema.dart L148/L171). Migration is **belt-and-suspenders**: a `PRAGMA table_info`-guarded idempotent `ALTER TABLE ADD COLUMN` in `onUpgrade` `if (oldVersion < 3)` **plus** a defensive `onOpen` re-check (database.dart L84–105, L141–158) mirroring the existing SOP9 pattern — a partially-migrated device self-heals. `DATABASE_SCHEMA.md` updated.
+  - **Engine T4 (§5)** — weekly-only, fires strictly at `inventoryVariancePct > 2.0` (2.0 exactly does **not** fire — test 6 confirms), null-safe, → Owner / `same_day` / `whatsapp`. Matches spec §7 L299–303 exactly.
+  - **Engine T5 (§5)** — one draft **per** result with `flagSecurityConcern == true` (independent of P/F/NA — test 14 confirms a flagged PASS/NA fires), → Owner / `immediate` / `whatsapp`. Matches spec §7 L307–311. `cpMap` is now hoisted to method scope (L76) so T1/T2/T5 share it cleanly.
+  - **Idempotency (§5)** — `raise()` `what_happened` discrimination extended to `triggerNumber == 2 || == 5` (repo L45), so multiple flagged checkpoints each get a distinct row (test 16), while a re-raise of the same finding dedups (test 15). Correct.
+  - **Models/data layer** — `AuditResult.flagSecurityConcern` (bool, default false) and `Audit.inventoryVariancePct` (nullable double) with full fromMap/toMap/copyWith; threaded through `mark`/`recordFailAndAdvance`/`submitAudit` (provider L206/248/298) → repository → DB. Round-trip tests 3/4 green.
+  - **Capture UI (§4)** — inventory-variance % input is **weekly-gated** both on write (`audit.auditType == 'weekly' ? val : null`, review L174–175) and on display (L359 block); security toggle on S07 (P/NA path) and S08 (F path), forwarded via router `extra` (app.dart). No daily audit can write inventory variance.
+  - **R2** — schema change is the **Owner-authorised** one recorded 2026-09-30; no new packages; real migration + version bump. ✅
+  - **R3/R8** — 6 new keys present in both ARBs with authentic Marathi (`साप्ताहिक इन्व्हेंटरी तफावत`, `सुरक्षा चिंता`, …); escalation bodies English-only. Test 17 asserts parity.
+  - **R4** — scoring untouched; `score_engine_test.dart` 12/12 green after the version bump (no regression).
+  - **R5** — both fields captured at/before submit (flag during conduct, variance at submit); submitted audits/results remain immutable.
+  - **§9 confirmation answered** — Antigravity checked the Workbook (L3574–75, L3744): `IW.1` is a binary pass/fail signature checkpoint; the numeric % is an audit-level metric captured at S10 review, symmetric to daily closing cash variance. Sound reasoning — S10 is the correct home.
+- **Non-blocking observation (log only)**: T4/T5 use `deliveryChannel: 'whatsapp'` per spec; on a device without WhatsApp the P3-2 dispatch path already falls back to clipboard/notification — no new work, just noting the shared path now carries Owner-critical security alerts, so the fallback matters. No change required.
+- **Decision**: Faithful to the P3-2b plan and the spec; the Owner-authorised schema change is correctly recorded and migrated; all 10 rules hold. The **7-trigger escalation engine is now complete** (T1–T7 + T6 manual).
+- **`APPROVED — cleared to commit & push`**
+- **Next Immediate Task (Antigravity)**: `git add` the reviewed files + the new plan + test + brain updates, commit with a Conventional Commit (e.g. `feat(escalation): P3-2b triggers T4 inventory-variance & T5 security-flag — schema v3 migration, capture UI, engine + idempotency`), push `origin/feature/p3-t4-t5-triggers`, fast-forward merge into `phase-3`, push `phase-3`, and paste the raw `git log --oneline` + `git log main -n 1` (Rule-7 check — `main` must stay at `0cb2e55`) as the push record. **Then** the baton returns to me for the **P3-4 plan** (Monthly Reports S21 + `fl_chart` multi-week trend analytics) — the final Phase-3 build before the Phase-3 sign-off merge to `main`.
+
+
 
 
 

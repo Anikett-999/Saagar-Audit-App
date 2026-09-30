@@ -2573,4 +2573,25 @@ class AppLocalizationsMr extends AppLocalizations {
   String s27RunAgingSuccess(int aged, int pending, int escalations) {
     return 'कॅप एजिंग पूर्ण: $aged जुने झाले, $pending पडताळणी प्रलंबित, $escalations इशारे पाठवले';
   }
+
+  @override
+  String get s10InventoryVarianceTitle => 'साप्ताहिक इन्व्हेंटरी तफावत';
+
+  @override
+  String get s10InventoryVarianceSubtitle =>
+      'प्रत्यक्ष स्टॉक आणि सिस्टीम नोंदींमधील मोजलेली % तफावत प्रविष्ट करा (नियम §7 / T4).';
+
+  @override
+  String get s10InventoryVarianceLabel => 'इन्व्हेंटरी तफावत (%)';
+
+  @override
+  String get s10InventoryVarianceHelper =>
+      'तफावत 2.0% पेक्षा जास्त असल्यास मालकाला तात्काळ इशारा पाठवला जातो (ट्रिगर ४).';
+
+  @override
+  String get s07SecurityConcernLabel => 'सुरक्षा चिंता';
+
+  @override
+  String get s07SecurityConcernSubtitle =>
+      'या तपासणी बिंदूमध्ये सुरक्षा किंवा चोरीचा धोका असल्यास चिन्हांकित करा (मालकास तात्काळ इशारा).';
 }

@@ -1234,7 +1234,13 @@
       "pending": {"type": "int"},
       "escalations": {"type": "int"}
     }
-  }
+  },
+  "s10InventoryVarianceTitle": "Weekly Inventory Variance",
+  "s10InventoryVarianceSubtitle": "Enter measured % variance between physical stock and system records (Spec §7 / T4).",
+  "s10InventoryVarianceLabel": "Inventory Variance (%)",
+  "s10InventoryVarianceHelper": "Alert triggers to Owner if variance exceeds 2.0% (Trigger 4).",
+  "s07SecurityConcernLabel": "Security Concern",
+  "s07SecurityConcernSubtitle": "Flag if this checkpoint presents a security or theft risk (triggers immediate alert to Owner)."
 }
 
 

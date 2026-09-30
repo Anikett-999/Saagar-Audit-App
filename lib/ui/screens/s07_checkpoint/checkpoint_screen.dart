@@ -28,6 +28,7 @@ class CheckpointScreen extends ConsumerStatefulWidget {
 
 class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
   Map<String, String> _sopNamesById = const {};
+  bool _securityConcern = false;
 
   @override
   void initState() {
@@ -44,7 +45,12 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
   }
 
   Future<void> _onPass(Checkpoint cp) async {
-    await ref.read(draftAuditProvider.notifier).mark(Verdict.pass);
+    final concern = _securityConcern;
+    setState(() => _securityConcern = false);
+    await ref.read(draftAuditProvider.notifier).mark(
+          Verdict.pass,
+          flagSecurityConcern: concern,
+        );
     // Tiny "good" haptic + slight pause so the user sees the tick.
     await Future<void>.delayed(const Duration(milliseconds: 200));
     if (!mounted) return;
@@ -55,17 +61,25 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
     // Navigate directly to S8. S8 captures finding text & photos, then
     // atomically saves the FAIL result and advances currentIndex.
     // If the user backs out of S8 without saving, no orphan record is written.
-    await context.pushNamed('s08_fail_detail');
+    await context.pushNamed(
+      's08_fail_detail',
+      extra: {'initialSecurityConcern': _securityConcern},
+    );
     if (!mounted) return;
+    setState(() => _securityConcern = false);
     _maybeFinishOrAdvance();
   }
 
   Future<void> _onNa(Checkpoint cp) async {
     final reason = await _askNaReason(cp);
     if (reason == null) return; // user cancelled
-    await ref
-        .read(draftAuditProvider.notifier)
-        .mark(Verdict.na, findingText: reason);
+    final concern = _securityConcern;
+    setState(() => _securityConcern = false);
+    await ref.read(draftAuditProvider.notifier).mark(
+          Verdict.na,
+          findingText: reason,
+          flagSecurityConcern: concern,
+        );
     if (!mounted) return;
     _maybeFinishOrAdvance();
   }
@@ -166,12 +180,17 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
         leading: state.currentIndex == 0
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
-                onPressed: () => context.goNamed('s05_home'),
+                onPressed: () {
+                  setState(() => _securityConcern = false);
+                  context.goNamed('s05_home');
+                },
               )
             : IconButton(
                 icon: const Icon(Icons.arrow_back),
-                onPressed: () =>
-                    ref.read(draftAuditProvider.notifier).goBack(),
+                onPressed: () {
+                  setState(() => _securityConcern = false);
+                  ref.read(draftAuditProvider.notifier).goBack();
+                },
               ),
       ),
       body: SafeArea(
@@ -202,7 +221,7 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
               ),
             ),
             Expanded(
-              child: Padding(
+              child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,6 +292,8 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
                         ),
                       ),
                     ],
+                    const SizedBox(height: 16),
+                    _securityConcernCard(l10n),
                   ],
                 ),
               ),
@@ -419,6 +440,61 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
           pill('PASS', state.passCount, AppColors.green),
           pill('FAIL', state.failCount, AppColors.red),
           pill('N/A', state.naCount, AppColors.gray600),
+        ],
+      ),
+    );
+  }
+
+  Widget _securityConcernCard(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: _securityConcern ? AppColors.goldPale : AppColors.gray100,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: _securityConcern ? AppColors.gold : AppColors.gray300,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.security_outlined,
+            color: _securityConcern ? AppColors.gold : AppColors.gray600,
+            size: 22,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.s07SecurityConcernLabel,
+                  style: TextStyle(
+                    fontFamily: 'DMSans',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color:
+                        _securityConcern ? AppColors.navy : AppColors.gray800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  l10n.s07SecurityConcernSubtitle,
+                  style: const TextStyle(
+                    fontFamily: 'DMSans',
+                    fontSize: 11,
+                    color: AppColors.gray600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Switch.adaptive(
+            key: const ValueKey('s07_security_concern_switch'),
+            value: _securityConcern,
+            activeTrackColor: AppColors.gold,
+            onChanged: (val) => setState(() => _securityConcern = val),
+          ),
         ],
       ),
     );

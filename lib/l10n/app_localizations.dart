@@ -4682,6 +4682,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'CAP Aging complete: {aged} aged, {pending} pending verification, {escalations} escalations raised'**
   String s27RunAgingSuccess(int aged, int pending, int escalations);
+
+  /// No description provided for @s10InventoryVarianceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Inventory Variance'**
+  String get s10InventoryVarianceTitle;
+
+  /// No description provided for @s10InventoryVarianceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter measured % variance between physical stock and system records (Spec §7 / T4).'**
+  String get s10InventoryVarianceSubtitle;
+
+  /// No description provided for @s10InventoryVarianceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory Variance (%)'**
+  String get s10InventoryVarianceLabel;
+
+  /// No description provided for @s10InventoryVarianceHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert triggers to Owner if variance exceeds 2.0% (Trigger 4).'**
+  String get s10InventoryVarianceHelper;
+
+  /// No description provided for @s07SecurityConcernLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Concern'**
+  String get s07SecurityConcernLabel;
+
+  /// No description provided for @s07SecurityConcernSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Flag if this checkpoint presents a security or theft risk (triggers immediate alert to Owner).'**
+  String get s07SecurityConcernSubtitle;
 }
 
 class _AppLocalizationsDelegate

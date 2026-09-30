@@ -39,16 +39,16 @@ class EscalationRepository {
 
     return await db.transaction((txn) async {
       // 2. Idempotency check: don't double-raise on same audit + trigger + recipient
-      // For Trigger 2 (recurring checkpoint fails), discriminate by what_happened so
-      // multiple recurring checkpoints each raise their own escalation record.
+      // For Trigger 2 (recurring checkpoint fails) and Trigger 5 (security concern flag),
+      // discriminate by what_happened so multiple checkpoints each raise their own escalation record.
       if (draft.sourceAuditId != null) {
-        final isT2 = draft.triggerNumber == 2;
+        final isDiscriminated = draft.triggerNumber == 2 || draft.triggerNumber == 5;
         final existing = await txn.query(
           'escalations',
-          where: isT2
+          where: isDiscriminated
               ? 'trigger_number = ? AND source_audit_id = ? AND raised_to_user_id = ? AND what_happened = ?'
               : 'trigger_number = ? AND source_audit_id = ? AND raised_to_user_id = ?',
-          whereArgs: isT2
+          whereArgs: isDiscriminated
               ? [draft.triggerNumber, draft.sourceAuditId, resolvedRecipientId, draft.whatHappened]
               : [draft.triggerNumber, draft.sourceAuditId, resolvedRecipientId],
           limit: 1,

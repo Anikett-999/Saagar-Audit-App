@@ -1036,7 +1036,13 @@
       "pending": {"type": "int"},
       "escalations": {"type": "int"}
     }
-  }
+  },
+  "s10InventoryVarianceTitle": "साप्ताहिक इन्व्हेंटरी तफावत",
+  "s10InventoryVarianceSubtitle": "प्रत्यक्ष स्टॉक आणि सिस्टीम नोंदींमधील मोजलेली % तफावत प्रविष्ट करा (नियम §7 / T4).",
+  "s10InventoryVarianceLabel": "इन्व्हेंटरी तफावत (%)",
+  "s10InventoryVarianceHelper": "तफावत 2.0% पेक्षा जास्त असल्यास मालकाला तात्काळ इशारा पाठवला जातो (ट्रिगर ४).",
+  "s07SecurityConcernLabel": "सुरक्षा चिंता",
+  "s07SecurityConcernSubtitle": "या तपासणी बिंदूमध्ये सुरक्षा किंवा चोरीचा धोका असल्यास चिन्हांकित करा (मालकास तात्काळ इशारा)."
 }
 
 

@@ -199,7 +199,12 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
   /// Mark the current checkpoint as PASS or NA. Persists to DB and advances index.
   /// Hard Rule: FAIL marks must go through [recordFailAndAdvance] to ensure
   /// finding text and mandatory photos are captured atomically without leaving orphans.
-  Future<void> mark(Verdict v, {String? findingText, String? croId}) async {
+  Future<void> mark(
+    Verdict v, {
+    String? findingText,
+    String? croId,
+    bool flagSecurityConcern = false,
+  }) async {
     assert(
       v != Verdict.fail,
       'FAIL must be recorded via recordFailAndAdvance with finding details',
@@ -220,6 +225,7 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
       weight: cp.weight,
       findingText: findingText,
       croId: croId,
+      flagSecurityConcern: flagSecurityConcern,
     );
 
     final nextResults = Map<String, Verdict>.from(state.results)
@@ -239,6 +245,7 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
     required String findingText,
     String? croId,
     required List<String> photoPaths,
+    bool flagSecurityConcern = false,
   }) async {
     final cp = state.currentCheckpoint;
     final audit = state.audit;
@@ -261,6 +268,7 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
       weight: cp.weight,
       findingText: findingText,
       croId: croId,
+      flagSecurityConcern: flagSecurityConcern,
     );
 
     for (final path in photoPaths) {
@@ -284,7 +292,11 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
 
   /// Calculates final score and submits the audit to SQLite, locking status to 'submitted'.
   /// Dispatches to `computeWeeklyScore` for weekly audits and `scoreDaily` for daily audits.
-  Future<ScoreResult> submitAudit({String? notes, double? cashVarianceRupees}) async {
+  Future<ScoreResult> submitAudit({
+    String? notes,
+    double? cashVarianceRupees,
+    double? inventoryVariancePct,
+  }) async {
     final audit = state.audit;
     if (audit == null) {
       throw StateError('No active audit to submit');
@@ -376,6 +388,7 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
       failCount: failCount,
       naCount: naCount,
       cashVarianceRupees: cashVarianceRupees,
+      inventoryVariancePct: inventoryVariancePct,
       notes: notes,
     );
 
@@ -390,6 +403,7 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
       failCount: failCount,
       naCount: naCount,
       cashVarianceRupees: cashVarianceRupees,
+      inventoryVariancePct: inventoryVariancePct,
       notes: notes,
     );
 

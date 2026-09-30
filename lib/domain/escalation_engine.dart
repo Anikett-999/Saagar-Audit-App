@@ -55,14 +55,13 @@ class EscalationEngine {
 
   /// Evaluates triggers after an audit submission (Spec §7).
   ///
-  /// Implemented in P3-2:
+  /// Implemented in P3-2 & P3-2b:
   /// - Trigger 1: Daily Critical band (< 80%) → GM (same_night), Owner if Cash/Inv cause.
   /// - Trigger 2: Same checkpoint failed in ≥5 of last 7 daily audits → GM (next_audit).
   /// - Trigger 3: Single-day cash variance > ₹500 → GM (same_day, whatsapp); consecutive → Owner (immediate, whatsapp).
+  /// - Trigger 4: Inventory variance > 2% of stock value on weekly audit → Owner (same_day, whatsapp).
+  /// - Trigger 5: Security concern flagged on any checkpoint result → Owner (immediate, whatsapp).
   /// - Trigger 7: Declining trend across 3+ consecutive weekly audits → Owner (same_day, in_app).
-  ///
-  /// Note: Triggers 4 (inventory variance >2%) and 5 (security concern flag)
-  /// are deferred to P3-2b per Owner ruling.
   static List<EscalationDraft> evaluateAfterAudit({
     required Audit audit,
     required List<AuditResult> results,
@@ -74,6 +73,7 @@ class EscalationEngine {
     String? raisedByUserId,
   }) {
     final drafts = <EscalationDraft>[];
+    final cpMap = {for (final cp in checkpoints) cp.id: cp};
 
     // -------------------------------------------------------------
     // Trigger 1: Daily Critical band (< 80%) (Spec §7.0)
@@ -82,7 +82,6 @@ class EscalationEngine {
     final compliance = audit.compliancePct;
     if (audit.auditType == 'daily' &&
         (band == 'critical' || (compliance != null && compliance < 80.0))) {
-      final cpMap = {for (final cp in checkpoints) cp.id: cp};
       final failedResults = results.where((r) => r.result == 'F').toList();
 
       bool hasCashCause = false;
@@ -169,8 +168,6 @@ class EscalationEngine {
         }
       }
 
-      final cpMap = {for (final cp in checkpoints) cp.id: cp};
-
       for (final entry in failCounts.entries) {
         if (entry.value >= 5) {
           final cp = cpMap[entry.key];
@@ -256,6 +253,65 @@ class EscalationEngine {
             ),
           );
         }
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Trigger 4: Inventory variance > 2% (Spec §7.0, weekly only)
+    // -------------------------------------------------------------
+    if (audit.auditType == 'weekly') {
+      final invVariance = audit.inventoryVariancePct;
+      if (invVariance != null && invVariance > 2.0) {
+        drafts.add(
+          EscalationDraft(
+            triggerNumber: 4,
+            triggerLabel: 'Inventory variance > 2%',
+            sourceType: 'audit',
+            sourceAuditId: audit.id,
+            raisedByUserId: raisedByUserId,
+            targetRole: 'OWNER',
+            urgency: 'same_day',
+            deliveryChannel: 'whatsapp',
+            whatHappened:
+                'Weekly physical inventory count variance exceeded 2.0% threshold (measured: ${invVariance.toStringAsFixed(1)}%).',
+            evidence:
+                'Weekly stock audit sheet for ${audit.auditDate} records inventory variance of ${invVariance.toStringAsFixed(1)}% of total stock value.',
+            impact:
+                'Significant stock discrepancy indicates potential shrinkage, unrecorded stock movements, or inventory miscounting.',
+            requestedAction:
+                'Owner action needed: Review weekly count variance report and initiate stock reconciliation with Store Manager.',
+          ),
+        );
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Trigger 5: Security concern flag (Spec §7.0, per checkpoint result)
+    // -------------------------------------------------------------
+    for (final r in results) {
+      if (r.flagSecurityConcern) {
+        final cp = cpMap[r.checkpointId];
+        final cpText = cp?.textEn ?? r.checkpointId;
+        drafts.add(
+          EscalationDraft(
+            triggerNumber: 5,
+            triggerLabel: 'Security concern',
+            sourceType: 'audit',
+            sourceAuditId: audit.id,
+            raisedByUserId: raisedByUserId,
+            targetRole: 'OWNER',
+            urgency: 'immediate',
+            deliveryChannel: 'whatsapp',
+            whatHappened:
+                'Security concern flagged on Checkpoint ${r.checkpointId} during ${audit.auditType} audit on ${audit.auditDate}.${r.findingText != null && r.findingText!.isNotEmpty ? ' Finding: "${r.findingText}".' : ''}',
+            evidence:
+                'Auditor noted security risk on Checkpoint ${r.checkpointId} ($cpText) with status ${r.result}.',
+            impact:
+                'Potential security vulnerability or breach threatening store safety, asset integrity, or staff security.',
+            requestedAction:
+                'Immediate action required: Owner review security finding and inspect counter CCTV / premises immediately.',
+          ),
+        );
       }
     }
 

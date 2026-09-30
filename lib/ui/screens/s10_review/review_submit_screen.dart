@@ -36,6 +36,7 @@ class ReviewSubmitScreen extends ConsumerStatefulWidget {
 class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
   final _notesController = TextEditingController();
   final _cashVarianceController = TextEditingController(text: '0');
+  final _inventoryVarianceController = TextEditingController();
   List<Sop> _sops = const [];
   List<Audit> _dailyAudits = const [];
   Map<String, AuditResult> _failResults = const {};
@@ -53,6 +54,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
   void dispose() {
     _notesController.dispose();
     _cashVarianceController.dispose();
+    _inventoryVarianceController.dispose();
     super.dispose();
   }
 
@@ -169,10 +171,13 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
       final notes = _notesController.text.trim();
       final varianceVal = double.tryParse(_cashVarianceController.text.trim());
       final cashVariance = audit.auditType == 'daily' ? (varianceVal ?? 0.0) : null;
+      final invVarianceVal = double.tryParse(_inventoryVarianceController.text.trim());
+      final inventoryVariance = audit.auditType == 'weekly' ? invVarianceVal : null;
 
       await ref.read(draftAuditProvider.notifier).submitAudit(
             notes: notes.isEmpty ? null : notes,
             cashVarianceRupees: cashVariance,
+            inventoryVariancePct: inventoryVariance,
           );
 
       if (audit.auditType == 'weekly') {
@@ -347,6 +352,12 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
               // 3.5 Closing Cash Variance (Daily Audits only — Spec §6.7 / T3)
               if (audit.auditType == 'daily') ...[
                 _buildCashVarianceSection(l10n),
+                const SizedBox(height: 24),
+              ],
+
+              // 3.6 Weekly Inventory Variance % (Weekly Audits only — Spec §7 / T4)
+              if (audit.auditType == 'weekly') ...[
+                _buildInventoryVarianceSection(l10n),
                 const SizedBox(height: 24),
               ],
 
@@ -1005,6 +1016,56 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
               prefixIcon: const Icon(Icons.calculate_outlined),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               helperText: l10n.s10CashVarianceHelper,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInventoryVarianceSection(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.gray200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.inventory_2_outlined, color: AppColors.navy, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.s10InventoryVarianceTitle,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.navy,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.s10InventoryVarianceSubtitle,
+            style: const TextStyle(fontSize: 13, color: AppColors.gray600),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _inventoryVarianceController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: InputDecoration(
+              labelText: l10n.s10InventoryVarianceLabel,
+              hintText: 'e.g. 1.5 or 2.5',
+              suffixText: '%',
+              prefixIcon: const Icon(Icons.percent),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              helperText: l10n.s10InventoryVarianceHelper,
             ),
           ),
         ],

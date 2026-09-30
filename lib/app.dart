@@ -89,7 +89,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/audit/fail-detail',
         name: 's08_fail_detail',
-        builder: (_, __) => const FailDetailScreen(),
+        builder: (_, state) {
+          final extra = state.extra;
+          final initialConcern = extra is Map<String, dynamic>
+              ? (extra['initialSecurityConcern'] as bool? ?? false)
+              : false;
+          return FailDetailScreen(initialSecurityConcern: initialConcern);
+        },
       ),
       // S9 Photo Capture is folded into S8 (inline camera launch).
       GoRoute(

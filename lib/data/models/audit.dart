@@ -19,6 +19,7 @@ class Audit {
     this.passCount = 0,
     this.naCount = 0,
     this.cashVarianceRupees,
+    this.inventoryVariancePct,
     this.draftStartedAt,
     this.submittedAt,
     this.verifiedAt,
@@ -48,6 +49,7 @@ class Audit {
         passCount: m['pass_count'] as int? ?? 0,
         naCount: m['na_count'] as int? ?? 0,
         cashVarianceRupees: (m['cash_variance_rupees'] as num?)?.toDouble(),
+        inventoryVariancePct: (m['inventory_variance_pct'] as num?)?.toDouble(),
         draftStartedAt: m['draft_started_at'] as String?,
         submittedAt: m['submitted_at'] as String?,
         verifiedAt: m['verified_at'] as String?,
@@ -76,6 +78,7 @@ class Audit {
   final int passCount;
   final int naCount;
   final double? cashVarianceRupees;
+  final double? inventoryVariancePct;
   final String? draftStartedAt;
   final String? submittedAt;
   final String? verifiedAt;
@@ -107,6 +110,7 @@ class Audit {
         'pass_count': passCount,
         'na_count': naCount,
         'cash_variance_rupees': cashVarianceRupees,
+        'inventory_variance_pct': inventoryVariancePct,
         'draft_started_at': draftStartedAt,
         'submitted_at': submittedAt,
         'verified_at': verifiedAt,
@@ -136,6 +140,7 @@ class Audit {
     int? passCount,
     int? naCount,
     double? cashVarianceRupees,
+    double? inventoryVariancePct,
     String? draftStartedAt,
     String? submittedAt,
     String? verifiedAt,
@@ -164,6 +169,7 @@ class Audit {
         passCount: passCount ?? this.passCount,
         naCount: naCount ?? this.naCount,
         cashVarianceRupees: cashVarianceRupees ?? this.cashVarianceRupees,
+        inventoryVariancePct: inventoryVariancePct ?? this.inventoryVariancePct,
         draftStartedAt: draftStartedAt ?? this.draftStartedAt,
         submittedAt: submittedAt ?? this.submittedAt,
         verifiedAt: verifiedAt ?? this.verifiedAt,

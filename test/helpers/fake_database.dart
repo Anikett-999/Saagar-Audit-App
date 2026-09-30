@@ -49,7 +49,11 @@ class FakeDatabase extends Fake implements Database, Transaction {
         );
       }
     }
-    list.add(Map<String, Object?>.from(values));
+    final rowToInsert = Map<String, Object?>.from(values);
+    if (table == 'audit_results' && !rowToInsert.containsKey('flag_security_concern')) {
+      rowToInsert['flag_security_concern'] = 0;
+    }
+    list.add(rowToInsert);
     return 1;
   }
 

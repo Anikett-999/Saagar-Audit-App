@@ -12,9 +12,9 @@
 class Schema {
   Schema._();
 
-  /// Schema version. Bumped to 2 for Phase 2: addition of SOP9 (Operations)
-  /// and 36 weekly checkpoints.
-  static const int currentVersion = 2;
+  /// Schema version. Bumped to 3 for Sprint P3-2b (Owner-authorised 2026-09-30):
+  /// addition of audits.inventory_variance_pct (T4) and audit_results.flag_security_concern (T5).
+  static const int currentVersion = 3;
 
   /// All CREATE statements, executed in order on first install or upgrade.
   /// Order matters because of foreign key dependencies — `users` and `sops`
@@ -145,6 +145,7 @@ CREATE TABLE audits (
   pass_count            INTEGER NOT NULL DEFAULT 0,
   na_count              INTEGER NOT NULL DEFAULT 0,
   cash_variance_rupees  REAL,
+  inventory_variance_pct REAL, -- Spec §7 T4: weekly inventory variance % of stock value
   draft_started_at      TEXT,
   submitted_at          TEXT,
   verified_at           TEXT,
@@ -160,14 +161,15 @@ CREATE TABLE audits (
   // §4.7 audit_results
   static const _auditResults = '''
 CREATE TABLE audit_results (
-  id                TEXT PRIMARY KEY,
-  audit_id          TEXT NOT NULL REFERENCES audits(id) ON DELETE CASCADE,
-  checkpoint_id     TEXT NOT NULL REFERENCES checkpoints(id) ON DELETE RESTRICT,
-  result            TEXT NOT NULL CHECK (result IN ('P','F','NA')),
-  weighted_points   REAL,
-  finding_text      TEXT,
-  cro_id            TEXT REFERENCES cros(id) ON DELETE SET NULL,
-  created_at        TEXT NOT NULL,
+  id                    TEXT PRIMARY KEY,
+  audit_id              TEXT NOT NULL REFERENCES audits(id) ON DELETE CASCADE,
+  checkpoint_id         TEXT NOT NULL REFERENCES checkpoints(id) ON DELETE RESTRICT,
+  result                TEXT NOT NULL CHECK (result IN ('P','F','NA')),
+  weighted_points       REAL,
+  finding_text          TEXT,
+  cro_id                TEXT REFERENCES cros(id) ON DELETE SET NULL,
+  flag_security_concern INTEGER NOT NULL DEFAULT 0 CHECK (flag_security_concern IN (0,1)), -- Spec §7 T5: security concern flag
+  created_at            TEXT NOT NULL,
   UNIQUE (audit_id, checkpoint_id)
 );
 ''';

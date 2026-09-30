@@ -227,6 +227,7 @@ class AuditRepository {
     required int weight,
     String? findingText,
     String? croId,
+    bool flagSecurityConcern = false,
   }) async {
     final auditRows = await AppDatabase.instance.db.query(
       'audits',
@@ -253,6 +254,7 @@ class AuditRepository {
       },
       'finding_text': findingText,
       'cro_id': croId,
+      'flag_security_concern': flagSecurityConcern ? 1 : 0,
       'created_at': DateTime.now().toUtc().toIso8601String(),
     };
     await AppDatabase.instance.db.insert(
@@ -274,6 +276,7 @@ class AuditRepository {
     required int failCount,
     required int naCount,
     double? cashVarianceRupees,
+    double? inventoryVariancePct,
     String? notes,
   }) async {
     final now = DateTime.now().toUtc().toIso8601String();
@@ -290,6 +293,7 @@ class AuditRepository {
         'fail_count': failCount,
         'na_count': naCount,
         'cash_variance_rupees': cashVarianceRupees,
+        'inventory_variance_pct': inventoryVariancePct,
         'notes': notes,
       },
       where: "id = ? AND status = 'draft'",

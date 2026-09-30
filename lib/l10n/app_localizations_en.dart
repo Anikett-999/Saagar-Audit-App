@@ -2570,4 +2570,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String s27RunAgingSuccess(int aged, int pending, int escalations) {
     return 'CAP Aging complete: $aged aged, $pending pending verification, $escalations escalations raised';
   }
+
+  @override
+  String get s10InventoryVarianceTitle => 'Weekly Inventory Variance';
+
+  @override
+  String get s10InventoryVarianceSubtitle =>
+      'Enter measured % variance between physical stock and system records (Spec §7 / T4).';
+
+  @override
+  String get s10InventoryVarianceLabel => 'Inventory Variance (%)';
+
+  @override
+  String get s10InventoryVarianceHelper =>
+      'Alert triggers to Owner if variance exceeds 2.0% (Trigger 4).';
+
+  @override
+  String get s07SecurityConcernLabel => 'Security Concern';
+
+  @override
+  String get s07SecurityConcernSubtitle =>
+      'Flag if this checkpoint presents a security or theft risk (triggers immediate alert to Owner).';
 }

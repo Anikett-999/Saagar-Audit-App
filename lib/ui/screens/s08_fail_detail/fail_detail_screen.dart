@@ -19,7 +19,12 @@ import '../../theme/app_colors.dart';
 ///   * Photos: max 5; if checkpoint.requires_photo_on_fail = 1, at least one
 ///     photo must be attached before Save is allowed
 class FailDetailScreen extends ConsumerStatefulWidget {
-  const FailDetailScreen({super.key});
+  const FailDetailScreen({
+    super.key,
+    this.initialSecurityConcern = false,
+  });
+
+  final bool initialSecurityConcern;
 
   @override
   ConsumerState<FailDetailScreen> createState() => _FailDetailScreenState();
@@ -29,6 +34,7 @@ class _FailDetailScreenState extends ConsumerState<FailDetailScreen> {
   final _findingController = TextEditingController();
   String? _selectedCroId;
   List<String> _pendingPhotoPaths = const [];
+  bool _flagSecurityConcern = false;
   bool _saving = false;
   String? _error;
 
@@ -37,6 +43,7 @@ class _FailDetailScreenState extends ConsumerState<FailDetailScreen> {
   @override
   void initState() {
     super.initState();
+    _flagSecurityConcern = widget.initialSecurityConcern;
     _bootstrap();
   }
 
@@ -64,6 +71,8 @@ class _FailDetailScreenState extends ConsumerState<FailDetailScreen> {
       _pendingPhotoPaths = photos.map((p) => p.localPath).toList();
       _findingController.text = result.findingText ?? '';
       _selectedCroId = result.croId;
+      _flagSecurityConcern =
+          result.flagSecurityConcern || widget.initialSecurityConcern;
     });
   }
 
@@ -112,6 +121,7 @@ class _FailDetailScreenState extends ConsumerState<FailDetailScreen> {
           findingText: finding,
           croId: _selectedCroId,
           photoPaths: _pendingPhotoPaths,
+          flagSecurityConcern: _flagSecurityConcern,
         );
 
     if (!mounted) return;
@@ -207,6 +217,61 @@ class _FailDetailScreenState extends ConsumerState<FailDetailScreen> {
                     ),
                 ],
                 onChanged: (v) => setState(() => _selectedCroId = v),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: _flagSecurityConcern ? AppColors.goldPale : AppColors.gray100,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: _flagSecurityConcern ? AppColors.gold : AppColors.gray300,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.security_outlined,
+                      color: _flagSecurityConcern ? AppColors.gold : AppColors.gray600,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.s07SecurityConcernLabel,
+                            style: TextStyle(
+                              fontFamily: 'DMSans',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: _flagSecurityConcern
+                                  ? AppColors.navy
+                                  : AppColors.gray800,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            l10n.s07SecurityConcernSubtitle,
+                            style: const TextStyle(
+                              fontFamily: 'DMSans',
+                              fontSize: 11,
+                              color: AppColors.gray600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Switch.adaptive(
+                      key: const ValueKey('s08_security_concern_switch'),
+                      value: _flagSecurityConcern,
+                      activeTrackColor: AppColors.gold,
+                      onChanged: (val) =>
+                          setState(() => _flagSecurityConcern = val),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 20),
               Row(
