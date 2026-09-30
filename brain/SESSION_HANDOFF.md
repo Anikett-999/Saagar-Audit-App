@@ -6183,6 +6183,20 @@ Fix the BLOCKER (rename the duplicate key + restore CW.7 title + guard test), de
 - Sprint P3-2b is committed, pushed, and merged into `phase-3`.
 - **Next Immediate Task (Claude)**: Deliver plan for **Sprint P3-4: Monthly Reports (S21 monthly view) & Multi-week Compliance Trend Analytics (`fl_chart`)**, the final build of Phase 3 prior to the Phase-3 sign-off merge to `main`.
 
+---
+
+### Entry: 2026-09-30 — Sprint P3-4 Plan Delivered (Monthly Reports + Trend Analytics) — FINAL Phase-3 build
+- **Author**: Claude
+- **Method**: Static code + spec review only (I cannot run Flutter; this entry is a plan, no build/test numbers). Grounded via a focused codebase+spec pass.
+- **Delivered**: `brain/SPRINT_P3_4_MONTHLY_REPORTS_TRENDS.md` — full buildable plan, **CLEARED TO BUILD**, no R2 gate, **no schema change**.
+- **Grounding verified**: `reports.report_type` CHECK already allows `'monthly'` and the 8 JSON payload columns already exist → **zero migration**; `fl_chart ^1.2.0` is in the locked stack with **zero existing `lib/` usage** (P3-4 is the first chart — no new package); monthly audits exist & are scored (Option-C hybrid MC.1/MC.2/MC.3 from P3-1); the **weekly report already stores per-SOP `sop_rows` + WoW trend**, so a multi-week series can be assembled by reading the last N weekly reports (no new per-audit data). `ReportRepository` has `generateWeeklyReport` but **no `generateMonthlyReport`**; `pattern_detection.dart` has only intra-week detection — none of the three §4.5 multi-week patterns exist yet.
+- **Scope**: (1) pure `trend_analytics.dart` (weekly series, 4-week moving average §4.1, and the three §4.5 patterns — slow slide / single-SOP decay / day-of-week clustering — tests-first); (2) `generateMonthlyReport(...)` assembling the existing JSON blobs (post-submit, non-blocking, R5-safe, upsert-idempotent like weekly); (3) first `fl_chart` widget — overall compliance line + 4-week MA overlay + **rolling per-SOP graph** (the graph §4.5 explicitly names); (4) S21 monthly render branch; (5) S20 monthly type/year/month filter; (6) monthly PDF via the already-generic `weekly_report_pdf_service`.
+- **Flagged (non-blocking)**: (a) the monthly report layout is a **recorded R1 derivation** — the Workbook specs only the *weekly* report format, so I derived the monthly layout from the weekly skeleton re-weighted toward trend + Tier-3 intent + Option C; Owner may override. (b) Charts/patterns **must degrade honestly with < 4 weeks** of data (insufficient-data empty state, unit-tested) — no fabricated lines. (c) MoM delta included as a *derived* headline stat (WoW is the only spec-named delta).
+- **One confirmation requested of Antigravity**: report the intended **chart-into-PDF approach** (fl_chart-to-image vs. compact tabular trend) before building the monthly PDF, so I can keep it simple/1–2 pages/bilingual.
+- **Rules held**: R1 (derivation recorded, not invented), R2 (no schema/package change), R3/R8 (bilingual UI + chart labels), R4 (scoring untouched), R5 (report gen reads audits, post-submit non-blocking, no audit mutation), R6 (build → analyze/test → HOLD for my review), R7 (`feature/p3-monthly-reports-trends` off `phase-3`, never `main`).
+- **Next Immediate Task (Antigravity)**: Cut `feature/p3-monthly-reports-trends` off `phase-3`; build in the plan's §7 order (trend analytics + truth-table tests FIRST → `generateMonthlyReport` → post-submit wiring → fl_chart widget → S21 monthly branch → S20 filter → monthly PDF → bilingual keys). Report the §8 chart-into-PDF approach, run `flutter analyze` + full `flutter test`, paste raw output, and **HOLD** for my review — do not commit until I write `APPROVED — cleared to commit & push`.
+- **After P3-4**: Phase 3 is feature-complete → **Phase-3 sign-off merge `phase-3` → `main`** (first `main` update since `0cb2e55`), gated on full green suite + my review, then **Phase 4** (Firestore mirror + Play Store internal track).
+
 
 
 
