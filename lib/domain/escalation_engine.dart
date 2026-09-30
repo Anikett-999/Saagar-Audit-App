@@ -1,5 +1,6 @@
 import '../data/models/audit.dart';
 import '../data/models/audit_result.dart';
+import '../data/models/cap.dart';
 import '../data/models/checkpoint.dart';
 
 /// Draft escalation object before database persistence (Spec §7 & Appendix A.5).
@@ -335,6 +336,76 @@ class EscalationEngine {
       evidence: evidence,
       impact: impact,
       requestedAction: requestedAction,
+    );
+  }
+
+  /// Creates an escalation for an overdue CAP transitioning to 'aged' (Spec §9.1 / Workbook Day 4 §4.4).
+  ///
+  /// Target role is escalated one tier up:
+  ///   * SM -> GM
+  ///   * GM -> OWNER
+  ///   * OWNER -> OWNER (capped at highest role)
+  static EscalationDraft createCapAgedEscalation({
+    required Cap cap,
+    required String responsibleRole,
+    DateTime? asOf,
+  }) {
+    final cleanRole = responsibleRole.toUpperCase().trim();
+    final String targetRole;
+    if (cleanRole == 'SM') {
+      targetRole = 'GM';
+    } else {
+      targetRole = 'OWNER';
+    }
+
+    return EscalationDraft(
+      triggerNumber: 0,
+      triggerLabel: 'CAP aged',
+      sourceType: 'cap',
+      sourceAuditId: null,
+      sourceCapId: cap.id,
+      raisedByUserId: null,
+      targetRole: targetRole,
+      urgency: 'same_day',
+      deliveryChannel: 'in_app',
+      whatHappened:
+          'CAP ${cap.id} missed its deadline (${cap.deadline}) without completion and has auto-aged (age count: ${cap.agedCount + 1}).',
+      evidence:
+          'Origin Checkpoint: ${cap.originCheckpointId}, Problem: "${cap.problemStatement}", Root cause: "${cap.rootCause}".',
+      impact:
+          'Corrective action overdue. Operational non-compliance remains unmitigated past commitment date.',
+      requestedAction:
+          '$targetRole intervention required: Review root cause with responsible staff and expedite corrective action closure.',
+    );
+  }
+
+  /// Creates an escalation for a done CAP pending verification > 3 days past deadline (Spec §9.1).
+  static EscalationDraft createVerifyPendingEscalation({
+    required Cap cap,
+    DateTime? asOf,
+  }) {
+    final doneDateStr = cap.doneAt != null
+        ? (cap.doneAt!.length >= 10 ? cap.doneAt!.substring(0, 10) : cap.doneAt!)
+        : 'unknown date';
+
+    return EscalationDraft(
+      triggerNumber: 0,
+      triggerLabel: 'CAP verify pending',
+      sourceType: 'cap',
+      sourceAuditId: null,
+      sourceCapId: cap.id,
+      raisedByUserId: null,
+      targetRole: 'GM',
+      urgency: 'same_day',
+      deliveryChannel: 'in_app',
+      whatHappened:
+          'CAP ${cap.id} was marked done on $doneDateStr but remains unverified > 3 days past deadline (${cap.deadline}).',
+      evidence:
+          'Origin Checkpoint: ${cap.originCheckpointId}, Verification method: "${cap.verificationMethod}".',
+      impact:
+          'Corrective actions cannot be formally closed without GM verification. Risk of recurring non-compliance.',
+      requestedAction:
+          'GM verification required: Conduct physical spot-check verification on store floor and verify or extend CAP in app.',
     );
   }
 

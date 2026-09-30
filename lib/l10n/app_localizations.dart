@@ -4664,6 +4664,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This field is required'**
   String get fieldRequired;
+
+  /// No description provided for @s27RunAgingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Run CAP Aging Check'**
+  String get s27RunAgingTitle;
+
+  /// No description provided for @s27RunAgingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Evaluate overdue CAPs and raise escalations now'**
+  String get s27RunAgingSubtitle;
+
+  /// No description provided for @s27RunAgingSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'CAP Aging complete: {aged} aged, {pending} pending verification, {escalations} escalations raised'**
+  String s27RunAgingSuccess(int aged, int pending, int escalations);
 }
 
 class _AppLocalizationsDelegate

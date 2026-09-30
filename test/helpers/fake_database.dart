@@ -168,6 +168,10 @@ class FakeDatabase extends Fake implements Database, Transaction {
               final dl = r['deadline'] as String? ?? '';
               return st == 'aged' || ((st == 'open' || st == 'reopened') && dl.compareTo(nowStr) < 0);
             }).toList();
+          } else if (where.contains("status IN ('open', 'done')")) {
+            results = results
+                .where((r) => r['status'] == 'open' || r['status'] == 'done')
+                .toList();
           } else if (where.contains("status IN ('open', 'reopened')")) {
             results = results
                 .where((r) => r['status'] == 'open' || r['status'] == 'reopened')
@@ -197,14 +201,17 @@ class FakeDatabase extends Fake implements Database, Transaction {
           results = results.where((r) => r['id'] == whereArgs[0]).toList();
         } else if (where.contains('trigger_number = ?') && whereArgs != null && whereArgs.length >= 3) {
           final tNum = whereArgs[0];
-          final auditId = whereArgs[1];
+          final sourceId = whereArgs[1];
           final userId = whereArgs[2];
           final whatHappened = whereArgs.length >= 4 ? whereArgs[3] : null;
+          final isCap = where.contains('source_cap_id = ?');
+          final isStatusActive = where.contains("status IN ('open', 'acknowledged')");
           results = results.where((r) =>
             r['trigger_number'] == tNum &&
-            r['source_audit_id'] == auditId &&
+            (isCap ? r['source_cap_id'] == sourceId : r['source_audit_id'] == sourceId) &&
             r['raised_to_user_id'] == userId &&
-            (whatHappened == null || r['what_happened'] == whatHappened),
+            (whatHappened == null || r['what_happened'] == whatHappened) &&
+            (!isStatusActive || r['status'] == 'open' || r['status'] == 'acknowledged'),
           ).toList();
         } else {
           if (where.contains('status = ?') && whereArgs != null && argIdx < whereArgs.length) {

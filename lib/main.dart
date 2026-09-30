@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
 import 'data/db/database.dart';
+import 'services/workmanager_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,8 +11,13 @@ Future<void> main() async {
   // Open SQLite, run migrations, load seed JSON on first launch.
   await AppDatabase.instance.open();
 
+  // Register daily background WorkManager task and run catch-up if needed (Spec §9.1).
+  await WorkmanagerService.instance.initialize();
+  await WorkmanagerService.instance.runCatchUpIfNeeded();
+
   // Firebase is initialized lazily on first sync attempt (offline-first per
   // spec §2 — the app must boot and work without network).
 
   runApp(const ProviderScope(child: SaagarAuditApp()));
 }
+

@@ -56,6 +56,21 @@ class EscalationRepository {
         if (existing.isNotEmpty) {
           return Escalation.fromMap(existing.first);
         }
+      } else if (draft.sourceCapId != null) {
+        // Spec §3.1 / §4.3: Guard against double-raising CAP escalations.
+        // For verify-pending specifically, do not re-raise while one is already active ('open' or 'acknowledged').
+        final isVerifyPending = draft.triggerLabel == 'CAP verify pending';
+        final existing = await txn.query(
+          'escalations',
+          where: isVerifyPending
+              ? "trigger_number = ? AND source_cap_id = ? AND raised_to_user_id = ? AND status IN ('open', 'acknowledged')"
+              : 'trigger_number = ? AND source_cap_id = ? AND raised_to_user_id = ?',
+          whereArgs: [draft.triggerNumber, draft.sourceCapId, resolvedRecipientId],
+          limit: 1,
+        );
+        if (existing.isNotEmpty) {
+          return Escalation.fromMap(existing.first);
+        }
       }
 
       // 3. Insert fresh escalation record atomically

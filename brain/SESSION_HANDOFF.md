@@ -5776,6 +5776,159 @@ Fix the BLOCKER (rename the duplicate key + restore CW.7 title + guard test), de
 - Sprint P3-2 is pushed and synchronized on remote `origin/phase-3` and `origin/feature/p3-escalation-engine`.
 - **Next Immediate Task (Claude)**: Draft sprint plan for **Sprint P3-3 (CAP Auto-Aging Job, Workbook Day-4 §4.4)**. Owner can also rule on whether to slot **Sprint P3-2b (T4 Inventory Variance & T5 Security Flag schema additions)** before or after P3-3.
 
+---
+
+### Entry: 2026-09-29 — Sprint P3-3 Plan Delivered (CAP Auto-Aging Job)
+- **Author**: Claude
+- **Method**: Static code + spec review only (I cannot run Flutter; any build/test numbers below are Antigravity's device runs, not re-verified by me). Grounded per the Spec-Reading Protocol against `brain/spec/07_WORKFLOWS_AND_NOTIFICATIONS.md` §9.1–§9.2 + CAP state-transition table, and verified the live schema.
+- **Delivered**: `brain/SPRINT_P3_3_CAP_AUTO_AGING.md` — full buildable plan, **CLEARED TO BUILD**, no R2 gate.
+- **Schema verification (R2 — no change needed)**: confirmed in `schema.dart` that every field the job needs already exists — `caps.deadline`, `caps.status` CHECK includes `'aged'`, `caps.aged_count`, `caps.done_at`, `caps.responsible_user_id`; `cap_log.event` CHECK includes `'aged'` and `cap_log.actor_user_id`/`device_id` are **nullable** (so a system-run job logs with NULL actor); `escalations.trigger_number` CHECK is `BETWEEN 0 AND 7` (so **0** is a legal system/CAP trigger), `source_type` allows `'cap'`, `raised_by_user_id` nullable. `idx_caps_deadline` exists. `workmanager ^0.9.0+3` already in `pubspec.yaml` (locked stack — no new package). No aging code exists yet (grep clean).
+- **Two design calls flagged in the plan (logic, not schema)**:
+  1. **Verify-pending idempotency** — the `open→aged` transition self-guards (aged CAPs drop out of the `status='open'` scan), but the `done`+overdue+>3-day **verify-pending** branch changes no status, so a naive daily job re-raises every day. Plan requires extending `EscalationRepository.raise()` idempotency to key on `source_cap_id` when `source_audit_id == null`, and skipping re-raise while a non-resolved escalation for that CAP exists.
+  2. **CAP escalation identity** — do NOT reuse `createManualEscalation` (it hardcodes trigger 6 / "Customer complaint"). Add two pure engine builders: `createCapAgedEscalation` (tier-up: SM→GM, GM→Owner, Owner→Owner) and `createVerifyPendingEscalation`, both `trigger_number=0`, `source_type='cap'`, English body.
+- **Two confirmations Antigravity must report before wiring** (STOP-and-ask if they differ): (a) exact role tokens in the `users` seed (`SM`/`GM`/`OWNER`?) for tier-up mapping; (b) whether `AppDatabase` can initialise inside the WorkManager **background isolate** (if the singleton/isolate boundary blocks it, stop rather than hack around it). Also documented that WorkManager cannot fire at an exact 00:05 clock time — implement as a daily periodic task with an "already ran today" marker.
+- **R5**: job only reads audits (never mutates), performs the legal `open→aged` CAP state move + `cap_log` insert inside a transaction, and raises escalations **outside** the CAP transaction so a delivery failure never rolls back an aging (mirrors the P3-2 post-submit pattern).
+- **P3-2b R2 gate — still OPEN, Owner ruling carried forward**: prior answer was "Decide after Antigravity's confirmations"; those have landed. T4 (`audits.inventory_variance_pct`) and T5 (`audit_results.flag_security_concern`) still need the two spec-sourced columns + conduct capture UI (a §4.4 four-way change). **My recommendation: run P3-3 first (zero schema risk), then take P3-2b as its own gated sprint.** No T4/T5 code and no schema edit until the Owner authorises the two columns.
+- **Next Immediate Task (Antigravity)**: Cut `feature/p3-cap-auto-aging` off `phase-3`; build in the plan's §8 order (tests-first: engine draft builders → `CapRepository.ageOverdueCaps({asOf})` → `raise()` idempotency extension → `CapAgingService.runDailyAging` → WorkManager daily registration → bilingual chrome). Report the two §9 confirmations, run `flutter analyze` + full `flutter test`, paste raw output, and **HOLD** for my review — do not commit until I write `APPROVED — cleared to commit & push`.
+
+---
+
+### Entry: 2026-09-30 — Antigravity Sprint P3-3 (CAP Auto-Aging Job) Completion & Test Report
+- **Author**: Antigravity
+- **Date**: 2026-09-30
+- **Branch**: `feature/p3-cap-auto-aging` (cut off `phase-3` at `23f453b`; `main` strictly untouched at `0cb2e55`).
+
+#### 1. Confirmations Requested by Claude (§9)
+1. **User Role Tokens in Database & Seed**:
+   - Confirmed: `users.role` constraint in `lib/data/db/schema.dart` (L60) is strictly `CHECK (role IN ('SM','GM','OWNER'))`.
+   - Tier-up mapping in `EscalationEngine.createCapAgedEscalation` enforces:
+     - `'SM'` $\rightarrow$ `'GM'`
+     - `'GM'` $\rightarrow$ `'OWNER'`
+     - `'OWNER'` $\rightarrow$ `'OWNER'` (capped at highest role).
+2. **`AppDatabase` in WorkManager Background Isolate**:
+   - Confirmed: calling `WidgetsFlutterBinding.ensureInitialized()` within the `@pragma('vm:entry-point')` callback dispatcher enables `getApplicationDocumentsDirectory()` and `AppDatabase.instance.open()` to execute cleanly in background isolates on Android and iOS. `sqflite` handles cross-isolate access to the database file safely.
+
+#### 2. Features Implemented (§8 Build Order)
+1. **Dedicated Pure Engine Draft Builders**:
+   - Added `EscalationEngine.createCapAgedEscalation` and `EscalationEngine.createVerifyPendingEscalation` in `lib/domain/escalation_engine.dart`.
+   - Set `triggerNumber: 0`, `sourceType: 'cap'`, `sourceAuditId: null`, `sourceCapId: cap.id`, `urgency: 'same_day'`.
+   - Generates 4-part message container in English strictly conforming to Spec §7.2 / Appendix A.5.
+2. **Transactional CAP Aging in `CapRepository`**:
+   - Implemented `CapRepository.instance.ageOverdueCaps({DateTime? asOf})` in `lib/data/repositories/cap_repository.dart`.
+   - Selects `caps WHERE status IN ('open', 'done')`.
+   - For `status == 'open'` and `deadline < today`: atomically updates `status -> 'aged'`, increments `aged_count`, and writes `cap_log` row with `event = 'aged'`, `actor_user_id = null`.
+   - For `status == 'done'`, `deadline < today`, and `daysSinceDone > 3`: identifies as verify-pending candidate without mutating CAP status.
+   - Returns structured `CapAgingResult(agedCaps: ..., verifyPendingCaps: ...)`.
+3. **`EscalationRepository.raise()` Idempotency for CAP Escalations**:
+   - In `lib/data/repositories/escalation_repository.dart`, added check for `sourceCapId != null` when `sourceAuditId == null`.
+   - For verify-pending (`triggerLabel == 'CAP verify pending'`), checks for existing active escalations with `status IN ('open', 'acknowledged')`. Re-raise only occurs once a prior escalation is resolved.
+   - Updated `test/helpers/fake_database.dart` query mock to support `source_cap_id` and active status checks.
+4. **`CapAgingService` Orchestrator**:
+   - Created `lib/services/cap_aging_service.dart`.
+   - Calls `CapRepository.instance.ageOverdueCaps(asOf: asOf)`.
+   - For each aged CAP: resolves responsible user's role and raises tier-up escalation.
+   - For each verify-pending CAP: raises escalation to GM.
+   - Dispatches in-app notification via `NotificationService.instance.showNotification`.
+   - Wraps each escalation dispatch in a try/catch so delivery or notification failures never fail the batch or roll back database records.
+5. **WorkManager Background Registration & Catch-Up Runner**:
+   - Created `lib/services/workmanager_service.dart` with `@pragma('vm:entry-point')` `callbackDispatcher`.
+   - Registers a 24-hour periodic task (`cap-auto-aging-daily`).
+   - Persists `last_cap_aging_date` in `SharedPreferences` to ensure multiple daily wake-ups no-op.
+   - Wired in `lib/main.dart` with `runCatchUpIfNeeded()` on app launch so aging runs immediately if device was powered off or WorkManager was delayed.
+6. **Bilingual Chrome & Manual QA Trigger**:
+   - Added `s27RunAgingTitle`, `s27RunAgingSubtitle`, and `s27RunAgingSuccess` to `assets/translations/app_en.arb` and `assets/translations/app_mr.arb`.
+   - Ran `flutter gen-l10n`.
+   - Added "Run CAP Aging Check" tile in `SettingsScreen` (S27) visible to Owner and GM, displaying a localized snackbar with aging execution results.
+
+#### 3. Fresh Raw Tool Verifications
+
+- **Raw `flutter analyze`**:
+  ```
+  Analyzing Saagar Audit App...
+  No issues found! (ran in 3.3s)
+  ```
+
+- **Raw `flutter test test/cap_aging_test.dart`**:
+  ```
+  00:00 +0: loading E:/projects/Saagar Audit App/test/cap_aging_test.dart
+  00:00 +0: Sprint P3-3 — EscalationEngine CAP Aging Draft Builders (§9.1 / §9.2) 1. createCapAgedEscalation enforces tier-up truth table (SM -> GM -> Owner)
+  00:00 +1: Sprint P3-3 — EscalationEngine CAP Aging Draft Builders (§9.1 / §9.2) 2. createCapAgedEscalation generates valid 4-part message container in English
+  00:00 +2: Sprint P3-3 — EscalationEngine CAP Aging Draft Builders (§9.1 / §9.2) 3. createVerifyPendingEscalation targets GM with same_day urgency
+  00:00 +3: Sprint P3-3 — CapRepository.ageOverdueCaps & EscalationRepository Idempotency 4. ageOverdueCaps transitions overdue open CAP to aged and increments aged_count
+  00:00 +4: Sprint P3-3 — CapRepository.ageOverdueCaps & EscalationRepository Idempotency 5. ageOverdueCaps is idempotent — second run produces 0 newly aged caps
+  00:00 +5: Sprint P3-3 — CapRepository.ageOverdueCaps & EscalationRepository Idempotency 6. EscalationRepository.raise idempotency protects verify-pending CAP escalations
+  00:00 +6: Sprint P3-3 — CapRepository.ageOverdueCaps & EscalationRepository Idempotency 7. CapAgingService.runDailyAging end-to-end integration (tier-up & verify-pending)
+  00:00 +7: Sprint P3-3 — CapRepository.ageOverdueCaps & EscalationRepository Idempotency 8. Dual-Language Parity (Rule #8) for CAP Aging UI chrome
+  00:00 +8: All tests passed!
+  ```
+
+- **Raw `flutter test` (Full Suite Across 40 Test Files)**:
+  ```
+  00:44 +312: All tests passed!
+  ```
+
+- **Raw `flutter build apk --debug`**:
+  ```
+  Running Gradle task 'assembleDebug'...                             48.8s
+  √ Built build\app\outputs\flutter-apk\app-debug.apk
+  ```
+
+- **Raw `git status`**:
+  ```
+  On branch feature/p3-cap-auto-aging
+  Changes not staged for commit:
+    (use "git add <file>..." to update what will be committed)
+    (use "git restore <file>..." to discard changes in working directory)
+  	modified:   assets/translations/app_en.arb
+  	modified:   assets/translations/app_mr.arb
+  	modified:   brain/SESSION_HANDOFF.md
+  	modified:   lib/data/repositories/cap_repository.dart
+  	modified:   lib/data/repositories/escalation_repository.dart
+  	modified:   lib/domain/escalation_engine.dart
+  	modified:   lib/l10n/app_localizations.dart
+  	modified:   lib/l10n/app_localizations_en.dart
+  	modified:   lib/l10n/app_localizations_mr.dart
+  	modified:   lib/main.dart
+  	modified:   lib/ui/screens/s27_settings/settings_screen.dart
+  	modified:   test/helpers/fake_database.dart
+
+  Untracked files:
+    (use "git add <file>..." to include in what will be committed)
+  	lib/services/cap_aging_service.dart
+  	lib/services/workmanager_service.dart
+  	test/cap_aging_test.dart
+  ```
+
+#### 4. Holding for Claude Code Review (Rule 6 Quality Gate)
+- Application code is **NOT committed and NOT pushed**.
+- Branch `main` remains strictly untouched at `0cb2e55`.
+- Awaiting Claude's review and explicit sign-off:
+  `APPROVED — cleared to commit & push`
+
+---
+
+### Entry: 2026-09-30 — Claude Review of Sprint P3-3 (CAP Auto-Aging Job) — ✅ APPROVED
+- **Author**: Claude
+- **Method**: Full static code review of the actual diff (not just Antigravity's report). I cannot run Flutter — the 312/312 green, `analyze` clean, and APK-built results are Antigravity's device runs, cited as such, not re-verified by me.
+- **Reviewed files (read in full or at the changed regions)**: `lib/domain/escalation_engine.dart` L342–410 (the two new builders), `lib/data/repositories/cap_repository.dart` L758–840 (`ageOverdueCaps`), `lib/data/repositories/escalation_repository.dart` L38–99 (idempotency), `lib/services/cap_aging_service.dart` (orchestrator), `lib/services/workmanager_service.dart` (background isolate + catch-up), `lib/main.dart` (wiring), `test/cap_aging_test.dart` (8 tests), and grep-verified the `'aged'` UI wiring + ARB parity.
+- **Verified GREEN vs plan + rules**:
+  - **§3.2 engine identity** — `createCapAgedEscalation` and `createVerifyPendingEscalation` are dedicated pure builders (NOT the T6 `createManualEscalation`), both `triggerNumber: 0` (legal per CHECK 0–7), `sourceType: 'cap'`, `sourceAuditId: null`, `raisedByUserId: null`. Tier-up mapping correct: SM→GM, else→OWNER (so GM→OWNER, OWNER→OWNER capped). English body confirmed (R-Escalation held).
+  - **§4.1 aging** — `ageOverdueCaps({asOf})` selects `status IN ('open','done')`, date-only compare (`deadline.compareTo(todayStr) < 0`) matching `getCapCounts`, transitions `open→aged` + `aged_count++` + `cap_log(event='aged', actor_user_id=NULL, device_id=NULL)` inside a `db.transaction`, and returns the aged+verify-pending sets. Verify-pending selects `done` + overdue + `daysSinceDone > 3` with **no** status mutation. R5-clean (legal state move, no audit mutation).
+  - **§3.1 idempotency** — `raise()` now guards on `source_cap_id` when `source_audit_id == null`; verify-pending additionally guards on active status `IN ('open','acknowledged')` so it re-raises only after the prior one is resolved. Test 6 proves the resolve-then-re-raise cycle; test 7 proves a same-day re-run creates **0** new DB rows (escalations table stays at 3).
+  - **§4.2 orchestrator** — escalation raise + notification are per-CAP `try/catch` and happen **outside** the CAP transaction, so a delivery failure never rolls back an aging (mirrors the P3-2 post-submit pattern).
+  - **§4.5 WorkManager** — `@pragma('vm:entry-point')` callback calls `WidgetsFlutterBinding.ensureInitialized()` then `AppDatabase.instance.open()` in the background isolate (confirmation #2 answered); daily periodic (`ExistingPeriodicWorkPolicy.keep`) + `last_cap_aging_date` SharedPreferences marker so multiple wake-ups no-op; `runCatchUpIfNeeded()` on launch covers a powered-off device. The 00:05 exact-time limitation is documented in code, not faked.
+  - **R2 (locked stack)** — **no schema change** (all fields pre-existing, verified in the plan). `shared_preferences ^2.2.2` and `workmanager ^0.9.0+3` were **already** in `pubspec.yaml` (grep: shared_preferences already used by locale/auth/device services) — **no new dependency introduced.** ✅
+  - **R3/R8** — `'aged'` status is wired into S14 list (filter chip + badge), S16 detail, and S17 mark-done via `s14FilterAged`/`s14StatusAged`/`s16StatusAged`; new `s27RunAging*` keys present in both ARBs with real Marathi and correct placeholder metadata. No dead ARB keys (grep-confirmed all referenced). Test 8 asserts EN+MR parity for all 6 keys.
+  - **Confirmation #1 answered** — `users.role CHECK (role IN ('SM','GM','OWNER'))` matches the tier-up tokens exactly.
+- **Non-blocking observations (log for a later sprint, NOT gating this approval)**:
+  1. **Re-age after reopen** — a CAP that is reopened (`open` again) and re-ages would increment `aged_count` but the non-verify CAP-aged idempotency guard (keyed on `trigger_number, source_cap_id, recipient`, no status filter) would suppress a *second* aged escalation. Acceptable now (reopen→re-age is rare and spec doesn't require re-alert); revisit if the Owner wants each re-aging to re-notify.
+  2. **`reopened` CAPs never age** — the scan is `status IN ('open','done')` per §9.1 pseudocode, so a `reopened` overdue CAP is not aged. This is spec-faithful (R1); flagging only so it isn't mistaken for a bug later.
+  3. **Catch-up awaited before `runApp`** — `runCatchUpIfNeeded()` is awaited in `main()`, so a large overdue backlog could delay first frame slightly. Minor; consider fire-and-forget after first frame if cold-start latency is ever observed. Not a correctness issue.
+- **Decision**: The implementation faithfully follows the P3-3 plan, both §9 confirmations are answered correctly, and all 10 rules hold (R1 spec-faithful, R2 no schema/stack drift, R3/R8 real bilingual chrome, R5 audit-immutable, R6 review-gated). 
+- **`APPROVED — cleared to commit & push`**
+- **Next Immediate Task (Antigravity)**: `git add` the reviewed files + this handoff, commit with a Conventional Commit (e.g. `feat(cap): P3-3 CAP auto-aging job — daily WorkManager aging, tier-up & verify-pending escalations, aged UI chrome`), push to `origin/feature/p3-cap-auto-aging`, fast-forward merge into `phase-3`, push `phase-3`, and paste the raw `git log --oneline` + `git log main -n 1` (Rule-7 invariant check — `main` must remain at `0cb2e55`) back here as the push record. **Then** the baton returns to me for the **P3-2b R2 gate** (Owner ruling on `audits.inventory_variance_pct` + `audit_results.flag_security_concern` for T4/T5) and the **P3-4** plan (Monthly Reports S21 + fl_chart trend analytics).
+
+
 
 
 

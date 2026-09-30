@@ -1026,7 +1026,17 @@
   "s33TargetOwner": "प्रति: मालक",
   "s33TargetGm": "प्रति: GM",
   "s33WhatsAppSentBadge": "व्हॉट्सअॅप पाठवले",
-  "fieldRequired": "हे फील्ड आवश्यक आहे"
+  "fieldRequired": "हे फील्ड आवश्यक आहे",
+  "s27RunAgingTitle": "कॅप एजिंग तपासा",
+  "s27RunAgingSubtitle": "मुदत संपलेले कॅप तपासा आणि आता इशारे पाठवा",
+  "s27RunAgingSuccess": "कॅप एजिंग पूर्ण: {aged} जुने झाले, {pending} पडताळणी प्रलंबित, {escalations} इशारे पाठवले",
+  "@s27RunAgingSuccess": {
+    "placeholders": {
+      "aged": {"type": "int"},
+      "pending": {"type": "int"},
+      "escalations": {"type": "int"}
+    }
+  }
 }
 
 

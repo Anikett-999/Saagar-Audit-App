@@ -2558,4 +2558,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fieldRequired => 'This field is required';
+
+  @override
+  String get s27RunAgingTitle => 'Run CAP Aging Check';
+
+  @override
+  String get s27RunAgingSubtitle =>
+      'Evaluate overdue CAPs and raise escalations now';
+
+  @override
+  String s27RunAgingSuccess(int aged, int pending, int escalations) {
+    return 'CAP Aging complete: $aged aged, $pending pending verification, $escalations escalations raised';
+  }
 }

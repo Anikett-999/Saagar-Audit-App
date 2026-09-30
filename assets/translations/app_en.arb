@@ -1224,7 +1224,17 @@
   "s33TargetOwner": "To: Owner",
   "s33TargetGm": "To: GM",
   "s33WhatsAppSentBadge": "WhatsApp Sent",
-  "fieldRequired": "This field is required"
+  "fieldRequired": "This field is required",
+  "s27RunAgingTitle": "Run CAP Aging Check",
+  "s27RunAgingSubtitle": "Evaluate overdue CAPs and raise escalations now",
+  "s27RunAgingSuccess": "CAP Aging complete: {aged} aged, {pending} pending verification, {escalations} escalations raised",
+  "@s27RunAgingSuccess": {
+    "placeholders": {
+      "aged": {"type": "int"},
+      "pending": {"type": "int"},
+      "escalations": {"type": "int"}
+    }
+  }
 }
 
 

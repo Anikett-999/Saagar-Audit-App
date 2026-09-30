@@ -2561,4 +2561,16 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get fieldRequired => 'हे फील्ड आवश्यक आहे';
+
+  @override
+  String get s27RunAgingTitle => 'कॅप एजिंग तपासा';
+
+  @override
+  String get s27RunAgingSubtitle =>
+      'मुदत संपलेले कॅप तपासा आणि आता इशारे पाठवा';
+
+  @override
+  String s27RunAgingSuccess(int aged, int pending, int escalations) {
+    return 'कॅप एजिंग पूर्ण: $aged जुने झाले, $pending पडताळणी प्रलंबित, $escalations इशारे पाठवले';
+  }
 }
