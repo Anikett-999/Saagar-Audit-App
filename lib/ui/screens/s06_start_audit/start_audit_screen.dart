@@ -57,6 +57,12 @@ class _StartAuditScreenState extends ConsumerState<StartAuditScreen> {
         year: _date.year,
         auditType: 'weekly',
       );
+    } else if (widget.auditType == 'monthly') {
+      existing = await AuditRepository.instance.findByMonth(
+        monthNumber: _date.month,
+        year: _date.year,
+        auditType: 'monthly',
+      );
     } else {
       existing = await AuditRepository.instance.findByDate(
         date: DateFormat('yyyy-MM-dd').format(_date),
@@ -173,18 +179,26 @@ class _StartAuditScreenState extends ConsumerState<StartAuditScreen> {
 
     final l10n = AppLocalizations.of(context)!;
     final isWeekly = widget.auditType == 'weekly';
+    final isMonthly = widget.auditType == 'monthly';
     final dateLabel = DateFormat('EEEE, d MMMM yyyy').format(_date);
+    final monthName = DateFormat('MMMM').format(_date);
     final isToday =
         DateFormat('yyyy-MM-dd').format(_date) ==
             DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     final calendarSubtitle = isWeekly
         ? '${l10n.s05WeekNumberLabel(isoWeek(_date), _date.year)}  ·  $dateLabel'
-        : dateLabel + (isToday ? '  ·  today' : '');
+        : isMonthly
+            ? '${l10n.s05MonthYearLabel(monthName, _date.year)}  ·  $dateLabel'
+            : dateLabel + (isToday ? '  ·  today' : '');
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isWeekly ? l10n.s06WeeklyTitle : l10n.s06Title),
+        title: Text(
+          isWeekly
+              ? l10n.s06WeeklyTitle
+              : (isMonthly ? l10n.s06MonthlyTitle : l10n.s06Title),
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -218,11 +232,27 @@ class _StartAuditScreenState extends ConsumerState<StartAuditScreen> {
                     child: Text(
                       _existingAudit!.isSubmitted
                           ? (isWeekly
-                              ? 'A submitted weekly audit exists for Week ${isoWeek(_date)}, ${_date.year}. Starting a new one will supersede it.'
-                              : 'A submitted audit exists for this date. Starting a new one will supersede it (history preserved).')
+                              ? l10n.s06SubmittedAuditExistsWeekly(
+                                  isoWeek(_date),
+                                  _date.year,
+                                )
+                              : isMonthly
+                                  ? l10n.s06SubmittedAuditExistsMonthly(
+                                      monthName,
+                                      _date.year,
+                                    )
+                                  : l10n.s06SubmittedAuditExistsDaily)
                           : (isWeekly
-                              ? 'A draft weekly audit exists for Week ${isoWeek(_date)}, ${_date.year}. Starting a new one will replace it.'
-                              : 'A draft audit exists for this date. Starting a new one will replace it.'),
+                              ? l10n.s06DraftAuditExistsWeekly(
+                                  isoWeek(_date),
+                                  _date.year,
+                                )
+                              : isMonthly
+                                  ? l10n.s06DraftAuditExistsMonthly(
+                                      monthName,
+                                      _date.year,
+                                    )
+                                  : l10n.s06DraftAuditExistsDaily),
                       style: const TextStyle(color: AppColors.amber),
                     ),
                   ),

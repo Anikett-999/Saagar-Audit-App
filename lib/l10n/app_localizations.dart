@@ -764,6 +764,66 @@ abstract class AppLocalizations {
   /// **'Week {week}, {year}'**
   String s05WeekNumberLabel(int week, int year);
 
+  /// No description provided for @s05ThisMonthMonthlyAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'This month\'s strategic audit'**
+  String get s05ThisMonthMonthlyAudit;
+
+  /// No description provided for @s05MonthlyNotStartedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t started this month\'s audit yet.'**
+  String get s05MonthlyNotStartedYet;
+
+  /// No description provided for @s05MonthlyNotStartedAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'This month\'s strategic audit has not been started yet.'**
+  String get s05MonthlyNotStartedAdmin;
+
+  /// No description provided for @s05StartMonthlyAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'Start monthly audit'**
+  String get s05StartMonthlyAudit;
+
+  /// No description provided for @s05ResumeMonthlyDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume monthly draft'**
+  String get s05ResumeMonthlyDraft;
+
+  /// No description provided for @s05MonthlyDraftInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'A monthly draft audit is in progress. Resume to continue marking checkpoints.'**
+  String get s05MonthlyDraftInProgress;
+
+  /// No description provided for @s05MonthlyAuditsRunByOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly strategic audits are run by the Store Owner.'**
+  String get s05MonthlyAuditsRunByOwner;
+
+  /// No description provided for @s05MonthYearLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{month}, {year}'**
+  String s05MonthYearLabel(String month, int year);
+
+  /// No description provided for @s05MonthlySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Strategic spot-checks & trend review (Target: 95%+)'**
+  String get s05MonthlySubtitle;
+
+  /// No description provided for @s05ViewWeeklyReport.
+  ///
+  /// In en, this message translates to:
+  /// **'View Weekly Report (S21)'**
+  String get s05ViewWeeklyReport;
+
   /// No description provided for @s05AuditHistoryTitle.
   ///
   /// In en, this message translates to:
@@ -830,6 +890,12 @@ abstract class AppLocalizations {
   /// **'Start Weekly Audit'**
   String get s06WeeklyTitle;
 
+  /// No description provided for @s06MonthlyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Monthly Strategic Audit'**
+  String get s06MonthlyTitle;
+
   /// No description provided for @s06AuditDate.
   ///
   /// In en, this message translates to:
@@ -860,11 +926,53 @@ abstract class AppLocalizations {
   /// **'Begin Audit'**
   String get s06BeginAudit;
 
+  /// No description provided for @s06SubmittedAuditExistsDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'A submitted audit exists for this date. Starting a new one will supersede it (history preserved).'**
+  String get s06SubmittedAuditExistsDaily;
+
+  /// No description provided for @s06DraftAuditExistsDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'A draft audit exists for this date. Starting a new one will replace it.'**
+  String get s06DraftAuditExistsDaily;
+
+  /// No description provided for @s06SubmittedAuditExistsWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'A submitted weekly audit exists for Week {week}, {year}. Starting a new one will supersede it.'**
+  String s06SubmittedAuditExistsWeekly(int week, int year);
+
+  /// No description provided for @s06DraftAuditExistsWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'A draft weekly audit exists for Week {week}, {year}. Starting a new one will replace it.'**
+  String s06DraftAuditExistsWeekly(int week, int year);
+
+  /// No description provided for @s06SubmittedAuditExistsMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'A submitted monthly audit exists for {month}, {year}. Starting a new one will supersede it.'**
+  String s06SubmittedAuditExistsMonthly(String month, int year);
+
+  /// No description provided for @s06DraftAuditExistsMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'A draft monthly audit exists for {month}, {year}. Starting a new one will replace it.'**
+  String s06DraftAuditExistsMonthly(String month, int year);
+
   /// No description provided for @s10WeeklyScoreTitle.
   ///
   /// In en, this message translates to:
   /// **'Weekly Audit Score'**
   String get s10WeeklyScoreTitle;
+
+  /// No description provided for @s10MonthlyScoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Strategic Audit Score'**
+  String get s10MonthlyScoreTitle;
 
   /// No description provided for @s10DailyAvgContribution.
   ///
@@ -889,6 +997,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Weekly Audit Submitted'**
   String get s11WeeklyTitle;
+
+  /// No description provided for @s11MonthlyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Audit Submitted'**
+  String get s11MonthlyTitle;
 
   /// No description provided for @s07CheckpointNumber.
   ///
@@ -2838,7 +2952,7 @@ abstract class AppLocalizations {
   /// No description provided for @s12FilterMonthly.
   ///
   /// In en, this message translates to:
-  /// **'Monthly (Phase 3)'**
+  /// **'Monthly'**
   String get s12FilterMonthly;
 
   /// No description provided for @s12NoAuditsFound.
@@ -4038,13 +4152,13 @@ abstract class AppLocalizations {
   /// No description provided for @s20ScreenTitle.
   ///
   /// In en, this message translates to:
-  /// **'Weekly Reports'**
+  /// **'Compliance Reports'**
   String get s20ScreenTitle;
 
   /// No description provided for @s20ScreenSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Workbook §3.6 reports & 1-page PDF export'**
+  /// **'Weekly & monthly reports, trend analytics & PDF export'**
   String get s20ScreenSubtitle;
 
   /// No description provided for @s20FilterAll.
@@ -4328,6 +4442,372 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to export PDF: {error}'**
   String s21PdfExportError(String error);
+
+  /// No description provided for @s10ClosingCashVarianceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Closing Cash Variance'**
+  String get s10ClosingCashVarianceTitle;
+
+  /// No description provided for @s10CashVarianceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter till cash variance from physical reconciliation (tolerance: ₹500).'**
+  String get s10CashVarianceSubtitle;
+
+  /// No description provided for @s10CashVarianceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Variance (₹)'**
+  String get s10CashVarianceLabel;
+
+  /// No description provided for @s10CashVarianceHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Variance > ₹500 automatically triggers an alert to GM / Owner (Trigger 3).'**
+  String get s10CashVarianceHelper;
+
+  /// No description provided for @s33EscalationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalations'**
+  String get s33EscalationsTitle;
+
+  /// No description provided for @s33EscalationsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Threshold breaches & emergency alerts'**
+  String get s33EscalationsSubtitle;
+
+  /// No description provided for @s33FilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get s33FilterAll;
+
+  /// No description provided for @s33FilterOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get s33FilterOpen;
+
+  /// No description provided for @s33FilterAcknowledged.
+  ///
+  /// In en, this message translates to:
+  /// **'Acknowledged'**
+  String get s33FilterAcknowledged;
+
+  /// No description provided for @s33FilterResolved.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolved'**
+  String get s33FilterResolved;
+
+  /// No description provided for @s33EmptyOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'No Open Escalations'**
+  String get s33EmptyOpen;
+
+  /// No description provided for @s33EmptyOpenDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Store operations, cash counts, and inventory are within expected tolerances.'**
+  String get s33EmptyOpenDesc;
+
+  /// No description provided for @s33TriggerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Trigger {number}'**
+  String s33TriggerLabel(int number);
+
+  /// No description provided for @s33AcknowledgeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Acknowledge'**
+  String get s33AcknowledgeAction;
+
+  /// No description provided for @s33ResolveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolve'**
+  String get s33ResolveAction;
+
+  /// No description provided for @s33CopyAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Alert'**
+  String get s33CopyAction;
+
+  /// No description provided for @s33CopiedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalation message copied to clipboard'**
+  String get s33CopiedSuccess;
+
+  /// No description provided for @s33WhatsAppAction.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp'**
+  String get s33WhatsAppAction;
+
+  /// No description provided for @s33ResolutionNotesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolution Notes'**
+  String get s33ResolutionNotesTitle;
+
+  /// No description provided for @s33ResolutionNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe corrective actions taken...'**
+  String get s33ResolutionNotesHint;
+
+  /// No description provided for @s33ResolutionNotesRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolution notes are required to resolve an escalation.'**
+  String get s33ResolutionNotesRequired;
+
+  /// No description provided for @s33AcknowledgeSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalation acknowledged'**
+  String get s33AcknowledgeSuccess;
+
+  /// No description provided for @s33ResolveSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalation resolved'**
+  String get s33ResolveSuccess;
+
+  /// No description provided for @s33RaiseManualTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Raise Manual Escalation'**
+  String get s33RaiseManualTitle;
+
+  /// No description provided for @s33WhatHappenedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What happened'**
+  String get s33WhatHappenedLabel;
+
+  /// No description provided for @s33EvidenceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Evidence'**
+  String get s33EvidenceLabel;
+
+  /// No description provided for @s33ImpactLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Operational Impact'**
+  String get s33ImpactLabel;
+
+  /// No description provided for @s33ActionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Requested Action'**
+  String get s33ActionLabel;
+
+  /// No description provided for @s33SaveManualButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Escalation'**
+  String get s33SaveManualButton;
+
+  /// No description provided for @s33UrgencyImmediate.
+  ///
+  /// In en, this message translates to:
+  /// **'Immediate'**
+  String get s33UrgencyImmediate;
+
+  /// No description provided for @s33UrgencySameDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Same Day'**
+  String get s33UrgencySameDay;
+
+  /// No description provided for @s33UrgencySameNight.
+  ///
+  /// In en, this message translates to:
+  /// **'Same Night'**
+  String get s33UrgencySameNight;
+
+  /// No description provided for @s33UrgencyNextAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Audit'**
+  String get s33UrgencyNextAudit;
+
+  /// No description provided for @s33TargetOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'To: Owner'**
+  String get s33TargetOwner;
+
+  /// No description provided for @s33TargetGm.
+  ///
+  /// In en, this message translates to:
+  /// **'To: GM'**
+  String get s33TargetGm;
+
+  /// No description provided for @s33WhatsAppSentBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp Sent'**
+  String get s33WhatsAppSentBadge;
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get fieldRequired;
+
+  /// No description provided for @s27RunAgingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Run CAP Aging Check'**
+  String get s27RunAgingTitle;
+
+  /// No description provided for @s27RunAgingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Evaluate overdue CAPs and raise escalations now'**
+  String get s27RunAgingSubtitle;
+
+  /// No description provided for @s27RunAgingSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'CAP Aging complete: {aged} aged, {pending} pending verification, {escalations} escalations raised'**
+  String s27RunAgingSuccess(int aged, int pending, int escalations);
+
+  /// No description provided for @s10InventoryVarianceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Inventory Variance'**
+  String get s10InventoryVarianceTitle;
+
+  /// No description provided for @s10InventoryVarianceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter measured % variance between physical stock and system records (Spec §7 / T4).'**
+  String get s10InventoryVarianceSubtitle;
+
+  /// No description provided for @s10InventoryVarianceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory Variance (%)'**
+  String get s10InventoryVarianceLabel;
+
+  /// No description provided for @s10InventoryVarianceHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert triggers to Owner if variance exceeds 2.0% (Trigger 4).'**
+  String get s10InventoryVarianceHelper;
+
+  /// No description provided for @s07SecurityConcernLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Concern'**
+  String get s07SecurityConcernLabel;
+
+  /// No description provided for @s07SecurityConcernSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Flag if this checkpoint presents a security or theft risk (triggers immediate alert to Owner).'**
+  String get s07SecurityConcernSubtitle;
+
+  /// No description provided for @s20FilterWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get s20FilterWeekly;
+
+  /// No description provided for @s20FilterMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get s20FilterMonthly;
+
+  /// No description provided for @s21MonthlyScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Trend Report'**
+  String get s21MonthlyScreenTitle;
+
+  /// No description provided for @s21MonthlySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Workbook §3.7 Strategic Spot-Checks & Multi-Week Trends'**
+  String get s21MonthlySubtitle;
+
+  /// No description provided for @s21MonthlySpotCheckSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 2: Strategic Spot-Checks'**
+  String get s21MonthlySpotCheckSection;
+
+  /// No description provided for @s21MonthlyTrendAnalyticsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 3: Multi-Week Trend Analytics'**
+  String get s21MonthlyTrendAnalyticsSection;
+
+  /// No description provided for @s21MonthlyFindingsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 4: Spot-Check Non-Compliances ({count})'**
+  String s21MonthlyFindingsSection(int count);
+
+  /// No description provided for @s21MonthlyNoFindings.
+  ///
+  /// In en, this message translates to:
+  /// **'No spot-check non-compliances recorded.'**
+  String get s21MonthlyNoFindings;
+
+  /// No description provided for @s21MonthlyCapsRollupSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 5: Monthly CAPs Rollup'**
+  String get s21MonthlyCapsRollupSection;
+
+  /// No description provided for @s21MonthlyEscalationsRollupSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 6: Monthly Escalations Rollup'**
+  String get s21MonthlyEscalationsRollupSection;
+
+  /// No description provided for @s21MonthlySpotCheckLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Strategic Spot-Check Score'**
+  String get s21MonthlySpotCheckLabel;
+
+  /// No description provided for @s21MonthlyWeeklyAvgLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Month Weekly Audits Average'**
+  String get s21MonthlyWeeklyAvgLabel;
+
+  /// No description provided for @s21MonthlyNoCaps.
+  ///
+  /// In en, this message translates to:
+  /// **'No CAPs opened, closed, or aged this month.'**
+  String get s21MonthlyNoCaps;
+
+  /// No description provided for @s21MonthlyNoEscalations.
+  ///
+  /// In en, this message translates to:
+  /// **'No escalations triggered during this month.'**
+  String get s21MonthlyNoEscalations;
+
+  /// No description provided for @s21ExportMonthlyPdfButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Monthly PDF'**
+  String get s21ExportMonthlyPdfButton;
 }
 
 class _AppLocalizationsDelegate

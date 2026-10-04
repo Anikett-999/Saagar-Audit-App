@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../services/cap_aging_service.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
 
@@ -95,6 +96,30 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: l10n.s27BackupExportSubtitle,
             onTap: () => context.pushNamed('s32_backup_export'),
           ),
+          // Manual CAP aging trigger for QA / store testing (Spec §9.1)
+          if (isOwner || (auth.user?.isGm ?? false))
+            _buildTile(
+              context: context,
+              icon: Icons.update_outlined,
+              title: l10n.s27RunAgingTitle,
+              subtitle: l10n.s27RunAgingSubtitle,
+              onTap: () async {
+                final summary = await CapAgingService.instance.runDailyAging();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        l10n.s27RunAgingSuccess(
+                          summary.agedCount,
+                          summary.verifyPendingCount,
+                          summary.escalationsRaised.length,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
           const SizedBox(height: 20),
           _buildSectionHeader(l10n.s27AccountSection),
           const SizedBox(height: 8),

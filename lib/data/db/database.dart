@@ -80,6 +80,29 @@ class AppDatabase {
           ''');
           await SeedLoader.loadCheckpoints(db);
         }
+
+        if (oldVersion < 3) {
+          // Migration v2 -> v3 (Sprint P3-2b, Owner-authorised 2026-09-30):
+          // 1. audits.inventory_variance_pct REAL (Spec §7 T4)
+          // 2. audit_results.flag_security_concern INTEGER NOT NULL DEFAULT 0 (Spec §7 T5)
+          try {
+            final auditCols = await db.rawQuery('PRAGMA table_info(audits)');
+            final hasInv = auditCols.any((c) => c['name'] == 'inventory_variance_pct');
+            if (!hasInv) {
+              await db.execute('ALTER TABLE audits ADD COLUMN inventory_variance_pct REAL;');
+            }
+          } catch (_) {}
+
+          try {
+            final resultCols = await db.rawQuery('PRAGMA table_info(audit_results)');
+            final hasSec = resultCols.any((c) => c['name'] == 'flag_security_concern');
+            if (!hasSec) {
+              await db.execute(
+                'ALTER TABLE audit_results ADD COLUMN flag_security_concern INTEGER NOT NULL DEFAULT 0 CHECK (flag_security_concern IN (0,1));',
+              );
+            }
+          } catch (_) {}
+        }
       },
       onOpen: (db) async {
         // Defensive check: ensure SOP9 exists in sops table in case a device
@@ -107,6 +130,39 @@ class AppDatabase {
           ''');
           await SeedLoader.loadCheckpoints(db);
         }
+
+        // Defensive check: ensure monthly checkpoints exist in checkpoints table
+        // in case an existing device installation upgraded from Phase 1 or 2.
+        final monthlyCps = await db.rawQuery("SELECT id FROM checkpoints WHERE frequency = 'monthly'");
+        if (monthlyCps.isEmpty) {
+          await SeedLoader.loadCheckpoints(db);
+        }
+
+        // Defensive check: ensure v3 columns exist on audits and audit_results
+        try {
+          final auditCols = await db.rawQuery('PRAGMA table_info(audits)');
+          final hasInv = auditCols.any((c) => c['name'] == 'inventory_variance_pct');
+          if (!hasInv) {
+            await db.execute('ALTER TABLE audits ADD COLUMN inventory_variance_pct REAL;');
+          }
+        } catch (_) {}
+
+        try {
+          final resultCols = await db.rawQuery('PRAGMA table_info(audit_results)');
+          final hasSec = resultCols.any((c) => c['name'] == 'flag_security_concern');
+          if (!hasSec) {
+            await db.execute(
+              'ALTER TABLE audit_results ADD COLUMN flag_security_concern INTEGER NOT NULL DEFAULT 0 CHECK (flag_security_concern IN (0,1));',
+            );
+          }
+        } catch (_) {}
+
+        // Clean up any empty drafts created before checkpoints were seeded
+        await db.execute('''
+          DELETE FROM audits 
+          WHERE status = 'draft' 
+            AND id NOT IN (SELECT DISTINCT audit_id FROM audit_results)
+        ''');
 
         // Enable foreign key enforcement for all app queries per Spec §4
         await db.execute('PRAGMA foreign_keys = ON');

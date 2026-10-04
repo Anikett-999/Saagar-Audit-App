@@ -754,6 +754,90 @@ class CapRepository {
       overdue: overdueCount,
     );
   }
+
+  /// Daily batch job evaluating overdue CAPs (Spec §9.1 / Workbook Day 4 §4.4).
+  ///
+  /// Evaluates all CAPs with status in ('open', 'done'):
+  ///   1. If status == 'open' and deadline < asOfDate:
+  ///      Atomically updates status -> 'aged', increments aged_count, and logs cap_log event 'aged'.
+  ///      Returns updated CAP in [CapAgingResult.agedCaps].
+  ///   2. If status == 'done' and deadline < asOfDate and done > 3 days ago:
+  ///      Collects CAP in [CapAgingResult.verifyPendingCaps] without status mutation.
+  Future<CapAgingResult> ageOverdueCaps({DateTime? asOf}) async {
+    final effectiveAsOf = asOf ?? DateTime.now();
+    final todayStr = effectiveAsOf.toIso8601String().substring(0, 10);
+    final asOfDateOnly = DateTime(effectiveAsOf.year, effectiveAsOf.month, effectiveAsOf.day);
+
+    final db = AppDatabase.instance.db;
+
+    // 1. Select all candidate caps with status IN ('open', 'done')
+    final rows = await db.query(
+      'caps',
+      where: "status IN ('open', 'done')",
+    );
+
+    final agedList = <Cap>[];
+    final verifyPendingList = <Cap>[];
+
+    for (final row in rows) {
+      final cap = Cap.fromMap(row);
+
+      if (cap.status == 'open' && cap.deadline.compareTo(todayStr) < 0) {
+        // Overdue open CAP -> transition to aged in transaction
+        final nowIso = DateTime.now().toUtc().toIso8601String();
+        final newAgedCount = cap.agedCount + 1;
+
+        await db.transaction((txn) async {
+          await txn.update(
+            'caps',
+            {
+              'status': 'aged',
+              'aged_count': newAgedCount,
+            },
+            where: 'id = ?',
+            whereArgs: [cap.id],
+          );
+
+          await txn.insert('cap_log', {
+            'id': const Uuid().v4(),
+            'cap_id': cap.id,
+            'event': 'aged',
+            'from_status': 'open',
+            'to_status': 'aged',
+            'actor_user_id': null,
+            'device_id': null,
+            'timestamp': nowIso,
+            'note': 'Auto-aged: deadline ${cap.deadline} passed',
+          });
+        });
+
+        // Add updated Cap to returned aged list
+        agedList.add(
+          Cap.fromMap({
+            ...row,
+            'status': 'aged',
+            'aged_count': newAgedCount,
+          }),
+        );
+      } else if (cap.status == 'done' && cap.deadline.compareTo(todayStr) < 0) {
+        if (cap.doneAt != null) {
+          final doneDateTime = DateTime.tryParse(cap.doneAt!);
+          if (doneDateTime != null) {
+            final doneDateOnly = DateTime(doneDateTime.year, doneDateTime.month, doneDateTime.day);
+            final daysSinceDone = asOfDateOnly.difference(doneDateOnly).inDays;
+            if (daysSinceDone > 3) {
+              verifyPendingList.add(cap);
+            }
+          }
+        }
+      }
+    }
+
+    return CapAgingResult(
+      agedCaps: agedList,
+      verifyPendingCaps: verifyPendingList,
+    );
+  }
 }
 
 /// Summary counts for GM CAP oversight dashboard.
@@ -772,3 +856,15 @@ class CapDashboardCounts {
   final int closed;
   final int overdue;
 }
+
+/// Result structure returned by [CapRepository.ageOverdueCaps].
+class CapAgingResult {
+  const CapAgingResult({
+    required this.agedCaps,
+    required this.verifyPendingCaps,
+  });
+
+  final List<Cap> agedCaps;
+  final List<Cap> verifyPendingCaps;
+}
+

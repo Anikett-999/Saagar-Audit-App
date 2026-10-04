@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../../data/models/audit.dart';
 import '../../../data/models/audit_result.dart';
@@ -16,6 +17,7 @@ import '../../../domain/score_engine.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/draft_audit_provider.dart';
+import '../../../services/escalation_service.dart';
 import '../../theme/app_colors.dart';
 
 /// Screen S10 — Review & Submit (Spec §5 S10).
@@ -33,6 +35,8 @@ class ReviewSubmitScreen extends ConsumerStatefulWidget {
 
 class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
   final _notesController = TextEditingController();
+  final _cashVarianceController = TextEditingController(text: '0');
+  final _inventoryVarianceController = TextEditingController();
   List<Sop> _sops = const [];
   List<Audit> _dailyAudits = const [];
   Map<String, AuditResult> _failResults = const {};
@@ -49,6 +53,8 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
   @override
   void dispose() {
     _notesController.dispose();
+    _cashVarianceController.dispose();
+    _inventoryVarianceController.dispose();
     super.dispose();
   }
 
@@ -163,9 +169,16 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
     setState(() => _submitting = true);
     try {
       final notes = _notesController.text.trim();
-      await ref
-          .read(draftAuditProvider.notifier)
-          .submitAudit(notes: notes.isEmpty ? null : notes);
+      final varianceVal = double.tryParse(_cashVarianceController.text.trim());
+      final cashVariance = audit.auditType == 'daily' ? (varianceVal ?? 0.0) : null;
+      final invVarianceVal = double.tryParse(_inventoryVarianceController.text.trim());
+      final inventoryVariance = audit.auditType == 'weekly' ? invVarianceVal : null;
+
+      await ref.read(draftAuditProvider.notifier).submitAudit(
+            notes: notes.isEmpty ? null : notes,
+            cashVarianceRupees: cashVariance,
+            inventoryVariancePct: inventoryVariance,
+          );
 
       if (audit.auditType == 'weekly') {
         try {
@@ -177,6 +190,26 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
         } catch (_) {
           // Non-blocking per plan
         }
+      }
+
+      // P3-4: Monthly report generation (post-submit, non-blocking, R5-safe)
+      if (audit.auditType == 'monthly') {
+        try {
+          final currentUser = ref.read(authProvider).user;
+          await ReportRepository.instance.generateMonthlyReport(
+            monthlyAuditId: audit.id,
+            authorUserId: currentUser?.id ?? audit.auditorId,
+          );
+        } catch (_) {
+          // Non-blocking — monthly report generation must not block submission
+        }
+      }
+
+      // Spec §7 — Evaluate escalation triggers after submission (outside audit transaction)
+      try {
+        await EscalationService.instance.evaluateAndDispatch(auditId: audit.id);
+      } catch (_) {
+        // Non-blocking per Rule 5
       }
 
       if (!mounted) return;
@@ -239,6 +272,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
     }).toList();
 
     final isWeekly = audit.auditType == 'weekly';
+    final isMonthly = audit.auditType == 'monthly';
     WeeklyScoreResult? weeklyScore;
     ScoreResult? dailyScore;
 
@@ -264,7 +298,12 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
             audit.weekNumber,
             audit.year,
           )
-        : audit.auditDate;
+        : isMonthly
+            ? l10n.s05MonthYearLabel(
+                DateFormat('MMMM').format(DateTime.parse(audit.auditDate)),
+                audit.year,
+              )
+            : audit.auditDate;
 
     return Scaffold(
       appBar: AppBar(
@@ -322,6 +361,18 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
               // 3. Fails List with Evidence & CAP Status
               _buildFailsSection(l10n, locale, failCheckpoints),
               const SizedBox(height: 24),
+
+              // 3.5 Closing Cash Variance (Daily Audits only — Spec §6.7 / T3)
+              if (audit.auditType == 'daily') ...[
+                _buildCashVarianceSection(l10n),
+                const SizedBox(height: 24),
+              ],
+
+              // 3.6 Weekly Inventory Variance % (Weekly Audits only — Spec §7 / T4)
+              if (audit.auditType == 'weekly') ...[
+                _buildInventoryVarianceSection(l10n),
+                const SizedBox(height: 24),
+              ],
 
               // 4. Auditor Notes (max 500 chars)
               _buildNotesSection(l10n),
@@ -427,7 +478,11 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
                       ),
                     ),
                     Text(
-                      isWeekly ? l10n.s10WeeklyScoreTitle : l10n.s10ScoreCard,
+                      isWeekly
+                          ? l10n.s10WeeklyScoreTitle
+                          : (audit.auditType == 'monthly'
+                              ? l10n.s10MonthlyScoreTitle
+                              : l10n.s10ScoreCard),
                       style: const TextStyle(
                         fontSize: 13,
                         color: AppColors.gray600,
@@ -929,6 +984,105 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCashVarianceSection(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.gray200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.currency_rupee, color: AppColors.navy, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.s10ClosingCashVarianceTitle,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.navy,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.s10CashVarianceSubtitle,
+            style: const TextStyle(fontSize: 13, color: AppColors.gray600),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _cashVarianceController,
+            keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
+            decoration: InputDecoration(
+              labelText: l10n.s10CashVarianceLabel,
+              hintText: '0 (e.g. -350 or +200)',
+              prefixIcon: const Icon(Icons.calculate_outlined),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              helperText: l10n.s10CashVarianceHelper,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInventoryVarianceSection(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.gray200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.inventory_2_outlined, color: AppColors.navy, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.s10InventoryVarianceTitle,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.navy,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.s10InventoryVarianceSubtitle,
+            style: const TextStyle(fontSize: 13, color: AppColors.gray600),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _inventoryVarianceController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: InputDecoration(
+              labelText: l10n.s10InventoryVarianceLabel,
+              hintText: 'e.g. 1.5 or 2.5',
+              suffixText: '%',
+              prefixIcon: const Icon(Icons.percent),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              helperText: l10n.s10InventoryVarianceHelper,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

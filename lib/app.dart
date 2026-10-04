@@ -38,6 +38,7 @@ import 'ui/screens/s29_manage_users/manage_users_screen.dart';
 import 'ui/screens/s30_change_pin/change_pin_screen.dart';
 import 'ui/screens/s31_language/settings_language_screen.dart';
 import 'ui/screens/s32_backup_export/backup_export_screen.dart';
+import 'ui/screens/s33_escalations/escalations_list_screen.dart';
 import 'ui/theme/app_theme.dart';
 
 /// Top-level [GoRouter] provider so navigation stack persists across widget rebuilds.
@@ -88,7 +89,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/audit/fail-detail',
         name: 's08_fail_detail',
-        builder: (_, __) => const FailDetailScreen(),
+        builder: (_, state) {
+          final extra = state.extra;
+          final initialConcern = extra is Map<String, dynamic>
+              ? (extra['initialSecurityConcern'] as bool? ?? false)
+              : false;
+          return FailDetailScreen(initialSecurityConcern: initialConcern);
+        },
       ),
       // S9 Photo Capture is folded into S8 (inline camera launch).
       GoRoute(
@@ -265,6 +272,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => ReportDetailScreen(
           reportId: state.pathParameters['id']!,
         ),
+      ),
+      GoRoute(
+        path: '/escalations',
+        name: 's33_escalations',
+        redirect: (context, state) {
+          final auth = ref.read(authProvider);
+          if (auth.user == null) {
+            return '/login';
+          }
+          return null;
+        },
+        builder: (_, __) => const EscalationsListScreen(),
       ),
       GoRoute(
         path: '/reference',

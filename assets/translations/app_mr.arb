@@ -136,6 +136,22 @@
       "year": {"type": "int"}
     }
   },
+  "s05ThisMonthMonthlyAudit": "या महिन्याचे धोरणात्मक ऑडिट",
+  "s05MonthlyNotStartedYet": "तुम्ही या महिन्याचे ऑडिट अद्याप सुरू केलेले नाही.",
+  "s05MonthlyNotStartedAdmin": "या महिन्याचे धोरणात्मक ऑडिट अद्याप सुरू झालेले नाही.",
+  "s05StartMonthlyAudit": "मासिक ऑडिट सुरू करा",
+  "s05ResumeMonthlyDraft": "मासिक मसुदा पुन्हा सुरू करा",
+  "s05MonthlyDraftInProgress": "मासिक मसुदा ऑडिट सुरू आहे. तपासणी पुढे चालू ठेवण्यासाठी पुन्हा सुरू करा.",
+  "s05MonthlyAuditsRunByOwner": "मासिक धोरणात्मक ऑडिट स्टोअर मालकाद्वारे (Owner) चालवले जाते.",
+  "s05MonthYearLabel": "{month}, {year}",
+  "@s05MonthYearLabel": {
+    "placeholders": {
+      "month": {"type": "String"},
+      "year": {"type": "int"}
+    }
+  },
+  "s05MonthlySubtitle": "धोरणात्मक स्पॉट-चेक व कल पुनरावलोकन (लक्ष्य: ९५%+)",
+  "s05ViewWeeklyReport": "साप्ताहिक अहवाल पहा (S21)",
   "s05AuditHistoryTitle": "ऑडिट इतिहास",
   "s05AuditHistorySubtitle": "मागील दैनिक ऑडिट पहा",
   "s05CapsTitle": "सीएपी (CAPs)",
@@ -149,17 +165,50 @@
 
   "s06Title": "दैनिक ऑडिट सुरू करा",
   "s06WeeklyTitle": "साप्ताहिक ऑडिट सुरू करा",
+  "s06MonthlyTitle": "मासिक धोरणात्मक ऑडिट सुरू करा",
   "s06AuditDate": "ऑडिट तारीख",
   "s06StoreLabel": "स्टोअर",
   "s06CrosOnDuty": "ड्युटीवरील कर्मचारी (CRO)",
   "s06SelectAtLeastOneCro": "कृपया किमान एक ड्युटीवरील कर्मचारी निवडा.",
   "s06BeginAudit": "ऑडिट सुरू करा",
+  "s06SubmittedAuditExistsDaily": "या तारखेसाठी सादर केलेले ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास ते अधिक्रमित होईल (इतिहास जपला जाईल).",
+  "s06DraftAuditExistsDaily": "या तारखेसाठी मसुदा ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास तो बदलला जाईल.",
+  "s06SubmittedAuditExistsWeekly": "आठवडा {week}, {year} साठी सादर केलेले साप्ताहिक ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास ते अधिक्रमित होईल.",
+  "@s06SubmittedAuditExistsWeekly": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "year": {"type": "int"}
+    }
+  },
+  "s06DraftAuditExistsWeekly": "आठवडा {week}, {year} साठी साप्ताहिक मसुदा ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास तो बदलला जाईल.",
+  "@s06DraftAuditExistsWeekly": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "year": {"type": "int"}
+    }
+  },
+  "s06SubmittedAuditExistsMonthly": "{month}, {year} साठी सादर केलेले मासिक ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास ते अधिक्रमित होईल.",
+  "@s06SubmittedAuditExistsMonthly": {
+    "placeholders": {
+      "month": {"type": "String"},
+      "year": {"type": "int"}
+    }
+  },
+  "s06DraftAuditExistsMonthly": "{month}, {year} साठी मासिक मसुदा ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास तो बदलला जाईल.",
+  "@s06DraftAuditExistsMonthly": {
+    "placeholders": {
+      "month": {"type": "String"},
+      "year": {"type": "int"}
+    }
+  },
 
   "s10WeeklyScoreTitle": "साप्ताहिक ऑडिट गुण",
+  "s10MonthlyScoreTitle": "मासिक धोरणात्मक ऑडिट गुण",
   "s10DailyAvgContribution": "दैनंदिन सरासरी योगदान",
   "s10WeeklyCheckpointsScore": "साप्ताहिक तपासणी बिंदू गुण",
   "s10CashVarianceTitle": "एकूण संचित रोख तफावत (CW.7)",
   "s11WeeklyTitle": "साप्ताहिक ऑडिट सादर झाले",
+  "s11MonthlyTitle": "मासिक ऑडिट सादर झाले",
 
   "s07CheckpointNumber": "चेकपॉइंट {current} / {total}",
   "@s07CheckpointNumber": {"placeholders": {"current": {"type": "int"}, "total": {"type": "int"}}},
@@ -539,7 +588,7 @@
   "s12FilterDaily": "दैनंदिन",
   "s12FilterUnverified": "अपडताळलेले",
   "s12FilterWeekly": "साप्ताहिक",
-  "s12FilterMonthly": "मासिक (टप्पा ३)",
+  "s12FilterMonthly": "मासिक",
   "s12NoAuditsFound": "कोणतेही ऑडिट आढळले नाही",
   "s12NoAuditsMatchFilter": "निवडलेल्या फिल्टरशी जुळणारे कोणतेही ऑडिट आढळले नाही.",
   "s12CompleteAuditPrompt": "येथे इतिहास पाहण्यासाठी दैनंदिन ऑडिट पूर्ण करा आणि सबमिट करा.",
@@ -805,8 +854,8 @@
   "capOversightAwaitingSection": "माझ्या पडताळणीसाठी प्रलंबित",
   "capOversightNoAwaiting": "पडताळणीसाठी कोणतेही CAP प्रलंबित नाहीत",
   "capOversightVerifyNow": "आता पडताळा",
-  "s20ScreenTitle": "साप्ताहिक अहवाल",
-  "s20ScreenSubtitle": "कार्यपुस्तिका §3.6 अहवाल आणि 1-पान PDF निर्यात",
+  "s20ScreenTitle": "अनुपालन अहवाल",
+  "s20ScreenSubtitle": "साप्ताहिक व मासिक अहवाल, कल विश्लेषण आणि PDF निर्यात",
   "s20FilterAll": "सर्व",
   "s20EmptyTitle": "अद्याप कोणतेही साप्ताहिक अहवाल नाहीत",
   "s20EmptySubtitle": "साप्ताहिक अनुपालन ऑडिट पूर्ण झाल्यावर साप्ताहिक अहवाल तयार केले जातात.",
@@ -935,7 +984,85 @@
     "placeholders": {
       "error": {"type": "String"}
     }
-  }
+  },
+  "s10ClosingCashVarianceTitle": "बंद रोख तफावत",
+  "s10CashVarianceSubtitle": "प्रत्यक्ष ताळमेळातील गल्ल्याची रोख तफावत नोंदवा (सहनशीलता: ₹५००).",
+  "s10CashVarianceLabel": "तफावत (₹)",
+  "s10CashVarianceHelper": "> ₹५०० ची तफावत आपोआप GM / मालकांना इशारा पाठवते (ट्रिगर ३).",
+  "s33EscalationsTitle": "एस्केलेशन्स",
+  "s33EscalationsSubtitle": "थ्रेशोल्ड उल्लंघन आणि आपत्कालीन इशारे",
+  "s33FilterAll": "सर्व",
+  "s33FilterOpen": "उघडे",
+  "s33FilterAcknowledged": "मान्य केलेले",
+  "s33FilterResolved": "सोडवलेले",
+  "s33EmptyOpen": "कोणतेही उघडे एस्केलेशन नाही",
+  "s33EmptyOpenDesc": "स्टोअर कामकाज, रोख मोजणी आणि स्टॉक अपेक्षित मर्यादेत आहेत.",
+  "s33TriggerLabel": "ट्रिगर {number}",
+  "@s33TriggerLabel": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "s33AcknowledgeAction": "मान्य करा",
+  "s33ResolveAction": "निवारण करा",
+  "s33CopyAction": "इशारा संदेश कॉपी करा",
+  "s33CopiedSuccess": "एस्केलेशन संदेश क्लिपबोर्डवर कॉपी केला",
+  "s33WhatsAppAction": "व्हॉट्सअॅप",
+  "s33ResolutionNotesTitle": "निवारण नोंदी",
+  "s33ResolutionNotesHint": "केलेल्या सुधारात्मक कृतींचे वर्णन करा...",
+  "s33ResolutionNotesRequired": "एस्केलेशन सोडवण्यासाठी निवारण नोंदी आवश्यक आहेत.",
+  "s33AcknowledgeSuccess": "एस्केलेशन मान्य केले",
+  "s33ResolveSuccess": "एस्केलेशन सोडवले",
+  "s33RaiseManualTitle": "मॅन्युअल एस्केलेशन नोंदवा",
+  "s33WhatHappenedLabel": "काय झाले",
+  "s33EvidenceLabel": "पुरावा",
+  "s33ImpactLabel": "कार्यवाहक परिणाम",
+  "s33ActionLabel": "मागितलेली कृती",
+  "s33SaveManualButton": "एस्केलेशन सादर करा",
+  "s33UrgencyImmediate": "तातडीने",
+  "s33UrgencySameDay": "त्याच दिवशी",
+  "s33UrgencySameNight": "त्याच रात्री",
+  "s33UrgencyNextAudit": "पुढील ऑडिट",
+  "s33TargetOwner": "प्रति: मालक",
+  "s33TargetGm": "प्रति: GM",
+  "s33WhatsAppSentBadge": "व्हॉट्सअॅप पाठवले",
+  "fieldRequired": "हे फील्ड आवश्यक आहे",
+  "s27RunAgingTitle": "कॅप एजिंग तपासा",
+  "s27RunAgingSubtitle": "मुदत संपलेले कॅप तपासा आणि आता इशारे पाठवा",
+  "s27RunAgingSuccess": "कॅप एजिंग पूर्ण: {aged} जुने झाले, {pending} पडताळणी प्रलंबित, {escalations} इशारे पाठवले",
+  "@s27RunAgingSuccess": {
+    "placeholders": {
+      "aged": {"type": "int"},
+      "pending": {"type": "int"},
+      "escalations": {"type": "int"}
+    }
+  },
+  "s10InventoryVarianceTitle": "साप्ताहिक इन्व्हेंटरी तफावत",
+  "s10InventoryVarianceSubtitle": "प्रत्यक्ष स्टॉक आणि सिस्टीम नोंदींमधील मोजलेली % तफावत प्रविष्ट करा (नियम §7 / T4).",
+  "s10InventoryVarianceLabel": "इन्व्हेंटरी तफावत (%)",
+  "s10InventoryVarianceHelper": "तफावत 2.0% पेक्षा जास्त असल्यास मालकाला तात्काळ इशारा पाठवला जातो (ट्रिगर ४).",
+  "s07SecurityConcernLabel": "सुरक्षा चिंता",
+  "s07SecurityConcernSubtitle": "या तपासणी बिंदूमध्ये सुरक्षा किंवा चोरीचा धोका असल्यास चिन्हांकित करा (मालकास तात्काळ इशारा).",
+  "s20FilterWeekly": "साप्ताहिक",
+  "s20FilterMonthly": "मासिक",
+  "s21MonthlyScreenTitle": "मासिक कल अहवाल",
+  "s21MonthlySubtitle": "कार्यपुस्तिका §3.7 धोरणात्मक तपासणी आणि बहु-आठवडा कल",
+  "s21MonthlySpotCheckSection": "विभाग २: धोरणात्मक स्पॉट-तपासण्या",
+  "s21MonthlyTrendAnalyticsSection": "विभाग ३: बहु-आठवडा कल विश्लेषण",
+  "s21MonthlyFindingsSection": "विभाग ४: स्पॉट-तपासणी त्रुटी ({count})",
+  "@s21MonthlyFindingsSection": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21MonthlyNoFindings": "कोणतीही स्पॉट-तपासणी त्रुटी नोंदवली गेली नाही.",
+  "s21MonthlyCapsRollupSection": "विभाग ५: मासिक कॅप सारांश",
+  "s21MonthlyEscalationsRollupSection": "विभाग ६: मासिक एस्केलेशन सारांश",
+  "s21MonthlySpotCheckLabel": "धोरणात्मक स्पॉट-तपासणी गुण",
+  "s21MonthlyWeeklyAvgLabel": "महिन्यातील साप्ताहिक सरासरी",
+  "s21MonthlyNoCaps": "या महिन्यात कोणतीही कॅप उघडलेली, बंद किंवा जुनी झालेली नाही.",
+  "s21MonthlyNoEscalations": "या महिन्यात कोणतीही वाढ किंवा इशारा नोंदवला गेला नाही.",
+  "s21ExportMonthlyPdfButton": "मासिक PDF निर्यात करा"
 }
 
 

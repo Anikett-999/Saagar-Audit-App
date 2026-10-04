@@ -251,9 +251,11 @@ class _AuditHistoryScreenState extends ConsumerState<AuditHistoryScreen> {
               onTap: () => _onFilterSelected(AuditHistoryFilter.weekly),
             ),
             const SizedBox(width: 8),
-            _buildDisabledFilterChip(
+            _buildFilterChip(
+              key: const ValueKey('s12_filter_monthly'),
               label: l10n.s12FilterMonthly,
-              tooltip: l10n.s12FilterMonthlyTooltip,
+              isSelected: _selectedFilter == AuditHistoryFilter.monthly,
+              onTap: () => _onFilterSelected(AuditHistoryFilter.monthly),
             ),
           ],
         ),
@@ -283,29 +285,6 @@ class _AuditHistoryScreenState extends ConsumerState<AuditHistoryScreen> {
         borderRadius: BorderRadius.circular(20),
         side: BorderSide(
           color: isSelected ? AppColors.navy : AppColors.gray300,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDisabledFilterChip({
-    required String label,
-    required String tooltip,
-  }) {
-    return Tooltip(
-      message: tooltip,
-      child: Opacity(
-        opacity: 0.5,
-        child: Chip(
-          label: Text(
-            label,
-            style: const TextStyle(fontSize: 12, color: AppColors.gray600),
-          ),
-          backgroundColor: AppColors.gray100,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: const BorderSide(color: AppColors.gray300),
-          ),
         ),
       ),
     );

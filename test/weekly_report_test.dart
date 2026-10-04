@@ -488,7 +488,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Check title and headline
-      expect(find.text('Weekly Reports'), findsOneWidget);
+      expect(find.text('Compliance Reports'), findsOneWidget);
       expect(find.textContaining('Week 39 Ending 2026-09-27'), findsOneWidget);
       expect(find.text('84.5% POOR'), findsOneWidget);
 

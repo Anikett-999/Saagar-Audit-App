@@ -43,6 +43,29 @@ class UserRepository {
     return User.fromMap(rows.first);
   }
 
+  /// Returns the sole active Owner user, or null if not yet created.
+  Future<User?> getOwner() async {
+    final rows = await AppDatabase.instance.db.query(
+      'users',
+      where: "role = 'OWNER' AND is_active = 1",
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return User.fromMap(rows.first);
+  }
+
+  /// Returns the first active GM user, or falls back to Owner if no GM exists.
+  Future<User?> getFirstGm() async {
+    final rows = await AppDatabase.instance.db.query(
+      'users',
+      where: "role = 'GM' AND is_active = 1",
+      orderBy: 'created_at ASC',
+      limit: 1,
+    );
+    if (rows.isNotEmpty) return User.fromMap(rows.first);
+    return getOwner();
+  }
+
   /// Adds a new SM or GM user.
   ///
   /// Throws [ArgumentError] if role is 'OWNER' or invalid.

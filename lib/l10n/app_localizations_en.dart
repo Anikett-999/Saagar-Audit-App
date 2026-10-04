@@ -365,6 +365,43 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get s05ThisMonthMonthlyAudit => 'This month\'s strategic audit';
+
+  @override
+  String get s05MonthlyNotStartedYet =>
+      'You haven\'t started this month\'s audit yet.';
+
+  @override
+  String get s05MonthlyNotStartedAdmin =>
+      'This month\'s strategic audit has not been started yet.';
+
+  @override
+  String get s05StartMonthlyAudit => 'Start monthly audit';
+
+  @override
+  String get s05ResumeMonthlyDraft => 'Resume monthly draft';
+
+  @override
+  String get s05MonthlyDraftInProgress =>
+      'A monthly draft audit is in progress. Resume to continue marking checkpoints.';
+
+  @override
+  String get s05MonthlyAuditsRunByOwner =>
+      'Monthly strategic audits are run by the Store Owner.';
+
+  @override
+  String s05MonthYearLabel(String month, int year) {
+    return '$month, $year';
+  }
+
+  @override
+  String get s05MonthlySubtitle =>
+      'Strategic spot-checks & trend review (Target: 95%+)';
+
+  @override
+  String get s05ViewWeeklyReport => 'View Weekly Report (S21)';
+
+  @override
   String get s05AuditHistoryTitle => 'Audit history';
 
   @override
@@ -401,6 +438,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s06WeeklyTitle => 'Start Weekly Audit';
 
   @override
+  String get s06MonthlyTitle => 'Start Monthly Strategic Audit';
+
+  @override
   String get s06AuditDate => 'Audit Date';
 
   @override
@@ -417,7 +457,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s06BeginAudit => 'Begin Audit';
 
   @override
+  String get s06SubmittedAuditExistsDaily =>
+      'A submitted audit exists for this date. Starting a new one will supersede it (history preserved).';
+
+  @override
+  String get s06DraftAuditExistsDaily =>
+      'A draft audit exists for this date. Starting a new one will replace it.';
+
+  @override
+  String s06SubmittedAuditExistsWeekly(int week, int year) {
+    return 'A submitted weekly audit exists for Week $week, $year. Starting a new one will supersede it.';
+  }
+
+  @override
+  String s06DraftAuditExistsWeekly(int week, int year) {
+    return 'A draft weekly audit exists for Week $week, $year. Starting a new one will replace it.';
+  }
+
+  @override
+  String s06SubmittedAuditExistsMonthly(String month, int year) {
+    return 'A submitted monthly audit exists for $month, $year. Starting a new one will supersede it.';
+  }
+
+  @override
+  String s06DraftAuditExistsMonthly(String month, int year) {
+    return 'A draft monthly audit exists for $month, $year. Starting a new one will replace it.';
+  }
+
+  @override
   String get s10WeeklyScoreTitle => 'Weekly Audit Score';
+
+  @override
+  String get s10MonthlyScoreTitle => 'Monthly Strategic Audit Score';
 
   @override
   String get s10DailyAvgContribution => 'Daily Average Contribution';
@@ -430,6 +501,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s11WeeklyTitle => 'Weekly Audit Submitted';
+
+  @override
+  String get s11MonthlyTitle => 'Monthly Audit Submitted';
 
   @override
   String s07CheckpointNumber(int current, int total) {
@@ -1499,7 +1573,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s12FilterWeekly => 'Weekly';
 
   @override
-  String get s12FilterMonthly => 'Monthly (Phase 3)';
+  String get s12FilterMonthly => 'Monthly';
 
   @override
   String get s12NoAuditsFound => 'No audits found';
@@ -2187,10 +2261,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get capOversightVerifyNow => 'Verify Now';
 
   @override
-  String get s20ScreenTitle => 'Weekly Reports';
+  String get s20ScreenTitle => 'Compliance Reports';
 
   @override
-  String get s20ScreenSubtitle => 'Workbook §3.6 reports & 1-page PDF export';
+  String get s20ScreenSubtitle =>
+      'Weekly & monthly reports, trend analytics & PDF export';
 
   @override
   String get s20FilterAll => 'All';
@@ -2367,4 +2442,205 @@ class AppLocalizationsEn extends AppLocalizations {
   String s21PdfExportError(String error) {
     return 'Failed to export PDF: $error';
   }
+
+  @override
+  String get s10ClosingCashVarianceTitle => 'Closing Cash Variance';
+
+  @override
+  String get s10CashVarianceSubtitle =>
+      'Enter till cash variance from physical reconciliation (tolerance: ₹500).';
+
+  @override
+  String get s10CashVarianceLabel => 'Variance (₹)';
+
+  @override
+  String get s10CashVarianceHelper =>
+      'Variance > ₹500 automatically triggers an alert to GM / Owner (Trigger 3).';
+
+  @override
+  String get s33EscalationsTitle => 'Escalations';
+
+  @override
+  String get s33EscalationsSubtitle => 'Threshold breaches & emergency alerts';
+
+  @override
+  String get s33FilterAll => 'All';
+
+  @override
+  String get s33FilterOpen => 'Open';
+
+  @override
+  String get s33FilterAcknowledged => 'Acknowledged';
+
+  @override
+  String get s33FilterResolved => 'Resolved';
+
+  @override
+  String get s33EmptyOpen => 'No Open Escalations';
+
+  @override
+  String get s33EmptyOpenDesc =>
+      'Store operations, cash counts, and inventory are within expected tolerances.';
+
+  @override
+  String s33TriggerLabel(int number) {
+    return 'Trigger $number';
+  }
+
+  @override
+  String get s33AcknowledgeAction => 'Acknowledge';
+
+  @override
+  String get s33ResolveAction => 'Resolve';
+
+  @override
+  String get s33CopyAction => 'Copy Alert';
+
+  @override
+  String get s33CopiedSuccess => 'Escalation message copied to clipboard';
+
+  @override
+  String get s33WhatsAppAction => 'WhatsApp';
+
+  @override
+  String get s33ResolutionNotesTitle => 'Resolution Notes';
+
+  @override
+  String get s33ResolutionNotesHint => 'Describe corrective actions taken...';
+
+  @override
+  String get s33ResolutionNotesRequired =>
+      'Resolution notes are required to resolve an escalation.';
+
+  @override
+  String get s33AcknowledgeSuccess => 'Escalation acknowledged';
+
+  @override
+  String get s33ResolveSuccess => 'Escalation resolved';
+
+  @override
+  String get s33RaiseManualTitle => 'Raise Manual Escalation';
+
+  @override
+  String get s33WhatHappenedLabel => 'What happened';
+
+  @override
+  String get s33EvidenceLabel => 'Evidence';
+
+  @override
+  String get s33ImpactLabel => 'Operational Impact';
+
+  @override
+  String get s33ActionLabel => 'Requested Action';
+
+  @override
+  String get s33SaveManualButton => 'Submit Escalation';
+
+  @override
+  String get s33UrgencyImmediate => 'Immediate';
+
+  @override
+  String get s33UrgencySameDay => 'Same Day';
+
+  @override
+  String get s33UrgencySameNight => 'Same Night';
+
+  @override
+  String get s33UrgencyNextAudit => 'Next Audit';
+
+  @override
+  String get s33TargetOwner => 'To: Owner';
+
+  @override
+  String get s33TargetGm => 'To: GM';
+
+  @override
+  String get s33WhatsAppSentBadge => 'WhatsApp Sent';
+
+  @override
+  String get fieldRequired => 'This field is required';
+
+  @override
+  String get s27RunAgingTitle => 'Run CAP Aging Check';
+
+  @override
+  String get s27RunAgingSubtitle =>
+      'Evaluate overdue CAPs and raise escalations now';
+
+  @override
+  String s27RunAgingSuccess(int aged, int pending, int escalations) {
+    return 'CAP Aging complete: $aged aged, $pending pending verification, $escalations escalations raised';
+  }
+
+  @override
+  String get s10InventoryVarianceTitle => 'Weekly Inventory Variance';
+
+  @override
+  String get s10InventoryVarianceSubtitle =>
+      'Enter measured % variance between physical stock and system records (Spec §7 / T4).';
+
+  @override
+  String get s10InventoryVarianceLabel => 'Inventory Variance (%)';
+
+  @override
+  String get s10InventoryVarianceHelper =>
+      'Alert triggers to Owner if variance exceeds 2.0% (Trigger 4).';
+
+  @override
+  String get s07SecurityConcernLabel => 'Security Concern';
+
+  @override
+  String get s07SecurityConcernSubtitle =>
+      'Flag if this checkpoint presents a security or theft risk (triggers immediate alert to Owner).';
+
+  @override
+  String get s20FilterWeekly => 'Weekly';
+
+  @override
+  String get s20FilterMonthly => 'Monthly';
+
+  @override
+  String get s21MonthlyScreenTitle => 'Monthly Trend Report';
+
+  @override
+  String get s21MonthlySubtitle =>
+      'Workbook §3.7 Strategic Spot-Checks & Multi-Week Trends';
+
+  @override
+  String get s21MonthlySpotCheckSection => 'Section 2: Strategic Spot-Checks';
+
+  @override
+  String get s21MonthlyTrendAnalyticsSection =>
+      'Section 3: Multi-Week Trend Analytics';
+
+  @override
+  String s21MonthlyFindingsSection(int count) {
+    return 'Section 4: Spot-Check Non-Compliances ($count)';
+  }
+
+  @override
+  String get s21MonthlyNoFindings => 'No spot-check non-compliances recorded.';
+
+  @override
+  String get s21MonthlyCapsRollupSection => 'Section 5: Monthly CAPs Rollup';
+
+  @override
+  String get s21MonthlyEscalationsRollupSection =>
+      'Section 6: Monthly Escalations Rollup';
+
+  @override
+  String get s21MonthlySpotCheckLabel => 'Strategic Spot-Check Score';
+
+  @override
+  String get s21MonthlyWeeklyAvgLabel => 'Month Weekly Audits Average';
+
+  @override
+  String get s21MonthlyNoCaps => 'No CAPs opened, closed, or aged this month.';
+
+  @override
+  String get s21MonthlyNoEscalations =>
+      'No escalations triggered during this month.';
+
+  @override
+  String get s21ExportMonthlyPdfButton => 'Export Monthly PDF';
 }

@@ -364,6 +364,43 @@ class AppLocalizationsMr extends AppLocalizations {
   }
 
   @override
+  String get s05ThisMonthMonthlyAudit => 'या महिन्याचे धोरणात्मक ऑडिट';
+
+  @override
+  String get s05MonthlyNotStartedYet =>
+      'तुम्ही या महिन्याचे ऑडिट अद्याप सुरू केलेले नाही.';
+
+  @override
+  String get s05MonthlyNotStartedAdmin =>
+      'या महिन्याचे धोरणात्मक ऑडिट अद्याप सुरू झालेले नाही.';
+
+  @override
+  String get s05StartMonthlyAudit => 'मासिक ऑडिट सुरू करा';
+
+  @override
+  String get s05ResumeMonthlyDraft => 'मासिक मसुदा पुन्हा सुरू करा';
+
+  @override
+  String get s05MonthlyDraftInProgress =>
+      'मासिक मसुदा ऑडिट सुरू आहे. तपासणी पुढे चालू ठेवण्यासाठी पुन्हा सुरू करा.';
+
+  @override
+  String get s05MonthlyAuditsRunByOwner =>
+      'मासिक धोरणात्मक ऑडिट स्टोअर मालकाद्वारे (Owner) चालवले जाते.';
+
+  @override
+  String s05MonthYearLabel(String month, int year) {
+    return '$month, $year';
+  }
+
+  @override
+  String get s05MonthlySubtitle =>
+      'धोरणात्मक स्पॉट-चेक व कल पुनरावलोकन (लक्ष्य: ९५%+)';
+
+  @override
+  String get s05ViewWeeklyReport => 'साप्ताहिक अहवाल पहा (S21)';
+
+  @override
   String get s05AuditHistoryTitle => 'ऑडिट इतिहास';
 
   @override
@@ -400,6 +437,9 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s06WeeklyTitle => 'साप्ताहिक ऑडिट सुरू करा';
 
   @override
+  String get s06MonthlyTitle => 'मासिक धोरणात्मक ऑडिट सुरू करा';
+
+  @override
   String get s06AuditDate => 'ऑडिट तारीख';
 
   @override
@@ -416,7 +456,38 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s06BeginAudit => 'ऑडिट सुरू करा';
 
   @override
+  String get s06SubmittedAuditExistsDaily =>
+      'या तारखेसाठी सादर केलेले ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास ते अधिक्रमित होईल (इतिहास जपला जाईल).';
+
+  @override
+  String get s06DraftAuditExistsDaily =>
+      'या तारखेसाठी मसुदा ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास तो बदलला जाईल.';
+
+  @override
+  String s06SubmittedAuditExistsWeekly(int week, int year) {
+    return 'आठवडा $week, $year साठी सादर केलेले साप्ताहिक ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास ते अधिक्रमित होईल.';
+  }
+
+  @override
+  String s06DraftAuditExistsWeekly(int week, int year) {
+    return 'आठवडा $week, $year साठी साप्ताहिक मसुदा ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास तो बदलला जाईल.';
+  }
+
+  @override
+  String s06SubmittedAuditExistsMonthly(String month, int year) {
+    return '$month, $year साठी सादर केलेले मासिक ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास ते अधिक्रमित होईल.';
+  }
+
+  @override
+  String s06DraftAuditExistsMonthly(String month, int year) {
+    return '$month, $year साठी मासिक मसुदा ऑडिट अस्तित्वात आहे. नवीन सुरू केल्यास तो बदलला जाईल.';
+  }
+
+  @override
   String get s10WeeklyScoreTitle => 'साप्ताहिक ऑडिट गुण';
+
+  @override
+  String get s10MonthlyScoreTitle => 'मासिक धोरणात्मक ऑडिट गुण';
 
   @override
   String get s10DailyAvgContribution => 'दैनंदिन सरासरी योगदान';
@@ -429,6 +500,9 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s11WeeklyTitle => 'साप्ताहिक ऑडिट सादर झाले';
+
+  @override
+  String get s11MonthlyTitle => 'मासिक ऑडिट सादर झाले';
 
   @override
   String s07CheckpointNumber(int current, int total) {
@@ -1500,7 +1574,7 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s12FilterWeekly => 'साप्ताहिक';
 
   @override
-  String get s12FilterMonthly => 'मासिक (टप्पा ३)';
+  String get s12FilterMonthly => 'मासिक';
 
   @override
   String get s12NoAuditsFound => 'कोणतेही ऑडिट आढळले नाही';
@@ -2188,11 +2262,11 @@ class AppLocalizationsMr extends AppLocalizations {
   String get capOversightVerifyNow => 'आता पडताळा';
 
   @override
-  String get s20ScreenTitle => 'साप्ताहिक अहवाल';
+  String get s20ScreenTitle => 'अनुपालन अहवाल';
 
   @override
   String get s20ScreenSubtitle =>
-      'कार्यपुस्तिका §3.6 अहवाल आणि 1-पान PDF निर्यात';
+      'साप्ताहिक व मासिक अहवाल, कल विश्लेषण आणि PDF निर्यात';
 
   @override
   String get s20FilterAll => 'सर्व';
@@ -2369,4 +2443,208 @@ class AppLocalizationsMr extends AppLocalizations {
   String s21PdfExportError(String error) {
     return 'PDF निर्यात अयशस्वी: $error';
   }
+
+  @override
+  String get s10ClosingCashVarianceTitle => 'बंद रोख तफावत';
+
+  @override
+  String get s10CashVarianceSubtitle =>
+      'प्रत्यक्ष ताळमेळातील गल्ल्याची रोख तफावत नोंदवा (सहनशीलता: ₹५००).';
+
+  @override
+  String get s10CashVarianceLabel => 'तफावत (₹)';
+
+  @override
+  String get s10CashVarianceHelper =>
+      '> ₹५०० ची तफावत आपोआप GM / मालकांना इशारा पाठवते (ट्रिगर ३).';
+
+  @override
+  String get s33EscalationsTitle => 'एस्केलेशन्स';
+
+  @override
+  String get s33EscalationsSubtitle => 'थ्रेशोल्ड उल्लंघन आणि आपत्कालीन इशारे';
+
+  @override
+  String get s33FilterAll => 'सर्व';
+
+  @override
+  String get s33FilterOpen => 'उघडे';
+
+  @override
+  String get s33FilterAcknowledged => 'मान्य केलेले';
+
+  @override
+  String get s33FilterResolved => 'सोडवलेले';
+
+  @override
+  String get s33EmptyOpen => 'कोणतेही उघडे एस्केलेशन नाही';
+
+  @override
+  String get s33EmptyOpenDesc =>
+      'स्टोअर कामकाज, रोख मोजणी आणि स्टॉक अपेक्षित मर्यादेत आहेत.';
+
+  @override
+  String s33TriggerLabel(int number) {
+    return 'ट्रिगर $number';
+  }
+
+  @override
+  String get s33AcknowledgeAction => 'मान्य करा';
+
+  @override
+  String get s33ResolveAction => 'निवारण करा';
+
+  @override
+  String get s33CopyAction => 'इशारा संदेश कॉपी करा';
+
+  @override
+  String get s33CopiedSuccess => 'एस्केलेशन संदेश क्लिपबोर्डवर कॉपी केला';
+
+  @override
+  String get s33WhatsAppAction => 'व्हॉट्सअॅप';
+
+  @override
+  String get s33ResolutionNotesTitle => 'निवारण नोंदी';
+
+  @override
+  String get s33ResolutionNotesHint =>
+      'केलेल्या सुधारात्मक कृतींचे वर्णन करा...';
+
+  @override
+  String get s33ResolutionNotesRequired =>
+      'एस्केलेशन सोडवण्यासाठी निवारण नोंदी आवश्यक आहेत.';
+
+  @override
+  String get s33AcknowledgeSuccess => 'एस्केलेशन मान्य केले';
+
+  @override
+  String get s33ResolveSuccess => 'एस्केलेशन सोडवले';
+
+  @override
+  String get s33RaiseManualTitle => 'मॅन्युअल एस्केलेशन नोंदवा';
+
+  @override
+  String get s33WhatHappenedLabel => 'काय झाले';
+
+  @override
+  String get s33EvidenceLabel => 'पुरावा';
+
+  @override
+  String get s33ImpactLabel => 'कार्यवाहक परिणाम';
+
+  @override
+  String get s33ActionLabel => 'मागितलेली कृती';
+
+  @override
+  String get s33SaveManualButton => 'एस्केलेशन सादर करा';
+
+  @override
+  String get s33UrgencyImmediate => 'तातडीने';
+
+  @override
+  String get s33UrgencySameDay => 'त्याच दिवशी';
+
+  @override
+  String get s33UrgencySameNight => 'त्याच रात्री';
+
+  @override
+  String get s33UrgencyNextAudit => 'पुढील ऑडिट';
+
+  @override
+  String get s33TargetOwner => 'प्रति: मालक';
+
+  @override
+  String get s33TargetGm => 'प्रति: GM';
+
+  @override
+  String get s33WhatsAppSentBadge => 'व्हॉट्सअॅप पाठवले';
+
+  @override
+  String get fieldRequired => 'हे फील्ड आवश्यक आहे';
+
+  @override
+  String get s27RunAgingTitle => 'कॅप एजिंग तपासा';
+
+  @override
+  String get s27RunAgingSubtitle =>
+      'मुदत संपलेले कॅप तपासा आणि आता इशारे पाठवा';
+
+  @override
+  String s27RunAgingSuccess(int aged, int pending, int escalations) {
+    return 'कॅप एजिंग पूर्ण: $aged जुने झाले, $pending पडताळणी प्रलंबित, $escalations इशारे पाठवले';
+  }
+
+  @override
+  String get s10InventoryVarianceTitle => 'साप्ताहिक इन्व्हेंटरी तफावत';
+
+  @override
+  String get s10InventoryVarianceSubtitle =>
+      'प्रत्यक्ष स्टॉक आणि सिस्टीम नोंदींमधील मोजलेली % तफावत प्रविष्ट करा (नियम §7 / T4).';
+
+  @override
+  String get s10InventoryVarianceLabel => 'इन्व्हेंटरी तफावत (%)';
+
+  @override
+  String get s10InventoryVarianceHelper =>
+      'तफावत 2.0% पेक्षा जास्त असल्यास मालकाला तात्काळ इशारा पाठवला जातो (ट्रिगर ४).';
+
+  @override
+  String get s07SecurityConcernLabel => 'सुरक्षा चिंता';
+
+  @override
+  String get s07SecurityConcernSubtitle =>
+      'या तपासणी बिंदूमध्ये सुरक्षा किंवा चोरीचा धोका असल्यास चिन्हांकित करा (मालकास तात्काळ इशारा).';
+
+  @override
+  String get s20FilterWeekly => 'साप्ताहिक';
+
+  @override
+  String get s20FilterMonthly => 'मासिक';
+
+  @override
+  String get s21MonthlyScreenTitle => 'मासिक कल अहवाल';
+
+  @override
+  String get s21MonthlySubtitle =>
+      'कार्यपुस्तिका §3.7 धोरणात्मक तपासणी आणि बहु-आठवडा कल';
+
+  @override
+  String get s21MonthlySpotCheckSection => 'विभाग २: धोरणात्मक स्पॉट-तपासण्या';
+
+  @override
+  String get s21MonthlyTrendAnalyticsSection =>
+      'विभाग ३: बहु-आठवडा कल विश्लेषण';
+
+  @override
+  String s21MonthlyFindingsSection(int count) {
+    return 'विभाग ४: स्पॉट-तपासणी त्रुटी ($count)';
+  }
+
+  @override
+  String get s21MonthlyNoFindings =>
+      'कोणतीही स्पॉट-तपासणी त्रुटी नोंदवली गेली नाही.';
+
+  @override
+  String get s21MonthlyCapsRollupSection => 'विभाग ५: मासिक कॅप सारांश';
+
+  @override
+  String get s21MonthlyEscalationsRollupSection =>
+      'विभाग ६: मासिक एस्केलेशन सारांश';
+
+  @override
+  String get s21MonthlySpotCheckLabel => 'धोरणात्मक स्पॉट-तपासणी गुण';
+
+  @override
+  String get s21MonthlyWeeklyAvgLabel => 'महिन्यातील साप्ताहिक सरासरी';
+
+  @override
+  String get s21MonthlyNoCaps =>
+      'या महिन्यात कोणतीही कॅप उघडलेली, बंद किंवा जुनी झालेली नाही.';
+
+  @override
+  String get s21MonthlyNoEscalations =>
+      'या महिन्यात कोणतीही वाढ किंवा इशारा नोंदवला गेला नाही.';
+
+  @override
+  String get s21ExportMonthlyPdfButton => 'मासिक PDF निर्यात करा';
 }

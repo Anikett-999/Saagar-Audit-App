@@ -49,7 +49,11 @@ class FakeDatabase extends Fake implements Database, Transaction {
         );
       }
     }
-    list.add(Map<String, Object?>.from(values));
+    final rowToInsert = Map<String, Object?>.from(values);
+    if (table == 'audit_results' && !rowToInsert.containsKey('flag_security_concern')) {
+      rowToInsert['flag_security_concern'] = 0;
+    }
+    list.add(rowToInsert);
     return 1;
   }
 
@@ -81,6 +85,10 @@ class FakeDatabase extends Fake implements Database, Transaction {
             final weekVal = whereArgs[argIdx++];
             results = results.where((r) => r['week_number'] == weekVal).toList();
           }
+          if (where.contains('month_number = ?') && whereArgs != null && argIdx < whereArgs.length) {
+            final monthVal = whereArgs[argIdx++];
+            results = results.where((r) => r['month_number'] == monthVal).toList();
+          }
           if (where.contains('year = ?') && whereArgs != null && argIdx < whereArgs.length) {
             final yearVal = whereArgs[argIdx++];
             results = results.where((r) => r['year'] == yearVal).toList();
@@ -107,12 +115,23 @@ class FakeDatabase extends Fake implements Database, Transaction {
           if (where.contains("audit_type = 'weekly'")) {
             results = results.where((r) => r['audit_type'] == 'weekly').toList();
           }
+          if (where.contains("audit_type = 'monthly'")) {
+            results = results.where((r) => r['audit_type'] == 'monthly').toList();
+          }
           if (where.contains("status = 'submitted'")) {
             results = results.where((r) => r['status'] == 'submitted').toList();
           }
           if (where.contains('auditor_id = ?') && whereArgs != null && argIdx < whereArgs.length) {
             final auditorId = whereArgs[argIdx++];
             results = results.where((r) => r['auditor_id'] == auditorId).toList();
+          }
+          if (where.contains('audit_date < ?') && whereArgs != null && argIdx < whereArgs.length) {
+            final dateVal = whereArgs[argIdx++] as String;
+            results = results.where((r) => (r['audit_date'] as String? ?? '').compareTo(dateVal) < 0).toList();
+          }
+          if (where.contains('audit_date <= ?') && whereArgs != null && argIdx < whereArgs.length) {
+            final dateVal = whereArgs[argIdx++] as String;
+            results = results.where((r) => (r['audit_date'] as String? ?? '').compareTo(dateVal) <= 0).toList();
           }
         }
       } else if (table == 'caps') {
@@ -153,6 +172,10 @@ class FakeDatabase extends Fake implements Database, Transaction {
               final dl = r['deadline'] as String? ?? '';
               return st == 'aged' || ((st == 'open' || st == 'reopened') && dl.compareTo(nowStr) < 0);
             }).toList();
+          } else if (where.contains("status IN ('open', 'done')")) {
+            results = results
+                .where((r) => r['status'] == 'open' || r['status'] == 'done')
+                .toList();
           } else if (where.contains("status IN ('open', 'reopened')")) {
             results = results
                 .where((r) => r['status'] == 'open' || r['status'] == 'reopened')
@@ -165,6 +188,24 @@ class FakeDatabase extends Fake implements Database, Transaction {
                 .toList();
           }
 
+          // Date range filters
+          if (where.contains('opened_at >= ? AND opened_at < ?') && whereArgs != null && argIdx + 1 < whereArgs.length) {
+            final start = whereArgs[argIdx++] as String;
+            final end = whereArgs[argIdx++] as String;
+            results = results.where((r) {
+              final op = r['opened_at'] as String? ?? '';
+              return op.compareTo(start) >= 0 && op.compareTo(end) < 0;
+            }).toList();
+          }
+          if (where.contains('closed_at >= ? AND closed_at < ?') && whereArgs != null && argIdx + 1 < whereArgs.length) {
+            final start = whereArgs[argIdx++] as String;
+            final end = whereArgs[argIdx++] as String;
+            results = results.where((r) {
+              final cl = r['closed_at'] as String? ?? '';
+              return cl.compareTo(start) >= 0 && cl.compareTo(end) < 0;
+            }).toList();
+          }
+
           // Search text
           if (where.contains('problem_statement LIKE ? OR id LIKE ?') && whereArgs != null && argIdx < whereArgs.length) {
             final pattern = (whereArgs[argIdx++] as String).replaceAll('%', '').toLowerCase();
@@ -175,6 +216,57 @@ class FakeDatabase extends Fake implements Database, Transaction {
               return ps.contains(pattern) || id.contains(pattern);
             }).toList();
           }
+        }
+      } else if (table == 'escalations') {
+        var argIdx = 0;
+        if (where == 'id = ?' && whereArgs != null && whereArgs.isNotEmpty) {
+          results = results.where((r) => r['id'] == whereArgs[0]).toList();
+        } else if (where.contains('trigger_number = ?') && whereArgs != null && whereArgs.length >= 3) {
+          final tNum = whereArgs[0];
+          final sourceId = whereArgs[1];
+          final userId = whereArgs[2];
+          final whatHappened = whereArgs.length >= 4 ? whereArgs[3] : null;
+          final isCap = where.contains('source_cap_id = ?');
+          final isStatusActive = where.contains("status IN ('open', 'acknowledged')");
+          results = results.where((r) =>
+            r['trigger_number'] == tNum &&
+            (isCap ? r['source_cap_id'] == sourceId : r['source_audit_id'] == sourceId) &&
+            r['raised_to_user_id'] == userId &&
+            (whatHappened == null || r['what_happened'] == whatHappened) &&
+            (!isStatusActive || r['status'] == 'open' || r['status'] == 'acknowledged'),
+          ).toList();
+        } else {
+          if (where.contains('raised_at >= ? AND raised_at < ?') && whereArgs != null && argIdx + 1 < whereArgs.length) {
+            final start = whereArgs[argIdx++] as String;
+            final end = whereArgs[argIdx++] as String;
+            results = results.where((r) {
+              final ra = r['raised_at'] as String? ?? '';
+              return ra.compareTo(start) >= 0 && ra.compareTo(end) < 0;
+            }).toList();
+          }
+          if (where.contains('status = ?') && whereArgs != null && argIdx < whereArgs.length) {
+            final statusVal = whereArgs[argIdx++];
+            results = results.where((r) => r['status'] == statusVal).toList();
+          }
+          if (where.contains('raised_to_user_id = ?') && whereArgs != null && argIdx < whereArgs.length) {
+            final userVal = whereArgs[argIdx++];
+            results = results.where((r) => r['raised_to_user_id'] == userVal).toList();
+          }
+        }
+      } else if (table == 'users') {
+        if (where == 'id = ? AND is_active = 1' && whereArgs != null && whereArgs.isNotEmpty) {
+          results = results.where((r) => r['id'] == whereArgs[0] && (r['is_active'] == 1 || r['is_active'] == true)).toList();
+        } else if (where.contains("role = 'OWNER'")) {
+          results = results.where((r) => r['role'] == 'OWNER' && (r['is_active'] == 1 || r['is_active'] == true)).toList();
+        } else if (where.contains("role = 'GM'")) {
+          results = results.where((r) => r['role'] == 'GM' && (r['is_active'] == 1 || r['is_active'] == true)).toList();
+        } else if (where.contains('role = ?') && whereArgs != null && whereArgs.isNotEmpty) {
+          final roleVal = whereArgs[0];
+          results = results.where((r) => r['role'] == roleVal && (r['is_active'] == 1 || r['is_active'] == true)).toList();
+        } else if (where == 'is_active = 1') {
+          results = results.where((r) => r['is_active'] == 1 || r['is_active'] == true).toList();
+        } else if (where == 'id = ?' && whereArgs != null && whereArgs.isNotEmpty) {
+          results = results.where((r) => r['id'] == whereArgs[0]).toList();
         }
       } else {
         if (where == 'is_active = 1') {

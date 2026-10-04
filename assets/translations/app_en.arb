@@ -137,6 +137,22 @@
       "year": {"type": "int"}
     }
   },
+  "s05ThisMonthMonthlyAudit": "This month's strategic audit",
+  "s05MonthlyNotStartedYet": "You haven't started this month's audit yet.",
+  "s05MonthlyNotStartedAdmin": "This month's strategic audit has not been started yet.",
+  "s05StartMonthlyAudit": "Start monthly audit",
+  "s05ResumeMonthlyDraft": "Resume monthly draft",
+  "s05MonthlyDraftInProgress": "A monthly draft audit is in progress. Resume to continue marking checkpoints.",
+  "s05MonthlyAuditsRunByOwner": "Monthly strategic audits are run by the Store Owner.",
+  "s05MonthYearLabel": "{month}, {year}",
+  "@s05MonthYearLabel": {
+    "placeholders": {
+      "month": {"type": "String"},
+      "year": {"type": "int"}
+    }
+  },
+  "s05MonthlySubtitle": "Strategic spot-checks & trend review (Target: 95%+)",
+  "s05ViewWeeklyReport": "View Weekly Report (S21)",
   "s05AuditHistoryTitle": "Audit history",
   "s05AuditHistorySubtitle": "View past daily audits",
   "s05CapsTitle": "CAPs",
@@ -150,17 +166,50 @@
 
   "s06Title": "Start Daily Audit",
   "s06WeeklyTitle": "Start Weekly Audit",
+  "s06MonthlyTitle": "Start Monthly Strategic Audit",
   "s06AuditDate": "Audit Date",
   "s06StoreLabel": "Store",
   "s06CrosOnDuty": "CROs on Duty",
   "s06SelectAtLeastOneCro": "Please select at least one CRO on duty.",
   "s06BeginAudit": "Begin Audit",
+  "s06SubmittedAuditExistsDaily": "A submitted audit exists for this date. Starting a new one will supersede it (history preserved).",
+  "s06DraftAuditExistsDaily": "A draft audit exists for this date. Starting a new one will replace it.",
+  "s06SubmittedAuditExistsWeekly": "A submitted weekly audit exists for Week {week}, {year}. Starting a new one will supersede it.",
+  "@s06SubmittedAuditExistsWeekly": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "year": {"type": "int"}
+    }
+  },
+  "s06DraftAuditExistsWeekly": "A draft weekly audit exists for Week {week}, {year}. Starting a new one will replace it.",
+  "@s06DraftAuditExistsWeekly": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "year": {"type": "int"}
+    }
+  },
+  "s06SubmittedAuditExistsMonthly": "A submitted monthly audit exists for {month}, {year}. Starting a new one will supersede it.",
+  "@s06SubmittedAuditExistsMonthly": {
+    "placeholders": {
+      "month": {"type": "String"},
+      "year": {"type": "int"}
+    }
+  },
+  "s06DraftAuditExistsMonthly": "A draft monthly audit exists for {month}, {year}. Starting a new one will replace it.",
+  "@s06DraftAuditExistsMonthly": {
+    "placeholders": {
+      "month": {"type": "String"},
+      "year": {"type": "int"}
+    }
+  },
 
   "s10WeeklyScoreTitle": "Weekly Audit Score",
+  "s10MonthlyScoreTitle": "Monthly Strategic Audit Score",
   "s10DailyAvgContribution": "Daily Average Contribution",
   "s10WeeklyCheckpointsScore": "Weekly Checkpoints Score",
   "s10CashVarianceTitle": "Cumulative Cash Variance (CW.7)",
   "s11WeeklyTitle": "Weekly Audit Submitted",
+  "s11MonthlyTitle": "Monthly Audit Submitted",
 
   "s07CheckpointNumber": "Checkpoint {current} of {total}",
   "@s07CheckpointNumber": {"placeholders": {"current": {"type": "int"}, "total": {"type": "int"}}},
@@ -658,7 +707,7 @@
   "s12FilterDaily": "Daily",
   "s12FilterUnverified": "Unverified",
   "s12FilterWeekly": "Weekly",
-  "s12FilterMonthly": "Monthly (Phase 3)",
+  "s12FilterMonthly": "Monthly",
   "s12NoAuditsFound": "No audits found",
   "s12NoAuditsMatchFilter": "No audits match the selected filter.",
   "s12CompleteAuditPrompt": "Complete and submit a daily audit to view history here.",
@@ -1003,8 +1052,8 @@
   "capOversightAwaitingSection": "Awaiting My Verification",
   "capOversightNoAwaiting": "No CAPs awaiting verification",
   "capOversightVerifyNow": "Verify Now",
-  "s20ScreenTitle": "Weekly Reports",
-  "s20ScreenSubtitle": "Workbook §3.6 reports & 1-page PDF export",
+  "s20ScreenTitle": "Compliance Reports",
+  "s20ScreenSubtitle": "Weekly & monthly reports, trend analytics & PDF export",
   "s20FilterAll": "All",
   "s20EmptyTitle": "No Weekly Reports Yet",
   "s20EmptySubtitle": "Weekly reports are generated upon completing weekly compliance audits.",
@@ -1133,7 +1182,85 @@
     "placeholders": {
       "error": {"type": "String"}
     }
-  }
+  },
+  "s10ClosingCashVarianceTitle": "Closing Cash Variance",
+  "s10CashVarianceSubtitle": "Enter till cash variance from physical reconciliation (tolerance: ₹500).",
+  "s10CashVarianceLabel": "Variance (₹)",
+  "s10CashVarianceHelper": "Variance > ₹500 automatically triggers an alert to GM / Owner (Trigger 3).",
+  "s33EscalationsTitle": "Escalations",
+  "s33EscalationsSubtitle": "Threshold breaches & emergency alerts",
+  "s33FilterAll": "All",
+  "s33FilterOpen": "Open",
+  "s33FilterAcknowledged": "Acknowledged",
+  "s33FilterResolved": "Resolved",
+  "s33EmptyOpen": "No Open Escalations",
+  "s33EmptyOpenDesc": "Store operations, cash counts, and inventory are within expected tolerances.",
+  "s33TriggerLabel": "Trigger {number}",
+  "@s33TriggerLabel": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "s33AcknowledgeAction": "Acknowledge",
+  "s33ResolveAction": "Resolve",
+  "s33CopyAction": "Copy Alert",
+  "s33CopiedSuccess": "Escalation message copied to clipboard",
+  "s33WhatsAppAction": "WhatsApp",
+  "s33ResolutionNotesTitle": "Resolution Notes",
+  "s33ResolutionNotesHint": "Describe corrective actions taken...",
+  "s33ResolutionNotesRequired": "Resolution notes are required to resolve an escalation.",
+  "s33AcknowledgeSuccess": "Escalation acknowledged",
+  "s33ResolveSuccess": "Escalation resolved",
+  "s33RaiseManualTitle": "Raise Manual Escalation",
+  "s33WhatHappenedLabel": "What happened",
+  "s33EvidenceLabel": "Evidence",
+  "s33ImpactLabel": "Operational Impact",
+  "s33ActionLabel": "Requested Action",
+  "s33SaveManualButton": "Submit Escalation",
+  "s33UrgencyImmediate": "Immediate",
+  "s33UrgencySameDay": "Same Day",
+  "s33UrgencySameNight": "Same Night",
+  "s33UrgencyNextAudit": "Next Audit",
+  "s33TargetOwner": "To: Owner",
+  "s33TargetGm": "To: GM",
+  "s33WhatsAppSentBadge": "WhatsApp Sent",
+  "fieldRequired": "This field is required",
+  "s27RunAgingTitle": "Run CAP Aging Check",
+  "s27RunAgingSubtitle": "Evaluate overdue CAPs and raise escalations now",
+  "s27RunAgingSuccess": "CAP Aging complete: {aged} aged, {pending} pending verification, {escalations} escalations raised",
+  "@s27RunAgingSuccess": {
+    "placeholders": {
+      "aged": {"type": "int"},
+      "pending": {"type": "int"},
+      "escalations": {"type": "int"}
+    }
+  },
+  "s10InventoryVarianceTitle": "Weekly Inventory Variance",
+  "s10InventoryVarianceSubtitle": "Enter measured % variance between physical stock and system records (Spec §7 / T4).",
+  "s10InventoryVarianceLabel": "Inventory Variance (%)",
+  "s10InventoryVarianceHelper": "Alert triggers to Owner if variance exceeds 2.0% (Trigger 4).",
+  "s07SecurityConcernLabel": "Security Concern",
+  "s07SecurityConcernSubtitle": "Flag if this checkpoint presents a security or theft risk (triggers immediate alert to Owner).",
+  "s20FilterWeekly": "Weekly",
+  "s20FilterMonthly": "Monthly",
+  "s21MonthlyScreenTitle": "Monthly Trend Report",
+  "s21MonthlySubtitle": "Workbook §3.7 Strategic Spot-Checks & Multi-Week Trends",
+  "s21MonthlySpotCheckSection": "Section 2: Strategic Spot-Checks",
+  "s21MonthlyTrendAnalyticsSection": "Section 3: Multi-Week Trend Analytics",
+  "s21MonthlyFindingsSection": "Section 4: Spot-Check Non-Compliances ({count})",
+  "@s21MonthlyFindingsSection": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21MonthlyNoFindings": "No spot-check non-compliances recorded.",
+  "s21MonthlyCapsRollupSection": "Section 5: Monthly CAPs Rollup",
+  "s21MonthlyEscalationsRollupSection": "Section 6: Monthly Escalations Rollup",
+  "s21MonthlySpotCheckLabel": "Strategic Spot-Check Score",
+  "s21MonthlyWeeklyAvgLabel": "Month Weekly Audits Average",
+  "s21MonthlyNoCaps": "No CAPs opened, closed, or aged this month.",
+  "s21MonthlyNoEscalations": "No escalations triggered during this month.",
+  "s21ExportMonthlyPdfButton": "Export Monthly PDF"
 }
 
 
