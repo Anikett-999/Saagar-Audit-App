@@ -9,6 +9,8 @@ import 'package:printing/printing.dart';
 import '../../../data/backup_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../providers/cloud_sync_provider.dart';
+import '../../../services/cloud_sync_service.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
 
@@ -374,21 +376,28 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
                                 ),
                               ),
                               const SizedBox(height: 2),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: AppColors.navyLight.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  l10n.s32CloudSyncComingSoonBadge,
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.navyLight,
-                                    fontFamily: 'DMSans',
-                                  ),
-                                ),
+                              Consumer(
+                                builder: (context, ref, _) {
+                                  final syncState = ref.watch(cloudSyncProvider);
+                                  final isOk = syncState.status == CloudSyncStatus.success;
+                                  final badgeColor = isOk ? AppColors.green : AppColors.navyLight;
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: badgeColor.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      l10n.s32CloudSyncComingSoonBadge,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        color: badgeColor,
+                                        fontFamily: 'DMSans',
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
                             ],
                           ),
@@ -407,69 +416,243 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Status Indicator
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.gray100,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.gray200),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.cloud_off,
-                                color: AppColors.gray600,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  l10n.s32CloudSyncStatusLabel,
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.navy,
-                                    fontFamily: 'DMSans',
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            l10n.s32CloudSyncPhase4Notice,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.gray600,
-                              fontFamily: 'DMSans',
+                    // Live Status Indicator Card
+                    Builder(
+                      builder: (context) {
+                        final syncState = ref.watch(cloudSyncProvider);
+                        IconData statusIcon;
+                        Color statusColor;
+                        String statusText;
+
+                        switch (syncState.status) {
+                          case CloudSyncStatus.syncing:
+                            statusIcon = Icons.sync;
+                            statusColor = AppColors.gold;
+                            statusText = l10n.s32CloudSyncStatusSyncing;
+                            break;
+                          case CloudSyncStatus.success:
+                            statusIcon = Icons.cloud_done;
+                            statusColor = AppColors.green;
+                            statusText = l10n.s32CloudSyncStatusSuccess;
+                            break;
+                          case CloudSyncStatus.error:
+                            statusIcon = Icons.sync_problem;
+                            statusColor = AppColors.red;
+                            statusText = l10n.s32CloudSyncStatusError(
+                              syncState.errorMessage ?? 'Unknown',
+                            );
+                            break;
+                          case CloudSyncStatus.offline:
+                            statusIcon = Icons.cloud_off;
+                            statusColor = AppColors.gray600;
+                            statusText = l10n.s32CloudSyncStatusOffline;
+                            break;
+                          case CloudSyncStatus.unconfigured:
+                            statusIcon = Icons.cloud_queue;
+                            statusColor = AppColors.navyLight;
+                            statusText = l10n.s32CloudSyncStatusUnconfigured;
+                            break;
+                          case CloudSyncStatus.idle:
+                            statusIcon = Icons.cloud_sync;
+                            statusColor = AppColors.navy;
+                            statusText = l10n.s32CloudSyncStatusIdle;
+                            break;
+                        }
+
+                        final lastSyncText = syncState.lastSyncAt != null
+                            ? l10n.s32CloudSyncLastSync(
+                                '${syncState.lastSyncAt!.day}/${syncState.lastSyncAt!.month}/${syncState.lastSyncAt!.year} '
+                                '${syncState.lastSyncAt!.hour.toString().padLeft(2, '0')}:${syncState.lastSyncAt!.minute.toString().padLeft(2, '0')}',
+                              )
+                            : l10n.s32CloudSyncLastSync(l10n.s32CloudSyncNever);
+
+                        return Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: statusColor.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: statusColor.withValues(alpha: 0.3),
                             ),
                           ),
-                        ],
-                      ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    statusIcon,
+                                    color: statusColor,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      statusText,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: statusColor,
+                                        fontFamily: 'DMSans',
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                lastSyncText,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.gray600,
+                                  fontFamily: 'DMSans',
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                l10n.s32CloudSyncPending(syncState.pendingCount),
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.navy,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'DMSans',
+                                ),
+                              ),
+                              if (syncState.status == CloudSyncStatus.syncing) ...[
+                                const SizedBox(height: 8),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: LinearProgressIndicator(
+                                    value: syncState.progress > 0
+                                        ? syncState.progress
+                                        : null,
+                                    backgroundColor: AppColors.gray200,
+                                    color: AppColors.gold,
+                                    minHeight: 4,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 16),
 
-                    // Disabled Force Sync Button with Phase 4 indicator
-                    OutlinedButton.icon(
-                      onPressed: null,
-                      icon: const Icon(Icons.sync_disabled),
-                      label: Text(
-                        '${l10n.s32ForceSyncButton} (${l10n.s32CloudSyncComingSoonBadge})',
-                        style: const TextStyle(
-                          fontFamily: 'DMSans',
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
+                    // Active Force Sync Button
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final syncState = ref.watch(cloudSyncProvider);
+                        final isSyncing =
+                            syncState.status == CloudSyncStatus.syncing;
+
+                        return ElevatedButton.icon(
+                          onPressed: isSyncing
+                              ? null
+                              : () async {
+                                  final res = await ref
+                                      .read(cloudSyncProvider.notifier)
+                                      .syncNow(force: true);
+                                  if (context.mounted) {
+                                    if (res.success) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            l10n.s32SyncSuccessNotice(
+                                              res.pushedRecords +
+                                                  res.pulledRecords +
+                                                  res.uploadedPhotos,
+                                            ),
+                                          ),
+                                          backgroundColor: AppColors.green,
+                                          behavior: SnackBarBehavior.floating,
+                                        ),
+                                      );
+                                    } else if (res.status == CloudSyncStatus.unconfigured) {
+                                      showDialog<void>(
+                                        context: context,
+                                        builder: (ctx) => AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(16),
+                                          ),
+                                          title: Row(
+                                            children: [
+                                              const Icon(Icons.cloud_queue, color: AppColors.navy),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                l10n.s32CloudSyncTitle,
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          content: Text(
+                                            res.message ?? l10n.s32CloudSyncPhase4Notice,
+                                            style: const TextStyle(fontSize: 14, height: 1.4),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(ctx),
+                                              child: const Text('OK'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } else if (res.status == CloudSyncStatus.offline) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(l10n.s32CloudSyncStatusOffline),
+                                          backgroundColor: AppColors.amber,
+                                          behavior: SnackBarBehavior.floating,
+                                        ),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            res.message ??
+                                                l10n.s32CloudSyncStatusError(
+                                                  'Failed',
+                                                ),
+                                          ),
+                                          backgroundColor: AppColors.red,
+                                          behavior: SnackBarBehavior.floating,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                          icon: isSyncing
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Icon(Icons.sync),
+                          label: Text(
+                            isSyncing
+                                ? l10n.s32CloudSyncStatusSyncing
+                                : l10n.s32ForceSyncButton,
+                            style: const TextStyle(
+                              fontFamily: 'DMSans',
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            backgroundColor: AppColors.navy,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),

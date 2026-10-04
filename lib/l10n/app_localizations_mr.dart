@@ -989,13 +989,61 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s32CloudSyncPhase4Notice =>
-      'फेज ४ मध्ये उपलब्ध होईल. सर्व ऑर्डिट्स आणि सेटिंग्ज या डिव्हाइसवर सुरक्षितपणे स्थानिकरित्या साठवल्या आहेत.';
+      'सर्व ऑडिट, CAPs आणि अहवाल या डिव्हाइसवर सुरक्षितपणे स्थानिकरीत्या जतन केले आहेत.';
 
   @override
-  String get s32CloudSyncComingSoonBadge => 'फेज ४ मध्ये येत आहे';
+  String get s32CloudSyncComingSoonBadge => 'सक्रिय मिरर';
 
   @override
   String get s32ForceSyncButton => 'क्लाउड सिंक करा';
+
+  @override
+  String get s32CloudSyncStatusIdle => 'स्थिती: समक्रमणासाठी सज्ज';
+
+  @override
+  String get s32CloudSyncStatusSyncing =>
+      'स्थिती: क्लाउडसह समक्रमित होत आहे...';
+
+  @override
+  String get s32CloudSyncStatusSuccess =>
+      'स्थिती: सर्व डेटा समक्रमित (क्लाउड अद्ययावत)';
+
+  @override
+  String s32CloudSyncStatusError(String error) {
+    return 'स्थिती: समक्रमण त्रुटी ($error)';
+  }
+
+  @override
+  String get s32CloudSyncStatusOffline => 'स्थिती: ऑफलाइन (लोकल SQLite सक्रिय)';
+
+  @override
+  String get s32CloudSyncStatusUnconfigured =>
+      'स्थिती: क्लाउड बॅकएंड ऑफलाइन / स्टँडबाय';
+
+  @override
+  String s32CloudSyncLastSync(String time) {
+    return 'शेवटचे समक्रमण: $time';
+  }
+
+  @override
+  String get s32CloudSyncNever => 'कधीही नाही';
+
+  @override
+  String s32CloudSyncPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count बदल अपलोडसाठी प्रलंबित',
+      one: '१ बदल अपलोडसाठी प्रलंबित',
+      zero: 'सर्व स्थानिक बदल जतन झाले आहेत',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String s32SyncSuccessNotice(int count) {
+    return 'क्लाउड मिरर समक्रमण यशस्वीरित्या पूर्ण झाले ($count नोंदी अद्यतनित).';
+  }
 
   @override
   String get s32AboutCardTitle => 'सागर ऑडिट अॅपबद्दल';

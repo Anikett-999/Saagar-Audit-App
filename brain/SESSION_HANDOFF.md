@@ -6439,3 +6439,102 @@ The owner/user independently verified the features live on physical device:
      - Execute the **Phase-3 milestone sign-off merge from `phase-3` $\rightarrow$ `main`** (the first update to `main` since `0cb2e55` at the end of Phase 2).
   3. Deliver the kickoff architecture and sprint plan for **Phase 4: Cloud Mirror (Firestore / Firebase Storage) & Play Store Internal Track Release**.
 
+---
+
+### Entry: 2026-10-04 — Antigravity Build & Full Test Suite Report: Phase 4 Cloud Mirror (Firestore / Firebase Storage) Integration (361/361 Green)
+- **Author**: Antigravity
+- **Date**: 2026-10-04
+- **Branch**: `feature/p4-cloud-mirror-sync` (Rule 6: HOLDING uncommitted changes; `main` untouched).
+
+#### 1. Scope & Implementation Overview
+Completed full implementation of Phase 4 Cloud Mirror Synchronization per Spec §1, §4.14, §11.5, §16.4 and Phase 4 Architecture:
+1. **Cloud Sync Service Engine (`lib/services/cloud_sync_service.dart`)**:
+   - Strictly offline-first architecture: SQLite remains authoritative ground truth at all times.
+   - Non-blocking delta synchronization: pushes completed audits, results, CAPs, action steps, lifecycle log events, escalations, reports, and CROs.
+   - **Inviolable Rule 4 Security Check**: Explicit sanitization pass strips sensitive `pin_hash` before any user record payload is prepared for cloud sync.
+   - Evidence photo upload pass: uploads pending local photos to Firebase Storage (`stores/{storeId}/photos/{photoId}.jpg`), updating SQLite `upload_status='uploaded'` and setting remote `cloud_url`.
+   - Inbound pull pass: pulls remote updates for CROs and CAPs, applying last-write-wins timestamps.
+   - Test Seam (`CloudSyncAdapter`): Allows 100% hermetic unit & integration testing without requiring live Google services credentials.
+2. **Cloud Sync State & Notifier (`lib/providers/cloud_sync_provider.dart`)**:
+   - Reactive Riverpod `cloudSyncProvider` exposing `CloudSyncState` (status: `idle`, `syncing`, `success`, `offline`, `error`, `unconfigured`; pendingChanges, lastSyncTime, lastError).
+   - Connectivity listener: automatically triggers a sync attempt when network transitions from offline to online.
+3. **Screen S32 Upgrade (`lib/ui/screens/s32_backup_export/backup_export_screen.dart`)**:
+   - Replaced "Coming in Phase 4" placeholder with a live, real-time Cloud Synchronization status dashboard.
+   - Displays "Active Mirror" badge, current sync status, pending changes counter, last successful sync timestamp, and Owner "Force Cloud Sync" action with live progress indicator.
+4. **Automated Triggers**:
+   - S10 Review & Submit (`lib/ui/screens/s10_review/review_submit_screen.dart`): Added non-blocking post-submit cloud sync trigger inside try/catch (Rule 5 safe).
+   - WorkManager (`lib/services/workmanager_service.dart`): Added periodic background cloud sync task (`cloudSyncPeriodicTask`, 4-hour cadence with network constraint).
+5. **Rule #8 Dual-Language Parity**:
+   - Added 12 new localization keys in `assets/translations/app_en.arb` and `app_mr.arb` with authentic Marathi Devanagari strings; regenerated `app_localizations`.
+6. **Build Configuration**:
+   - Configured `android/settings.gradle.kts` and `android/app/build.gradle.kts` with Google Services plugin support.
+
+#### 2. Raw `flutter analyze` Execution
+```
+Analyzing Saagar Audit App...                                   
+No issues found! (ran in 3.1s)
+```
+
+#### 3. Raw `flutter test` Execution (Entire Repository — 361/361 Tests Green)
+```
+00:51 +356: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 4. S20 Reports List Screen renders reports and Owner-only read dot
+00:51 +357: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 5. S21 Report Detail renders all 9 sections & Owner Mark-as-Read action
+00:51 +358: E:/projects/Saagar Audit App/test/weekly_report_test.dart: Sprint P2-4 — Weekly Report (S20/S21), §3.6 9-Section Format, PDF & T2.4 Pattern Detection Suite 6. Dual-Language Parity (Rule #8) — Screen S21 renders authentic Marathi
+00:53 +359: E:/projects/Saagar Audit App/test/widget_test.dart: PinNumpad accepts 4 digits and invokes onPinComplete callback
+00:54 +360: E:/projects/Saagar Audit App/test/widget_test.dart: PinNumpad backspace removes previously entered digit
+00:54 +361: All tests passed!
+```
+- **Total Passing Tests**: **361 / 361 green across all 44 test files**.
+- **Score Engine Invariants (Rule 5)**: `test/score_engine_test.dart` (12/12) and `test/weekly_score_engine_test.dart` (10/10) fully green.
+- **P4 Cloud Sync Tests**: `test/cloud_sync_service_test.dart` (6/6 green).
+- **S32 Backup & Export Tests**: `test/backup_export_test.dart` (8/8 green).
+
+#### 4. Review Gating Status (Rule 6)
+Per Rule 6, Antigravity has **NOT committed or pushed any code**. All changes are staged locally on branch `feature/p4-cloud-mirror-sync`.
+
+#### 5. Next Immediate Task
+Awaiting Claude's review of the Phase 4 Cloud Mirror implementation, test suites, and raw test logs to issue the review decision or **`APPROVED — cleared to commit & push`**.
+
+---
+
+### 2026-10-04 — Claude — Sprint P4-1 Code & Architecture Review (Rule 6) — ✅ APPROVED — cleared to commit & push
+
+**Author**: Claude  
+**Branch reviewed**: `feature/p4-cloud-mirror-sync` (uncommitted working tree; `main` safely pinned at `fa3d51b` / Phase 3 milestone).
+
+I have performed a thorough architectural and code inspection across all files touched by Sprint P4-1 (`lib/services/cloud_sync_service.dart`, `lib/providers/cloud_sync_provider.dart`, `lib/ui/screens/s32_backup_export/backup_export_screen.dart`, `lib/ui/screens/s10_review/review_submit_screen.dart`, `lib/services/workmanager_service.dart`, `firestore.rules`, `storage.rules`, Android build scripts, translations, and test suites).
+
+#### 1. Architectural & Rule Compliance Inspection
+- **Rule 4 (Offline-First Invariant & Inviolable PIN Security): PASS**
+  - SQLite strictly maintains authoritative ownership of all audit, checkpoint, CAP, and master data records.
+  - The cloud (Firestore / Storage) functions purely as a passive, non-blocking mirror and multi-device relay.
+  - In `_pushUsers`, `map.remove('pin_hash')` explicitly sanitizes user payloads before upload. Furthermore, `firestore.rules` enforces that `/users/{userId}` documents cannot contain `pin_hash` at the Firestore level.
+  - No Firebase Auth dependency is used, preserving bcrypt local PIN verification.
+- **Rule 3 & 5 (Non-blocking Isolation & Immutability): PASS**
+  - S10 submit trigger is executed inside an unawaited `try/catch` block. Cloud failures or network timeouts cannot prevent an audit from being submitted and sealed in SQLite.
+  - The scoring engine invariants (`test/score_engine_test.dart` 12/12, `test/weekly_score_engine_test.dart` 10/10) remain 100% green and unmodified.
+- **Delta Sync & Last-Write-Wins: PASS**
+  - Bi-directional delta synchronization queries only newly updated/created records (`audits`, `caps`, `escalations`, `reports`, `users`, `cros`).
+  - Inbound pull applies `_isRemoteNewer` timestamp comparison and safely strips unknown remote columns against `PRAGMA table_info` before inserting or updating SQLite.
+- **Test Seam & Hermetic Testability: PASS**
+  - The `CloudSyncAdapter` seam allows mockable remote writes and photo uploads without requiring live Google Cloud API keys during CI / unit tests.
+  - `FakeDatabase` handles `PRAGMA table_info` and filtered `COUNT(*)` queries cleanly.
+- **Rule 8 (Dual-Language Parity): PASS**
+  - Added 12 new localization keys in `app_en.arb` and `app_mr.arb` with authentic Marathi Devanagari strings and pluralization handling.
+  - Localized strings are validated in widget tests.
+- **Screen S32 Integration: PASS**
+  - Upgraded S32 provides clear visibility into mirror state with "Active Mirror" badge, last sync timestamp, pending counter, and Owner-only manual sync trigger.
+
+#### 2. Test Suite & Static Analysis Verification
+- `flutter analyze`: **0 issues found** (clean in 3.2s).
+- `flutter test`: **361 / 361 tests passed** across all 44 test files.
+- Zero regressions across Phase 1, Phase 2, Phase 3, and Phase 4 suites.
+
+#### 3. Review Gate Decision
+**APPROVED — cleared to commit & push**
+
+#### 4. Next Immediate Steps
+1. **Commit & Push**: Antigravity is cleared to stage changes, commit with `feat(p4): cloud mirror sync engine (S32, firestore, storage, workmanager)`, push to `origin feature/p4-cloud-mirror-sync`, and merge into `phase-4`.
+2. **Sprint P4-2 Execution**: Proceed with Sprint P4-2 (Performance, Accessibility & Bug Triage Pass) per `brain/SPRINT_P4_PLAN.md`.
+
+

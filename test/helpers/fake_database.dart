@@ -403,10 +403,52 @@ class FakeDatabase extends Fake implements Database, Transaction {
     String sql, [
     List<Object?>? arguments,
   ]) async {
+    if (sql.contains('PRAGMA table_info')) {
+      final match = RegExp(r'table_info\((\w+)\)').firstMatch(sql);
+      final tableName = match?.group(1);
+      final sample = (tables[tableName] ?? []).firstOrNull;
+      final defaultCols = [
+        'id',
+        'store_id',
+        'name',
+        'status',
+        'opened_at',
+        'is_active',
+        'created_at',
+        'updated_at',
+        'deadline',
+        'responsible_user_id',
+      ];
+      final cols = sample != null
+          ? {...sample.keys, ...defaultCols}.toList()
+          : defaultCols;
+      return cols.map((c) => {'name': c}).toList();
+    }
     if (sql.contains('COUNT(*)')) {
+      for (final t in tables.keys) {
+        if (sql.contains('FROM $t')) {
+          var list = tables[t] ?? [];
+          if (t == 'photos' &&
+              (sql.contains("upload_status = 'pending'") ||
+                  sql.contains('cloud_url IS NULL'))) {
+            list = list
+                .where(
+                  (p) =>
+                      p['upload_status'] == 'pending' ||
+                      p['cloud_url'] == null,
+                )
+                .toList();
+          } else if (t == 'audits' && sql.contains("status != 'draft'")) {
+            list = list.where((a) => a['status'] != 'draft').toList();
+          }
+          return [
+            {'count': list.length, 'n': list.length},
+          ];
+        }
+      }
       final list = tables['users'] ?? [];
       return [
-        {'n': list.length},
+        {'n': list.length, 'count': list.length},
       ];
     }
     if (sql.contains('FROM users')) {
