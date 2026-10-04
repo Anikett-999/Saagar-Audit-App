@@ -645,6 +645,8 @@ class _SpotCheckSheetState extends State<_SpotCheckSheet> {
               child: Image.file(
                 File(localPath),
                 fit: BoxFit.contain,
+                cacheWidth: 800,
+                cacheHeight: 800,
                 errorBuilder: (_, __, ___) => const Padding(
                   padding: EdgeInsets.all(32),
                   child: Text('Could not load photo'),
@@ -835,6 +837,8 @@ class _SpotCheckSheetState extends State<_SpotCheckSheet> {
                                   width: 50,
                                   height: 50,
                                   fit: BoxFit.cover,
+                                  cacheWidth: 150,
+                                  cacheHeight: 150,
                                   errorBuilder: (_, __, ___) => Container(
                                     width: 50,
                                     height: 50,

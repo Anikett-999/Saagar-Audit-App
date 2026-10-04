@@ -182,6 +182,7 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
               actions: [
                 IconButton(
                   icon: const Icon(Icons.close),
+                  tooltip: 'Close photo',
                   onPressed: () => Navigator.of(ctx).pop(),
                 ),
               ],
@@ -191,6 +192,8 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
               child: Image.file(
                 File(localPath),
                 fit: BoxFit.contain,
+                cacheWidth: 800,
+                cacheHeight: 800,
                 errorBuilder: (_, __, ___) => const Padding(
                   padding: EdgeInsets.all(32),
                   child: Center(
@@ -290,6 +293,7 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
       appBar: AppBar(
         title: Text('${l10n.s13Title} — ${audit.auditDate}'),
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             if (context.canPop()) {
@@ -1045,6 +1049,8 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
                           width: 64,
                           height: 64,
                           fit: BoxFit.cover,
+                          cacheWidth: 150,
+                          cacheHeight: 150,
                           errorBuilder: (_, __, ___) => Container(
                             width: 64,
                             height: 64,

@@ -94,21 +94,24 @@ class _PinNumpadState extends State<PinNumpad>
   }
 
   Widget _buildDots() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        for (var i = 0; i < 4; i++)
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 10),
-            width: 18,
-            height: 18,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: i < _pin.length ? AppColors.navy : AppColors.gray200,
-              border: Border.all(color: AppColors.navy, width: 1.5),
+    return Semantics(
+      label: '${_pin.length} of 4 digits entered',
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          for (var i = 0; i < 4; i++)
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 10),
+              width: 18,
+              height: 18,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: i < _pin.length ? AppColors.navy : AppColors.gray200,
+                border: Border.all(color: AppColors.navy, width: 1.5),
+              ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -125,16 +128,20 @@ class _PinNumpadState extends State<PinNumpad>
       );
     }
 
-    Widget digit(int n) => cell(
-          Text(
-            '$n',
-            style: const TextStyle(
-              fontFamily: 'DMSerifDisplay',
-              fontSize: 30,
-              color: AppColors.navy,
+    Widget digit(int n) => Semantics(
+          button: true,
+          label: '$n',
+          child: cell(
+            Text(
+              '$n',
+              style: const TextStyle(
+                fontFamily: 'DMSerifDisplay',
+                fontSize: 30,
+                color: AppColors.navy,
+              ),
             ),
+            onTap: () => _onDigit('$n'),
           ),
-          onTap: () => _onDigit('$n'),
         );
 
     return Column(
@@ -154,11 +161,15 @@ class _PinNumpadState extends State<PinNumpad>
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(width: 72, height: 72),
+            const ExcludeSemantics(child: SizedBox(width: 72, height: 72)),
             digit(0),
-            cell(
-              const Icon(Icons.backspace_outlined, color: AppColors.gray600),
-              onTap: _onBackspace,
+            Semantics(
+              button: true,
+              label: 'Backspace',
+              child: cell(
+                const Icon(Icons.backspace_outlined, color: AppColors.gray600),
+                onTap: _onBackspace,
+              ),
             ),
           ],
         ),

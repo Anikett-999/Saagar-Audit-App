@@ -1143,6 +1143,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get s14ClearSearch => 'Clear search';
+
+  @override
   String get s15Title => 'New Corrective Action Plan';
 
   @override
@@ -1239,6 +1242,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s15AddStep => 'Add Step';
+
+  @override
+  String get s15RemoveStep => 'Remove step';
 
   @override
   String get s15MinStepsNotice => 'At least 3 steps required';

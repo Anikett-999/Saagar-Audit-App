@@ -86,6 +86,7 @@ class _RatingScaleScreenState extends ConsumerState<RatingScaleScreen> {
       appBar: AppBar(
         title: Text(l10n.s23Title),
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             if (context.canPop()) {

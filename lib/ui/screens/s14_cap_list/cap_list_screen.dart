@@ -178,6 +178,7 @@ class _CapListScreenState extends ConsumerState<CapListScreen> {
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear, size: 18),
+                      tooltip: l10n.s14ClearSearch,
                       onPressed: () {
                         _searchController.clear();
                         _loadData();

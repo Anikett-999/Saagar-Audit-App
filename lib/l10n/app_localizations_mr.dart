@@ -1143,6 +1143,9 @@ class AppLocalizationsMr extends AppLocalizations {
   }
 
   @override
+  String get s14ClearSearch => 'शोध साफ करा';
+
+  @override
   String get s15Title => 'नवीन सुधारात्मक कृती योजना';
 
   @override
@@ -1240,6 +1243,9 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s15AddStep => 'पाऊल जोडा';
+
+  @override
+  String get s15RemoveStep => 'पाऊल काढा';
 
   @override
   String get s15MinStepsNotice => 'किमान ३ पावले आवश्यक आहेत';

@@ -317,6 +317,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
       appBar: AppBar(
         title: Text('${l10n.s10Title} — $titleDate'),
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.goNamed('s07_checkpoint'),
         ),
@@ -938,6 +939,8 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
                     width: 60,
                     height: 60,
                     fit: BoxFit.cover,
+                    cacheWidth: 150,
+                    cacheHeight: 150,
                     errorBuilder: (_, __, ___) => Container(
                       width: 60,
                       height: 60,

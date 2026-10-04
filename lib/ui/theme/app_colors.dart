@@ -13,6 +13,7 @@ class AppColors {
   static const navyLight = Color(0xFF264D7A);
   static const gold = Color(0xFFB8922A);
   static const goldLight = Color(0xFFD4A843);
+  static const goldDark = Color(0xFF8D6B18); // WCAG AA text on cream/white (>= 4.5:1)
   static const goldPale = Color(0xFFFDF6E3);
   static const cream = Color(0xFFFAF8F3);
   static const white = Color(0xFFFFFFFF);
@@ -28,6 +29,7 @@ class AppColors {
   static const red = Color(0xFFB91C1C);
   static const redPale = Color(0xFFFEF2F2);
   static const amber = Color(0xFFB45309);
+  static const amberDark = Color(0xFF8A5A00); // WCAG AA text on light amber (>= 4.5:1)
   static const amberPale = Color(0xFFFFFBEB);
   static const green = Color(0xFF166534);
   static const greenPale = Color(0xFFF0FDF4);

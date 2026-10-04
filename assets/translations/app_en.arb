@@ -470,6 +470,7 @@
       "name": {"type": "String"}
     }
   },
+  "s14ClearSearch": "Clear search",
 
   "s15Title": "New Corrective Action Plan",
   "s15Subtitle": "10-field root cause & action template",
@@ -508,6 +509,7 @@
   "s15StepHint": "Action step description",
   "s15StepRequired": "Action step cannot be empty",
   "s15AddStep": "Add Step",
+  "s15RemoveStep": "Remove step",
   "s15MinStepsNotice": "At least 3 steps required",
   "s15MaxStepsReached": "Maximum 5 steps reached",
   "s15SectionOwnership": "4. Ownership & Verification",

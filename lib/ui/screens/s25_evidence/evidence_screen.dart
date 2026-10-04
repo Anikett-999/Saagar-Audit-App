@@ -69,6 +69,7 @@ class _EvidenceScreenState extends ConsumerState<EvidenceScreen> {
       appBar: AppBar(
         title: Text(l10n.s25Title),
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             if (context.canPop()) {

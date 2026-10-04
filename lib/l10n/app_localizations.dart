@@ -2163,6 +2163,12 @@ abstract class AppLocalizations {
   /// **'Responsible: {name}'**
   String s14ResponsiblePrefix(String name);
 
+  /// No description provided for @s14ClearSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get s14ClearSearch;
+
   /// No description provided for @s15Title.
   ///
   /// In en, this message translates to:
@@ -2354,6 +2360,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add Step'**
   String get s15AddStep;
+
+  /// No description provided for @s15RemoveStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove step'**
+  String get s15RemoveStep;
 
   /// No description provided for @s15MinStepsNotice.
   ///
