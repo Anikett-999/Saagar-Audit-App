@@ -5,10 +5,13 @@ import 'package:workmanager/workmanager.dart';
 
 import '../data/db/database.dart';
 import 'cap_aging_service.dart';
+import 'cloud_sync_service.dart';
 
 const String capAutoAgingTask = 'capAutoAgingTask';
 const String capAutoAgingUniqueName = 'cap-auto-aging-daily';
 const String lastCapAgingDateKey = 'last_cap_aging_date';
+const String cloudSyncPeriodicTask = 'cloudSyncPeriodicTask';
+const String cloudSyncUniqueName = 'cloud-sync-periodic';
 
 /// Top-level background isolate entry point for WorkManager.
 @pragma('vm:entry-point')
@@ -47,6 +50,20 @@ void callbackDispatcher() {
         return Future.value(false);
       }
     }
+
+    if (taskName == cloudSyncPeriodicTask || taskName == cloudSyncUniqueName) {
+      try {
+        WidgetsFlutterBinding.ensureInitialized();
+        await AppDatabase.instance.open();
+        final res = await CloudSyncService.instance.syncAll();
+        debugPrint('WorkManager: CloudSync completed with status: ${res.status}');
+        return Future.value(res.success);
+      } catch (e, st) {
+        debugPrint('WorkManager: error in CloudSync task: $e\n$st');
+        return Future.value(false);
+      }
+    }
+
     return Future.value(true);
   });
 }
@@ -55,11 +72,7 @@ class WorkmanagerService {
   WorkmanagerService._();
   static final WorkmanagerService instance = WorkmanagerService._();
 
-  /// Initializes WorkManager and registers the daily periodic CAP aging task.
-  ///
-  /// Spec §9.1 states aging runs daily at 00:05 local time. Because Android WorkManager
-  /// cannot guarantee exact minute firing times, it runs periodically (daily cadence)
-  /// with a persistent "already ran today" marker preventing multiple evaluations per day.
+  /// Initializes WorkManager and registers daily CAP aging and periodic cloud sync tasks.
   Future<void> initialize() async {
     // Only initialize on supported mobile platforms
     if (kIsWeb || (defaultTargetPlatform != TargetPlatform.android && defaultTargetPlatform != TargetPlatform.iOS)) {
@@ -77,6 +90,16 @@ class WorkmanagerService {
         frequency: const Duration(hours: 24),
         constraints: Constraints(
           networkType: NetworkType.notRequired,
+        ),
+        existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
+      );
+
+      await Workmanager().registerPeriodicTask(
+        cloudSyncUniqueName,
+        cloudSyncPeriodicTask,
+        frequency: const Duration(hours: 4),
+        constraints: Constraints(
+          networkType: NetworkType.connected,
         ),
         existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
       );

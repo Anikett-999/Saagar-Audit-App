@@ -1914,13 +1914,13 @@ abstract class AppLocalizations {
   /// No description provided for @s32CloudSyncPhase4Notice.
   ///
   /// In en, this message translates to:
-  /// **'Coming in Phase 4. All audits and settings are safely stored locally on this device.'**
+  /// **'All audits, CAPs, and reports are safely preserved locally on this device.'**
   String get s32CloudSyncPhase4Notice;
 
   /// No description provided for @s32CloudSyncComingSoonBadge.
   ///
   /// In en, this message translates to:
-  /// **'Coming in Phase 4'**
+  /// **'Active Mirror'**
   String get s32CloudSyncComingSoonBadge;
 
   /// No description provided for @s32ForceSyncButton.
@@ -1928,6 +1928,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Force Cloud Sync'**
   String get s32ForceSyncButton;
+
+  /// No description provided for @s32CloudSyncStatusIdle.
+  ///
+  /// In en, this message translates to:
+  /// **'Status: Ready to Sync'**
+  String get s32CloudSyncStatusIdle;
+
+  /// No description provided for @s32CloudSyncStatusSyncing.
+  ///
+  /// In en, this message translates to:
+  /// **'Status: Synchronizing with Cloud...'**
+  String get s32CloudSyncStatusSyncing;
+
+  /// No description provided for @s32CloudSyncStatusSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Status: All Data Mirrored (Cloud up to date)'**
+  String get s32CloudSyncStatusSuccess;
+
+  /// No description provided for @s32CloudSyncStatusError.
+  ///
+  /// In en, this message translates to:
+  /// **'Status: Sync Error ({error})'**
+  String s32CloudSyncStatusError(String error);
+
+  /// No description provided for @s32CloudSyncStatusOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Status: Offline (Local SQLite Active)'**
+  String get s32CloudSyncStatusOffline;
+
+  /// No description provided for @s32CloudSyncStatusUnconfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Status: Cloud Backend Offline / Standby'**
+  String get s32CloudSyncStatusUnconfigured;
+
+  /// No description provided for @s32CloudSyncLastSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Synced: {time}'**
+  String s32CloudSyncLastSync(String time);
+
+  /// No description provided for @s32CloudSyncNever.
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get s32CloudSyncNever;
+
+  /// No description provided for @s32CloudSyncPending.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{All local changes backed up} =1{1 change pending upload} other{{count} changes pending upload}}'**
+  String s32CloudSyncPending(int count);
+
+  /// No description provided for @s32SyncSuccessNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud mirror sync completed ({count} records updated).'**
+  String s32SyncSuccessNotice(int count);
 
   /// No description provided for @s32AboutCardTitle.
   ///

@@ -387,9 +387,39 @@
   "s32CloudSyncTitle": "Cloud Synchronization (Firestore)",
   "s32CloudSyncDesc": "Automatic multi-device synchronization and cloud data storage via Google Cloud Firestore.",
   "s32CloudSyncStatusLabel": "Status: Offline-First Mode (Local SQLite)",
-  "s32CloudSyncPhase4Notice": "Coming in Phase 4. All audits and settings are safely stored locally on this device.",
-  "s32CloudSyncComingSoonBadge": "Coming in Phase 4",
+  "s32CloudSyncPhase4Notice": "All audits, CAPs, and reports are safely preserved locally on this device.",
+  "s32CloudSyncComingSoonBadge": "Active Mirror",
   "s32ForceSyncButton": "Force Cloud Sync",
+  "s32CloudSyncStatusIdle": "Status: Ready to Sync",
+  "s32CloudSyncStatusSyncing": "Status: Synchronizing with Cloud...",
+  "s32CloudSyncStatusSuccess": "Status: All Data Mirrored (Cloud up to date)",
+  "s32CloudSyncStatusError": "Status: Sync Error ({error})",
+  "@s32CloudSyncStatusError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "s32CloudSyncStatusOffline": "Status: Offline (Local SQLite Active)",
+  "s32CloudSyncStatusUnconfigured": "Status: Cloud Backend Offline / Standby",
+  "s32CloudSyncLastSync": "Last Synced: {time}",
+  "@s32CloudSyncLastSync": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "s32CloudSyncNever": "Never",
+  "s32CloudSyncPending": "{count, plural, =0{All local changes backed up} =1{1 change pending upload} other{{count} changes pending upload}}",
+  "@s32CloudSyncPending": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s32SyncSuccessNotice": "Cloud mirror sync completed ({count} records updated).",
+  "@s32SyncSuccessNotice": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "s32AboutCardTitle": "About Saagar Audit App",
   "s32AboutVersion": "Version: 0.1.0+1 (Phase 1 Baseline)",
   "s32AboutStore": "Stores: Titan World (WLMHW) & Helios (HEMW), Latur",

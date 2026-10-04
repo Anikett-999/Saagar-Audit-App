@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
 import 'data/db/database.dart';
+import 'services/cloud_sync_service.dart';
 import 'services/workmanager_service.dart';
 
 Future<void> main() async {
@@ -15,8 +18,8 @@ Future<void> main() async {
   await WorkmanagerService.instance.initialize();
   await WorkmanagerService.instance.runCatchUpIfNeeded();
 
-  // Firebase is initialized lazily on first sync attempt (offline-first per
-  // spec §2 — the app must boot and work without network).
+  // Safe, non-blocking Firebase initialization in background (Spec §1, §16.4)
+  unawaited(CloudSyncService.instance.initialize());
 
   runApp(const ProviderScope(child: SaagarAuditApp()));
 }
