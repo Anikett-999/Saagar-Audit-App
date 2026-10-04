@@ -188,6 +188,24 @@ class FakeDatabase extends Fake implements Database, Transaction {
                 .toList();
           }
 
+          // Date range filters
+          if (where.contains('opened_at >= ? AND opened_at < ?') && whereArgs != null && argIdx + 1 < whereArgs.length) {
+            final start = whereArgs[argIdx++] as String;
+            final end = whereArgs[argIdx++] as String;
+            results = results.where((r) {
+              final op = r['opened_at'] as String? ?? '';
+              return op.compareTo(start) >= 0 && op.compareTo(end) < 0;
+            }).toList();
+          }
+          if (where.contains('closed_at >= ? AND closed_at < ?') && whereArgs != null && argIdx + 1 < whereArgs.length) {
+            final start = whereArgs[argIdx++] as String;
+            final end = whereArgs[argIdx++] as String;
+            results = results.where((r) {
+              final cl = r['closed_at'] as String? ?? '';
+              return cl.compareTo(start) >= 0 && cl.compareTo(end) < 0;
+            }).toList();
+          }
+
           // Search text
           if (where.contains('problem_statement LIKE ? OR id LIKE ?') && whereArgs != null && argIdx < whereArgs.length) {
             final pattern = (whereArgs[argIdx++] as String).replaceAll('%', '').toLowerCase();
@@ -218,6 +236,14 @@ class FakeDatabase extends Fake implements Database, Transaction {
             (!isStatusActive || r['status'] == 'open' || r['status'] == 'acknowledged'),
           ).toList();
         } else {
+          if (where.contains('raised_at >= ? AND raised_at < ?') && whereArgs != null && argIdx + 1 < whereArgs.length) {
+            final start = whereArgs[argIdx++] as String;
+            final end = whereArgs[argIdx++] as String;
+            results = results.where((r) {
+              final ra = r['raised_at'] as String? ?? '';
+              return ra.compareTo(start) >= 0 && ra.compareTo(end) < 0;
+            }).toList();
+          }
           if (where.contains('status = ?') && whereArgs != null && argIdx < whereArgs.length) {
             final statusVal = whereArgs[argIdx++];
             results = results.where((r) => r['status'] == statusVal).toList();

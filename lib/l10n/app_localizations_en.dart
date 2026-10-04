@@ -2261,10 +2261,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get capOversightVerifyNow => 'Verify Now';
 
   @override
-  String get s20ScreenTitle => 'Weekly Reports';
+  String get s20ScreenTitle => 'Compliance Reports';
 
   @override
-  String get s20ScreenSubtitle => 'Workbook §3.6 reports & 1-page PDF export';
+  String get s20ScreenSubtitle =>
+      'Weekly & monthly reports, trend analytics & PDF export';
 
   @override
   String get s20FilterAll => 'All';
@@ -2591,4 +2592,55 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get s07SecurityConcernSubtitle =>
       'Flag if this checkpoint presents a security or theft risk (triggers immediate alert to Owner).';
+
+  @override
+  String get s20FilterWeekly => 'Weekly';
+
+  @override
+  String get s20FilterMonthly => 'Monthly';
+
+  @override
+  String get s21MonthlyScreenTitle => 'Monthly Trend Report';
+
+  @override
+  String get s21MonthlySubtitle =>
+      'Workbook §3.7 Strategic Spot-Checks & Multi-Week Trends';
+
+  @override
+  String get s21MonthlySpotCheckSection => 'Section 2: Strategic Spot-Checks';
+
+  @override
+  String get s21MonthlyTrendAnalyticsSection =>
+      'Section 3: Multi-Week Trend Analytics';
+
+  @override
+  String s21MonthlyFindingsSection(int count) {
+    return 'Section 4: Spot-Check Non-Compliances ($count)';
+  }
+
+  @override
+  String get s21MonthlyNoFindings => 'No spot-check non-compliances recorded.';
+
+  @override
+  String get s21MonthlyCapsRollupSection => 'Section 5: Monthly CAPs Rollup';
+
+  @override
+  String get s21MonthlyEscalationsRollupSection =>
+      'Section 6: Monthly Escalations Rollup';
+
+  @override
+  String get s21MonthlySpotCheckLabel => 'Strategic Spot-Check Score';
+
+  @override
+  String get s21MonthlyWeeklyAvgLabel => 'Month Weekly Audits Average';
+
+  @override
+  String get s21MonthlyNoCaps => 'No CAPs opened, closed, or aged this month.';
+
+  @override
+  String get s21MonthlyNoEscalations =>
+      'No escalations triggered during this month.';
+
+  @override
+  String get s21ExportMonthlyPdfButton => 'Export Monthly PDF';
 }

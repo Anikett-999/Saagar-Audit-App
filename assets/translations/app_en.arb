@@ -1052,8 +1052,8 @@
   "capOversightAwaitingSection": "Awaiting My Verification",
   "capOversightNoAwaiting": "No CAPs awaiting verification",
   "capOversightVerifyNow": "Verify Now",
-  "s20ScreenTitle": "Weekly Reports",
-  "s20ScreenSubtitle": "Workbook §3.6 reports & 1-page PDF export",
+  "s20ScreenTitle": "Compliance Reports",
+  "s20ScreenSubtitle": "Weekly & monthly reports, trend analytics & PDF export",
   "s20FilterAll": "All",
   "s20EmptyTitle": "No Weekly Reports Yet",
   "s20EmptySubtitle": "Weekly reports are generated upon completing weekly compliance audits.",
@@ -1240,7 +1240,27 @@
   "s10InventoryVarianceLabel": "Inventory Variance (%)",
   "s10InventoryVarianceHelper": "Alert triggers to Owner if variance exceeds 2.0% (Trigger 4).",
   "s07SecurityConcernLabel": "Security Concern",
-  "s07SecurityConcernSubtitle": "Flag if this checkpoint presents a security or theft risk (triggers immediate alert to Owner)."
+  "s07SecurityConcernSubtitle": "Flag if this checkpoint presents a security or theft risk (triggers immediate alert to Owner).",
+  "s20FilterWeekly": "Weekly",
+  "s20FilterMonthly": "Monthly",
+  "s21MonthlyScreenTitle": "Monthly Trend Report",
+  "s21MonthlySubtitle": "Workbook §3.7 Strategic Spot-Checks & Multi-Week Trends",
+  "s21MonthlySpotCheckSection": "Section 2: Strategic Spot-Checks",
+  "s21MonthlyTrendAnalyticsSection": "Section 3: Multi-Week Trend Analytics",
+  "s21MonthlyFindingsSection": "Section 4: Spot-Check Non-Compliances ({count})",
+  "@s21MonthlyFindingsSection": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21MonthlyNoFindings": "No spot-check non-compliances recorded.",
+  "s21MonthlyCapsRollupSection": "Section 5: Monthly CAPs Rollup",
+  "s21MonthlyEscalationsRollupSection": "Section 6: Monthly Escalations Rollup",
+  "s21MonthlySpotCheckLabel": "Strategic Spot-Check Score",
+  "s21MonthlyWeeklyAvgLabel": "Month Weekly Audits Average",
+  "s21MonthlyNoCaps": "No CAPs opened, closed, or aged this month.",
+  "s21MonthlyNoEscalations": "No escalations triggered during this month.",
+  "s21ExportMonthlyPdfButton": "Export Monthly PDF"
 }
 
 

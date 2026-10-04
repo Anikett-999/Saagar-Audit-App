@@ -89,6 +89,18 @@ class WeeklyReportPdfService {
       );
     }
 
+    if (report.reportType == 'monthly') {
+      return _buildMonthlyPdfBytes(
+        report: report,
+        pdf: pdf,
+        baseFont: baseFont,
+        headerFont: headerFont,
+        fallbackFonts: fallbackFonts,
+        baseStyle: baseStyle,
+        headerStyle: headerStyle,
+      );
+    }
+
     final compTable = report.complianceTable;
     final trend = report.trendBlock;
     final findings = report.findings;
@@ -528,7 +540,8 @@ class WeeklyReportPdfService {
   Future<String> generateAndSavePdf(Report report) async {
     final bytes = await buildPdfBytes(report);
     final outputDir = await getApplicationDocumentsDirectory();
-    final fileName = 'weekly_report_${report.auditId}.pdf';
+    final typePrefix = report.reportType == 'monthly' ? 'monthly' : 'weekly';
+    final fileName = '${typePrefix}_report_${report.auditId}.pdf';
     final file = File('${outputDir.path}/$fileName');
     await file.writeAsBytes(bytes);
 
@@ -543,10 +556,357 @@ class WeeklyReportPdfService {
   /// Generates and shares or prints the PDF using printing package.
   Future<void> shareOrPrintPdf(Report report) async {
     final bytes = await buildPdfBytes(report);
+    final typePrefix = report.reportType == 'monthly' ? 'monthly' : 'weekly';
     await Printing.sharePdf(
       bytes: bytes,
-      filename: 'weekly_report_${report.auditId}.pdf',
+      filename: '${typePrefix}_report_${report.auditId}.pdf',
     );
+  }
+
+  Future<Uint8List> _buildMonthlyPdfBytes({
+    required Report report,
+    required pw.Document pdf,
+    required pw.Font baseFont,
+    required pw.Font headerFont,
+    required List<pw.Font> fallbackFonts,
+    required pw.TextStyle Function({double fontSize, PdfColor? color, pw.FontWeight? fontWeight}) baseStyle,
+    required pw.TextStyle Function({double fontSize, PdfColor? color, pw.FontWeight? fontWeight}) headerStyle,
+  }) async {
+    final compTable = report.complianceTable;
+    final trend = report.trendBlock;
+    final findings = report.findings;
+    final patterns = (trend['detected_patterns'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+    final capsOpened = report.capsOpened;
+    final capsClosed = report.capsClosed;
+    final capsAged = report.capsAged;
+    final escalations = report.escalations;
+
+    final monthlyPct = (compTable['monthly_spot_check_pct'] as num?)?.toDouble() ??
+        (compTable['compliance_pct'] as num?)?.toDouble() ??
+        0.0;
+    final weeklyAvgPct = (compTable['weekly_avg_pct'] as num?)?.toDouble();
+    final monthlySopRows = (compTable['monthly_sop_rows'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+
+    final weeklySeries = (trend['weekly_series'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+    final movingAverages = (trend['moving_averages'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+    final momDelta = (trend['mom_delta'] as num?)?.toDouble();
+    final headlineText = report.headline ??
+        'Monthly Strategic Compliance & Trend Report - ${monthlyPct.toStringAsFixed(1)}% ${_marathiBand(monthlyPct)}';
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(18),
+        theme: pw.ThemeData.withFont(
+          base: baseFont,
+          bold: headerFont,
+          fontFallback: fallbackFonts,
+        ),
+        build: (context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+            children: [
+              // --- Header ---
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text(
+                        'SAAGAR TRADERS - सागर ट्रेडर्स',
+                        style: headerStyle(fontSize: 13, color: PdfColors.blueGrey900),
+                      ),
+                      pw.Text(
+                        'Monthly Strategic Trend Report - मासिक धोरणात्मक व कल अहवाल (Workbook §3.7)',
+                        style: baseStyle(fontSize: 8, color: PdfColors.grey700),
+                      ),
+                    ],
+                  ),
+                  pw.Container(
+                    padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: pw.BoxDecoration(
+                      color: monthlyPct >= 95.0
+                          ? PdfColors.green100
+                          : (monthlyPct >= 85.0 ? PdfColors.amber100 : PdfColors.red100),
+                      borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
+                      border: pw.Border.all(
+                        color: monthlyPct >= 95.0
+                            ? PdfColors.green800
+                            : (monthlyPct >= 85.0 ? PdfColors.amber800 : PdfColors.red800),
+                      ),
+                    ),
+                    child: pw.Text(
+                      '${monthlyPct.toStringAsFixed(1)}% - ${_marathiBand(monthlyPct)}',
+                      style: headerStyle(
+                        fontSize: 9.5,
+                        color: monthlyPct >= 95.0
+                            ? PdfColors.green900
+                            : (monthlyPct >= 85.0 ? PdfColors.amber900 : PdfColors.red900),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              pw.SizedBox(height: 6),
+
+              // --- Headline ---
+              pw.Container(
+                padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: const pw.BoxDecoration(
+                  color: PdfColors.grey100,
+                  borderRadius: pw.BorderRadius.all(pw.Radius.circular(3)),
+                ),
+                child: pw.Row(
+                  children: [
+                    pw.Text('SECTION 1 - विभाग १ (HEADLINE / मथळा): ', style: headerStyle(fontSize: 8)),
+                    pw.Expanded(
+                      child: pw.Text(headlineText, style: baseStyle(fontSize: 8), maxLines: 1),
+                    ),
+                  ],
+                ),
+              ),
+              pw.SizedBox(height: 6),
+
+              // --- 2-Column Middle Layout ---
+              pw.Row(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  // Left Column: Spot-Checks & Findings & Signature
+                  pw.Expanded(
+                    flex: 11,
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        _sectionTitle('SECTION 2 - विभाग २: धोरणात्मक तपासण्या (SPOT-CHECKS)', headerStyle),
+                        pw.Container(
+                          padding: const pw.EdgeInsets.all(6),
+                          decoration: pw.BoxDecoration(
+                            border: pw.Border.all(color: PdfColors.grey300),
+                            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(3)),
+                          ),
+                          child: pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: [
+                              _scoreRow('Spot-Check Score / स्पॉट-तपासणी:', '${monthlyPct.toStringAsFixed(1)}% (${_marathiBand(monthlyPct)})', headerStyle),
+                              if (weeklyAvgPct != null) ...[
+                                pw.Divider(color: PdfColors.grey200, height: 4),
+                                _scoreRow('Weekly Audits Avg / साप्ताहिक सरासरी:', '${weeklyAvgPct.toStringAsFixed(1)}%', baseStyle),
+                              ],
+                              pw.SizedBox(height: 4),
+                              pw.Table(
+                                border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
+                                children: [
+                                  pw.TableRow(
+                                    decoration: const pw.BoxDecoration(color: PdfColors.grey100),
+                                    children: [
+                                      _cell('SOP', headerStyle, isHeader: true),
+                                      _cell('Score', headerStyle, isHeader: true),
+                                      _cell('%', headerStyle, isHeader: true),
+                                    ],
+                                  ),
+                                  for (final s in monthlySopRows)
+                                    pw.TableRow(
+                                      children: [
+                                        _cell('SOP ${s['sop_number']}: ${s['name_en']}', baseStyle),
+                                        _cell('${(s['raw_score'] as num?)?.toStringAsFixed(0)}/${(s['max_score'] as num?)?.toStringAsFixed(0)}', baseStyle),
+                                        _cell('${(s['compliance_pct'] as num?)?.toStringAsFixed(1)}%', baseStyle),
+                                      ],
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        pw.SizedBox(height: 6),
+
+                        _sectionTitle('SECTION 4 - विभाग ४: त्रुटी तपशील (FINDINGS)', headerStyle),
+                        pw.Container(
+                          padding: const pw.EdgeInsets.all(6),
+                          decoration: pw.BoxDecoration(
+                            border: pw.Border.all(color: PdfColors.grey300),
+                            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(3)),
+                          ),
+                          child: findings.isEmpty
+                              ? pw.Text('No spot-check non-compliances recorded. (कोणतीही त्रुटी नाही)', style: baseStyle(fontSize: 7, color: PdfColors.grey600))
+                              : pw.Column(
+                                  children: [
+                                    for (final f in findings)
+                                      pw.Padding(
+                                        padding: const pw.EdgeInsets.only(bottom: 3),
+                                        child: pw.Row(
+                                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                          children: [
+                                            pw.Text('- ', style: headerStyle(fontSize: 7, color: PdfColors.red800)),
+                                            pw.Expanded(
+                                              child: pw.Text(
+                                                '${f['checkpoint_id']}: ${f['finding_text'] ?? ''}',
+                                                style: baseStyle(fontSize: 7),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                        ),
+                        pw.SizedBox(height: 6),
+
+                        _sectionTitle('SECTION 7 - स्वाक्षरी (SIGNATURE OF RECORD)', headerStyle),
+                        pw.Container(
+                          padding: const pw.EdgeInsets.all(5),
+                          decoration: pw.BoxDecoration(
+                            border: pw.Border.all(color: PdfColors.grey300),
+                            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(3)),
+                          ),
+                          child: pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: [
+                              pw.Text('Auditor: ${report.authorUserId ?? "Owner"} · ${report.submittedAt?.split("T").first ?? ""}', style: headerStyle(fontSize: 6.5)),
+                              pw.SizedBox(height: 2),
+                              pw.Text('Owner Review: ${report.isReadByOwner ? "Read on ${report.readByOwnerAt?.split("T").first}" : "Pending Owner Review"}', style: baseStyle(fontSize: 6.5, color: report.isReadByOwner ? PdfColors.green800 : PdfColors.amber800)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  pw.SizedBox(width: 8),
+
+                  // Right Column: Trend Analytics & Rollups
+                  pw.Expanded(
+                    flex: 12,
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        _sectionTitle('SECTION 3 - विभाग ३: बहु-आठवडा कल विश्लेषण (TREND ANALYTICS)', headerStyle),
+                        pw.Container(
+                          padding: const pw.EdgeInsets.all(6),
+                          decoration: pw.BoxDecoration(
+                            border: pw.Border.all(color: PdfColors.grey300),
+                            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(3)),
+                          ),
+                          child: pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: [
+                              if (weeklySeries.isEmpty)
+                                pw.Text('Insufficient weekly reports for trend analysis (< 4 weeks).', style: baseStyle(fontSize: 7, color: PdfColors.grey600))
+                              else ...[
+                                pw.Table(
+                                  border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
+                                  children: [
+                                    pw.TableRow(
+                                      decoration: const pw.BoxDecoration(color: PdfColors.grey100),
+                                      children: [
+                                        _cell('Week / आठवडा', headerStyle, isHeader: true),
+                                        _cell('Score %', headerStyle, isHeader: true),
+                                        _cell('4-Wk MA', headerStyle, isHeader: true),
+                                      ],
+                                    ),
+                                    for (int i = 0; i < weeklySeries.length; i++)
+                                      pw.TableRow(
+                                        children: [
+                                          _cell(weeklySeries[i]['week_ending']?.toString() ?? 'W${i+1}', baseStyle),
+                                          _cell('${(weeklySeries[i]['overall_pct'] as num?)?.toStringAsFixed(1)}%', baseStyle),
+                                          _cell(
+                                            i < movingAverages.length && movingAverages[i]['value'] != null
+                                                ? '${(movingAverages[i]['value'] as num).toStringAsFixed(1)}%'
+                                                : '—',
+                                            baseStyle,
+                                          ),
+                                        ],
+                                      ),
+                                  ],
+                                ),
+                                if (momDelta != null) ...[
+                                  pw.SizedBox(height: 3),
+                                  pw.Text(
+                                    'Month-over-Month Delta: ${(momDelta >= 0 ? "+" : "") + momDelta.toStringAsFixed(1)}%',
+                                    style: headerStyle(fontSize: 7, color: momDelta >= 0 ? PdfColors.green800 : PdfColors.red800),
+                                  ),
+                                ],
+                              ],
+                            ],
+                          ),
+                        ),
+                        pw.SizedBox(height: 6),
+
+                        _sectionTitle('SECTION 5 - विभाग ५: आढळलेले कल (DETECTED PATTERNS)', headerStyle),
+                        pw.Container(
+                          padding: const pw.EdgeInsets.all(6),
+                          decoration: pw.BoxDecoration(
+                            border: pw.Border.all(color: PdfColors.grey300),
+                            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(3)),
+                          ),
+                          child: patterns.isEmpty
+                              ? pw.Text('No critical multi-week patterns detected. (कोणताही गंभीर कल आढळला नाही)', style: baseStyle(fontSize: 7, color: PdfColors.grey600))
+                              : pw.Column(
+                                  children: [
+                                    for (final p in patterns)
+                                      pw.Padding(
+                                        padding: const pw.EdgeInsets.only(bottom: 2),
+                                        child: pw.Row(
+                                          children: [
+                                            pw.Text('- ', style: headerStyle(fontSize: 7, color: PdfColors.orange800)),
+                                            pw.Expanded(
+                                              child: pw.Text(
+                                                '${p['name_en'] ?? p['pattern_type']}: ${p['description_en'] ?? ''}',
+                                                style: baseStyle(fontSize: 7),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                        ),
+                        pw.SizedBox(height: 6),
+
+                        _sectionTitle('SECTION 6 - विभाग ६: कॅप आणि एस्केलेशन सारांश (CAP & ESCALATIONS)', headerStyle),
+                        pw.Container(
+                          padding: const pw.EdgeInsets.all(6),
+                          decoration: pw.BoxDecoration(
+                            border: pw.Border.all(color: PdfColors.grey300),
+                            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(3)),
+                          ),
+                          child: pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: [
+                              _scoreRow('CAPs Opened This Month / उघडलेले:', '${capsOpened.length}', baseStyle),
+                              pw.Divider(color: PdfColors.grey200, height: 4),
+                              _scoreRow('CAPs Closed This Month / बंद झालेले:', '${capsClosed.length}', baseStyle),
+                              pw.Divider(color: PdfColors.grey200, height: 4),
+                              _scoreRow('Currently Aged CAPs / जुने झालेले:', '${capsAged.length}', baseStyle),
+                              pw.Divider(color: PdfColors.grey200, height: 4),
+                              _scoreRow('Escalations Raised / एस्केलेशन्स:', '${escalations.length}', baseStyle),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              pw.Spacer(),
+              pw.Divider(color: PdfColors.grey300, height: 4),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    'सागर रिटेल ऑडिट प्रणाली - अपरिवर्तनीयता सक्रिय (Immutability Active) · मासिक कल अहवाल',
+                    style: baseStyle(fontSize: 6, color: PdfColors.grey600),
+                  ),
+                  pw.Text('पान १ पैकी १ - Page 1 of 1', style: baseStyle(fontSize: 6, color: PdfColors.grey600)),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    return pdf.save();
   }
 
   // --- Helper Widgets ---

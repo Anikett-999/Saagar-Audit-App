@@ -569,7 +569,7 @@ void main() {
           'why_1': 'w',
           'root_cause': 'r',
           'responsible_user_id': 'user-sm-1',
-          'deadline': '2026-10-01',
+          'deadline': '2026-12-01',
           'verification_method': 'v',
           'status': 'done', // awaiting verification
           'opened_at': '2026-09-20T10:00:00Z',
@@ -582,7 +582,7 @@ void main() {
           'why_1': 'w',
           'root_cause': 'r',
           'responsible_user_id': 'user-sm-1',
-          'deadline': '2026-10-01',
+          'deadline': '2026-12-01',
           'verification_method': 'v',
           'status': 'verified',
           'opened_at': '2026-09-20T10:00:00Z',

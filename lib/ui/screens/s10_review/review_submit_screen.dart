@@ -192,6 +192,19 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
         }
       }
 
+      // P3-4: Monthly report generation (post-submit, non-blocking, R5-safe)
+      if (audit.auditType == 'monthly') {
+        try {
+          final currentUser = ref.read(authProvider).user;
+          await ReportRepository.instance.generateMonthlyReport(
+            monthlyAuditId: audit.id,
+            authorUserId: currentUser?.id ?? audit.auditorId,
+          );
+        } catch (_) {
+          // Non-blocking — monthly report generation must not block submission
+        }
+      }
+
       // Spec §7 — Evaluate escalation triggers after submission (outside audit transaction)
       try {
         await EscalationService.instance.evaluateAndDispatch(auditId: audit.id);
