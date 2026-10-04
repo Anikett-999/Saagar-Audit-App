@@ -1,0 +1,8 @@
+# Release signing credentials template
+# Copy this file to `android/key.properties` and replace with your actual keystore details.
+# NEVER commit android/key.properties or your *.jks / *.keystore file to version control.
+
+storePassword=YOUR_KEYSTORE_PASSWORD
+keyPassword=YOUR_KEY_PASSWORD
+keyAlias=saagar_release_key
+storeFile=saagar_release.jks
