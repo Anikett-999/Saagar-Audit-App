@@ -2262,11 +2262,11 @@ class AppLocalizationsMr extends AppLocalizations {
   String get capOversightVerifyNow => 'आता पडताळा';
 
   @override
-  String get s20ScreenTitle => 'साप्ताहिक अहवाल';
+  String get s20ScreenTitle => 'अनुपालन अहवाल';
 
   @override
   String get s20ScreenSubtitle =>
-      'कार्यपुस्तिका §3.6 अहवाल आणि 1-पान PDF निर्यात';
+      'साप्ताहिक व मासिक अहवाल, कल विश्लेषण आणि PDF निर्यात';
 
   @override
   String get s20FilterAll => 'सर्व';
@@ -2594,4 +2594,57 @@ class AppLocalizationsMr extends AppLocalizations {
   @override
   String get s07SecurityConcernSubtitle =>
       'या तपासणी बिंदूमध्ये सुरक्षा किंवा चोरीचा धोका असल्यास चिन्हांकित करा (मालकास तात्काळ इशारा).';
+
+  @override
+  String get s20FilterWeekly => 'साप्ताहिक';
+
+  @override
+  String get s20FilterMonthly => 'मासिक';
+
+  @override
+  String get s21MonthlyScreenTitle => 'मासिक कल अहवाल';
+
+  @override
+  String get s21MonthlySubtitle =>
+      'कार्यपुस्तिका §3.7 धोरणात्मक तपासणी आणि बहु-आठवडा कल';
+
+  @override
+  String get s21MonthlySpotCheckSection => 'विभाग २: धोरणात्मक स्पॉट-तपासण्या';
+
+  @override
+  String get s21MonthlyTrendAnalyticsSection =>
+      'विभाग ३: बहु-आठवडा कल विश्लेषण';
+
+  @override
+  String s21MonthlyFindingsSection(int count) {
+    return 'विभाग ४: स्पॉट-तपासणी त्रुटी ($count)';
+  }
+
+  @override
+  String get s21MonthlyNoFindings =>
+      'कोणतीही स्पॉट-तपासणी त्रुटी नोंदवली गेली नाही.';
+
+  @override
+  String get s21MonthlyCapsRollupSection => 'विभाग ५: मासिक कॅप सारांश';
+
+  @override
+  String get s21MonthlyEscalationsRollupSection =>
+      'विभाग ६: मासिक एस्केलेशन सारांश';
+
+  @override
+  String get s21MonthlySpotCheckLabel => 'धोरणात्मक स्पॉट-तपासणी गुण';
+
+  @override
+  String get s21MonthlyWeeklyAvgLabel => 'महिन्यातील साप्ताहिक सरासरी';
+
+  @override
+  String get s21MonthlyNoCaps =>
+      'या महिन्यात कोणतीही कॅप उघडलेली, बंद किंवा जुनी झालेली नाही.';
+
+  @override
+  String get s21MonthlyNoEscalations =>
+      'या महिन्यात कोणतीही वाढ किंवा इशारा नोंदवला गेला नाही.';
+
+  @override
+  String get s21ExportMonthlyPdfButton => 'मासिक PDF निर्यात करा';
 }

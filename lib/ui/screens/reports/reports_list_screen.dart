@@ -22,6 +22,7 @@ class ReportsListScreen extends ConsumerStatefulWidget {
 class _ReportsListScreenState extends ConsumerState<ReportsListScreen> {
   bool _loading = true;
   List<Report> _reports = [];
+  String _selectedType = 'all'; // 'all', 'weekly', 'monthly'
   int? _selectedYear;
 
   @override
@@ -33,12 +34,34 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen> {
   Future<void> _loadReports() async {
     setState(() => _loading = true);
     try {
-      var reports = await ReportRepository.instance.listReports(
-        reportType: 'weekly',
-        year: _selectedYear,
-      );
+      List<Report> reports = [];
+      if (_selectedType == 'weekly') {
+        reports = await ReportRepository.instance.listReports(
+          reportType: 'weekly',
+          year: _selectedYear,
+        );
+      } else if (_selectedType == 'monthly') {
+        reports = await ReportRepository.instance.listReports(
+          reportType: 'monthly',
+          year: _selectedYear,
+        );
+      } else {
+        final weekly = await ReportRepository.instance.listReports(
+          reportType: 'weekly',
+          year: _selectedYear,
+        );
+        final monthly = await ReportRepository.instance.listReports(
+          reportType: 'monthly',
+          year: _selectedYear,
+        );
+        reports = [...weekly, ...monthly]..sort((a, b) {
+            final aDate = a.submittedAt ?? '';
+            final bDate = b.submittedAt ?? '';
+            return bDate.compareTo(aDate);
+          });
+      }
 
-      // If reports is empty, check if there are submitted weekly audits that haven't generated a report row yet
+      // If reports is empty, check if there are submitted audits that haven't generated a report row yet
       if (reports.isEmpty) {
         final db = AppDatabase.instance.db;
         final submittedWeekly = await db.query(
@@ -58,10 +81,50 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen> {
             } catch (_) {}
           }
         }
-        reports = await ReportRepository.instance.listReports(
-          reportType: 'weekly',
-          year: _selectedYear,
+
+        final submittedMonthly = await db.query(
+          'audits',
+          where: "status = 'submitted' AND audit_type = 'monthly'",
+          orderBy: 'audit_date DESC',
         );
+        for (final m in submittedMonthly) {
+          final auditId = m['id'].toString();
+          final existing = await ReportRepository.instance.getByAuditId(auditId);
+          if (existing == null) {
+            try {
+              await ReportRepository.instance.generateMonthlyReport(
+                monthlyAuditId: auditId,
+                authorUserId: m['auditor_id']?.toString() ?? 'Owner Auditor',
+              );
+            } catch (_) {}
+          }
+        }
+
+        if (_selectedType == 'weekly') {
+          reports = await ReportRepository.instance.listReports(
+            reportType: 'weekly',
+            year: _selectedYear,
+          );
+        } else if (_selectedType == 'monthly') {
+          reports = await ReportRepository.instance.listReports(
+            reportType: 'monthly',
+            year: _selectedYear,
+          );
+        } else {
+          final weekly = await ReportRepository.instance.listReports(
+            reportType: 'weekly',
+            year: _selectedYear,
+          );
+          final monthly = await ReportRepository.instance.listReports(
+            reportType: 'monthly',
+            year: _selectedYear,
+          );
+          reports = [...weekly, ...monthly]..sort((a, b) {
+              final aDate = a.submittedAt ?? '';
+              final bDate = b.submittedAt ?? '';
+              return bDate.compareTo(aDate);
+            });
+        }
       }
 
       if (!mounted) return;
@@ -169,15 +232,39 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen> {
                 children: [
                   ChoiceChip(
                     label: Text(l10n.s20FilterAll),
-                    selected: _selectedYear == null,
+                    selected: _selectedType == 'all',
                     onSelected: (selected) {
                       if (selected) {
-                        setState(() => _selectedYear = null);
+                        setState(() => _selectedType = 'all');
                         _loadReports();
                       }
                     },
                   ),
                   const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: Text(l10n.s20FilterWeekly),
+                    selected: _selectedType == 'weekly',
+                    onSelected: (selected) {
+                      if (selected) {
+                        setState(() => _selectedType = 'weekly');
+                        _loadReports();
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: Text(l10n.s20FilterMonthly),
+                    selected: _selectedType == 'monthly',
+                    onSelected: (selected) {
+                      if (selected) {
+                        setState(() => _selectedType = 'monthly');
+                        _loadReports();
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 12),
+                  Container(height: 20, width: 1, color: AppColors.gray300),
+                  const SizedBox(width: 12),
                   ChoiceChip(
                     label: Text(DateTime.now().year.toString()),
                     selected: _selectedYear == DateTime.now().year,
@@ -276,8 +363,10 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen> {
     bool isOwner,
   ) {
     final compTable = report.complianceTable;
-    final pct = (compTable['compliance_pct'] as num?)?.toDouble() ?? 0.0;
-    final bandName = (compTable['band'] as String?)?.toUpperCase() ?? 'UNKNOWN';
+    final pct = (compTable['monthly_spot_check_pct'] as num?)?.toDouble() ??
+        (compTable['compliance_pct'] as num?)?.toDouble() ??
+        0.0;
+    final bandName = ((compTable['monthly_band'] ?? compTable['band']) as String?)?.toUpperCase() ?? 'UNKNOWN';
     final color = bandColor(pct);
 
     final submittedDateStr = report.submittedAt != null
@@ -308,13 +397,46 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Type chip & date
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: report.reportType == 'monthly'
+                          ? AppColors.navy.withValues(alpha: 0.1)
+                          : AppColors.gold.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(
+                        color: report.reportType == 'monthly' ? AppColors.navy : AppColors.gold,
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Text(
+                      report.reportType == 'monthly' ? l10n.s20FilterMonthly : l10n.s20FilterWeekly,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: report.reportType == 'monthly' ? AppColors.navy : AppColors.gold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    submittedDateStr,
+                    style: const TextStyle(fontSize: 12, color: AppColors.gray600),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+
               // Top Row: Date/Header + Score Pill
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: Text(
-                      report.headline ?? 'Weekly Report · $submittedDateStr',
+                      report.headline ?? '${report.reportType == 'monthly' ? 'Monthly' : 'Weekly'} Report · $submittedDateStr',
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,

@@ -4152,13 +4152,13 @@ abstract class AppLocalizations {
   /// No description provided for @s20ScreenTitle.
   ///
   /// In en, this message translates to:
-  /// **'Weekly Reports'**
+  /// **'Compliance Reports'**
   String get s20ScreenTitle;
 
   /// No description provided for @s20ScreenSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Workbook §3.6 reports & 1-page PDF export'**
+  /// **'Weekly & monthly reports, trend analytics & PDF export'**
   String get s20ScreenSubtitle;
 
   /// No description provided for @s20FilterAll.
@@ -4718,6 +4718,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Flag if this checkpoint presents a security or theft risk (triggers immediate alert to Owner).'**
   String get s07SecurityConcernSubtitle;
+
+  /// No description provided for @s20FilterWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get s20FilterWeekly;
+
+  /// No description provided for @s20FilterMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get s20FilterMonthly;
+
+  /// No description provided for @s21MonthlyScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Trend Report'**
+  String get s21MonthlyScreenTitle;
+
+  /// No description provided for @s21MonthlySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Workbook §3.7 Strategic Spot-Checks & Multi-Week Trends'**
+  String get s21MonthlySubtitle;
+
+  /// No description provided for @s21MonthlySpotCheckSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 2: Strategic Spot-Checks'**
+  String get s21MonthlySpotCheckSection;
+
+  /// No description provided for @s21MonthlyTrendAnalyticsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 3: Multi-Week Trend Analytics'**
+  String get s21MonthlyTrendAnalyticsSection;
+
+  /// No description provided for @s21MonthlyFindingsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 4: Spot-Check Non-Compliances ({count})'**
+  String s21MonthlyFindingsSection(int count);
+
+  /// No description provided for @s21MonthlyNoFindings.
+  ///
+  /// In en, this message translates to:
+  /// **'No spot-check non-compliances recorded.'**
+  String get s21MonthlyNoFindings;
+
+  /// No description provided for @s21MonthlyCapsRollupSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 5: Monthly CAPs Rollup'**
+  String get s21MonthlyCapsRollupSection;
+
+  /// No description provided for @s21MonthlyEscalationsRollupSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Section 6: Monthly Escalations Rollup'**
+  String get s21MonthlyEscalationsRollupSection;
+
+  /// No description provided for @s21MonthlySpotCheckLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Strategic Spot-Check Score'**
+  String get s21MonthlySpotCheckLabel;
+
+  /// No description provided for @s21MonthlyWeeklyAvgLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Month Weekly Audits Average'**
+  String get s21MonthlyWeeklyAvgLabel;
+
+  /// No description provided for @s21MonthlyNoCaps.
+  ///
+  /// In en, this message translates to:
+  /// **'No CAPs opened, closed, or aged this month.'**
+  String get s21MonthlyNoCaps;
+
+  /// No description provided for @s21MonthlyNoEscalations.
+  ///
+  /// In en, this message translates to:
+  /// **'No escalations triggered during this month.'**
+  String get s21MonthlyNoEscalations;
+
+  /// No description provided for @s21ExportMonthlyPdfButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Monthly PDF'**
+  String get s21ExportMonthlyPdfButton;
 }
 
 class _AppLocalizationsDelegate

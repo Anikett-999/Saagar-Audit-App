@@ -854,8 +854,8 @@
   "capOversightAwaitingSection": "माझ्या पडताळणीसाठी प्रलंबित",
   "capOversightNoAwaiting": "पडताळणीसाठी कोणतेही CAP प्रलंबित नाहीत",
   "capOversightVerifyNow": "आता पडताळा",
-  "s20ScreenTitle": "साप्ताहिक अहवाल",
-  "s20ScreenSubtitle": "कार्यपुस्तिका §3.6 अहवाल आणि 1-पान PDF निर्यात",
+  "s20ScreenTitle": "अनुपालन अहवाल",
+  "s20ScreenSubtitle": "साप्ताहिक व मासिक अहवाल, कल विश्लेषण आणि PDF निर्यात",
   "s20FilterAll": "सर्व",
   "s20EmptyTitle": "अद्याप कोणतेही साप्ताहिक अहवाल नाहीत",
   "s20EmptySubtitle": "साप्ताहिक अनुपालन ऑडिट पूर्ण झाल्यावर साप्ताहिक अहवाल तयार केले जातात.",
@@ -1042,7 +1042,27 @@
   "s10InventoryVarianceLabel": "इन्व्हेंटरी तफावत (%)",
   "s10InventoryVarianceHelper": "तफावत 2.0% पेक्षा जास्त असल्यास मालकाला तात्काळ इशारा पाठवला जातो (ट्रिगर ४).",
   "s07SecurityConcernLabel": "सुरक्षा चिंता",
-  "s07SecurityConcernSubtitle": "या तपासणी बिंदूमध्ये सुरक्षा किंवा चोरीचा धोका असल्यास चिन्हांकित करा (मालकास तात्काळ इशारा)."
+  "s07SecurityConcernSubtitle": "या तपासणी बिंदूमध्ये सुरक्षा किंवा चोरीचा धोका असल्यास चिन्हांकित करा (मालकास तात्काळ इशारा).",
+  "s20FilterWeekly": "साप्ताहिक",
+  "s20FilterMonthly": "मासिक",
+  "s21MonthlyScreenTitle": "मासिक कल अहवाल",
+  "s21MonthlySubtitle": "कार्यपुस्तिका §3.7 धोरणात्मक तपासणी आणि बहु-आठवडा कल",
+  "s21MonthlySpotCheckSection": "विभाग २: धोरणात्मक स्पॉट-तपासण्या",
+  "s21MonthlyTrendAnalyticsSection": "विभाग ३: बहु-आठवडा कल विश्लेषण",
+  "s21MonthlyFindingsSection": "विभाग ४: स्पॉट-तपासणी त्रुटी ({count})",
+  "@s21MonthlyFindingsSection": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s21MonthlyNoFindings": "कोणतीही स्पॉट-तपासणी त्रुटी नोंदवली गेली नाही.",
+  "s21MonthlyCapsRollupSection": "विभाग ५: मासिक कॅप सारांश",
+  "s21MonthlyEscalationsRollupSection": "विभाग ६: मासिक एस्केलेशन सारांश",
+  "s21MonthlySpotCheckLabel": "धोरणात्मक स्पॉट-तपासणी गुण",
+  "s21MonthlyWeeklyAvgLabel": "महिन्यातील साप्ताहिक सरासरी",
+  "s21MonthlyNoCaps": "या महिन्यात कोणतीही कॅप उघडलेली, बंद किंवा जुनी झालेली नाही.",
+  "s21MonthlyNoEscalations": "या महिन्यात कोणतीही वाढ किंवा इशारा नोंदवला गेला नाही.",
+  "s21ExportMonthlyPdfButton": "मासिक PDF निर्यात करा"
 }
 
 

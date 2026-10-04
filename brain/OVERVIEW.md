@@ -21,5 +21,5 @@ Ground-truth documents:
 |---|---|---|---|
 | **Phase 1** | Weeks 1–4 | Daily audit foundation (S01–S17, S22–S32), SQLite schema, seed data, local PIN auth, scoring engine, CAP create + mark done | ✅ **COMPLETE & SIGNED OFF** (All 28 screens built; 214/214 tests green; Claude review approved; Physical device UAT verified) |
 | **Phase 2** | Weeks 5–8 | Weekly audit, CAP verify + close, GM dashboard, PDF generation & export | ✅ **COMPLETE & SIGNED OFF** (All 5 sprints P2-1..P2-5 built; 279/279 tests green; Claude review approved; Physical device UAT verified; merged to `main`) |
-| **Phase 3** | Weeks 9–11 | Monthly audit, 7-trigger Escalation Engine, Trend Analytics & Charts, CAP auto-aging | **Next** (Active Kickoff) |
-| **Phase 4** | Weeks 12–13 | Cloud mirror (Firestore / Storage), Play Store internal track release | Scheduled |
+| **Phase 3** | Weeks 9–11 | Monthly audit, 7-trigger Escalation Engine, Trend Analytics & Charts, CAP auto-aging | ✅ **COMPLETE & SIGNED OFF** (All 5 sprints P3-1..P3-4 built; 355+ tests green; Claude review approved; Physical device UAT verified on POCO) |
+| **Phase 4** | Weeks 12–13 | Cloud mirror (Firestore / Storage), Play Store internal track release | **Next** (Active Kickoff) |

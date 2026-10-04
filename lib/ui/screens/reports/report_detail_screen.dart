@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../data/models/report.dart';
 import '../../../data/repositories/report_repository.dart';
+import '../../../domain/trend_analytics.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/weekly_report_pdf_service.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
+import '../../widgets/trend_chart.dart';
 
 /// Screen S21: Weekly Report Detail (Workbook Day 3 §3.6 Nine-Section Format & Spec §5 S21).
 class ReportDetailScreen extends ConsumerStatefulWidget {
@@ -119,6 +121,25 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.s21ScreenTitle)),
         body: const Center(child: Text('Report not found.')),
+      );
+    }
+
+    if (report.reportType == 'monthly') {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.s21MonthlyScreenTitle),
+          actions: const [
+            LanguageToggleButton(),
+          ],
+        ),
+        body: _buildMonthlyBody(
+          context: context,
+          report: report,
+          isOwner: isOwner,
+          locale: locale,
+          isMr: isMr,
+          l10n: l10n,
+        ),
       );
     }
 
@@ -665,6 +686,370 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
               ),
             ),
           ),
+      ],
+    );
+  }
+
+  Widget _buildMonthlyBody({
+    required BuildContext context,
+    required Report report,
+    required bool isOwner,
+    required String locale,
+    required bool isMr,
+    required AppLocalizations l10n,
+  }) {
+    final compTable = report.complianceTable;
+    final monthlyPct = (compTable['monthly_spot_check_pct'] as num?)?.toDouble() ??
+        (compTable['compliance_pct'] as num?)?.toDouble() ??
+        0.0;
+    final monthlyBand = (compTable['monthly_band'] as String?)?.toUpperCase() ?? 'UNKNOWN';
+    final color = bandColor(monthlyPct);
+    final weeklyAvgPct = (compTable['weekly_avg_pct'] as num?)?.toDouble();
+
+    final trendResult = TrendAnalysisResult.fromJson(report.trendBlock);
+    final findings = report.findings;
+    final capsOpened = report.capsOpened;
+    final capsClosed = report.capsClosed;
+    final capsAged = report.capsAged;
+    final escalations = report.escalations;
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        // Subtitle / Standard Banner
+        Text(
+          l10n.s21MonthlySubtitle,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppColors.gray600,
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // --- Section 1: Executive Headline ---
+        _sectionCard(
+          title: l10n.s21HeadlineSection,
+          icon: Icons.title,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  report.headline ?? 'Monthly Trend Report',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.navy,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: color, width: 1.5),
+                ),
+                child: Text(
+                  '$monthlyBand · ${monthlyPct.toStringAsFixed(1)}%',
+                  style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // --- Section 2: Strategic Spot-Checks ---
+        _sectionCard(
+          title: l10n.s21MonthlySpotCheckSection,
+          icon: Icons.fact_check_outlined,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.gray100,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.gray200),
+                ),
+                child: Column(
+                  children: [
+                    _scoreRow(
+                      l10n.s21MonthlySpotCheckLabel,
+                      '${monthlyPct.toStringAsFixed(1)}% ($monthlyBand)',
+                      isBold: true,
+                      valueColor: color,
+                    ),
+                    if (weeklyAvgPct != null) ...[
+                      const Divider(height: 12),
+                      _scoreRow(
+                        l10n.s21MonthlyWeeklyAvgLabel,
+                        '${weeklyAvgPct.toStringAsFixed(1)}%',
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                isMr ? 'स्पॉट-तपासणी तपशील' : 'Spot-Check Checkpoint Breakdown',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              const SizedBox(height: 6),
+              _buildSopTable(compTable['monthly_sop_rows'] as List<dynamic>?, isMr),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // --- Section 3: Multi-Week Trend Analytics ---
+        _sectionCard(
+          title: l10n.s21MonthlyTrendAnalyticsSection,
+          icon: Icons.show_chart_rounded,
+          child: TrendChartWidget(
+            trendResult: trendResult,
+            locale: locale,
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // --- Section 4: Spot-Check Non-Compliances ---
+        _sectionCard(
+          title: l10n.s21MonthlyFindingsSection(findings.length),
+          icon: Icons.warning_amber_rounded,
+          child: findings.isEmpty
+              ? Text(
+                  l10n.s21MonthlyNoFindings,
+                  style: const TextStyle(color: AppColors.gray600, fontStyle: FontStyle.italic),
+                )
+              : Column(
+                  children: [
+                    for (final f in findings)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.error_outline, color: AppColors.red, size: 18),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${f['checkpoint_id']} · ${isMr ? f['sop_name_mr'] : f['sop_name_en']}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  Text(
+                                    f['finding_text']?.toString() ?? '',
+                                    style: const TextStyle(fontSize: 13, color: AppColors.gray800),
+                                  ),
+                                  if ((f['photo_count'] as int? ?? 0) > 0)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 2),
+                                      child: Text(
+                                        l10n.s21PhotosCount(f['photo_count'] as int),
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: AppColors.gray600,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+        ),
+        const SizedBox(height: 12),
+
+        // --- Section 5: Monthly CAPs Rollup ---
+        _sectionCard(
+          title: l10n.s21MonthlyCapsRollupSection,
+          icon: Icons.assignment_outlined,
+          child: (capsOpened.isEmpty && capsClosed.isEmpty && capsAged.isEmpty)
+              ? Text(
+                  l10n.s21MonthlyNoCaps,
+                  style: const TextStyle(color: AppColors.gray600, fontStyle: FontStyle.italic),
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (capsOpened.isNotEmpty) ...[
+                      Text(
+                        isMr
+                            ? 'या महिन्यात उघडलेल्या कॅप (${capsOpened.length})'
+                            : 'CAPs Opened This Month (${capsOpened.length})',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                      const SizedBox(height: 6),
+                      for (final cap in capsOpened)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Text(
+                            '• ${cap['problem_statement'] ?? cap['problem_statement_en'] ?? ''} [${cap['status'] ?? 'open'}]',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      const SizedBox(height: 10),
+                    ],
+                    if (capsClosed.isNotEmpty) ...[
+                      Text(
+                        isMr
+                            ? 'या महिन्यात बंद केलेल्या कॅप (${capsClosed.length})'
+                            : 'CAPs Closed This Month (${capsClosed.length})',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                      const SizedBox(height: 6),
+                      for (final cap in capsClosed)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Text(
+                            '• ${cap['problem_statement'] ?? ''} [${cap['status'] ?? 'closed'}]',
+                            style: const TextStyle(fontSize: 12, color: AppColors.green),
+                          ),
+                        ),
+                      const SizedBox(height: 10),
+                    ],
+                    if (capsAged.isNotEmpty) ...[
+                      Text(
+                        isMr
+                            ? 'सध्या जुन्या / प्रलंबित कॅप (${capsAged.length})'
+                            : 'Currently Aged / Overdue CAPs (${capsAged.length})',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.amber),
+                      ),
+                      const SizedBox(height: 6),
+                      for (final cap in capsAged)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Text(
+                            '• ${cap['problem_statement'] ?? ''} (Aged count: ${cap['aged_count'] ?? 1}, Deadline: ${cap['deadline'] ?? ''})',
+                            style: const TextStyle(fontSize: 12, color: AppColors.amber),
+                          ),
+                        ),
+                    ],
+                  ],
+                ),
+        ),
+        const SizedBox(height: 12),
+
+        // --- Section 6: Monthly Escalations Rollup ---
+        _sectionCard(
+          title: l10n.s21MonthlyEscalationsRollupSection,
+          icon: Icons.campaign_outlined,
+          child: escalations.isEmpty
+              ? Text(
+                  l10n.s21MonthlyNoEscalations,
+                  style: const TextStyle(color: AppColors.gray600, fontStyle: FontStyle.italic),
+                )
+              : Column(
+                  children: [
+                    for (final esc in escalations)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.warning, color: AppColors.amber, size: 18),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${esc['trigger_label'] ?? 'Trigger'} · ${esc['urgency'] ?? ''}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  Text(
+                                    esc['what_happened']?.toString() ?? '',
+                                    style: const TextStyle(fontSize: 12, color: AppColors.gray800),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+        ),
+        const SizedBox(height: 12),
+
+        // --- Signature of Record ---
+        _sectionCard(
+          title: l10n.s21SignatureSection,
+          icon: Icons.verified_user_outlined,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.s21AuditorSignature(
+                  report.authorUserId ?? 'Owner Auditor',
+                  report.submittedAt != null ? report.submittedAt!.split('T').first : 'Submitted',
+                ),
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                report.isReadByOwner
+                    ? l10n.s21OwnerSignature(report.readByOwnerAt?.split('T').first ?? '')
+                    : l10n.s21OwnerSignaturePending,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                  color: report.isReadByOwner ? AppColors.green : AppColors.amber,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // --- Bottom Actions ---
+        if (isOwner) ...[
+          ElevatedButton.icon(
+            icon: _markingRead
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  )
+                : Icon(report.isReadByOwner ? Icons.check_circle : Icons.mark_email_read),
+            label: Text(report.isReadByOwner ? l10n.s20OwnerRead : l10n.s21MarkAsReadButton),
+            onPressed: report.isReadByOwner || _markingRead ? null : _markAsRead,
+          ),
+          const SizedBox(height: 10),
+        ],
+
+        OutlinedButton.icon(
+          icon: _exportingPdf
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.picture_as_pdf),
+          label: Text(l10n.s21ExportMonthlyPdfButton),
+          onPressed: _exportingPdf ? null : _exportPdf,
+        ),
+        const SizedBox(height: 32),
       ],
     );
   }
