@@ -30,13 +30,15 @@
 | **S29**    | Manage Users | ✅ Complete | Owner-only, route-guarded, SM/GM creation only (no Owner), bcrypt PINs, soft deactivation, Owner protected, EN/MR parity |
 | **S30**    | Change PIN | ✅ Complete | Verifies current PIN via BCrypt.checkpw, bcrypt hash on new PIN, 4-digit validation, mismatch & same-PIN guards, EN/MR parity |
 | **S31**    | Language | ✅ Complete | Dedicated screen, live EN/MR switch, persists to users.language_pref, login restore, full EN/MR parity |
-| **S32**    | Backup / Export | ✅ Complete | All 14 tables exported to timestamped JSON in Downloads, Owner-only Firestore sync stub (Coming in Phase 4), security advisory, About card, full EN/MR parity |
+| **S32**    | Backup / Export | ✅ Complete | All 14 tables exported to timestamped JSON in Downloads, live Firestore delta sync + Storage photo mirror with Active Mirror badge and Owner force sync, full EN/MR parity |
 
 > **PHASE 1 IS 100% COMPLETE & SIGNED OFF.** All 28 screens (S01–S17, S22–S32) are fully built and verified. Automated suite: 214/214 tests passing across 26 test files. Claude code review: APPROVED. Physical device UAT: verified by owner on device.
 
 > **PHASE 2 IS 100% COMPLETE & SIGNED OFF ACROSS ALL 5 SPRINTS (P2-1 TO P2-5).** Automated suite: 279/279 tests passing across 36 test files. Clean analyze: 0 issues. Claude code review: APPROVED. Physical device UAT: verified by owner on device. Merged to `main`.
 
-> **PHASE 3 SPRINTS P3-1, P3-2, P3-2b, P3-3, AND P3-4 ARE 100% BUILT, TESTED (355+ PASSING TESTS, 0 ANALYZE ISSUES), AND VERIFIED ON PHYSICAL DEVICE (POCO 2312BPC51H). READY FOR CLAUDE SIGN-OFF MERGE INTO MAIN & PHASE 4 KICKOFF.**
+> **PHASE 3 IS 100% COMPLETE & SIGNED OFF ACROSS ALL SPRINTS (P3-1 TO P3-4).** Automated suite: 355/355 tests passing across 43 test files. Clean analyze: 0 issues. Claude code review: APPROVED. Physical device UAT: verified by owner on device. Merged to `main`.
+
+> **PHASE 4 SPRINT P4-1 (CLOUD MIRROR SYNC ENGINE) IS 100% COMPLETE, SIGNED OFF & PHYSICALLY VERIFIED ON DEVICE BY OWNER.** Live bi-directional delta sync with Firestore (`saagar-audit-app-latur`), photo mirror to Firebase Storage, S32 live status dashboard and manual trigger, post-submit hook, WorkManager background sync, and strict Rule 4 PIN hash stripping confirmed on device. Ready for Sprint P4-2.
 
 | Screen / Feature | Name | Status | Notes |
 |---|---|---|---|
