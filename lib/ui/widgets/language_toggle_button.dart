@@ -19,13 +19,18 @@ class LanguageToggleButton extends ConsumerWidget {
       child: Center(
         child: Material(
           color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              final newCode = isMarathi ? 'en' : 'mr';
-              ref.read(localeProvider.notifier).set(Locale(newCode));
-            },
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
+          child: Semantics(
+            button: true,
+            label: isMarathi
+                ? 'Switch language to English'
+                : 'Switch language to Marathi (मराठी)',
+            child: InkWell(
+              onTap: () {
+                final newCode = isMarathi ? 'en' : 'mr';
+                ref.read(localeProvider.notifier).set(Locale(newCode));
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: AppColors.navyMid,
@@ -64,10 +69,11 @@ class LanguageToggleButton extends ConsumerWidget {
                   ),
                 ],
               ),
-            ),
-          ),
-        ),
-      ),
-    );
+            ),         // closes Container
+          ),           // closes InkWell
+        ),             // closes Semantics
+      ),               // closes Material
+    ),                 // closes Center
+  );                   // closes Padding return
   }
 }

@@ -34,53 +34,75 @@ class TrendChartWidget extends StatelessWidget {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Overall Compliance + MA chart
-        _SectionHeader(
-          titleEn: 'Overall Compliance Trend',
-          titleMr: 'एकूण पालन कल',
-          locale: locale,
-        ),
-        const SizedBox(height: 8),
-        SizedBox(
-          height: height,
-          child: _OverallTrendChart(
-            series: trendResult.weeklySeries,
-            movingAverages: trendResult.movingAverages,
-          ),
-        ),
+    // Build a plain-English summary for TalkBack / accessibility services.
+    final weekCount = trendResult.weeklySeries.length;
+    final latestPct = weekCount > 0
+        ? trendResult.weeklySeries.last.overallPct.toStringAsFixed(1)
+        : '–';
+    final patternCount = trendResult.detectedPatterns.length;
+    final a11yLabel = locale == 'mr'
+        ? 'अनुपालन कल तक्ता. $weekCount आठवडे. शेवटचे अनुपालन $latestPct%. '
+            '${patternCount > 0 ? '$patternCount कल आढळले.' : 'कोणतेही कल नाहीत.'}'
+        : 'Compliance trend chart. $weekCount weeks of data. '
+            'Latest compliance: $latestPct%. '
+            '${patternCount > 0 ? '$patternCount pattern${patternCount == 1 ? '' : 's'} detected.' : 'No patterns detected.'}';
 
-        if (showPerSopChart && _hasPerSopData()) ...[
-          const SizedBox(height: 24),
+    return Semantics(
+      label: a11yLabel,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Overall Compliance + MA chart
           _SectionHeader(
-            titleEn: 'Per-SOP Rolling Compliance',
-            titleMr: 'SOP-अनुसार रोलिंग पालन',
+            titleEn: 'Overall Compliance Trend',
+            titleMr: 'एकूण पालन कल',
             locale: locale,
           ),
           const SizedBox(height: 8),
-          SizedBox(
-            height: height,
-            child: _PerSopTrendChart(
-              series: trendResult.weeklySeries,
+          // ExcludeSemantics: the chart canvas has no meaningful text nodes
+          // for TalkBack — the parent Semantics label covers it.
+          ExcludeSemantics(
+            child: SizedBox(
+              height: height,
+              child: _OverallTrendChart(
+                series: trendResult.weeklySeries,
+                movingAverages: trendResult.movingAverages,
+              ),
             ),
           ),
-        ],
 
-        if (trendResult.detectedPatterns.isNotEmpty) ...[
-          const SizedBox(height: 16),
-          _SectionHeader(
-            titleEn: 'Detected Patterns',
-            titleMr: 'आढळलेले कल',
-            locale: locale,
-          ),
-          const SizedBox(height: 8),
-          ...trendResult.detectedPatterns.map(
-            (p) => _PatternCard(pattern: p, locale: locale),
-          ),
+          if (showPerSopChart && _hasPerSopData()) ...[
+            const SizedBox(height: 24),
+            _SectionHeader(
+              titleEn: 'Per-SOP Rolling Compliance',
+              titleMr: 'SOP-अनुसार रोलिंग पालन',
+              locale: locale,
+            ),
+            const SizedBox(height: 8),
+            ExcludeSemantics(
+              child: SizedBox(
+                height: height,
+                child: _PerSopTrendChart(
+                  series: trendResult.weeklySeries,
+                ),
+              ),
+            ),
+          ],
+
+          if (trendResult.detectedPatterns.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            _SectionHeader(
+              titleEn: 'Detected Patterns',
+              titleMr: 'आढळलेले कल',
+              locale: locale,
+            ),
+            const SizedBox(height: 8),
+            ...trendResult.detectedPatterns.map(
+              (p) => _PatternCard(pattern: p, locale: locale),
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 

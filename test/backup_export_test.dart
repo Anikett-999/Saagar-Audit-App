@@ -231,7 +231,7 @@ void main() {
       expect(find.text('Version: 0.1.0+1 (Phase 1 Baseline)'), findsOneWidget);
     });
 
-    testWidgets('Owner sees Firestore Cloud Sync section with Coming in Phase 4 badge and disabled button', (tester) async {
+    testWidgets('Owner sees Firestore Cloud Sync section with active mirror status and force sync button', (tester) async {
       final localeNotifier = FakeLocaleNotifier(const Locale('en'));
       await pumpBackupExport(
         tester,
@@ -241,13 +241,8 @@ void main() {
 
       // Cloud Sync Section is visible for Owner
       expect(find.text('Cloud Synchronization (Firestore)'), findsOneWidget);
-      expect(find.textContaining('Coming in Phase 4'), findsNWidgets(3)); // Badge, notice, and button text
-      expect(find.text('Status: Offline-First Mode (Local SQLite)'), findsOneWidget);
-      expect(find.text('Coming in Phase 4. All audits and settings are safely stored locally on this device.'), findsOneWidget);
-
-      // Verify Force Sync button is disabled
-      final button = tester.widget<OutlinedButton>(find.byType(OutlinedButton));
-      expect(button.onPressed, isNull);
+      expect(find.text('Active Mirror'), findsOneWidget);
+      expect(find.widgetWithText(ElevatedButton, 'Force Cloud Sync'), findsOneWidget);
     });
 
     testWidgets('SM user does NOT see the Owner-only Firestore Cloud Sync section', (tester) async {
@@ -285,7 +280,8 @@ void main() {
           pollCount++;
         }
       });
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       // Verify success dialog is shown
       expect(find.byType(AlertDialog), findsOneWidget);
@@ -295,7 +291,8 @@ void main() {
 
       // Tap OK to dismiss
       await tester.tap(find.text('OK'));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
       expect(find.byType(AlertDialog), findsNothing);
     });
 
@@ -325,7 +322,7 @@ void main() {
       expect(find.text('स्थानिक डेटाबेस निर्यात करा (JSON)'), findsOneWidget);
       expect(find.text('डेटाबेस JSON निर्यात करा'), findsOneWidget);
       expect(find.text('क्लाउड समक्रमण (Firestore)'), findsOneWidget);
-      expect(find.textContaining('फेज ४ मध्ये येत आहे'), findsNWidgets(2));
+      expect(find.text('सक्रिय मिरर'), findsOneWidget);
       expect(find.text('सागर ऑडिट अॅपबद्दल'), findsOneWidget);
     });
   });

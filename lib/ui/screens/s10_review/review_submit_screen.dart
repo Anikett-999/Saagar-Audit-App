@@ -16,6 +16,7 @@ import '../../../data/repositories/report_repository.dart';
 import '../../../domain/score_engine.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../providers/cloud_sync_provider.dart';
 import '../../../providers/draft_audit_provider.dart';
 import '../../../services/escalation_service.dart';
 import '../../theme/app_colors.dart';
@@ -212,6 +213,13 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
         // Non-blocking per Rule 5
       }
 
+      // Phase 4: Cloud Mirror Auto-Sync (asynchronous, non-blocking per Rule 3)
+      try {
+        ref.read(cloudSyncProvider.notifier).syncNow();
+      } catch (_) {
+        // Non-blocking: cloud sync failure must never block audit submission
+      }
+
       if (!mounted) return;
       context.goNamed('s11_submitted');
     } catch (e) {
@@ -309,6 +317,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
       appBar: AppBar(
         title: Text('${l10n.s10Title} — $titleDate'),
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.goNamed('s07_checkpoint'),
         ),
@@ -930,6 +939,8 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
                     width: 60,
                     height: 60,
                     fit: BoxFit.cover,
+                    cacheWidth: 150,
+                    cacheHeight: 150,
                     errorBuilder: (_, __, ___) => Container(
                       width: 60,
                       height: 60,

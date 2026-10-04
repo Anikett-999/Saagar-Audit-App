@@ -112,6 +112,7 @@ class _EscalationTriggersScreenState
       appBar: AppBar(
         title: Text(l10n.s24Title),
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             if (context.canPop()) {

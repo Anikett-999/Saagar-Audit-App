@@ -95,6 +95,7 @@ class _GlossaryScreenState extends ConsumerState<GlossaryScreen> {
       appBar: AppBar(
         title: Text(l10n.s26Title),
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             if (context.canPop()) {

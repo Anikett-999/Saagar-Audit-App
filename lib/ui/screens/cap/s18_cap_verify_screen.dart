@@ -837,6 +837,8 @@ class _S18CapVerifyScreenState extends ConsumerState<S18CapVerifyScreen> {
                         child: Image.file(
                           File(_photoPath!),
                           fit: BoxFit.cover,
+                          cacheWidth: 150,
+                          cacheHeight: 150,
                           errorBuilder: (ctx, err, stack) => const Icon(
                             Icons.broken_image,
                             size: 32,
@@ -876,6 +878,7 @@ class _S18CapVerifyScreenState extends ConsumerState<S18CapVerifyScreen> {
                       ),
                     ),
                     IconButton(
+                      tooltip: l10n.s17RemovePhoto,
                       icon: const Icon(Icons.delete_outline, color: AppColors.red),
                       onPressed: () => setState(() => _photoPath = null),
                     ),

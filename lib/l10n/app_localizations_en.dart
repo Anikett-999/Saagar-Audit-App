@@ -990,13 +990,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s32CloudSyncPhase4Notice =>
-      'Coming in Phase 4. All audits and settings are safely stored locally on this device.';
+      'All audits, CAPs, and reports are safely preserved locally on this device.';
 
   @override
-  String get s32CloudSyncComingSoonBadge => 'Coming in Phase 4';
+  String get s32CloudSyncComingSoonBadge => 'Active Mirror';
 
   @override
   String get s32ForceSyncButton => 'Force Cloud Sync';
+
+  @override
+  String get s32CloudSyncStatusIdle => 'Status: Ready to Sync';
+
+  @override
+  String get s32CloudSyncStatusSyncing => 'Status: Synchronizing with Cloud...';
+
+  @override
+  String get s32CloudSyncStatusSuccess =>
+      'Status: All Data Mirrored (Cloud up to date)';
+
+  @override
+  String s32CloudSyncStatusError(String error) {
+    return 'Status: Sync Error ($error)';
+  }
+
+  @override
+  String get s32CloudSyncStatusOffline =>
+      'Status: Offline (Local SQLite Active)';
+
+  @override
+  String get s32CloudSyncStatusUnconfigured =>
+      'Status: Cloud Backend Offline / Standby';
+
+  @override
+  String s32CloudSyncLastSync(String time) {
+    return 'Last Synced: $time';
+  }
+
+  @override
+  String get s32CloudSyncNever => 'Never';
+
+  @override
+  String s32CloudSyncPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count changes pending upload',
+      one: '1 change pending upload',
+      zero: 'All local changes backed up',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String s32SyncSuccessNotice(int count) {
+    return 'Cloud mirror sync completed ($count records updated).';
+  }
 
   @override
   String get s32AboutCardTitle => 'About Saagar Audit App';
@@ -1095,6 +1143,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get s14ClearSearch => 'Clear search';
+
+  @override
   String get s15Title => 'New Corrective Action Plan';
 
   @override
@@ -1191,6 +1242,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s15AddStep => 'Add Step';
+
+  @override
+  String get s15RemoveStep => 'Remove step';
 
   @override
   String get s15MinStepsNotice => 'At least 3 steps required';

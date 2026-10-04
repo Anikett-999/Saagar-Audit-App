@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Inviolable Rule 4: pin_hash must NEVER be stored in the cloud.
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if !('pin_hash' in request.resource.data);
+    }
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

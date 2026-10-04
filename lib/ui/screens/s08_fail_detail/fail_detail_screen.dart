@@ -225,14 +225,14 @@ class _FailDetailScreenState extends ConsumerState<FailDetailScreen> {
                   color: _flagSecurityConcern ? AppColors.goldPale : AppColors.gray100,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: _flagSecurityConcern ? AppColors.gold : AppColors.gray300,
+                    color: _flagSecurityConcern ? AppColors.goldDark : AppColors.gray300,
                   ),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.security_outlined,
-                      color: _flagSecurityConcern ? AppColors.gold : AppColors.gray600,
+                      color: _flagSecurityConcern ? AppColors.goldDark : AppColors.gray600,
                       size: 22,
                     ),
                     const SizedBox(width: 12),
@@ -263,12 +263,17 @@ class _FailDetailScreenState extends ConsumerState<FailDetailScreen> {
                         ],
                       ),
                     ),
-                    Switch.adaptive(
-                      key: const ValueKey('s08_security_concern_switch'),
-                      value: _flagSecurityConcern,
-                      activeTrackColor: AppColors.gold,
-                      onChanged: (val) =>
-                          setState(() => _flagSecurityConcern = val),
+                    Semantics(
+                      label:
+                          '${l10n.s07SecurityConcernLabel}, ${_flagSecurityConcern ? "flagged" : "not flagged"}',
+                      child: Switch.adaptive(
+                        key: const ValueKey('s08_security_concern_switch'),
+                        value: _flagSecurityConcern,
+                        activeTrackColor: AppColors.gold,
+                        activeThumbColor: AppColors.goldDark,
+                        onChanged: (val) =>
+                            setState(() => _flagSecurityConcern = val),
+                      ),
                     ),
                   ],
                 ),
@@ -353,6 +358,8 @@ class _FailDetailScreenState extends ConsumerState<FailDetailScreen> {
             child: Image.file(
               File(path),
               fit: BoxFit.cover,
+              cacheWidth: 400,
+              cacheHeight: 400,
               errorBuilder: (_, __, ___) => Container(
                 color: AppColors.gray200,
                 child: const Center(child: Icon(Icons.broken_image)),
