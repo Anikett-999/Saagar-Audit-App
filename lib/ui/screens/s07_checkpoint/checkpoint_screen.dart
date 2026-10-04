@@ -196,11 +196,17 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            LinearProgressIndicator(
-              value: progress,
-              backgroundColor: AppColors.gray200,
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.gold),
-              minHeight: 4,
+            Semantics(
+              label:
+                  'Progress: Checkpoint ${state.currentIndex + 1} of $total, ${(progress * 100).toInt()}% complete',
+              value: '${(progress * 100).toInt()}%',
+              child: LinearProgressIndicator(
+                value: progress,
+                backgroundColor: AppColors.gray200,
+                valueColor:
+                    const AlwaysStoppedAnimation<Color>(AppColors.gold),
+                minHeight: 4,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
@@ -309,7 +315,7 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
 
   Widget _sopChip(String name, String sopId, bool isCritical) {
     final bg = isCritical ? AppColors.goldPale : AppColors.gray100;
-    final fg = isCritical ? AppColors.gold : AppColors.navy;
+    final fg = isCritical ? AppColors.goldDark : AppColors.navy;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -323,7 +329,7 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
             const Padding(
               padding: EdgeInsets.only(right: 4),
               child:
-                  Icon(Icons.star_rounded, color: AppColors.gold, size: 14),
+                  Icon(Icons.star_rounded, color: AppColors.goldDark, size: 14),
             ),
           Text(
             name,
@@ -346,18 +352,22 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
           SizedBox(
             width: double.infinity,
             height: 60,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.green,
-                foregroundColor: AppColors.white,
-              ),
-              onPressed: () => _onPass(cp),
-              child: Text(
-                l10n.s07Pass,
-                style: const TextStyle(
-                  fontFamily: 'DMSerifDisplay',
-                  fontSize: 22,
-                  letterSpacing: 2,
+            child: Semantics(
+              button: true,
+              label: '${l10n.s07Pass} checkpoint',
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.green,
+                  foregroundColor: AppColors.white,
+                ),
+                onPressed: () => _onPass(cp),
+                child: Text(
+                  l10n.s07Pass,
+                  style: const TextStyle(
+                    fontFamily: 'DMSerifDisplay',
+                    fontSize: 22,
+                    letterSpacing: 2,
+                  ),
                 ),
               ),
             ),
@@ -366,18 +376,22 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
           SizedBox(
             width: double.infinity,
             height: 60,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.red,
-                foregroundColor: AppColors.white,
-              ),
-              onPressed: () => _onFail(cp),
-              child: Text(
-                l10n.s07Fail,
-                style: const TextStyle(
-                  fontFamily: 'DMSerifDisplay',
-                  fontSize: 22,
-                  letterSpacing: 2,
+            child: Semantics(
+              button: true,
+              label: '${l10n.s07Fail} checkpoint',
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.red,
+                  foregroundColor: AppColors.white,
+                ),
+                onPressed: () => _onFail(cp),
+                child: Text(
+                  l10n.s07Fail,
+                  style: const TextStyle(
+                    fontFamily: 'DMSerifDisplay',
+                    fontSize: 22,
+                    letterSpacing: 2,
+                  ),
                 ),
               ),
             ),
@@ -387,15 +401,19 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
             SizedBox(
               width: double.infinity,
               height: 48,
-              child: OutlinedButton(
-                onPressed: () => _onNa(cp),
-                child: Text(
-                  l10n.s07Na,
-                  style: const TextStyle(
-                    fontFamily: 'DMSans',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.5,
+              child: Semantics(
+                button: true,
+                label: '${l10n.s07Na} checkpoint',
+                child: OutlinedButton(
+                  onPressed: () => _onNa(cp),
+                  child: Text(
+                    l10n.s07Na,
+                    style: const TextStyle(
+                      fontFamily: 'DMSans',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1.5,
+                    ),
                   ),
                 ),
               ),
@@ -452,14 +470,14 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
         color: _securityConcern ? AppColors.goldPale : AppColors.gray100,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: _securityConcern ? AppColors.gold : AppColors.gray300,
+          color: _securityConcern ? AppColors.goldDark : AppColors.gray300,
         ),
       ),
       child: Row(
         children: [
           Icon(
             Icons.security_outlined,
-            color: _securityConcern ? AppColors.gold : AppColors.gray600,
+            color: _securityConcern ? AppColors.goldDark : AppColors.gray600,
             size: 22,
           ),
           const SizedBox(width: 12),
@@ -489,11 +507,16 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
               ],
             ),
           ),
-          Switch.adaptive(
-            key: const ValueKey('s07_security_concern_switch'),
-            value: _securityConcern,
-            activeTrackColor: AppColors.gold,
-            onChanged: (val) => setState(() => _securityConcern = val),
+          Semantics(
+            label:
+                '${l10n.s07SecurityConcernLabel}, ${_securityConcern ? "flagged" : "not flagged"}',
+            child: Switch.adaptive(
+              key: const ValueKey('s07_security_concern_switch'),
+              value: _securityConcern,
+              activeTrackColor: AppColors.gold,
+              activeThumbColor: AppColors.goldDark,
+              onChanged: (val) => setState(() => _securityConcern = val),
+            ),
           ),
         ],
       ),

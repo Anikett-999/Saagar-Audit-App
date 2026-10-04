@@ -238,6 +238,7 @@ class _EscalationsListScreenState extends ConsumerState<EscalationsListScreen> {
       appBar: AppBar(
         title: Text(l10n.s33EscalationsTitle),
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.goNamed('s05_home'),
         ),

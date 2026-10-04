@@ -633,6 +633,8 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
                         child: Image.file(
                           File(_photoPath!),
                           fit: BoxFit.cover,
+                          cacheWidth: 150,
+                          cacheHeight: 150,
                           errorBuilder: (ctx, err, stack) => const Icon(
                             Icons.broken_image,
                             size: 32,

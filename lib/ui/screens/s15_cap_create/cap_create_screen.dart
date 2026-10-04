@@ -750,6 +750,7 @@ class _CapCreateScreenState extends ConsumerState<CapCreateScreen> {
                       IconButton(
                         key: ValueKey('s15_remove_step_$i'),
                         icon: const Icon(Icons.remove_circle_outline, color: AppColors.red),
+                        tooltip: l10n.s15RemoveStep,
                         onPressed: () => _removeActionStep(i),
                       )
                     else
