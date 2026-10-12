@@ -50,22 +50,31 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: AppColors.navy,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: Image.asset(
+                'assets/images/app_logo.png',
+                width: 96,
+                height: 96,
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
               'Saagar',
               style: TextStyle(
                 fontFamily: 'DMSerifDisplay',
-                fontSize: 56,
+                fontSize: 52,
                 color: AppColors.goldLight,
               ),
             ),
-            SizedBox(height: 8),
-            Text(
+            const SizedBox(height: 8),
+            const Text(
               'Audit',
               style: TextStyle(
                 fontFamily: 'DMSans',
@@ -74,8 +83,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 color: AppColors.white,
               ),
             ),
-            SizedBox(height: 64),
-            SizedBox(
+            const SizedBox(height: 48),
+            const SizedBox(
               width: 32,
               height: 32,
               child: CircularProgressIndicator(

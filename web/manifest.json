@@ -1,11 +1,11 @@
 {
-    "name": "saagar_audit_app",
-    "short_name": "saagar_audit_app",
+    "name": "Saagar Audit",
+    "short_name": "Saagar",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0D1829",
+    "theme_color": "#0D1829",
+    "description": "Saagar Audit & Store Executive Suite",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

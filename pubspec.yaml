@@ -54,10 +54,15 @@ dependencies:
 
   # Utility
   uuid: ^4.2.1
-  geolocator: ^14.0.3
+  geolocator: ^14.0.2
   connectivity_plus: ^7.1.1
   shared_preferences: ^2.2.2
   workmanager: ^0.9.0+3
+
+  # Owner Personal Executive Suite (Modular Local Package)
+  drift: 2.19.2
+  sagar_meeting_app:
+    path: ../sagar_meeting_app
 
 dev_dependencies:
   flutter_test:

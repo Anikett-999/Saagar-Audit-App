@@ -40,9 +40,21 @@ import 'ui/screens/s31_language/settings_language_screen.dart';
 import 'ui/screens/s32_backup_export/backup_export_screen.dart';
 import 'ui/screens/s33_escalations/escalations_list_screen.dart';
 import 'ui/theme/app_theme.dart';
+import 'package:sagar_meeting_app/sagar_meeting_app.dart' hide AppTheme;
+
+/// Initialize meeting module route namespace
+bool _meetingModuleInitialized = false;
+void _ensureMeetingRoutesInitialized() {
+  if (!_meetingModuleInitialized) {
+    MeetingRoutes.basePrefix = '/owner';
+    NotificationHandler.routerResolver = (ref) => ref.read(routerProvider);
+    _meetingModuleInitialized = true;
+  }
+}
 
 /// Top-level [GoRouter] provider so navigation stack persists across widget rebuilds.
 final routerProvider = Provider<GoRouter>((ref) {
+  _ensureMeetingRoutesInitialized();
   return GoRouter(
     initialLocation: '/',
     routes: [
@@ -403,6 +415,64 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
         builder: (_, __) => const BackupExportScreen(),
       ),
+
+      // ── Executive Meeting Suite Routes (Strictly OWNER Gated) ────────────
+      ...createMeetingRoutes().map((route) {
+        if (route is GoRoute) {
+          return GoRoute(
+            path: route.path,
+            redirect: (context, state) {
+              final auth = ref.read(authProvider);
+              if (auth.user == null || auth.user!.role != 'OWNER') {
+                return '/home'; // Non-owner access blocked
+              }
+              return null;
+            },
+            builder: (context, state) {
+              final Widget page = route.path == MeetingRoutes.dashboard
+                  ? DashboardPage(
+                      onHostExit: () {
+                        if (context.canPop()) {
+                          context.pop();
+                        } else {
+                          context.go('/home');
+                        }
+                      },
+                    )
+                  : route.builder!(context, state);
+
+              return Theme(
+                data: ThemeData(
+                  useMaterial3: true,
+                  brightness: Brightness.dark,
+                  scaffoldBackgroundColor: const Color(0xff121214),
+                  canvasColor: const Color(0xff121214),
+                  cardTheme: CardThemeData(
+                    color: const Color(0xff1a1a1e),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.08),
+                      ),
+                    ),
+                  ),
+                  colorScheme: ColorScheme.dark(
+                    primary: const Color(0xffd4af37),
+                    secondary: const Color(0xfff3e5ab),
+                    surface: const Color(0xff1a1a1e),
+                    onSurface: Colors.white,
+                    outlineVariant: Colors.white.withValues(alpha: 0.12),
+                    surfaceContainerHighest: const Color(0xff222226),
+                  ),
+                ),
+                child: page,
+              );
+            },
+          );
+        }
+        return route;
+      }),
     ],
   );
 });
@@ -424,6 +494,7 @@ class SaagarAuditApp extends ConsumerWidget {
       locale: locale,
       localizationsDelegates: const [
         AppLocalizations.delegate,
+        MeetingLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
