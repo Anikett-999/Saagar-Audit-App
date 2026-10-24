@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:sagar_meeting_app/sagar_meeting_app.dart' show MeetingRoutes;
 
 import '../../../data/models/audit.dart';
 import '../../../data/repositories/audit_repository.dart';
@@ -84,6 +85,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         title: Text(l10n.appTitle),
         actions: [
+          // Discrete Executive Suite Gate — Strictly OWNER role only
+          if (user.role == 'OWNER')
+            IconButton(
+              key: const ValueKey('executive_suite_appbar_btn'),
+              icon: const Icon(Icons.business_center_rounded, color: AppColors.goldLight),
+              tooltip: 'Executive Suite / संचालक कक्ष',
+              onPressed: () => context.push(MeetingRoutes.dashboard),
+            ),
           const LanguageToggleButton(),
           IconButton(
             icon: const Icon(Icons.logout, color: AppColors.goldLight),

@@ -223,7 +223,7 @@ void main() {
         'origin_checkpoint_id': 'MC.1',
         'problem_statement': 'Safe cash discrepancy ₹200',
         'status': 'open',
-        'deadline': '2026-10-05',
+        'deadline': '2027-10-05',
         'opened_at': '2026-09-15T10:00:00Z',
         'root_cause': 'Register discrepancy',
         'why_1': 'Count mismatch',

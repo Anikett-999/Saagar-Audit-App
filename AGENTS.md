@@ -49,4 +49,6 @@ Coordination rules (both agents):
    Rationale: Claude is Team Lead and quality gate; nothing enters the permanent history without a review. **Never force-push.** The only exception is a pure `brain/`-docs/handoff commit (no app code), which Antigravity may push without a code review since there is nothing to review.
 7. **Repo layout & phase-naming rule (spec §15.2 / §15.4):**
    The Flutter app lives at the **repository root** (`lib/`, `test/`, `android/`, `assets/`, `pubspec.yaml`, etc. sit directly in the repo root). There is **one** app that grows across phases. **`phase-1`…`phase-4` are Git BRANCH names ONLY — never folders.** Never create a `phase-N/` directory and never copy the app into a per-phase folder. New phase work happens on a `phase-N` branch (with `feature/*` branches off it), then merges to `main` when signed off.
+8. **Mandatory Developer Decision Consultation Rule (Zero Autonomous Client Decisions):**
+   Any architectural decision, client communication, proposal, roadmap, or engineering commitment MUST be presented to, reviewed by, and approved by the USER first before any action or external commitment is made. Never write, format, or finalize client replies without first conferring with the USER to take their direction and view.
 
