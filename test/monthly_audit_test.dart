@@ -21,7 +21,7 @@ void main() {
     final mockMonthlyCheckpoints = const [
       Checkpoint(
         id: 'MC.1',
-        sopId: 'SOP2',
+        sopId: 'SOP6',
         frequency: 'monthly',
         sequence: 1,
         textEn: 'Recount safe cash',
@@ -104,7 +104,7 @@ void main() {
       expect(monthly.length, equals(3));
 
       final mc1 = monthly.firstWhere((m) => m['id'] == 'MC.1');
-      expect(mc1['sop_id'], equals('SOP2'));
+      expect(mc1['sop_id'], equals('SOP6'));
       expect(mc1['weight'], equals(2));
       expect(mc1['requires_photo_on_fail'], equals(1));
       expect(mc1['text_en'], equals('Recount safe cash'));

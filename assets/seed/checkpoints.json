@@ -1477,7 +1477,7 @@
   },
   {
     "id": "MC.1",
-    "sop_id": "SOP2",
+    "sop_id": "SOP6",
     "frequency": "monthly",
     "sequence": 1,
     "text_en": "Recount safe cash",
