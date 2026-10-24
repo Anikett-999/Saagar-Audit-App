@@ -408,7 +408,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 's32_backup_export',
         redirect: (context, state) {
           final auth = ref.read(authProvider);
-          if (auth.user?.role != 'OWNER') {
+          if (auth.user == null) {
             return '/settings';
           }
           return null;

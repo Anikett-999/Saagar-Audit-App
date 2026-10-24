@@ -89,15 +89,14 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: l10n.s27LanguageSubtitle,
             onTap: () => context.pushNamed('s31_language'),
           ),
-          // Backup & Export is strictly Owner (Super Admin) only per Security Policy & UAT Item 7.
-          if (isOwner)
-            _buildTile(
-              context: context,
-              icon: Icons.cloud_download_outlined,
-              title: l10n.s27BackupExportTitle,
-              subtitle: l10n.s27BackupExportSubtitle,
-              onTap: () => context.pushNamed('s32_backup_export'),
-            ),
+          // Cloud Sync & Backup: SM/GM see "Cloud Sync", Owner sees "Cloud Sync & Backup" (Item 3 & Item 7)
+          _buildTile(
+            context: context,
+            icon: isOwner ? Icons.cloud_download_outlined : Icons.cloud_sync_outlined,
+            title: isOwner ? l10n.s27BackupExportTitle : l10n.s27CloudSyncTitle,
+            subtitle: isOwner ? l10n.s27BackupExportSubtitle : l10n.s27CloudSyncSubtitle,
+            onTap: () => context.pushNamed('s32_backup_export'),
+          ),
           // Manual CAP aging trigger for QA / store testing (Spec §9.1)
           if (isOwner || (auth.user?.isGm ?? false))
             _buildTile(

@@ -1259,14 +1259,26 @@ abstract class AppLocalizations {
   /// No description provided for @s27BackupExportTitle.
   ///
   /// In en, this message translates to:
-  /// **'Backup & Export'**
+  /// **'Cloud Sync & Backup'**
   String get s27BackupExportTitle;
 
   /// No description provided for @s27BackupExportSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Export database JSON and sync status'**
+  /// **'Sync store data and export database JSON'**
   String get s27BackupExportSubtitle;
+
+  /// No description provided for @s27CloudSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Sync'**
+  String get s27CloudSyncTitle;
+
+  /// No description provided for @s27CloudSyncSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync store audits and data with cloud'**
+  String get s27CloudSyncSubtitle;
 
   /// No description provided for @s27AboutTitle.
   ///
@@ -1835,14 +1847,26 @@ abstract class AppLocalizations {
   /// No description provided for @s32Title.
   ///
   /// In en, this message translates to:
-  /// **'Backup & Export'**
+  /// **'Cloud Sync & Backup'**
   String get s32Title;
+
+  /// No description provided for @s32TitleSyncOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Sync'**
+  String get s32TitleSyncOnly;
 
   /// No description provided for @s32Subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Local SQLite Database Export & Cloud Sync'**
+  /// **'Data Backup & Cloud Synchronization'**
   String get s32Subtitle;
+
+  /// No description provided for @s32SubtitleSyncOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Store Data Cloud Synchronization'**
+  String get s32SubtitleSyncOnly;
 
   /// No description provided for @s32ExportCardTitle.
   ///
@@ -1853,13 +1877,13 @@ abstract class AppLocalizations {
   /// No description provided for @s32ExportCardDesc.
   ///
   /// In en, this message translates to:
-  /// **'Export all 14 SQLite tables into a timestamped JSON file in your device Downloads directory. Ideal for manual backups before app updates.'**
+  /// **'Export all SQLite database tables into a timestamped JSON file. Intended for Owner use before app updates.'**
   String get s32ExportCardDesc;
 
   /// No description provided for @s32ExportSecurityNotice.
   ///
   /// In en, this message translates to:
-  /// **'Security Notice: Exported backup contains audit trails, findings, and bcrypt security hashes. Store and transfer this file securely.'**
+  /// **'Security Notice: Exported backup contains audit trails, findings, and store records. Store and transfer this file securely.'**
   String get s32ExportSecurityNotice;
 
   /// No description provided for @s32ExportButton.
@@ -1896,25 +1920,25 @@ abstract class AppLocalizations {
   /// No description provided for @s32CloudSyncTitle.
   ///
   /// In en, this message translates to:
-  /// **'Cloud Synchronization (Firestore)'**
+  /// **'Cloud Synchronization'**
   String get s32CloudSyncTitle;
 
   /// No description provided for @s32CloudSyncDesc.
   ///
   /// In en, this message translates to:
-  /// **'Automatic multi-device synchronization and cloud data storage via Google Cloud Firestore.'**
+  /// **'Sync your audits, photos, and corrective actions with the secure cloud.'**
   String get s32CloudSyncDesc;
 
   /// No description provided for @s32CloudSyncStatusLabel.
   ///
   /// In en, this message translates to:
-  /// **'Status: Offline-First Mode (Local SQLite)'**
+  /// **'Status: Local Storage Active'**
   String get s32CloudSyncStatusLabel;
 
   /// No description provided for @s32CloudSyncPhase4Notice.
   ///
   /// In en, this message translates to:
-  /// **'All audits, CAPs, and reports are safely preserved locally on this device.'**
+  /// **'All audits, CAPs, and reports are safely preserved on this device.'**
   String get s32CloudSyncPhase4Notice;
 
   /// No description provided for @s32CloudSyncComingSoonBadge.
@@ -1926,67 +1950,73 @@ abstract class AppLocalizations {
   /// No description provided for @s32ForceSyncButton.
   ///
   /// In en, this message translates to:
-  /// **'Force Cloud Sync'**
+  /// **'Sync Now'**
   String get s32ForceSyncButton;
 
   /// No description provided for @s32CloudSyncStatusIdle.
   ///
   /// In en, this message translates to:
-  /// **'Status: Ready to Sync'**
+  /// **'Ready to Sync'**
   String get s32CloudSyncStatusIdle;
 
   /// No description provided for @s32CloudSyncStatusSyncing.
   ///
   /// In en, this message translates to:
-  /// **'Status: Synchronizing with Cloud...'**
+  /// **'Synchronizing with Cloud...'**
   String get s32CloudSyncStatusSyncing;
 
   /// No description provided for @s32CloudSyncStatusSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Status: All Data Mirrored (Cloud up to date)'**
+  /// **'Cloud Backup is Up to Date'**
   String get s32CloudSyncStatusSuccess;
 
   /// No description provided for @s32CloudSyncStatusError.
   ///
   /// In en, this message translates to:
-  /// **'Status: Sync Error ({error})'**
+  /// **'Sync Issue ({error})'**
   String s32CloudSyncStatusError(String error);
 
   /// No description provided for @s32CloudSyncStatusOffline.
   ///
   /// In en, this message translates to:
-  /// **'Status: Offline (Local SQLite Active)'**
+  /// **'Device is Offline (No Internet)'**
   String get s32CloudSyncStatusOffline;
 
   /// No description provided for @s32CloudSyncStatusUnconfigured.
   ///
   /// In en, this message translates to:
-  /// **'Status: Cloud Backend Offline / Standby'**
+  /// **'Cloud Standby (Ready to connect)'**
   String get s32CloudSyncStatusUnconfigured;
 
   /// No description provided for @s32CloudSyncLastSync.
   ///
   /// In en, this message translates to:
-  /// **'Last Synced: {time}'**
+  /// **'Last Successful Backup: {time}'**
   String s32CloudSyncLastSync(String time);
 
   /// No description provided for @s32CloudSyncNever.
   ///
   /// In en, this message translates to:
-  /// **'Never'**
+  /// **'Never backed up yet'**
   String get s32CloudSyncNever;
 
   /// No description provided for @s32CloudSyncPending.
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =0{All local changes backed up} =1{1 change pending upload} other{{count} changes pending upload}}'**
+  /// **'{count, plural, =0{All items uploaded to cloud} =1{1 item waiting to upload} other{{count} items waiting to upload}}'**
   String s32CloudSyncPending(int count);
+
+  /// No description provided for @s32SavedOnPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved on this phone: {count} records'**
+  String s32SavedOnPhone(int count);
 
   /// No description provided for @s32SyncSuccessNotice.
   ///
   /// In en, this message translates to:
-  /// **'Cloud mirror sync completed ({count} records updated).'**
+  /// **'Cloud sync completed ({count} records updated).'**
   String s32SyncSuccessNotice(int count);
 
   /// No description provided for @s32AboutCardTitle.

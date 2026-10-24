@@ -640,11 +640,17 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s27LanguageSubtitle => 'इंग्रजी किंवा मराठी निवडा';
 
   @override
-  String get s27BackupExportTitle => 'बॅकअप व निर्यात';
+  String get s27BackupExportTitle => 'क्लाउड सिंक आणि बॅकअप';
 
   @override
   String get s27BackupExportSubtitle =>
-      'डेटाबेस JSON निर्यात आणि समक्रमण स्थिती';
+      'डेटा सिंक करा आणि स्थानिक बॅकअप डाउनलोड करा';
+
+  @override
+  String get s27CloudSyncTitle => 'क्लाउड सिंक';
+
+  @override
+  String get s27CloudSyncSubtitle => 'ऑडिट आणि डेटा क्लाउडसह सिंक करा';
 
   @override
   String get s27AboutTitle => 'अॅपबद्दल माहिती';
@@ -940,21 +946,27 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s31LanguageUpdatedSuccess => 'भाषा पसंती जतन केली';
 
   @override
-  String get s32Title => 'बॅकअप व निर्यात';
+  String get s32Title => 'क्लाउड सिंक आणि बॅकअप';
 
   @override
-  String get s32Subtitle => 'स्थानिक SQLite डेटाबेस निर्यात आणि क्लाउड समक्रमण';
+  String get s32TitleSyncOnly => 'क्लाउड सिंक';
 
   @override
-  String get s32ExportCardTitle => 'स्थानिक डेटाबेस निर्यात करा (JSON)';
+  String get s32Subtitle => 'डेटा बॅकअप आणि क्लाउड समक्रमण';
+
+  @override
+  String get s32SubtitleSyncOnly => 'स्टोअर डेटा क्लाउड समक्रमण';
+
+  @override
+  String get s32ExportCardTitle => 'स्थानिक डेटाबेस निर्यात (JSON)';
 
   @override
   String get s32ExportCardDesc =>
-      'तुमच्या डिव्हाइसच्या Downloads डिरेक्टरीमध्ये सर्व १४ SQLite टेबल्स टाइमस्टॅम्प केलेल्या JSON फाईलमध्ये निर्यात करा. अॅप अपडेटपूर्वी मॅन्युअल बॅकअपसाठी उपयुक्त.';
+      'सर्व डेटाबेस टेबल्स टाइमस्टॅम्प केलेल्या JSON फाईलमध्ये निर्यात करा. अॅप अपडेट करण्यापूर्वी मालकासाठी उपयुक्त.';
 
   @override
   String get s32ExportSecurityNotice =>
-      'सुरक्षा सूचना: निर्यात केलेल्या बॅकअपमध्ये ऑडिट ट्रेल, निरीक्षणे आणि bcrypt सुरक्षा हॅशेस असतात. ही फाईल सुरक्षितपणे साठवा आणि ट्रान्सफर करा.';
+      'सुरक्षा सूचना: निर्यात केलेल्या बॅकअपमध्ये ऑडिट नोंदी, निष्कर्ष आणि स्टोअर डेटा समाविष्ट आहे. ही फाईल सुरक्षितपणे ठेवा.';
 
   @override
   String get s32ExportButton => 'डेटाबेस JSON निर्यात करा';
@@ -963,29 +975,28 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s32Exporting => 'डेटाबेस निर्यात होत आहे...';
 
   @override
-  String get s32ExportSuccessTitle => 'निर्यात यशस्वी झाली';
+  String get s32ExportSuccessTitle => 'निर्यात यशस्वी';
 
   @override
   String s32ExportSuccessMessage(
       int records, int tables, String fileName, String path) {
-    return 'बॅकअप यशस्वीरित्या जतन केला ($tables टेबल्समध्ये $records नोंदी).\n\nफाईल: $fileName\nमार्ग:\n$path';
+    return 'बॅकअप यशस्वीरित्या जतन झाला ($tables टेबल्समधील $records नोंदी).\n\nफाईल: $fileName\nपाथ:\n$path';
   }
 
   @override
   String s32ExportFailed(String error) {
-    return 'डेटाबेस निर्यात अयशस्वी: $error';
+    return 'डेटाबेस निर्यात करण्यात अयशस्वी: $error';
   }
 
   @override
-  String get s32CloudSyncTitle => 'क्लाउड समक्रमण (Firestore)';
+  String get s32CloudSyncTitle => 'क्लाउड समक्रमण';
 
   @override
   String get s32CloudSyncDesc =>
-      'Google Cloud Firestore द्वारे स्वयंचलित मल्टी-डिव्हाइस समक्रमण आणि क्लाउड डेटा संचयन.';
+      'आपले ऑडिट, फोटो आणि सुधारात्मक कृती सुरक्षित क्लाउडसह सिंक करा.';
 
   @override
-  String get s32CloudSyncStatusLabel =>
-      'स्थिती: ऑफलाइन-फर्स्ट मोड (स्थानिक SQLite)';
+  String get s32CloudSyncStatusLabel => 'स्थिती: स्थानिक साठवण सक्रिय';
 
   @override
   String get s32CloudSyncPhase4Notice =>
@@ -995,54 +1006,57 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s32CloudSyncComingSoonBadge => 'सक्रिय मिरर';
 
   @override
-  String get s32ForceSyncButton => 'क्लाउड सिंक करा';
+  String get s32ForceSyncButton => 'आत्ताच सिंक करा';
 
   @override
-  String get s32CloudSyncStatusIdle => 'स्थिती: समक्रमणासाठी सज्ज';
+  String get s32CloudSyncStatusIdle => 'सिंक करण्यासाठी सज्ज';
 
   @override
-  String get s32CloudSyncStatusSyncing =>
-      'स्थिती: क्लाउडसह समक्रमित होत आहे...';
+  String get s32CloudSyncStatusSyncing => 'क्लाउडसह सिंक होत आहे...';
 
   @override
-  String get s32CloudSyncStatusSuccess =>
-      'स्थिती: सर्व डेटा समक्रमित (क्लाउड अद्ययावत)';
+  String get s32CloudSyncStatusSuccess => 'क्लाउड बॅकअप अद्ययावत आहे';
 
   @override
   String s32CloudSyncStatusError(String error) {
-    return 'स्थिती: समक्रमण त्रुटी ($error)';
+    return 'सिंक समस्या ($error)';
   }
 
   @override
-  String get s32CloudSyncStatusOffline => 'स्थिती: ऑफलाइन (लोकल SQLite सक्रिय)';
+  String get s32CloudSyncStatusOffline => 'डिव्हाइस ऑफलाइन आहे (इंटरनेट नाही)';
 
   @override
   String get s32CloudSyncStatusUnconfigured =>
-      'स्थिती: क्लाउड बॅकएंड ऑफलाइन / स्टँडबाय';
+      'क्लाउड सज्ज (कनेक्ट करण्यास तयार)';
 
   @override
   String s32CloudSyncLastSync(String time) {
-    return 'शेवटचे समक्रमण: $time';
+    return 'शेवटचा यशस्वी बॅकअप: $time';
   }
 
   @override
-  String get s32CloudSyncNever => 'कधीही नाही';
+  String get s32CloudSyncNever => 'अद्याप कधीही बॅकअप नाही';
 
   @override
   String s32CloudSyncPending(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count बदल अपलोडसाठी प्रलंबित',
-      one: '१ बदल अपलोडसाठी प्रलंबित',
-      zero: 'सर्व स्थानिक बदल जतन झाले आहेत',
+      other: '$count नोंदी अपलोडसाठी प्रलंबित',
+      one: '१ नोंद अपलोडसाठी प्रलंबित',
+      zero: 'सर्व नोंदी क्लाउडवर सुरक्षित आहेत',
     );
     return '$_temp0';
   }
 
   @override
+  String s32SavedOnPhone(int count) {
+    return 'या फोनवर जतन: $count नोंदी';
+  }
+
+  @override
   String s32SyncSuccessNotice(int count) {
-    return 'क्लाउड मिरर समक्रमण यशस्वीरित्या पूर्ण झाले ($count नोंदी अद्यतनित).';
+    return 'क्लाउड समक्रमण यशस्वीरित्या पूर्ण झाले ($count नोंदी अद्यतनित).';
   }
 
   @override

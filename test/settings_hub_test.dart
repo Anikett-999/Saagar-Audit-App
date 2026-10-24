@@ -118,12 +118,12 @@ void main() {
       expect(find.text('Manage Users'), findsOneWidget);
       expect(find.text('Change PIN'), findsOneWidget);
       expect(find.text('Language / भाषा'), findsOneWidget);
-      expect(find.text('Backup & Export'), findsOneWidget);
+      expect(find.text('Cloud Sync & Backup'), findsOneWidget);
       expect(find.text('About Saagar Audit'), findsOneWidget);
       expect(find.text('Logout'), findsOneWidget);
     });
 
-    testWidgets('SM user HIDES Manage Users completely', (tester) async {
+    testWidgets('SM user HIDES Manage Users completely and sees Cloud Sync only', (tester) async {
       await pumpSettings(
         tester,
         authState: const AuthState(user: smUser),
@@ -142,12 +142,13 @@ void main() {
       // Other settings are present
       expect(find.text('Change PIN'), findsOneWidget);
       expect(find.text('Language / भाषा'), findsOneWidget);
-      // Backup & Export is strictly Owner-only per UAT Item 7 & Security Policy
-      expect(find.text('Backup & Export'), findsNothing);
+      // SM sees "Cloud Sync", never "Cloud Sync & Backup" (Item 3 & Item 7)
+      expect(find.text('Cloud Sync'), findsOneWidget);
+      expect(find.text('Cloud Sync & Backup'), findsNothing);
       expect(find.text('About Saagar Audit'), findsOneWidget);
     });
 
-    testWidgets('GM user HIDES Manage Users completely', (tester) async {
+    testWidgets('GM user HIDES Manage Users completely and sees Cloud Sync only', (tester) async {
       await pumpSettings(
         tester,
         authState: const AuthState(user: gmUser),
@@ -160,8 +161,9 @@ void main() {
       // Manage Users MUST NOT be present
       expect(find.text('Manage Users'), findsNothing);
 
-      // Backup & Export MUST NOT be present for GM per UAT Item 7 & Security Policy
-      expect(find.text('Backup & Export'), findsNothing);
+      // GM sees "Cloud Sync", never "Cloud Sync & Backup" (Item 3 & Item 7)
+      expect(find.text('Cloud Sync'), findsOneWidget);
+      expect(find.text('Cloud Sync & Backup'), findsNothing);
     });
 
     testWidgets('Tapping About opens About Dialog with app info', (tester) async {
@@ -198,7 +200,7 @@ void main() {
       expect(find.text('वापरकर्ता व्यवस्थापन'), findsOneWidget);
       expect(find.text('PIN बदला'), findsOneWidget);
       expect(find.text('भाषा / Language'), findsOneWidget);
-      expect(find.text('बॅकअप व निर्यात'), findsOneWidget);
+      expect(find.text('क्लाउड सिंक आणि बॅकअप'), findsOneWidget);
       expect(find.text('अॅपबद्दल माहिती'), findsOneWidget);
       expect(find.text('लॉगआउट'), findsOneWidget);
     });

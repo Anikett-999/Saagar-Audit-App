@@ -244,8 +244,8 @@ class CloudSyncService {
       // 3. New audits since last sync
       if (lastSync != null) {
         final newAudits = await _db.rawQuery(
-          'SELECT COUNT(*) as count FROM audits WHERE created_at > ?',
-          [lastSync.toIso8601String()],
+          "SELECT COUNT(*) as count FROM audits WHERE submitted_at > ? OR (status = 'draft' AND draft_started_at > ?)",
+          [lastSync.toIso8601String(), lastSync.toIso8601String()],
         );
         count += (Sqflite.firstIntValue(newAudits) ?? 0);
 
@@ -266,6 +266,11 @@ class CloudSyncService {
           "SELECT COUNT(*) as count FROM audits WHERE status != 'draft'",
         );
         count += (Sqflite.firstIntValue(allAudits) ?? 0);
+
+        final allCaps = await _db.rawQuery(
+          "SELECT COUNT(*) as count FROM caps",
+        );
+        count += (Sqflite.firstIntValue(allCaps) ?? 0);
       }
 
       return count;

@@ -255,15 +255,14 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Verify Cloud Sync Section header and Active Mirror badge
-      expect(find.text('Cloud Synchronization (Firestore)'), findsOneWidget);
-      expect(find.text('Active Mirror'), findsOneWidget);
-      expect(find.text('Force Cloud Sync'), findsOneWidget);
+      // Verify Cloud Sync Section header and status
+      expect(find.text('Cloud Synchronization'), findsOneWidget);
+      expect(find.text('Sync Now'), findsOneWidget);
 
-      // Tap Force Cloud Sync button
-      final forceSyncBtn = find.text('Force Cloud Sync');
-      await tester.ensureVisible(forceSyncBtn);
-      await tester.tap(forceSyncBtn);
+      // Tap Sync Now button
+      final syncBtn = find.text('Sync Now');
+      await tester.ensureVisible(syncBtn);
+      await tester.tap(syncBtn);
       await tester.pumpAndSettle();
 
       // Verify successful completion notice or status update

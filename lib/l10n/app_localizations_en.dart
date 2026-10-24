@@ -642,10 +642,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s27LanguageSubtitle => 'Select English or मराठी';
 
   @override
-  String get s27BackupExportTitle => 'Backup & Export';
+  String get s27BackupExportTitle => 'Cloud Sync & Backup';
 
   @override
-  String get s27BackupExportSubtitle => 'Export database JSON and sync status';
+  String get s27BackupExportSubtitle =>
+      'Sync store data and export database JSON';
+
+  @override
+  String get s27CloudSyncTitle => 'Cloud Sync';
+
+  @override
+  String get s27CloudSyncSubtitle => 'Sync store audits and data with cloud';
 
   @override
   String get s27AboutTitle => 'About Saagar Audit';
@@ -941,21 +948,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s31LanguageUpdatedSuccess => 'Language preference saved';
 
   @override
-  String get s32Title => 'Backup & Export';
+  String get s32Title => 'Cloud Sync & Backup';
 
   @override
-  String get s32Subtitle => 'Local SQLite Database Export & Cloud Sync';
+  String get s32TitleSyncOnly => 'Cloud Sync';
+
+  @override
+  String get s32Subtitle => 'Data Backup & Cloud Synchronization';
+
+  @override
+  String get s32SubtitleSyncOnly => 'Store Data Cloud Synchronization';
 
   @override
   String get s32ExportCardTitle => 'Export Local Database (JSON)';
 
   @override
   String get s32ExportCardDesc =>
-      'Export all 14 SQLite tables into a timestamped JSON file in your device Downloads directory. Ideal for manual backups before app updates.';
+      'Export all SQLite database tables into a timestamped JSON file. Intended for Owner use before app updates.';
 
   @override
   String get s32ExportSecurityNotice =>
-      'Security Notice: Exported backup contains audit trails, findings, and bcrypt security hashes. Store and transfer this file securely.';
+      'Security Notice: Exported backup contains audit trails, findings, and store records. Store and transfer this file securely.';
 
   @override
   String get s32ExportButton => 'Export Database JSON';
@@ -978,72 +991,74 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get s32CloudSyncTitle => 'Cloud Synchronization (Firestore)';
+  String get s32CloudSyncTitle => 'Cloud Synchronization';
 
   @override
   String get s32CloudSyncDesc =>
-      'Automatic multi-device synchronization and cloud data storage via Google Cloud Firestore.';
+      'Sync your audits, photos, and corrective actions with the secure cloud.';
 
   @override
-  String get s32CloudSyncStatusLabel =>
-      'Status: Offline-First Mode (Local SQLite)';
+  String get s32CloudSyncStatusLabel => 'Status: Local Storage Active';
 
   @override
   String get s32CloudSyncPhase4Notice =>
-      'All audits, CAPs, and reports are safely preserved locally on this device.';
+      'All audits, CAPs, and reports are safely preserved on this device.';
 
   @override
   String get s32CloudSyncComingSoonBadge => 'Active Mirror';
 
   @override
-  String get s32ForceSyncButton => 'Force Cloud Sync';
+  String get s32ForceSyncButton => 'Sync Now';
 
   @override
-  String get s32CloudSyncStatusIdle => 'Status: Ready to Sync';
+  String get s32CloudSyncStatusIdle => 'Ready to Sync';
 
   @override
-  String get s32CloudSyncStatusSyncing => 'Status: Synchronizing with Cloud...';
+  String get s32CloudSyncStatusSyncing => 'Synchronizing with Cloud...';
 
   @override
-  String get s32CloudSyncStatusSuccess =>
-      'Status: All Data Mirrored (Cloud up to date)';
+  String get s32CloudSyncStatusSuccess => 'Cloud Backup is Up to Date';
 
   @override
   String s32CloudSyncStatusError(String error) {
-    return 'Status: Sync Error ($error)';
+    return 'Sync Issue ($error)';
   }
 
   @override
-  String get s32CloudSyncStatusOffline =>
-      'Status: Offline (Local SQLite Active)';
+  String get s32CloudSyncStatusOffline => 'Device is Offline (No Internet)';
 
   @override
   String get s32CloudSyncStatusUnconfigured =>
-      'Status: Cloud Backend Offline / Standby';
+      'Cloud Standby (Ready to connect)';
 
   @override
   String s32CloudSyncLastSync(String time) {
-    return 'Last Synced: $time';
+    return 'Last Successful Backup: $time';
   }
 
   @override
-  String get s32CloudSyncNever => 'Never';
+  String get s32CloudSyncNever => 'Never backed up yet';
 
   @override
   String s32CloudSyncPending(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count changes pending upload',
-      one: '1 change pending upload',
-      zero: 'All local changes backed up',
+      other: '$count items waiting to upload',
+      one: '1 item waiting to upload',
+      zero: 'All items uploaded to cloud',
     );
     return '$_temp0';
   }
 
   @override
+  String s32SavedOnPhone(int count) {
+    return 'Saved on this phone: $count records';
+  }
+
+  @override
   String s32SyncSuccessNotice(int count) {
-    return 'Cloud mirror sync completed ($count records updated).';
+    return 'Cloud sync completed ($count records updated).';
   }
 
   @override
