@@ -142,7 +142,8 @@ void main() {
       // Other settings are present
       expect(find.text('Change PIN'), findsOneWidget);
       expect(find.text('Language / भाषा'), findsOneWidget);
-      expect(find.text('Backup & Export'), findsOneWidget);
+      // Backup & Export is strictly Owner-only per UAT Item 7 & Security Policy
+      expect(find.text('Backup & Export'), findsNothing);
       expect(find.text('About Saagar Audit'), findsOneWidget);
     });
 
@@ -158,6 +159,9 @@ void main() {
 
       // Manage Users MUST NOT be present
       expect(find.text('Manage Users'), findsNothing);
+
+      // Backup & Export MUST NOT be present for GM per UAT Item 7 & Security Policy
+      expect(find.text('Backup & Export'), findsNothing);
     });
 
     testWidgets('Tapping About opens About Dialog with app info', (tester) async {

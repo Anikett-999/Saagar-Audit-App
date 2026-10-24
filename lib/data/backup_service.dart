@@ -71,7 +71,16 @@ class BackupService {
     for (final table in kDatabaseTables) {
       try {
         final rows = await db.query(table);
-        tablesData[table] = rows;
+        if (table == 'users') {
+          // Inviolable Rule: Never export PIN hashes in any backup
+          tablesData[table] = rows.map((r) {
+            final map = Map<String, Object?>.from(r);
+            map.remove('pin_hash');
+            return map;
+          }).toList();
+        } else {
+          tablesData[table] = rows;
+        }
         totalRecords += rows.length;
       } catch (_) {
         // Table may be unseeded or empty

@@ -185,7 +185,8 @@ void main() {
       final users = tables['users'] as List;
       expect(users.length, 1);
       expect(users.first['name'], 'Aniket Owner');
-      expect(users.first['pin_hash'], r'$2a$10$hashedSecurityPin');
+      // Inviolable Rule: PIN hashes must NEVER be exported in backup files
+      expect(users.first.containsKey('pin_hash'), isFalse, reason: 'pin_hash must be stripped from exports');
 
       final cros = tables['cros'] as List;
       expect(cros.length, 1);
