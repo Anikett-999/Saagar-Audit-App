@@ -2,7 +2,7 @@
 
 Welcome to the **Saagar Audit App** repository.
 
-## 🧠 Shared Brain & Context Directory
+##  Shared Brain & Context Directory
 All project specifications, architectural decisions, database schemas, scoring logic, and session handoffs are maintained inside the **`brain/`** directory in this repository:
 
 - **[`brain/OVERVIEW.md`](brain/OVERVIEW.md)**: Objective, stores (`WLMHW` & `HEMW`), user roles, and 4-phase delivery plan.
@@ -16,7 +16,7 @@ All project specifications, architectural decisions, database schemas, scoring l
 - **[`brain/SPEC_APP.md`](brain/SPEC_APP.md)** / **[`brain/SPEC_WORKBOOK.md`](brain/SPEC_WORKBOOK.md)** / **[`brain/SPEC_QUICKREF.md`](brain/SPEC_QUICKREF.md)**: Full spec (converted from Documentation `.docx`).
 - **[`brain/SPRINT_S27_S32_SETTINGS.md`](brain/SPRINT_S27_S32_SETTINGS.md)**: Active sprint plan — Settings, User & CRO management.
 
-## 🤝 Agent Roster & Coordination
+##  Agent Roster & Coordination
 Two AI agents share this ONE `brain/` folder. It is the single source of truth between them.
 
 - **Claude — Senior Developer & Team Lead of this project.** Claude owns the technical direction: reviews everything Antigravity ships, guides the team, safeguards architecture and the locked stack, keeps the `brain/` docs authoritative, and makes sure development is going well and staying on-spec. Claude designs the next step each session, does targeted code fixes and reviews, and holds the quality bar. Claude CANNOT run Flutter in-session — every build/test result Claude cites comes from Antigravity's device runs, and Claude labels them as such.
