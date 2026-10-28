@@ -380,13 +380,31 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
                             Consumer(
                               builder: (context, ref, _) {
                                 final syncState = ref.watch(cloudSyncProvider);
-                                final isOk = syncState.status == CloudSyncStatus.success && syncState.pendingCount == 0;
-                                final badgeColor = isOk ? AppColors.green : AppColors.gold;
-                                final badgeText = isOk
-                                    ? (Localizations.localeOf(context).languageCode == 'mr' ? 'समक्रमित' : 'Up to Date')
-                                    : (syncState.status == CloudSyncStatus.offline
-                                        ? (Localizations.localeOf(context).languageCode == 'mr' ? 'ऑफलाइन' : 'Offline')
-                                        : (Localizations.localeOf(context).languageCode == 'mr' ? 'प्रलंबित' : 'Pending Sync'));
+                                final isNeverSynced = syncState.lastSyncAt == null;
+                                final isOffline = syncState.status == CloudSyncStatus.offline;
+                                final isError = syncState.status == CloudSyncStatus.error;
+                                final hasPending = syncState.pendingCount > 0;
+
+                                final Color badgeColor;
+                                final String badgeText;
+
+                                if (isOffline) {
+                                  badgeColor = AppColors.gray600;
+                                  badgeText = l10n.s32CloudSyncBadgeOffline;
+                                } else if (isError) {
+                                  badgeColor = AppColors.red;
+                                  badgeText = l10n.s32CloudSyncBadgeError;
+                                } else if (isNeverSynced) {
+                                  badgeColor = AppColors.gold;
+                                  badgeText = l10n.s32CloudSyncBadgeNotSynced;
+                                } else if (hasPending) {
+                                  badgeColor = AppColors.gold;
+                                  badgeText = l10n.s32CloudSyncBadgePending;
+                                } else {
+                                  badgeColor = AppColors.green;
+                                  badgeText = l10n.s32CloudSyncBadgeUpToDate;
+                                }
+
                                 return Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
@@ -426,6 +444,7 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
                   Builder(
                     builder: (context) {
                       final syncState = ref.watch(cloudSyncProvider);
+                      final isNeverSynced = syncState.lastSyncAt == null;
                       final isOffline = syncState.status == CloudSyncStatus.offline;
                       final isSyncing = syncState.status == CloudSyncStatus.syncing;
                       final hasPending = syncState.pendingCount > 0;
@@ -448,24 +467,44 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
                         statusText = l10n.s32CloudSyncStatusError(
                           syncState.errorMessage ?? 'Unknown',
                         );
+                      } else if (isNeverSynced) {
+                        statusIcon = Icons.cloud_upload_outlined;
+                        statusColor = AppColors.gold;
+                        statusText = l10n.s32CloudSyncStatusNever;
                       } else if (hasPending) {
                         statusIcon = Icons.cloud_upload_outlined;
                         statusColor = AppColors.gold;
-                        statusText = Localizations.localeOf(context).languageCode == 'mr'
-                            ? 'डिव्हाइस ऑनलाइन आहे — बदल सिंकसाठी प्रलंबित'
-                            : 'Device is Online — Changes pending sync';
+                        statusText = l10n.s32CloudSyncStatusPending;
                       } else {
                         statusIcon = Icons.cloud_done;
                         statusColor = AppColors.green;
                         statusText = l10n.s32CloudSyncStatusSuccess;
                       }
 
-                      final lastSyncText = syncState.lastSyncAt != null
+                      final lastSyncText = !isNeverSynced
                           ? l10n.s32CloudSyncLastSync(
                               '${syncState.lastSyncAt!.day.toString().padLeft(2, '0')}/${syncState.lastSyncAt!.month.toString().padLeft(2, '0')}/${syncState.lastSyncAt!.year} '
                               '${syncState.lastSyncAt!.hour.toString().padLeft(2, '0')}:${syncState.lastSyncAt!.minute.toString().padLeft(2, '0')}',
                             )
                           : l10n.s32CloudSyncLastSync(l10n.s32CloudSyncNever);
+
+                      final IconData line2Icon;
+                      final Color line2Color;
+                      final String line2Text;
+
+                      if (isNeverSynced) {
+                        line2Icon = Icons.cloud_upload_outlined;
+                        line2Color = AppColors.gold;
+                        line2Text = l10n.s32CloudSyncInitialPending;
+                      } else if (hasPending) {
+                        line2Icon = Icons.pending_actions;
+                        line2Color = AppColors.gold;
+                        line2Text = l10n.s32CloudSyncPending(syncState.pendingCount);
+                      } else {
+                        line2Icon = Icons.check_circle_outline;
+                        line2Color = AppColors.green;
+                        line2Text = l10n.s32CloudSyncPending(0);
+                      }
 
                       return Container(
                         padding: const EdgeInsets.all(14),
@@ -526,22 +565,22 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
                               ],
                             ),
                             const SizedBox(height: 6),
-                            // Line 2: Waiting to upload
+                            // Line 2: Waiting to upload / Initial backup pending
                             Row(
                               children: [
                                 Icon(
-                                  hasPending ? Icons.pending_actions : Icons.check_circle_outline,
+                                  line2Icon,
                                   size: 16,
-                                  color: hasPending ? AppColors.gold : AppColors.green,
+                                  color: line2Color,
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    l10n.s32CloudSyncPending(syncState.pendingCount),
+                                    line2Text,
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
-                                      color: hasPending ? AppColors.gold : AppColors.green,
+                                      color: line2Color,
                                       fontFamily: 'DMSans',
                                     ),
                                   ),

@@ -1026,6 +1026,32 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s32CloudSyncStatusOffline => 'डिव्हाइस ऑफलाइन आहे (इंटरनेट नाही)';
 
   @override
+  String get s32CloudSyncStatusNever =>
+      'पहिला सिंक आवश्यक — खाली \'आता सिंक करा\' टॅप करा';
+
+  @override
+  String get s32CloudSyncStatusPending =>
+      'डिव्हाइस ऑनलाइन आहे — बदल सिंकसाठी प्रलंबित';
+
+  @override
+  String get s32CloudSyncInitialPending => 'पहिला बॅकअप प्रलंबित';
+
+  @override
+  String get s32CloudSyncBadgeNotSynced => 'सिंक नाही';
+
+  @override
+  String get s32CloudSyncBadgeUpToDate => 'समक्रमित';
+
+  @override
+  String get s32CloudSyncBadgePending => 'प्रलंबित';
+
+  @override
+  String get s32CloudSyncBadgeOffline => 'ऑफलाइन';
+
+  @override
+  String get s32CloudSyncBadgeError => 'समस्या';
+
+  @override
   String get s32CloudSyncStatusUnconfigured =>
       'क्लाउड सज्ज (कनेक्ट करण्यास तयार)';
 

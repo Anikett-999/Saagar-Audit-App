@@ -1028,6 +1028,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s32CloudSyncStatusOffline => 'Device is Offline (No Internet)';
 
   @override
+  String get s32CloudSyncStatusNever => 'Initial Sync Required — Tap Sync Now';
+
+  @override
+  String get s32CloudSyncStatusPending =>
+      'Device is Online — Changes pending sync';
+
+  @override
+  String get s32CloudSyncInitialPending => 'Initial backup pending';
+
+  @override
+  String get s32CloudSyncBadgeNotSynced => 'Not Synced';
+
+  @override
+  String get s32CloudSyncBadgeUpToDate => 'Up to Date';
+
+  @override
+  String get s32CloudSyncBadgePending => 'Pending Sync';
+
+  @override
+  String get s32CloudSyncBadgeOffline => 'Offline';
+
+  @override
+  String get s32CloudSyncBadgeError => 'Sync Issue';
+
+  @override
   String get s32CloudSyncStatusUnconfigured =>
       'Cloud Standby (Ready to connect)';
 

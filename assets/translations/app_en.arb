@@ -404,6 +404,14 @@
     }
   },
   "s32CloudSyncStatusOffline": "Device is Offline (No Internet)",
+  "s32CloudSyncStatusNever": "Initial Sync Required — Tap Sync Now",
+  "s32CloudSyncStatusPending": "Device is Online — Changes pending sync",
+  "s32CloudSyncInitialPending": "Initial backup pending",
+  "s32CloudSyncBadgeNotSynced": "Not Synced",
+  "s32CloudSyncBadgeUpToDate": "Up to Date",
+  "s32CloudSyncBadgePending": "Pending Sync",
+  "s32CloudSyncBadgeOffline": "Offline",
+  "s32CloudSyncBadgeError": "Sync Issue",
   "s32CloudSyncStatusUnconfigured": "Cloud Standby (Ready to connect)",
   "s32CloudSyncLastSync": "Last Successful Backup: {time}",
   "@s32CloudSyncLastSync": {

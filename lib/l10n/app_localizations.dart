@@ -1983,6 +1983,54 @@ abstract class AppLocalizations {
   /// **'Device is Offline (No Internet)'**
   String get s32CloudSyncStatusOffline;
 
+  /// No description provided for @s32CloudSyncStatusNever.
+  ///
+  /// In en, this message translates to:
+  /// **'Initial Sync Required — Tap Sync Now'**
+  String get s32CloudSyncStatusNever;
+
+  /// No description provided for @s32CloudSyncStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Device is Online — Changes pending sync'**
+  String get s32CloudSyncStatusPending;
+
+  /// No description provided for @s32CloudSyncInitialPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Initial backup pending'**
+  String get s32CloudSyncInitialPending;
+
+  /// No description provided for @s32CloudSyncBadgeNotSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Synced'**
+  String get s32CloudSyncBadgeNotSynced;
+
+  /// No description provided for @s32CloudSyncBadgeUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to Date'**
+  String get s32CloudSyncBadgeUpToDate;
+
+  /// No description provided for @s32CloudSyncBadgePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Sync'**
+  String get s32CloudSyncBadgePending;
+
+  /// No description provided for @s32CloudSyncBadgeOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get s32CloudSyncBadgeOffline;
+
+  /// No description provided for @s32CloudSyncBadgeError.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Issue'**
+  String get s32CloudSyncBadgeError;
+
   /// No description provided for @s32CloudSyncStatusUnconfigured.
   ///
   /// In en, this message translates to:
