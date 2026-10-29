@@ -216,16 +216,16 @@ void main() {
 
     test('Role-Based Inbound Scoping: SM cannot pull users, reports, or escalations', () async {
       testAdapter.mockRemoteData['users'] = [
-        {'id': 'u_gm_1', 'name': 'GM User', 'role': 'GM'}
+        {'id': 'u_gm_1', 'name': 'GM User', 'role': 'GM'},
       ];
       testAdapter.mockRemoteData['cros'] = [
-        {'id': 'cro_1', 'name': 'Staff 1', 'is_active': 1}
+        {'id': 'cro_1', 'name': 'Staff 1', 'is_active': 1},
       ];
       testAdapter.mockRemoteData['reports'] = [
-        {'id': 'rep_1', 'type': 'weekly_strategic'}
+        {'id': 'rep_1', 'type': 'weekly_strategic'},
       ];
       testAdapter.mockRemoteData['escalations'] = [
-        {'id': 'esc_1', 'target_role': 'OWNER'}
+        {'id': 'esc_1', 'target_role': 'OWNER'},
       ];
       testAdapter.mockRemoteData['audits'] = [
         {'id': 'a_daily_1', 'audit_type': 'daily', 'status': 'submitted'},
@@ -241,20 +241,32 @@ void main() {
 
       final localAudits = fakeDb.tables['audits']!;
       expect(localAudits.any((a) => a['id'] == 'a_daily_1'), isTrue);
-      expect(localAudits.any((a) => a['id'] == 'a_weekly_1'), isFalse,
-          reason: 'SM must never pull weekly/managerial audits');
+      expect(
+        localAudits.any((a) => a['id'] == 'a_weekly_1'),
+        isFalse,
+        reason: 'SM must never pull weekly/managerial audits',
+      );
 
       final localUsers = fakeDb.tables['users']!;
-      expect(localUsers.any((u) => u['id'] == 'u_gm_1'), isFalse,
-          reason: 'SM must never pull user profiles');
+      expect(
+        localUsers.any((u) => u['id'] == 'u_gm_1'),
+        isFalse,
+        reason: 'SM must never pull user profiles',
+      );
 
       final localReports = fakeDb.tables['reports']!;
-      expect(localReports.any((r) => r['id'] == 'rep_1'), isFalse,
-          reason: 'SM must never pull managerial reports');
+      expect(
+        localReports.any((r) => r['id'] == 'rep_1'),
+        isFalse,
+        reason: 'SM must never pull managerial reports',
+      );
 
       final localEscalations = fakeDb.tables['escalations']!;
-      expect(localEscalations.any((e) => e['id'] == 'esc_1'), isFalse,
-          reason: 'SM must never pull managerial escalations');
+      expect(
+        localEscalations.any((e) => e['id'] == 'esc_1'),
+        isFalse,
+        reason: 'SM must never pull managerial escalations',
+      );
     });
 
     test('Inviolable Security Rule: Owner sync pulls users but strictly preserves local pin_hash', () async {
@@ -273,7 +285,7 @@ void main() {
           'name': 'Sagar Bora Updated',
           'role': 'OWNER',
           'created_at': '2026-10-29T10:00:00Z',
-        }
+        },
       ];
 
       final result = await CloudSyncService.instance.syncAll(userRole: 'OWNER');
@@ -281,8 +293,11 @@ void main() {
 
       final localUsers = fakeDb.tables['users']!;
       final ownerUser = localUsers.firstWhere((u) => u['id'] == 'u_owner_1');
-      expect(ownerUser['pin_hash'], equals('existing_secure_local_hash'),
-          reason: 'Inviolable Rule: Local pin_hash must NEVER be overwritten by cloud pull');
+      expect(
+        ownerUser['pin_hash'],
+        equals('existing_secure_local_hash'),
+        reason: 'Inviolable Rule: Local pin_hash must NEVER be overwritten by cloud pull',
+      );
     });
   });
 

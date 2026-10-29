@@ -7,6 +7,7 @@ import '../data/models/photo.dart';
 import '../data/photo_service.dart';
 import '../data/repositories/audit_repository.dart';
 import '../data/repositories/checkpoint_repository.dart';
+import '../domain/cash_thresholds.dart';
 import '../domain/score_engine.dart';
 
 export '../domain/score_engine.dart'
@@ -312,9 +313,96 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
       );
     }
 
-    // Submission gate: verify all FAIL checkpoints with requiresPhotoOnFail have attached photos.
+    // ------------------------------------------------------------------
+    // Item 13 Enforcement: Auto-enforce Cash Variance Limits
+    // ------------------------------------------------------------------
+    final updatedResults = Map<String, Verdict>.from(state.results);
+
+    // 1. Daily Audit: Checkpoint 6.5 auto-enforcement
+    if (audit.auditType == 'daily' && cashVarianceRupees != null) {
+      final absVar = cashVarianceRupees.abs();
+      final direction = cashVarianceRupees < 0 ? 'shortage' : 'excess';
+      final varStr = absVar.toStringAsFixed(0);
+
+      if (absVar > CashThresholds.escalationTolerance) {
+        // Exceeds ₹500: Auto-FAIL per Item 13
+        updatedResults['6.5'] = Verdict.fail;
+        final existing = await AuditRepository.instance.findResult(
+          auditId: audit.id,
+          checkpointId: '6.5',
+        );
+        await AuditRepository.instance.saveResult(
+          auditId: audit.id,
+          checkpointId: '6.5',
+          result: 'F',
+          weight: 2,
+          findingText:
+              'Closing cash variance of ₹$varStr ($direction) exceeds ₹${CashThresholds.escalationTolerance.toInt()} tolerance limit.',
+          croId: existing?.croId,
+          flagSecurityConcern: existing?.flagSecurityConcern ?? false,
+        );
+      } else if (absVar > CashThresholds.dailyPassTolerance) {
+        // Between ₹50 and ₹500: Pass with note rule
+        final hasExplanation = notes != null && notes.trim().length >= 5;
+        if (!hasExplanation) {
+          updatedResults['6.5'] = Verdict.fail;
+          final existing = await AuditRepository.instance.findResult(
+            auditId: audit.id,
+            checkpointId: '6.5',
+          );
+          await AuditRepository.instance.saveResult(
+            auditId: audit.id,
+            checkpointId: '6.5',
+            result: 'F',
+            weight: 2,
+            findingText:
+                'Closing cash variance of ₹$varStr ($direction) exceeds ₹${CashThresholds.dailyPassTolerance.toInt()} daily limit without required explanation note.',
+            croId: existing?.croId,
+            flagSecurityConcern: existing?.flagSecurityConcern ?? false,
+          );
+        }
+      }
+    }
+
+    // 2. Weekly Audit: Checkpoint CW.7 auto-enforcement
+    if (audit.auditType == 'weekly') {
+      final dailyAudits = await AuditRepository.instance
+          .findSubmittedDailyAuditsForWeek(
+        weekNumber: audit.weekNumber,
+        year: audit.year,
+      );
+      final dailyVariances = dailyAudits
+          .where((a) => a.cashVarianceRupees != null)
+          .map((a) => a.cashVarianceRupees!)
+          .toList();
+      final cumVar = computeCumulativeWeeklyVariance(
+        dailyVariances,
+        thresholdRupees: CashThresholds.weeklyCumulativeTolerance,
+      );
+
+      if (cumVar.isBreached) {
+        updatedResults['CW.7'] = Verdict.fail;
+        final existing = await AuditRepository.instance.findResult(
+          auditId: audit.id,
+          checkpointId: 'CW.7',
+        );
+        await AuditRepository.instance.saveResult(
+          auditId: audit.id,
+          checkpointId: 'CW.7',
+          result: 'F',
+          weight: 2,
+          findingText:
+              'Cumulative weekly cash variance of ₹${cumVar.netVarianceRupees.abs().toStringAsFixed(0)} (${cumVar.netVarianceRupees < 0 ? 'shortage' : 'excess'}) breaches permitted ±₹${CashThresholds.weeklyCumulativeTolerance.toInt()} threshold.',
+          croId: existing?.croId,
+          flagSecurityConcern: existing?.flagSecurityConcern ?? false,
+        );
+      }
+    }
+
+    // Submission gate: verify all manual FAIL checkpoints with requiresPhotoOnFail have attached photos.
     for (final cp in state.checkpoints) {
-      final verdict = state.results[cp.id];
+      if (cp.id == '6.5' || cp.id == 'CW.7') continue;
+      final verdict = updatedResults[cp.id];
       if (verdict == Verdict.fail && cp.requiresPhotoOnFail) {
         final result = await AuditRepository.instance.findResult(
           auditId: audit.id,
@@ -332,7 +420,7 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
     }
 
     final marks = state.checkpoints.map((cp) {
-      final verdict = state.results[cp.id]!;
+      final verdict = updatedResults[cp.id]!;
       return CheckpointMark(
         checkpointId: cp.id,
         result: verdict,
@@ -407,7 +495,10 @@ class DraftAuditNotifier extends StateNotifier<DraftAuditState> {
       notes: notes,
     );
 
-    state = state.copyWith(audit: updatedAudit);
+    state = state.copyWith(
+      audit: updatedAudit,
+      results: updatedResults,
+    );
     return ScoreResult(
       rawScore: rawScore,
       maxScore: maxScore,

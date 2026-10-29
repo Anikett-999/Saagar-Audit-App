@@ -7,6 +7,8 @@
 /// Workbook §5.1 daily case must produce 81 / 90 = 90.0% Good exactly.
 library;
 
+import 'cash_thresholds.dart';
+
 /// A single audit result for scoring. `weight` is copied from the
 /// checkpoint definition so this engine has no DB dependency.
 class CheckpointMark {
@@ -270,7 +272,7 @@ WeeklyScoreResult computeWeeklyScore({
 /// Flags a breach when the absolute net variance exceeds [thresholdRupees] (default ±₹200).
 CumulativeVarianceResult computeCumulativeWeeklyVariance(
   List<double> dailyVariances, {
-  double thresholdRupees = 200.0,
+  double thresholdRupees = CashThresholds.weeklyCumulativeTolerance,
 }) {
   final net = dailyVariances.fold(0.0, (acc, v) => acc + v);
   final roundedNet = round1(net);

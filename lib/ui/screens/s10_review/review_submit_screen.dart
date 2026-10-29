@@ -119,6 +119,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
     // Every Fail with requires_photo_on_fail=1 MUST have at least 1 photo.
     final offendingCheckpoints = <Checkpoint>[];
     for (final cp in state.checkpoints) {
+      if (cp.id == '6.5' || cp.id == 'CW.7') continue;
       final verdict = state.results[cp.id];
       if (verdict == Verdict.fail && cp.requiresPhotoOnFail) {
         final photos = _failPhotos[cp.id] ?? const [];

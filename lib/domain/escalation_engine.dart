@@ -2,6 +2,7 @@ import '../data/models/audit.dart';
 import '../data/models/audit_result.dart';
 import '../data/models/cap.dart';
 import '../data/models/checkpoint.dart';
+import 'cash_thresholds.dart';
 
 /// Draft escalation object before database persistence (Spec §7 & Appendix A.5).
 class EscalationDraft {
@@ -202,7 +203,7 @@ class EscalationEngine {
     // -------------------------------------------------------------
     if (audit.auditType == 'daily') {
       final variance = audit.cashVarianceRupees;
-      if (variance != null && variance.abs() > 500.0) {
+      if (variance != null && variance.abs() > CashThresholds.escalationTolerance) {
         final varianceAbs = variance.abs().toStringAsFixed(0);
         final direction = variance < 0 ? 'shortage' : 'excess';
 
@@ -220,7 +221,7 @@ class EscalationEngine {
             whatHappened:
                 'Closing cash variance of ₹$varianceAbs ($direction) observed during daily audit on ${audit.auditDate}.',
             evidence:
-                'Daily cash count sheet shows actual variance of ₹${variance.toStringAsFixed(0)} (exceeds ₹500 tolerance).',
+                'Daily cash count sheet shows actual variance of ₹${variance.toStringAsFixed(0)} (exceeds ₹${CashThresholds.escalationTolerance.toInt()} tolerance).',
             impact:
                 'Direct financial discrepancy in daily cash till; unaccounted variance exceeds permitted tolerance.',
             requestedAction:
@@ -230,7 +231,7 @@ class EscalationEngine {
 
         // 3B. Check yesterday — if also > ₹500, escalate to Owner (immediate, whatsapp)
         final yestVar = previousDailyAudit?.cashVarianceRupees;
-        if (yestVar != null && yestVar.abs() > 500.0) {
+        if (yestVar != null && yestVar.abs() > CashThresholds.escalationTolerance) {
           final yestAbs = yestVar.abs().toStringAsFixed(0);
           drafts.add(
             EscalationDraft(
