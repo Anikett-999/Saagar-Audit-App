@@ -7118,3 +7118,44 @@ app-release.aab   54955804  04-10-2026 19:48:39
 - **Next Immediate Task**:
   - Push commit `ba2d9ab` to remote.
   - Present next problem to user (Item 25: IST timestamp formatting display).
+
+
+---
+
+### Entry: 2026-10-29 — Antigravity IST Datetime Formatting Suite (Item 25)
+- **Author**: Antigravity
+- **Requirement / Problem (Item 25, Client Review Ref F07)**:
+  - Timestamps across the app were shown in two different time zones without labels.
+  - Sagar's UAT review: *"Submission said 09:04 PM while Audit Detail showed 15:34 for the same audit, which is UTC. CAP timelines also show UTC (03:44 for an action done at 09:14 IST). After midnight, a verification appeared under the previous day's date. Store in UTC if needed, but always display in IST."*
+  - Root cause: Raw `.substring(0, 16).replaceFirst('T', ' ')` and `.split('T').first` were called directly on stored UTC ISO strings across multiple screens.
+- **Actions Executed**:
+  1. **Centralized Datetime Formatter (`lib/utils/app_date_format.dart`)**:
+     - Built `AppDateFormat` utility with safe null and empty fallbacks.
+     - `toLocalDateTime()` parses ISO strings or DateTime objects and explicitly converts via `.toLocal()`.
+     - `formatDateTime()`: `29 Oct 2026, 09:14 PM`
+     - `formatTime()`: `09:14 PM` (12-hour with AM/PM)
+     - `formatDate()`: `29 Oct 2026`
+     - `formatDateIso()`: `2026-10-29`
+     - `formatSyncDateTime()`: `29/10/2026 09:14 PM`
+  2. **Comprehensive App-wide UI & PDF Integration**:
+     - Audit Detail S13: `audit.submittedAt` formatted with `AppDateFormat.formatDateTime`, `audit.verifiedAt` with `AppDateFormat.formatDate`.
+     - CAP Detail S16: `entry.timestamp` timeline formatted with `AppDateFormat.formatDateTime`, `cap.openedAt` and `action.doneAt` with `AppDateFormat.formatDate`.
+     - 7-Day Review: `audit.verifiedAt` badge formatted with `AppDateFormat.formatDateTime`.
+     - Reports S20 & S21: `report.submittedAt` and `report.readByOwnerAt` formatted with `AppDateFormat.formatDate`.
+     - CAP Mark Done S17: `action.doneAt` formatted with `AppDateFormat.formatDate`.
+     - Cloud Sync S32: `lastSyncAt` formatted with `AppDateFormat.formatSyncDateTime`.
+     - Escalations S33: `esc.raisedAt` formatted with `AppDateFormat.formatDateTime`.
+     - Weekly Report PDF Service: Signatures and review dates formatted with `AppDateFormat.formatDate`.
+  3. **Unit Tests (`test/app_date_format_test.dart`)**:
+     - 6 dedicated tests covering fallback on null/empty, UTC-to-local conversion, midnight day-shift boundary verification, AM/PM formatting, sync formatting, and DateTime object handling.
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze lib/ test/`: **0 issues found** (clean in 11.0s).
+  - `flutter test test/app_date_format_test.dart`: **All 6 tests passed!**
+  - `flutter test test/audit_detail_screen_test.dart`: **All 12 tests passed!**
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!**
+  - `flutter test`: **All 387/387 tests passed!**
+- **Git Commit**: `34952a5` (`fix(ui): format all timestamps in local Indian Standard Time (IST) with AM/PM labels (Item 25)`)
+- **Next Immediate Task**:
+  - Push commit `34952a5` to remote.
+  - Present physical device verification steps for Item 25 to user.
+  - Proceed with next bug fix.

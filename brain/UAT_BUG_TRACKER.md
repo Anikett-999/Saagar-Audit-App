@@ -14,9 +14,9 @@
 | **B. Roles, Controls & Security** (Items 6–8) | 3 | 1 (Item 7) | 0 | 2 (Items 6, 8) |
 | **C. Alerts, Escalations, Cash & Reports** (Items 9–16) | 8 | 2 (Items 13, 14) | 0 | 6 (Items 9–12, 15, 16) |
 | **D. Corrective Action Plan (CAP) Controls** (Items 17–19) | 3 | 1 (Item 19) | 0 | 2 (Items 17, 18) |
-| **E. Language, Permissions & Layout** (Items 20–26) | 7 | 1 (Item 26) | 0 | 6 (Items 20–25) |
+| **E. Language, Permissions & Layout** (Items 20–26) | 7 | 2 (Items 25, 26) | 0 | 5 (Items 20–24) |
 | **F. General Ease of Use** (Item 27 UX Points) | 1 | 0 | 0 | 1 (Item 27) |
-| **TOTAL** | **27** | **7 Solved** | **0 In Progress** | **20 Pending** |
+| **TOTAL** | **27** | **8 Solved** | **0 In Progress** | **19 Pending** |
 
 ---
 
@@ -284,11 +284,12 @@
 
 #### Item 25: Times shown in two different time zones without a label
 - **Priority:** Medium | **Client Ref:** F07
-- **Problem:** Audit submission showed 09:04 PM while detail screen showed 15:34 (UTC). CAP timelines showed UTC. Verification appeared under previous day's date.
-- **Required Fix:** Store UTC in SQLite/Firestore, but format all UI displays explicitly in Indian Standard Time (IST, UTC+5:30) with clear AM/PM formatting.
-- **Status:** ⏳ **PENDING (Tier 1-6)**
-- **Commit:** —
-- **Files Changed:** —
+- **Problem:** Audit submission showed 09:04 PM while detail screen showed 15:34 (UTC). CAP timelines showed UTC. Verification after midnight appeared under previous day's date due to raw substring on UTC timestamps.
+- **Required Fix:** Store UTC in SQLite/Firestore, but format all UI displays and PDFs explicitly in device Local / Indian Standard Time (IST, UTC+5:30) via central `AppDateFormat` utility with 12-hour AM/PM formatting.
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** `34952a5` (`fix(ui): format all timestamps in local Indian Standard Time (IST) with AM/PM labels (Item 25)`)
+- **Files Changed:** `lib/utils/app_date_format.dart`, `lib/services/weekly_report_pdf_service.dart`, `lib/ui/screens/reports/report_detail_screen.dart`, `lib/ui/screens/reports/reports_list_screen.dart`, `lib/ui/screens/s11_submitted/submitted_screen.dart`, `lib/ui/screens/s13_audit_detail/audit_detail_screen.dart`, `lib/ui/screens/s16_cap_detail/cap_detail_screen.dart`, `lib/ui/screens/s17_cap_mark_done/cap_mark_done_screen.dart`, `lib/ui/screens/s32_backup_export/backup_export_screen.dart`, `lib/ui/screens/s33_escalations/escalations_list_screen.dart`, `lib/ui/screens/seven_day_review/seven_day_review_screen.dart`, `test/app_date_format_test.dart`
+- **Verification:** Unit tests passing (`test/app_date_format_test.dart` 6/6 tests passing), S13 widget tests 12/12 passing, canonical score engine 12/12 passing, full suite 387/387 tests passing. 0 analyzer issues.
 
 ---
 
