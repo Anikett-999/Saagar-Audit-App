@@ -12,11 +12,11 @@
 |---|:---:|:---:|:---:|:---:|
 | **A. Backup, Cloud Sync & Data Safety** (Items 1–5) | 5 | 2 (Items 1, 3) | 0 | 3 (Items 2, 4, 5) |
 | **B. Roles, Controls & Security** (Items 6–8) | 3 | 1 (Item 7) | 0 | 2 (Items 6, 8) |
-| **C. Alerts, Escalations, Cash & Reports** (Items 9–16) | 8 | 1 (Item 14) | 1 (Item 13) | 6 (Items 9–12, 15, 16) |
+| **C. Alerts, Escalations, Cash & Reports** (Items 9–16) | 8 | 2 (Items 13, 14) | 0 | 6 (Items 9–12, 15, 16) |
 | **D. Corrective Action Plan (CAP) Controls** (Items 17–19) | 3 | 0 | 0 | 3 (Items 17–19) |
 | **E. Language, Permissions & Layout** (Items 20–26) | 7 | 0 | 0 | 7 (Items 20–26) |
 | **F. General Ease of Use** (Item 27 UX Points) | 1 | 0 | 0 | 1 (Item 27) |
-| **TOTAL** | **27** | **4 Solved** | **1 In Progress** | **22 Pending** |
+| **TOTAL** | **27** | **5 Solved** | **0 In Progress** | **22 Pending** |
 
 ---
 
@@ -161,9 +161,10 @@
   1. Centralize cash limits in `lib/domain/cash_thresholds.dart`.
   2. Auto-enforce Checkpoint 6.5: auto-FAIL if variance > ₹500; require note if > ₹50.
   3. Auto-enforce Weekly CW.7: auto-FAIL if cumulative variance breaches ±₹200 limit.
-- **Status:** 🔄 **IN PROGRESS (Tier 1-3)**
-- **Commit:** —
-- **Files Changed:** `lib/domain/cash_thresholds.dart`, `lib/ui/screens/s10_review/review_submit_screen.dart`, `lib/providers/draft_audit_provider.dart`
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** `84c8c0f` (`fix(scoring): auto-enforce cash variance limits on Checkpoint 6.5 and CW.7 (Item 13)`)
+- **Files Changed:** `lib/domain/cash_thresholds.dart`, `lib/domain/escalation_engine.dart`, `lib/domain/score_engine.dart`, `lib/providers/draft_audit_provider.dart`, `lib/ui/screens/s10_review/review_submit_screen.dart`, `test/cash_variance_enforcement_test.dart`
+- **Verification:** Unit and integration tests passing (`test/cash_variance_enforcement_test.dart` 6/6 tests passed). Score engine suite 12/12 passed. Full test suite 380/380 tests passed. Auto-failure on breach and photo-gate bypass verified.
 
 ---
 

@@ -7028,3 +7028,40 @@ app-release.aab   54955804  04-10-2026 19:48:39
 - **Subject**: eat: integrate Owner Executive Meeting Suite and universal gold 'S' brand icons
 - **Branch**: eature/owner-meeting-suite
 - **Status**: Working tree clean, 66 files committed, tests 100% green.
+
+
+---
+
+### Entry: 2026-10-29 — Antigravity Cash Variance Auto-Enforcement (Item 13)
+- **Author**: Antigravity
+- **Requirement / Problem (Item 13, Sagar Review Ref F12 & F15)**:
+  - Daily audit Checkpoint 6.5 ("Cash variance ≤ ₹50") was marked PASS even when S10 recorded -₹600 shortage.
+  - In weekly audit, Checkpoint CW.7 passed with -₹600 cumulative shortage, awarding 16/16 (100%) to Cash Management SOP.
+  - Cash variance thresholds were scattered and inconsistent across the codebase (₹50 vs ₹200 vs ₹500).
+- **Actions Executed**:
+  1. **Centralized Cash Variance Limits (`lib/domain/cash_thresholds.dart`)**:
+     - `dailyPassTolerance = 50.0` (≤ ₹50 passes without question)
+     - `weeklyCumulativeTolerance = 200.0` (±₹200 cumulative net tolerance across 7 days)
+     - `escalationTolerance = 500.0` (> ₹500 triggers immediate auto-fail and escalation)
+  2. **Harmonized Escalation & Scoring Engines**:
+     - Replaced magic numbers in `lib/domain/escalation_engine.dart` and `lib/domain/score_engine.dart` with `CashThresholds`.
+  3. **Auto-Enforcement in `lib/providers/draft_audit_provider.dart`**:
+     - **Daily Audit**: When `cashVarianceRupees != null`:
+       - If `|variance| > 500`: Checkpoint 6.5 is automatically forced to `Verdict.fail`, finding text is written to `audit_results`, and score is recalculated (deducting 2 points from Cash Management).
+       - If `50 < |variance| <= 500`: Checkpoint 6.5 requires an explanation note (>= 5 chars); otherwise it is auto-failed.
+       - If `|variance| <= 50`: Checkpoint 6.5 passes normally.
+     - **Weekly Audit**: Calculates 7-day cumulative net cash variance across preceding 6 daily audits + current audit. If cumulative variance breaches `|net| > 200`, Checkpoint CW.7 is automatically forced to `Verdict.fail`, finding text is saved, and score points are deducted.
+  4. **Photo-Gate Bypass for Auto-Failures**:
+     - In `lib/ui/screens/s10_review/review_submit_screen.dart`: exempted `6.5` and `CW.7` from mandatory photo gating since cash discrepancy is verified via cash till count sheet values rather than photo evidence.
+  5. **Comprehensive Test Suite (`test/cash_variance_enforcement_test.dart`)**:
+     - 6 dedicated unit and integration tests covering daily > ₹500 auto-fail, 6.5 score deduction, weekly cumulative variance calculation, weekly CW.7 auto-fail, and photo-gate submission bypass.
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze lib/ test/`: **0 issues found** (clean in 4.8s).
+  - `flutter test test/cash_variance_enforcement_test.dart`: **All 6 tests passed!**
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (81/90 = 90.0% Good invariant preserved).
+  - `flutter test`: **All 380/380 tests passed!**
+- **Git Commit**: `84c8c0f` (`fix(scoring): auto-enforce cash variance limits on Checkpoint 6.5 and CW.7 (Item 13)`)
+- **Next Immediate Task**:
+  - Push commit `84c8c0f` to remote.
+  - Present physical device verification steps for Item 13 to user.
+  - Proceed with next isolated Tier 1 item per Strategy A (Item 19: CAP Extension Date Picker Past-Date Prevention, or Item 26: Photo Mandatory Badge text).
