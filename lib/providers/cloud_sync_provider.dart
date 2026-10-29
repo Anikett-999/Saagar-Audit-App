@@ -4,13 +4,15 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/cloud_sync_service.dart';
+import 'auth_provider.dart';
 
 /// Riverpod StateNotifier managing live cloud sync state for the application.
 class CloudSyncNotifier extends StateNotifier<CloudSyncState> {
-  CloudSyncNotifier() : super(const CloudSyncState()) {
+  CloudSyncNotifier([this._ref]) : super(const CloudSyncState()) {
     _init();
   }
 
+  final Ref? _ref;
   StreamSubscription<List<ConnectivityResult>>? _connectivitySub;
 
   Future<void> _init() async {
@@ -24,6 +26,11 @@ class CloudSyncNotifier extends StateNotifier<CloudSyncState> {
       status: hasNet ? CloudSyncStatus.idle : CloudSyncStatus.offline,
     );
 
+    // Auto-trigger background sync on app launch if online
+    if (hasNet) {
+      unawaited(syncNow());
+    }
+
     // Listen to network changes
     _connectivitySub = Connectivity().onConnectivityChanged.listen((results) {
       final isOnline = results.any((r) => r != ConnectivityResult.none);
@@ -31,7 +38,7 @@ class CloudSyncNotifier extends StateNotifier<CloudSyncState> {
         state = state.copyWith(status: CloudSyncStatus.offline);
       } else if (state.status == CloudSyncStatus.offline) {
         state = state.copyWith(status: CloudSyncStatus.idle);
-        refreshPending();
+        unawaited(syncNow());
       }
     });
   }
@@ -62,8 +69,10 @@ class CloudSyncNotifier extends StateNotifier<CloudSyncState> {
       errorMessage: null,
     );
 
+    final userRole = _ref?.read(authProvider).user?.role;
     final result = await CloudSyncService.instance.syncAll(
       force: force,
+      userRole: userRole,
       onProgress: (progress, step) {
         state = state.copyWith(progress: progress);
       },
@@ -101,5 +110,5 @@ class CloudSyncNotifier extends StateNotifier<CloudSyncState> {
 
 final cloudSyncProvider =
     StateNotifierProvider<CloudSyncNotifier, CloudSyncState>(
-  (ref) => CloudSyncNotifier(),
+  (ref) => CloudSyncNotifier(ref),
 );

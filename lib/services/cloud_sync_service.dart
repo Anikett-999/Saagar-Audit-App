@@ -283,6 +283,7 @@ class CloudSyncService {
   /// Executes a full bi-directional synchronization pass.
   Future<SyncResult> syncAll({
     bool force = false,
+    String? userRole,
     void Function(double progress, String step)? onProgress,
   }) async {
     // Step 1: Network Check
@@ -325,10 +326,9 @@ class CloudSyncService {
       totalPushed += await _pushTableData('cros', lastSync, force: force);
 
       // Step 5: Inbound Pull Pass (Cloud -> SQLite)
+      // Enforces Spec §1, §4 & Role-Based Least Privilege in strict FK dependency order.
       onProgress?.call(0.7, 'Pulling updates from cloud...');
-      totalPulled += await _pullTableData('cros', lastSync);
-      totalPulled += await _pullTableData('caps', lastSync);
-      totalPulled += await _pullTableData('escalations', lastSync);
+      totalPulled += await _pullScopedData(userRole: userRole, since: lastSync);
 
       // Step 6: Mark Audit Log as Synced
       try {
@@ -509,19 +509,85 @@ class CloudSyncService {
     }
   }
 
+  /// Pulls remote documents scoped by authenticated user role in strict
+  /// foreign-key dependency order (resolves Item 1 & role security).
+  Future<int> _pullScopedData({
+    required String? userRole,
+    required DateTime? since,
+  }) async {
+    int pulled = 0;
+
+    // 1. users: Only pulled by OWNER. SM and GM must never pull other users.
+    if (userRole == 'OWNER') {
+      pulled += await _pullTableData('users', since, isUserTable: true);
+    }
+
+    // 2. cros: Store staff records (All roles)
+    pulled += await _pullTableData('cros', since);
+
+    // 3. audits: Parent of audit_results, caps, escalations
+    // SM is scoped strictly to daily audits; GM and Owner pull all audits.
+    if (userRole == 'SM') {
+      pulled += await _pullTableData('audits', since, queryFilter: {'audit_type': 'daily'});
+    } else {
+      pulled += await _pullTableData('audits', since);
+    }
+
+    // 4. audit_results: Child of audits
+    pulled += await _pullTableData('audit_results', since);
+
+    // 5. photos: Evidence photos metadata
+    pulled += await _pullTableData('photos', since);
+
+    // 6. reports: Managerial reports (GM and Owner only; SM blocked)
+    if (userRole == 'GM' || userRole == 'OWNER') {
+      pulled += await _pullTableData('reports', since);
+    }
+
+    // 7. caps: Corrective action plans (Child of audits, now guaranteed safe)
+    pulled += await _pullTableData('caps', since);
+
+    // 8. cap_actions & cap_log: Children of caps
+    pulled += await _pullTableData('cap_actions', since);
+    pulled += await _pullTableData('cap_log', since);
+
+    // 9. escalations: Managerial escalations (GM and Owner only; SM blocked)
+    if (userRole == 'GM' || userRole == 'OWNER') {
+      pulled += await _pullTableData('escalations', since);
+    }
+
+    return pulled;
+  }
+
   /// Pulls remote documents from Firestore and upserts into local SQLite.
-  Future<int> _pullTableData(String tableName, DateTime? since) async {
+  Future<int> _pullTableData(
+    String tableName,
+    DateTime? since, {
+    Map<String, dynamic>? queryFilter,
+    bool isUserTable = false,
+  }) async {
     try {
       List<Map<String, dynamic>> remoteDocs = [];
 
       if (_testAdapter != null) {
         remoteDocs = await _testAdapter!.pullRecords(tableName, since);
+        if (queryFilter != null && queryFilter.isNotEmpty) {
+          remoteDocs = remoteDocs.where((doc) {
+            return queryFilter.entries.every((entry) => doc[entry.key] == entry.value);
+          }).toList();
+        }
       } else {
         final firestore = FirebaseFirestore.instance;
         Query query = firestore.collection(tableName);
 
         if (since != null) {
           query = query.where('_synced_at', isGreaterThan: Timestamp.fromDate(since));
+        }
+
+        if (queryFilter != null && queryFilter.isNotEmpty) {
+          for (final entry in queryFilter.entries) {
+            query = query.where(entry.key, isEqualTo: entry.value);
+          }
         }
 
         final snapshot = await query.limit(100).get();
@@ -552,6 +618,10 @@ class CloudSyncService {
           if (existing.isEmpty) {
             // Filter to only columns that exist in SQLite schema
             final filtered = await _filterColumns(tableName, doc, txn);
+            if (isUserTable) {
+              // Remote user documents never contain pin_hash. Provide fallback for new cloud users.
+              filtered['pin_hash'] ??= 'PENDING_SETUP';
+            }
             await txn.insert(tableName, filtered);
             upserted++;
           } else {
@@ -560,6 +630,10 @@ class CloudSyncService {
             final shouldUpdate = _isRemoteNewer(localDoc, doc);
             if (shouldUpdate) {
               final filtered = await _filterColumns(tableName, doc, txn);
+              if (isUserTable) {
+                // Inviolable Security Rule: Preserve existing local pin_hash!
+                filtered['pin_hash'] = localDoc['pin_hash'];
+              }
               await txn.update(
                 tableName,
                 filtered,
@@ -611,11 +685,12 @@ class CloudSyncService {
   }
 
   String? _getTimestampColumn(String table) {
-    if (table == 'audits') return 'created_at';
+    if (table == 'audits') return 'submitted_at';
     if (table == 'caps') return 'opened_at';
     if (table == 'escalations') return 'raised_at';
     if (table == 'reports') return 'generated_at';
-    if (table == 'cros' || table == 'users') return 'updated_at';
+    if (table == 'cros') return 'joined_at';
+    if (table == 'users') return 'created_at';
     if (table == 'cap_log') return 'created_at';
     return null;
   }

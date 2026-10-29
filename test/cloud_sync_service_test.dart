@@ -213,6 +213,77 @@ void main() {
       final localCaps = fakeDb.tables['caps']!;
       expect(localCaps.any((c) => c['id'] == 'cap_remote_1'), isTrue);
     });
+
+    test('Role-Based Inbound Scoping: SM cannot pull users, reports, or escalations', () async {
+      testAdapter.mockRemoteData['users'] = [
+        {'id': 'u_gm_1', 'name': 'GM User', 'role': 'GM'}
+      ];
+      testAdapter.mockRemoteData['cros'] = [
+        {'id': 'cro_1', 'name': 'Staff 1', 'is_active': 1}
+      ];
+      testAdapter.mockRemoteData['reports'] = [
+        {'id': 'rep_1', 'type': 'weekly_strategic'}
+      ];
+      testAdapter.mockRemoteData['escalations'] = [
+        {'id': 'esc_1', 'target_role': 'OWNER'}
+      ];
+      testAdapter.mockRemoteData['audits'] = [
+        {'id': 'a_daily_1', 'audit_type': 'daily', 'status': 'submitted'},
+        {'id': 'a_weekly_1', 'audit_type': 'weekly', 'status': 'submitted'},
+      ];
+
+      final result = await CloudSyncService.instance.syncAll(userRole: 'SM');
+      expect(result.success, isTrue);
+
+      // Verify SM strictly pulled cros and daily audit only
+      final localCros = fakeDb.tables['cros']!;
+      expect(localCros.any((c) => c['id'] == 'cro_1'), isTrue);
+
+      final localAudits = fakeDb.tables['audits']!;
+      expect(localAudits.any((a) => a['id'] == 'a_daily_1'), isTrue);
+      expect(localAudits.any((a) => a['id'] == 'a_weekly_1'), isFalse,
+          reason: 'SM must never pull weekly/managerial audits');
+
+      final localUsers = fakeDb.tables['users']!;
+      expect(localUsers.any((u) => u['id'] == 'u_gm_1'), isFalse,
+          reason: 'SM must never pull user profiles');
+
+      final localReports = fakeDb.tables['reports']!;
+      expect(localReports.any((r) => r['id'] == 'rep_1'), isFalse,
+          reason: 'SM must never pull managerial reports');
+
+      final localEscalations = fakeDb.tables['escalations']!;
+      expect(localEscalations.any((e) => e['id'] == 'esc_1'), isFalse,
+          reason: 'SM must never pull managerial escalations');
+    });
+
+    test('Inviolable Security Rule: Owner sync pulls users but strictly preserves local pin_hash', () async {
+      // Local user with existing pin hash
+      fakeDb.tables['users']!.add({
+        'id': 'u_owner_1',
+        'name': 'Sagar Bora',
+        'role': 'OWNER',
+        'pin_hash': 'existing_secure_local_hash',
+      });
+
+      // Remote cloud user update has NO pin_hash
+      testAdapter.mockRemoteData['users'] = [
+        {
+          'id': 'u_owner_1',
+          'name': 'Sagar Bora Updated',
+          'role': 'OWNER',
+          'created_at': '2026-10-29T10:00:00Z',
+        }
+      ];
+
+      final result = await CloudSyncService.instance.syncAll(userRole: 'OWNER');
+      expect(result.success, isTrue);
+
+      final localUsers = fakeDb.tables['users']!;
+      final ownerUser = localUsers.firstWhere((u) => u['id'] == 'u_owner_1');
+      expect(ownerUser['pin_hash'], equals('existing_secure_local_hash'),
+          reason: 'Inviolable Rule: Local pin_hash must NEVER be overwritten by cloud pull');
+    });
   });
 
   group('CloudSyncProvider & S32 UI Integration Tests', () {

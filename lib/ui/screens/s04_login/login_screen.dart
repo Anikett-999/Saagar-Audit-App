@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../data/db/database.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../providers/cloud_sync_provider.dart';
 import '../../../providers/locale_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
@@ -118,6 +119,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (ok) {
       _lockoutTimer?.cancel();
+      // Auto-trigger role-based background sync upon successful login
+      unawaited(ref.read(cloudSyncProvider.notifier).syncNow());
       final user = ref.read(authProvider).user;
       if (user != null && (user.languagePref == 'en' || user.languagePref == 'mr')) {
         await ref.read(localeProvider.notifier).set(Locale(user.languagePref));
