@@ -14,6 +14,7 @@ import '../../../data/repositories/checkpoint_repository.dart';
 import '../../../data/repositories/user_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../utils/app_date_format.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
 
@@ -706,9 +707,7 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
         ? '${responsibleUser.name} (${responsibleUser.role})'
         : cap.responsibleUserId;
 
-    final openedDate = cap.openedAt.length >= 10
-        ? cap.openedAt.substring(0, 10)
-        : cap.openedAt;
+    final openedDate = AppDateFormat.formatDate(cap.openedAt);
 
     return Card(
       elevation: 1,
@@ -835,8 +834,8 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
 
   Widget _buildActionItem(AppLocalizations l10n, CapAction action, bool canToggle) {
     final doneUserName = action.doneBy != null ? (_userMap[action.doneBy!]?.name ?? action.doneBy!) : '';
-    final doneDate = action.doneAt != null && action.doneAt!.length >= 10
-        ? action.doneAt!.substring(0, 10)
+    final doneDate = action.doneAt != null
+        ? AppDateFormat.formatDate(action.doneAt)
         : '';
 
     return Container(
@@ -1333,9 +1332,7 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
         ? '${actorUser.name} (${actorUser.role})'
         : entry.actorUserId ?? l10n.s16ActorSystem;
 
-    final dateStr = entry.timestamp.length >= 16
-        ? entry.timestamp.substring(0, 16).replaceFirst('T', ' ')
-        : entry.timestamp;
+    final dateStr = AppDateFormat.formatDateTime(entry.timestamp);
 
     IconData icon;
     Color iconColor;

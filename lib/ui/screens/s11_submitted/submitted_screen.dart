@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/draft_audit_provider.dart';
+import '../../../utils/app_date_format.dart';
 import '../../theme/app_colors.dart';
 
 /// Screen S11 — Daily Audit — Submitted Confirmation (Spec §5 S11).
@@ -55,13 +56,7 @@ class _SubmittedScreenState extends ConsumerState<SubmittedScreen>
     final bandName = audit?.band?.toUpperCase() ?? 'PENDING';
     final color = bandColor(scorePct);
 
-    String submittedTime = 'Just now';
-    if (audit?.submittedAt != null) {
-      try {
-        final dt = DateTime.parse(audit!.submittedAt!).toLocal();
-        submittedTime = DateFormat('hh:mm a').format(dt);
-      } catch (_) {}
-    }
+    final submittedTime = AppDateFormat.formatTime(audit?.submittedAt, fallback: 'Just now');
 
     final isFairOrBelow = scorePct < 90.0;
     final isPoorOrCritical = scorePct < 85.0;

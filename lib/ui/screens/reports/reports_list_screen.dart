@@ -8,6 +8,7 @@ import '../../../data/models/report.dart';
 import '../../../data/repositories/report_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../utils/app_date_format.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
 
@@ -369,9 +370,7 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen> {
     final bandName = ((compTable['monthly_band'] ?? compTable['band']) as String?)?.toUpperCase() ?? 'UNKNOWN';
     final color = bandColor(pct);
 
-    final submittedDateStr = report.submittedAt != null
-        ? report.submittedAt!.split('T').first
-        : '—';
+    final submittedDateStr = AppDateFormat.formatDate(report.submittedAt);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),

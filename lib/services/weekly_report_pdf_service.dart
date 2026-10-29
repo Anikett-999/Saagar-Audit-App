@@ -8,6 +8,7 @@ import 'package:printing/printing.dart';
 
 import '../data/models/report.dart';
 import '../data/repositories/report_repository.dart';
+import '../utils/app_date_format.dart';
 
 /// 1-Page Bilingual PDF Generator Service for Weekly Audit Reports (Workbook Day 3 §3.6).
 class WeeklyReportPdfService {
@@ -481,7 +482,7 @@ class WeeklyReportPdfService {
                           style: baseStyle(fontSize: 7),
                         ),
                         pw.Text(
-                          'GM / ऑडिटर स्वाक्षरी: ${report.authorUserId ?? "GM Auditor"} - ${report.submittedAt ?? "Submitted"}',
+                          'GM / ऑडिटर स्वाक्षरी: ${report.authorUserId ?? "GM Auditor"} - ${report.submittedAt != null ? AppDateFormat.formatDate(report.submittedAt) : "Submitted"}',
                           style: headerStyle(fontSize: 7.5),
                         ),
                       ],
@@ -762,9 +763,9 @@ class WeeklyReportPdfService {
                           child: pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
-                              pw.Text('Auditor: ${report.authorUserId ?? "Owner"} · ${report.submittedAt?.split("T").first ?? ""}', style: headerStyle(fontSize: 6.5)),
+                              pw.Text('Auditor: ${report.authorUserId ?? "Owner"} · ${report.submittedAt != null ? AppDateFormat.formatDate(report.submittedAt) : ""}', style: headerStyle(fontSize: 6.5)),
                               pw.SizedBox(height: 2),
-                              pw.Text('Owner Review: ${report.isReadByOwner ? "Read on ${report.readByOwnerAt?.split("T").first}" : "Pending Owner Review"}', style: baseStyle(fontSize: 6.5, color: report.isReadByOwner ? PdfColors.green800 : PdfColors.amber800)),
+                              pw.Text('Owner Review: ${report.isReadByOwner ? "Read on ${report.readByOwnerAt != null ? AppDateFormat.formatDate(report.readByOwnerAt) : ""}" : "Pending Owner Review"}', style: baseStyle(fontSize: 6.5, color: report.isReadByOwner ? PdfColors.green800 : PdfColors.amber800)),
                             ],
                           ),
                         ),

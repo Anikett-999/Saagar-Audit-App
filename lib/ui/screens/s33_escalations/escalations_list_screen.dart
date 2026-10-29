@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../data/models/escalation.dart';
 import '../../../data/repositories/escalation_repository.dart';
@@ -10,6 +9,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/escalation_service.dart';
 import '../../../services/notification_service.dart';
+import '../../../utils/app_date_format.dart';
 import '../../theme/app_colors.dart';
 
 /// Screen S33 — Escalations List & Detail (Spec §7 & Appendix A.5).
@@ -364,9 +364,7 @@ class _EscalationsListScreenState extends ConsumerState<EscalationsListScreen> {
       _ => l10n.s33UrgencyNextAudit,
     };
 
-    final formattedDate = esc.raisedAt.isNotEmpty
-        ? DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.parse(esc.raisedAt).toLocal())
-        : '';
+    final formattedDate = AppDateFormat.formatDateTime(esc.raisedAt, fallback: '');
 
     final draft = EscalationDraft(
       triggerNumber: esc.triggerNumber,

@@ -12,6 +12,7 @@ import '../../../data/repositories/cap_repository.dart';
 import '../../../data/repositories/user_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../utils/app_date_format.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
 
@@ -502,7 +503,7 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
                           if (action.doneAt != null) ...[
                             const SizedBox(height: 2),
                             Text(
-                              'Done: ${action.doneAt!.substring(0, 10)}',
+                              'Done: ${AppDateFormat.formatDate(action.doneAt)}',
                               style: const TextStyle(
                                 fontSize: 11,
                                 color: AppColors.gray600,

@@ -19,6 +19,7 @@ import '../../../data/repositories/report_repository.dart';
 import '../../../data/repositories/user_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../utils/app_date_format.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
 
@@ -365,9 +366,7 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
   }
 
   Widget _buildHeaderBanner(AppLocalizations l10n, Audit audit) {
-    final submittedTime = audit.submittedAt != null
-        ? audit.submittedAt!.substring(0, 16).replaceFirst('T', ' ')
-        : '—';
+    final submittedTime = AppDateFormat.formatDateTime(audit.submittedAt);
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -481,7 +480,7 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
                       const Icon(Icons.verified, size: 14, color: AppColors.green),
                       const SizedBox(width: 4),
                       Text(
-                        'Verified: ${_verifierName ?? audit.verifierId ?? "GM"}${audit.verifiedAt != null && audit.verifiedAt!.length >= 10 ? " (${audit.verifiedAt!.substring(0, 10)})" : ""}',
+                        'Verified: ${_verifierName ?? audit.verifierId ?? "GM"}${audit.verifiedAt != null ? " (${AppDateFormat.formatDate(audit.verifiedAt)})" : ""}',
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,

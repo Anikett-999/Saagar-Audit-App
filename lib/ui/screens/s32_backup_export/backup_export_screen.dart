@@ -11,6 +11,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/cloud_sync_provider.dart';
 import '../../../services/cloud_sync_service.dart';
+import '../../../utils/app_date_format.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
 
@@ -483,8 +484,7 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
 
                       final lastSyncText = !isNeverSynced
                           ? l10n.s32CloudSyncLastSync(
-                              '${syncState.lastSyncAt!.day.toString().padLeft(2, '0')}/${syncState.lastSyncAt!.month.toString().padLeft(2, '0')}/${syncState.lastSyncAt!.year} '
-                              '${syncState.lastSyncAt!.hour.toString().padLeft(2, '0')}:${syncState.lastSyncAt!.minute.toString().padLeft(2, '0')}',
+                              AppDateFormat.formatSyncDateTime(syncState.lastSyncAt),
                             )
                           : l10n.s32CloudSyncLastSync(l10n.s32CloudSyncNever);
 

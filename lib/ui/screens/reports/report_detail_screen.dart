@@ -7,6 +7,7 @@ import '../../../domain/trend_analytics.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/weekly_report_pdf_service.dart';
+import '../../../utils/app_date_format.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
 import '../../widgets/trend_chart.dart';
@@ -498,14 +499,14 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
                 Text(
                   l10n.s21AuditorSignature(
                     report.authorUserId ?? 'GM Auditor',
-                    report.submittedAt != null ? report.submittedAt!.split('T').first : 'Submitted',
+                    report.submittedAt != null ? AppDateFormat.formatDate(report.submittedAt) : 'Submitted',
                   ),
                   style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   report.isReadByOwner
-                      ? l10n.s21OwnerSignature(report.readByOwnerAt?.split('T').first ?? '')
+                      ? l10n.s21OwnerSignature(report.readByOwnerAt != null ? AppDateFormat.formatDate(report.readByOwnerAt) : '')
                       : l10n.s21OwnerSignaturePending,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
@@ -1002,14 +1003,14 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
               Text(
                 l10n.s21AuditorSignature(
                   report.authorUserId ?? 'Owner Auditor',
-                  report.submittedAt != null ? report.submittedAt!.split('T').first : 'Submitted',
+                  report.submittedAt != null ? AppDateFormat.formatDate(report.submittedAt) : 'Submitted',
                 ),
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
               ),
               const SizedBox(height: 6),
               Text(
                 report.isReadByOwner
-                    ? l10n.s21OwnerSignature(report.readByOwnerAt?.split('T').first ?? '')
+                    ? l10n.s21OwnerSignature(report.readByOwnerAt != null ? AppDateFormat.formatDate(report.readByOwnerAt) : '')
                     : l10n.s21OwnerSignaturePending,
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
