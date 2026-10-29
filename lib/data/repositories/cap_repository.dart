@@ -629,10 +629,22 @@ class CapRepository {
       throw ArgumentError('New deadline must not be blank');
     }
 
+    final trimmedDeadline = newDeadline.trim();
+    final parsedNew = DateTime.tryParse(trimmedDeadline);
+    final parsedOld = DateTime.tryParse(cap.deadline);
+    if (parsedNew != null && parsedOld != null) {
+      final oldDateOnly = DateTime(parsedOld.year, parsedOld.month, parsedOld.day);
+      final newDateOnly = DateTime(parsedNew.year, parsedNew.month, parsedNew.day);
+      if (!newDateOnly.isAfter(oldDateOnly)) {
+        throw ArgumentError(
+          'New deadline must be strictly after current deadline ($trimmedDeadline <= ${cap.deadline})',
+        );
+      }
+    }
+
     final now = DateTime.now().toUtc().toIso8601String();
     final deviceId = await DeviceService.instance.getId();
     final trimmedReason = reason.trim();
-    final trimmedDeadline = newDeadline.trim();
 
     await AppDatabase.instance.db.transaction((txn) async {
       await txn.update(

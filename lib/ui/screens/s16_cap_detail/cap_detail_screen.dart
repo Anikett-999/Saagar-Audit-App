@@ -940,7 +940,11 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
 
   void _showExtensionDialog(AppLocalizations l10n, Cap cap) {
     final reasonController = TextEditingController();
-    DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
+    final currentDeadline = DateTime.tryParse(cap.deadline) ?? DateTime.now();
+    final now = DateTime.now();
+    final baseDate = currentDeadline.isAfter(now) ? currentDeadline : now;
+    final minDate = DateTime(baseDate.year, baseDate.month, baseDate.day).add(const Duration(days: 1));
+    DateTime selectedDate = minDate.add(const Duration(days: 6));
 
     showDialog<void>(
       context: context,
@@ -963,9 +967,9 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
                     onTap: () async {
                       final picked = await showDatePicker(
                         context: context,
-                        initialDate: selectedDate,
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(const Duration(days: 365)),
+                        initialDate: selectedDate.isBefore(minDate) ? minDate : selectedDate,
+                        firstDate: minDate,
+                        lastDate: now.add(const Duration(days: 365)),
                       );
                       if (picked != null) {
                         setDialogState(() => selectedDate = picked);

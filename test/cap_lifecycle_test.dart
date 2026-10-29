@@ -332,6 +332,73 @@ void main() {
       );
     });
 
+    test(
+      '7b. Item 19 (Client Ref F19): extendCap throws ArgumentError if new deadline <= current deadline',
+      () async {
+        fakeDb.tables['caps']!.add({
+          'id': 'CAP-2026-F19',
+          'origin_audit_id': 'audit-f19',
+          'origin_checkpoint_id': '1.1',
+          'is_pattern': 0,
+          'problem_statement': 'Sagar UAT Item 19 test',
+          'why_1': 'Why',
+          'root_cause': 'Root',
+          'responsible_user_id': 'user-sm-1',
+          'deadline': '2026-10-31',
+          'verification_method': 'Method',
+          'status': 'open',
+          'opened_at': '2026-10-20T10:00:00Z',
+          'extension_count': 0,
+        });
+
+        // 1. Sagar exact test: current is 31 Oct, picked 25 Oct (earlier date)
+        expect(
+          () => repo.extendCap(
+            capId: 'CAP-2026-F19',
+            actorId: gmUser.id,
+            newDeadline: '2026-10-25',
+            reason: 'Testing earlier deadline',
+          ),
+          throwsA(
+            isA<ArgumentError>().having(
+              (e) => e.message,
+              'message',
+              contains('strictly after current deadline'),
+            ),
+          ),
+        );
+
+        // 2. Same date (31 Oct): not allowed to extend to the same deadline
+        expect(
+          () => repo.extendCap(
+            capId: 'CAP-2026-F19',
+            actorId: gmUser.id,
+            newDeadline: '2026-10-31',
+            reason: 'Testing same deadline',
+          ),
+          throwsA(
+            isA<ArgumentError>().having(
+              (e) => e.message,
+              'message',
+              contains('strictly after current deadline'),
+            ),
+          ),
+        );
+
+        // 3. Valid future date (1 Nov): succeeds
+        await repo.extendCap(
+          capId: 'CAP-2026-F19',
+          actorId: gmUser.id,
+          newDeadline: '2026-11-01',
+          reason: 'Valid future extension',
+        );
+
+        final updated = await repo.getById('CAP-2026-F19');
+        expect(updated!.deadline, equals('2026-11-01'));
+        expect(updated.extensionCount, equals(1));
+      },
+    );
+
     test('8. reopenCap happy path: verify-fail -> reopen sets status=reopened & logs', () async {
       fakeDb.tables['caps']!.add({
         'id': 'CAP-2026-W39-08',
