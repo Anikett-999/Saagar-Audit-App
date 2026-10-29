@@ -13,10 +13,10 @@
 | **A. Backup, Cloud Sync & Data Safety** (Items 1–5) | 5 | 2 (Items 1, 3) | 0 | 3 (Items 2, 4, 5) |
 | **B. Roles, Controls & Security** (Items 6–8) | 3 | 1 (Item 7) | 0 | 2 (Items 6, 8) |
 | **C. Alerts, Escalations, Cash & Reports** (Items 9–16) | 8 | 2 (Items 13, 14) | 0 | 6 (Items 9–12, 15, 16) |
-| **D. Corrective Action Plan (CAP) Controls** (Items 17–19) | 3 | 0 | 0 | 3 (Items 17–19) |
+| **D. Corrective Action Plan (CAP) Controls** (Items 17–19) | 3 | 1 (Item 19) | 0 | 2 (Items 17, 18) |
 | **E. Language, Permissions & Layout** (Items 20–26) | 7 | 0 | 0 | 7 (Items 20–26) |
 | **F. General Ease of Use** (Item 27 UX Points) | 1 | 0 | 0 | 1 (Item 27) |
-| **TOTAL** | **27** | **5 Solved** | **0 In Progress** | **22 Pending** |
+| **TOTAL** | **27** | **6 Solved** | **0 In Progress** | **21 Pending** |
 
 ---
 
@@ -220,12 +220,13 @@
 - **Files Changed:** —
 
 #### Item 19: "Request Extension" can move deadline earlier
-- **Priority:** Low | **Client Ref:** F19
-- **Problem:** Date picker in CAP extension request dialog allows picking dates before the current deadline or in the past.
-- **Required Fix:** Set `firstDate: currentDeadline.add(Duration(days: 1))` so extensions can only be granted for future dates.
-- **Status:** ⏳ **PENDING (Tier 1-5)**
-- **Commit:** —
-- **Files Changed:** —
+- **Priority:** Low | **Client Ref:** F19 (F22 in review doc)
+- **Problem:** Date picker in CAP extension request dialog allows picking dates before the current deadline or in the past (e.g., CAP due 31 Oct allowed picking 25 Oct and moving deadline earlier).
+- **Required Fix:** Set `firstDate: currentDeadline.add(Duration(days: 1))` so extensions can only be granted for future dates strictly after current deadline. Added repository-level guard in `CapRepository.extendCap` rejecting new deadlines $\le$ existing deadline.
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** `cde4398` (`fix(cap): prevent earlier or past dates in CAP deadline extension (Item 19)`)
+- **Files Changed:** `lib/data/repositories/cap_repository.dart`, `lib/ui/screens/cap/s18_cap_verify_screen.dart`, `lib/ui/screens/s16_cap_detail/cap_detail_screen.dart`, `test/cap_lifecycle_test.dart`
+- **Verification:** Unit tests passing (`test/cap_lifecycle_test.dart` 14/14 green, with dedicated test 7b verifying Sagar's exact 31 Oct $\rightarrow$ 25 Oct test is blocked). Full suite 381/381 tests green. 0 analyzer issues.
 
 ---
 

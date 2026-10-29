@@ -7065,3 +7065,33 @@ app-release.aab   54955804  04-10-2026 19:48:39
   - Push commit `84c8c0f` to remote.
   - Present physical device verification steps for Item 13 to user.
   - Proceed with next isolated Tier 1 item per Strategy A (Item 19: CAP Extension Date Picker Past-Date Prevention, or Item 26: Photo Mandatory Badge text).
+
+
+---
+
+### Entry: 2026-10-29 — Antigravity CAP Extension Past-Date Prevention (Item 19)
+- **Author**: Antigravity
+- **Requirement / Problem (Item 19, Client Review Ref F19 / F22)**:
+  - In CAP extension dialog (`CapDetailScreen` S16 & `CapVerifyScreen` S18), the date picker allowed selecting dates before the current deadline or in the past.
+  - Sagar's UAT test: *"Used Request Extension on a CAP due on 31 October and picked 25 October. It was accepted and recorded as 'Deadline extended to 2026-10-25' and counted as one extension."*
+  - An extension must strictly extend into the future beyond the current deadline.
+- **Actions Executed**:
+  1. **UI Date Picker Restriction (`cap_detail_screen.dart` & `s18_cap_verify_screen.dart`)**:
+     - Calculated `baseDate = currentDeadline.isAfter(now) ? currentDeadline : now`.
+     - Set `minDate = DateTime(baseDate.year, baseDate.month, baseDate.day).add(const Duration(days: 1))`.
+     - In `showDatePicker`: `firstDate = minDate`, `initialDate = selectedDate.isBefore(minDate) ? minDate : selectedDate`.
+     - Result: All dates on or prior to the current deadline are physically disabled / unselectable in the calendar UI.
+  2. **Defensive Repository Validation (`CapRepository.extendCap`)**:
+     - Added strict check comparing parsed date-only representations of `newDeadline` and `cap.deadline`.
+     - Throws `ArgumentError('New deadline must be strictly after current deadline')` if `newDeadline <= currentDeadline`.
+  3. **Automated Unit Testing (`test/cap_lifecycle_test.dart`)**:
+     - Added Test 7b mirroring Sagar's exact test case: CAP due 2026-10-31; extending to 2026-10-25 throws `ArgumentError`; extending to 2026-10-31 throws `ArgumentError`; extending to 2026-11-01 succeeds.
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze lib/ test/`: **0 issues found** (clean in 10.3s).
+  - `flutter test test/cap_lifecycle_test.dart`: **All 14/14 tests passed!**
+  - `flutter test test/score_engine_test.dart`: **All 12/12 canonical tests passed!**
+  - `flutter test`: **All 381/381 tests passed!**
+- **Git Commit**: `cde4398` (`fix(cap): prevent earlier or past dates in CAP deadline extension (Item 19)`)
+- **Next Immediate Task**:
+  - Push commit `cde4398` to remote.
+  - Present next bug to user (Item 26: "Photo mandatory" label on Pass, or Item 25: IST timestamp display).
