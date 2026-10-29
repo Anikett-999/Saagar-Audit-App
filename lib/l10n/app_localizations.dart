@@ -1091,7 +1091,7 @@ abstract class AppLocalizations {
   /// No description provided for @s08PhotoRequiredNotice.
   ///
   /// In en, this message translates to:
-  /// **'Photo is mandatory for this checkpoint.'**
+  /// **'Photo required if marked FAIL'**
   String get s08PhotoRequiredNotice;
 
   /// No description provided for @s08SaveFail.

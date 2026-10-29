@@ -227,7 +227,7 @@
   "s08FindingHint": "Describe the non-compliance...",
   "s08CroInvolved": "CRO involved (optional)",
   "s08PhotoEvidence": "Photo evidence",
-  "s08PhotoRequiredNotice": "Photo is mandatory for this checkpoint.",
+  "s08PhotoRequiredNotice": "Photo required if marked FAIL",
   "s08SaveFail": "Save Finding",
 
   "s10Title": "Review & Submit",

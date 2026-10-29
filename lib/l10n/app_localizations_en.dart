@@ -550,8 +550,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s08PhotoEvidence => 'Photo evidence';
 
   @override
-  String get s08PhotoRequiredNotice =>
-      'Photo is mandatory for this checkpoint.';
+  String get s08PhotoRequiredNotice => 'Photo required if marked FAIL';
 
   @override
   String get s08SaveFail => 'Save Finding';

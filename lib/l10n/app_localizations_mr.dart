@@ -549,7 +549,7 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s08PhotoEvidence => 'फोटो पुरावा';
 
   @override
-  String get s08PhotoRequiredNotice => 'या चेकपॉइंटसाठी फोटो अनिवार्य आहे.';
+  String get s08PhotoRequiredNotice => 'नापास (FAIL) असल्यास फोटो आवश्यक';
 
   @override
   String get s08SaveFail => 'दोष जतन करा';

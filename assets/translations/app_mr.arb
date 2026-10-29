@@ -226,7 +226,7 @@
   "s08FindingHint": "दोष किंवा त्रुटीचे वर्णन करा...",
   "s08CroInvolved": "संबंधित कर्मचारी (ऐच्छिक)",
   "s08PhotoEvidence": "फोटो पुरावा",
-  "s08PhotoRequiredNotice": "या चेकपॉइंटसाठी फोटो अनिवार्य आहे.",
+  "s08PhotoRequiredNotice": "नापास (FAIL) असल्यास फोटो आवश्यक",
   "s08SaveFail": "दोष जतन करा",
 
   "s10Title": "पुनरावलोकन आणि सादर करा",
