@@ -14,9 +14,9 @@
 | **B. Roles, Controls & Security** (Items 6–8) | 3 | 1 (Item 7) | 0 | 2 (Items 6, 8) |
 | **C. Alerts, Escalations, Cash & Reports** (Items 9–16) | 8 | 2 (Items 13, 14) | 0 | 6 (Items 9–12, 15, 16) |
 | **D. Corrective Action Plan (CAP) Controls** (Items 17–19) | 3 | 1 (Item 19) | 0 | 2 (Items 17, 18) |
-| **E. Language, Permissions & Layout** (Items 20–26) | 7 | 0 | 0 | 7 (Items 20–26) |
+| **E. Language, Permissions & Layout** (Items 20–26) | 7 | 1 (Item 26) | 0 | 6 (Items 20–25) |
 | **F. General Ease of Use** (Item 27 UX Points) | 1 | 0 | 0 | 1 (Item 27) |
-| **TOTAL** | **27** | **6 Solved** | **0 In Progress** | **21 Pending** |
+| **TOTAL** | **27** | **7 Solved** | **0 In Progress** | **20 Pending** |
 
 ---
 
@@ -296,9 +296,10 @@
 - **Priority:** Low | **Client Ref:** F17
 - **Problem:** Monthly checkpoint MC.1 shows badge "Photo is mandatory for this checkpoint", but passing requires no photo.
 - **Required Fix:** Update badge string in English and Marathi: "Photo required if marked FAIL".
-- **Status:** ⏳ **PENDING (Tier 1-7)**
-- **Commit:** —
-- **Files Changed:** —
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** `ba2d9ab` (`fix(l10n): clarify checkpoint photo badge to 'Photo required if marked FAIL' (Item 26)`)
+- **Files Changed:** `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `lib/l10n/app_localizations.dart`, `lib/l10n/app_localizations_en.dart`, `lib/l10n/app_localizations_mr.dart`
+- **Verification:** Localizations regenerated via `flutter gen-l10n`, 0 analyzer issues, canonical score engine 12/12 passing. Authenticated in S07 Checkpoint UI badge.
 
 ---
 

@@ -7095,3 +7095,26 @@ app-release.aab   54955804  04-10-2026 19:48:39
 - **Next Immediate Task**:
   - Push commit `cde4398` to remote.
   - Present next bug to user (Item 26: "Photo mandatory" label on Pass, or Item 25: IST timestamp display).
+
+
+---
+
+### Entry: 2026-10-29 — Antigravity Checkpoint Photo Badge Clarification (Item 26)
+- **Author**: Antigravity
+- **Requirement / Problem (Item 26, Client Review Ref F17)**:
+  - On checkpoint cards (S07 and Monthly MC.1), the badge displayed `"Photo is mandatory for this checkpoint."` / `"या चेकपॉइंटसाठी फोटो अनिवार्य आहे."`.
+  - Passing an audit does not require a photo; photos are only mandatory when marking a non-compliance (FAIL). The previous copy confused auditors into believing photos were required even on Pass.
+  - Sagar's UAT review: *"Change it to 'Photo required if marked Fail'."*
+- **Actions Executed**:
+  1. **Dual-Language Clarification (`assets/translations/app_en.arb` & `app_mr.arb`)**:
+     - `s08PhotoRequiredNotice`: Updated to `"Photo required if marked FAIL"` (English) and `"नापास (FAIL) असल्यास फोटो आवश्यक"` (Marathi).
+  2. **Regenerated Localizations**:
+     - Ran `flutter gen-l10n`.
+     - Verified clean compilation in `lib/l10n/app_localizations_en.dart` and `lib/l10n/app_localizations_mr.dart`.
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze lib/ test/`: **0 issues found** (clean in 8.9s).
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!**
+- **Git Commit**: `ba2d9ab` (`fix(l10n): clarify checkpoint photo badge to 'Photo required if marked FAIL' (Item 26)`)
+- **Next Immediate Task**:
+  - Push commit `ba2d9ab` to remote.
+  - Present next problem to user (Item 25: IST timestamp formatting display).
