@@ -7318,6 +7318,6 @@ app-release.aab   54955804  04-10-2026 19:48:39
   - `flutter analyze lib test`: **No issues found! (ran in 7.0s)**.
   - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5).
   - `flutter test`: **All 403/403 tests passed! (ran in 53s across 46 files)**.
+- **Git Commit**: `f72f5df` (`fix(cap): scope checkpoint dropdown to audit failures and seal self-reopening loophole (Items 17 & 6)`) pushed to `origin/fix/part-b-bugs`.
 - **Next Immediate Task**:
-  - Await user commit & push approval per Rule 6.
   - Proceed to next bug fix (Cluster A: Audit Submit & Escalations flow).
