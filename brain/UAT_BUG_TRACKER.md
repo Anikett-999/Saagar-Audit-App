@@ -184,7 +184,7 @@
 - **Problem:** Tapping "Export PDF", "Verify", or "Share" on S13 Daily Audit Detail shows "scheduled for Phase 2" snackbar.
 - **Required Fix:** Wire real PDF export / preview, WhatsApp share intent, and role-based verification directly on S13.
 - **Status:** ✅ **SOLVED & VERIFIED**
-- **Commit:** Pending commit
+- **Commit:** `2848b0c` (`feat(s13): wire role-based audit verification, daily audit PDF export, and WhatsApp sharing (Item 15 · F03)`)
 - **Files Changed:** `lib/ui/screens/s13_audit_detail/audit_detail_screen.dart`, `lib/services/daily_audit_pdf_service.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `test/audit_detail_screen_test.dart`, `test/daily_audit_pdf_service_test.dart`, `test/backup_export_test.dart`
 - **Verification:**
   1. **Verify Audit:** Role-based verification (GM & Owner only). Confirms without asking user to pick a role — automatically stamps the logged-in user's role and name. Updates database `status = 'verified'`, `verifier_id = user.id`, UTC timestamp. UI refreshes, replaces amber "SUBMITTED" badge with green "VERIFIED: <Name> (<Date>)" badge, and hides the verify button.
