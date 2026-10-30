@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../data/models/audit.dart';
+import '../../../data/models/audit_result.dart';
 import '../../../data/models/checkpoint.dart';
 import '../../../data/models/user.dart';
 import '../../../data/repositories/audit_repository.dart';
@@ -72,6 +73,8 @@ class _CapCreateScreenState extends ConsumerState<CapCreateScreen> {
   List<Audit> _audits = [];
   List<Checkpoint> _checkpoints = [];
   List<User> _responsibleUsers = [];
+  Map<String, Checkpoint> _allCheckpointsMap = const {};
+  Map<String, AuditResult> _resultsByCheckpoint = const {};
 
   bool _isLoading = true;
   bool _isSubmitting = false;
@@ -117,34 +120,78 @@ class _CapCreateScreenState extends ConsumerState<CapCreateScreen> {
           .where((u) => u.isSm || u.isGm || u.isOwner)
           .toList();
 
-      // 2. Load daily checkpoints
-      final checkpoints = await CheckpointRepository.instance
-          .loadDailyCheckpointsInAuditOrder();
+      // 2. Load all checkpoints across frequencies (daily, weekly, monthly)
+      final allCheckpoints = await CheckpointRepository.instance.loadAllCheckpoints();
+      final allCpMap = {for (final cp in allCheckpoints) cp.id: cp};
 
       // 3. Load audits
       final audits = await AuditRepository.instance.listAudits(
         viewer: auth.user!,
-        limit: 20,
+        limit: 30,
       );
+
+      if (widget.originAuditId != null && !audits.any((a) => a.id == widget.originAuditId)) {
+        final specificAudit = await AuditRepository.instance.getById(widget.originAuditId!);
+        if (specificAudit != null) {
+          audits.insert(0, specificAudit);
+        }
+      }
 
       // 4. Generate CAP ID preview
       final capId = await CapRepository.instance.generateNextCapId(DateTime.now());
 
+      String? initialAuditId = widget.originAuditId;
+      if (initialAuditId == null && audits.isNotEmpty) {
+        final withFails = audits.where((a) => a.failCount > 0);
+        initialAuditId = withFails.isNotEmpty ? withFails.first.id : audits.first.id;
+      }
+
+      final initialCheckpoints = <Checkpoint>[];
+      var resMap = <String, AuditResult>{};
+      String? initialCheckpointId = widget.originCheckpointId;
+
+      if (initialAuditId != null) {
+        final results = await AuditRepository.instance.resultsForAudit(initialAuditId);
+        final failedResults = results.where((r) => r.result == 'F').toList();
+        resMap = {for (final r in results) r.checkpointId: r};
+
+        for (final res in failedResults) {
+          final cp = allCpMap[res.checkpointId] ??
+              Checkpoint(
+                id: res.checkpointId,
+                sopId: '',
+                sequence: 1,
+                textEn: res.findingText ?? res.checkpointId,
+                textMr: res.findingText ?? res.checkpointId,
+                weight: 1,
+                allowsNa: false,
+                requiresPhotoOnFail: false,
+                displayOrder: 1,
+                frequency: 'daily',
+              );
+          if (!initialCheckpoints.any((c) => c.id == cp.id)) {
+            initialCheckpoints.add(cp);
+          }
+        }
+
+        if (initialCheckpointId != null &&
+            !initialCheckpoints.any((c) => c.id == initialCheckpointId)) {
+          initialCheckpointId = initialCheckpoints.isNotEmpty ? initialCheckpoints.first.id : null;
+        } else if (initialCheckpointId == null && initialCheckpoints.isNotEmpty) {
+          initialCheckpointId = initialCheckpoints.first.id;
+        }
+      }
+
       if (mounted) {
         setState(() {
+          _allCheckpointsMap = allCpMap;
           _responsibleUsers = validUsers;
-          _checkpoints = checkpoints;
           _audits = audits;
           _capIdPreview = capId;
-
-          // Default selections
-          if (_selectedAuditId == null && audits.isNotEmpty) {
-            _selectedAuditId = audits.first.id;
-          }
-
-          if (_selectedCheckpointId == null && checkpoints.isNotEmpty) {
-            _selectedCheckpointId = checkpoints.first.id;
-          }
+          _selectedAuditId = initialAuditId;
+          _checkpoints = initialCheckpoints;
+          _selectedCheckpointId = initialCheckpointId;
+          _resultsByCheckpoint = resMap;
 
           if (_selectedResponsibleUserId == null && validUsers.isNotEmpty) {
             // Default to viewer if eligible, otherwise first valid user
@@ -155,10 +202,11 @@ class _CapCreateScreenState extends ConsumerState<CapCreateScreen> {
 
           // Pre-populate verification text if empty
           if (_verificationController.text.trim().isEmpty &&
-              _selectedCheckpointId != null) {
-            final cp = checkpoints.firstWhere(
-              (c) => c.id == _selectedCheckpointId,
-              orElse: () => checkpoints.first,
+              initialCheckpointId != null &&
+              initialCheckpoints.isNotEmpty) {
+            final cp = initialCheckpoints.firstWhere(
+              (c) => c.id == initialCheckpointId,
+              orElse: () => initialCheckpoints.first,
             );
             final locale = auth.user!.languagePref;
             _verificationController.text = cp.text(locale);
@@ -172,6 +220,58 @@ class _CapCreateScreenState extends ConsumerState<CapCreateScreen> {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  Future<void> _onAuditChanged(String? newAuditId) async {
+    if (newAuditId == null || newAuditId == _selectedAuditId) return;
+
+    final results = await AuditRepository.instance.resultsForAudit(newAuditId);
+    final failedResults = results.where((r) => r.result == 'F').toList();
+    final resMap = {for (final r in results) r.checkpointId: r};
+
+    final newCheckpoints = <Checkpoint>[];
+    for (final res in failedResults) {
+      final cp = _allCheckpointsMap[res.checkpointId] ??
+          Checkpoint(
+            id: res.checkpointId,
+            sopId: '',
+            sequence: 1,
+            textEn: res.findingText ?? res.checkpointId,
+            textMr: res.findingText ?? res.checkpointId,
+            weight: 1,
+            allowsNa: false,
+            requiresPhotoOnFail: false,
+            displayOrder: 1,
+            frequency: 'daily',
+          );
+      if (!newCheckpoints.any((c) => c.id == cp.id)) {
+        newCheckpoints.add(cp);
+      }
+    }
+
+    final nextCheckpointId = newCheckpoints.isNotEmpty ? newCheckpoints.first.id : null;
+    final locale = ref.read(authProvider).user?.languagePref ?? 'en';
+
+    setState(() {
+      _selectedAuditId = newAuditId;
+      _checkpoints = newCheckpoints;
+      _selectedCheckpointId = nextCheckpointId;
+      _resultsByCheckpoint = resMap;
+
+      if (nextCheckpointId != null) {
+        final res = resMap[nextCheckpointId];
+        if (res?.findingText != null && res!.findingText!.isNotEmpty) {
+          _problemController.text = res.findingText!;
+        } else {
+          _problemController.text = '';
+        }
+        final cp = newCheckpoints.firstWhere((c) => c.id == nextCheckpointId);
+        _verificationController.text = cp.text(locale);
+      } else {
+        _problemController.text = '';
+        _verificationController.text = '';
+      }
+    });
   }
 
   void _addActionStep() {
@@ -235,9 +335,28 @@ class _CapCreateScreenState extends ConsumerState<CapCreateScreen> {
       return;
     }
 
+    if (_selectedCheckpointId == null || _checkpoints.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s15NoFailsFound),
+          backgroundColor: AppColors.red,
+        ),
+      );
+      return;
+    }
+
     final auditId = _selectedAuditId ?? '';
     final checkpointId = _selectedCheckpointId ?? '';
     final responsibleId = _selectedResponsibleUserId ?? auth.user!.id;
+
+    // Resolve originResultId if not already provided
+    String? originResultId = widget.originResultId;
+    if (originResultId == null) {
+      final match = _resultsByCheckpoint[checkpointId];
+      if (match != null && match.result == 'F') {
+        originResultId = match.id;
+      }
+    }
 
     setState(() => _isSubmitting = true);
 
@@ -248,7 +367,7 @@ class _CapCreateScreenState extends ConsumerState<CapCreateScreen> {
       final created = await CapRepository.instance.createCap(
         originAuditId: auditId,
         originCheckpointId: checkpointId,
-        originResultId: widget.originResultId,
+        originResultId: originResultId,
         problemStatement: _problemController.text.trim(),
         why1: _why1Controller.text.trim(),
         why2: _why2Controller.text.trim().isEmpty ? null : _why2Controller.text.trim(),
@@ -409,48 +528,6 @@ class _CapCreateScreenState extends ConsumerState<CapCreateScreen> {
             ),
             const SizedBox(height: 12),
 
-            // Checkpoint selector
-            Text(
-              l10n.s15OriginCheckpoint,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 6),
-            DropdownButtonFormField<String>(
-              key: const ValueKey('s15_checkpoint_dropdown'),
-              initialValue: _selectedCheckpointId,
-              isExpanded: true,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: AppColors.gray100,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              ),
-              items: _checkpoints.map((cp) {
-                final text = '${cp.id} — ${cp.text(locale)}';
-                return DropdownMenuItem<String>(
-                  value: cp.id,
-                  child: Text(
-                    text,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 13),
-                  ),
-                );
-              }).toList(),
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() {
-                    _selectedCheckpointId = val;
-                    final cp = _checkpoints.firstWhere((c) => c.id == val);
-                    _verificationController.text = cp.text(locale);
-                  });
-                }
-              },
-            ),
-            const SizedBox(height: 12),
-
             // Origin Audit
             Text(
               l10n.s15OriginAudit,
@@ -485,19 +562,88 @@ class _CapCreateScreenState extends ConsumerState<CapCreateScreen> {
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 ),
                 items: _audits.map((a) {
+                  final failText = a.failCount == 1 ? '1 fail' : '${a.failCount} fails';
                   return DropdownMenuItem<String>(
                     value: a.id,
                     child: Text(
-                      l10n.s15AuditDropdownItem(a.auditDate, a.auditType.toUpperCase()),
+                      '${a.auditDate} · ${a.auditType.toUpperCase()} ($failText)',
                       style: const TextStyle(fontSize: 13),
                     ),
                   );
                 }).toList(),
-                onChanged: (val) {
-                  if (val != null) {
-                    setState(() => _selectedAuditId = val);
-                  }
-                },
+                onChanged: _onAuditChanged,
+              ),
+            const SizedBox(height: 12),
+
+            // Checkpoint selector
+            Text(
+              l10n.s15OriginCheckpoint,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 6),
+            if (_checkpoints.isEmpty)
+              Container(
+                key: const ValueKey('s15_no_fails_notice'),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.amberPale,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.amber),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, color: AppColors.amber, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l10n.s15NoFailsFound,
+                        style: const TextStyle(fontSize: 12, color: AppColors.navy, fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              KeyedSubtree(
+                key: ValueKey('s15_checkpoint_wrapper_${_selectedAuditId}_$_selectedCheckpointId'),
+                child: DropdownButtonFormField<String>(
+                  key: const ValueKey('s15_checkpoint_dropdown'),
+                  initialValue: _selectedCheckpointId,
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: AppColors.gray100,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  ),
+                  items: _checkpoints.map((cp) {
+                    final text = '${cp.id} — ${cp.text(locale)}';
+                    return DropdownMenuItem<String>(
+                      value: cp.id,
+                      child: Text(
+                        text,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() {
+                        _selectedCheckpointId = val;
+                        final cp = _checkpoints.firstWhere((c) => c.id == val);
+                        final res = _resultsByCheckpoint[val];
+                        if (res?.findingText != null && res!.findingText!.isNotEmpty) {
+                          _problemController.text = res.findingText!;
+                        }
+                        _verificationController.text = cp.text(locale);
+                      });
+                    }
+                  },
+                ),
               ),
           ],
         ),

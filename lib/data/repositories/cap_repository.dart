@@ -117,6 +117,39 @@ class CapRepository {
       );
     }
 
+    // Origin check: cannot create non-pattern CAP on a checkpoint that did not fail
+    if (!isPattern) {
+      final resRows = await AppDatabase.instance.db.query(
+        'audit_results',
+        where: 'audit_id = ? AND checkpoint_id = ?',
+        whereArgs: [originAuditId, originCheckpointId],
+      );
+      if (resRows.isNotEmpty) {
+        final res = resRows.first['result'] as String?;
+        if (res != 'F') {
+          throw ArgumentError(
+            'Cannot create CAP for checkpoint $originCheckpointId: checkpoint did not fail in audit $originAuditId (result was $res)',
+          );
+        }
+      }
+
+      if (originResultId != null) {
+        final resById = await AppDatabase.instance.db.query(
+          'audit_results',
+          where: 'id = ?',
+          whereArgs: [originResultId],
+        );
+        if (resById.isNotEmpty) {
+          final res = resById.first['result'] as String?;
+          if (res != 'F') {
+            throw ArgumentError(
+              'Cannot create CAP for result $originResultId: result was $res (expected F)',
+            );
+          }
+        }
+      }
+    }
+
     final capId = id ?? await generateNextCapId(originDate ?? DateTime.now());
     final now = DateTime.now().toUtc().toIso8601String();
     final deviceId = await DeviceService.instance.getId();
@@ -671,6 +704,23 @@ class CapRepository {
         'Cannot extend: CAP $capId has status ${cap.status} (expected open, done, or reopened)',
       );
     }
+
+    // Segregation of duties on extension:
+    // A responsible user cannot extend their own completed CAP (Four-Eyes Principle)
+    if (cap.status == 'done') {
+      if (cap.responsibleUserId == actorId) {
+        throw StateError(
+          'Segregation of duties: actor ($actorId) cannot extend deadline on a completed CAP assigned to themselves',
+        );
+      }
+      final logs = await logFor(capId);
+      final doneLogs = logs.where((l) => l.event == 'marked_done').toList();
+      if (doneLogs.isNotEmpty && doneLogs.last.actorUserId == actorId) {
+        throw StateError(
+          'Segregation of duties (Four-Eyes Principle): actor ($actorId) cannot extend deadline on a CAP they marked done',
+        );
+      }
+    }
     if (reason.trim().isEmpty) {
       throw ArgumentError('Extension reason must not be blank');
     }
@@ -742,6 +792,24 @@ class CapRepository {
         'Cannot reopen: CAP $capId has status ${cap.status} (expected done or closed)',
       );
     }
+
+    // Segregation of duties (Four-Eyes Principle / Item 6 · F21):
+    // If reopening from verification failure (status == 'done'), actor cannot be responsible user or who marked done
+    if (cap.status == 'done') {
+      if (cap.responsibleUserId == actorId) {
+        throw StateError(
+          'Segregation of duties: actor ($actorId) cannot reject verification on a CAP assigned to themselves',
+        );
+      }
+      final logs = await logFor(capId);
+      final doneLogs = logs.where((l) => l.event == 'marked_done').toList();
+      if (doneLogs.isNotEmpty && doneLogs.last.actorUserId == actorId) {
+        throw StateError(
+          'Segregation of duties (Four-Eyes Principle): actor ($actorId) cannot reject verification on a CAP they marked done',
+        );
+      }
+    }
+
     final trimmedReason = reason.trim();
     if (trimmedReason.length < 10) {
       throw ArgumentError(

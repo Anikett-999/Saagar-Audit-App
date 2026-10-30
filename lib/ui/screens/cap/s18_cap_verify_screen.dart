@@ -184,6 +184,19 @@ class _S18CapVerifyScreenState extends ConsumerState<S18CapVerifyScreen> {
   }
 
   void _onVerificationFailed() {
+    final authState = ref.read(authProvider);
+    final user = authState.user;
+    final cap = _cap;
+    if (user != null && cap != null && (user.id == _doneByUserId || user.id == cap.responsibleUserId)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.s18SelfVerificationWarning),
+          backgroundColor: AppColors.red,
+        ),
+      );
+      return;
+    }
+
     final l10n = AppLocalizations.of(context)!;
     showDialog<void>(
       context: context,
@@ -988,10 +1001,12 @@ class _S18CapVerifyScreenState extends ConsumerState<S18CapVerifyScreen> {
           height: 48,
           child: OutlinedButton.icon(
             key: const ValueKey('s18_fail_verify_button'),
-            onPressed: _isSubmitting ? null : _onVerificationFailed,
+            onPressed: (_isSubmitting || isSelfVerification) ? null : _onVerificationFailed,
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.red,
               side: const BorderSide(color: AppColors.red),
+              disabledForegroundColor: AppColors.gray600,
+              disabledBackgroundColor: AppColors.gray200,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
             icon: const Icon(Icons.close),

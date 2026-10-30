@@ -597,6 +597,12 @@ void main() {
         find.byKey(const ValueKey('s18_pass_verify_button')),
       );
       expect(passBtn.onPressed, isNull);
+
+      // Verification Failed button is ALSO disabled (cannot fail/reopen own CAP)
+      final failBtn = tester.widget<OutlinedButton>(
+        find.byKey(const ValueKey('s18_fail_verify_button')),
+      );
+      expect(failBtn.onPressed, isNull);
     });
   });
 }

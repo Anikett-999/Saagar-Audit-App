@@ -7250,3 +7250,74 @@ app-release.aab   54955804  04-10-2026 19:48:39
   - Hand baton to user / Claude for physical device verification.
 
 
+
+
+---
+
+### Handoff: 30 October 2026 — CAP Checkpoint Scoping & Weekly/Monthly Audit Support (Item 17 · F20/F19)
+**Author**: Antigravity  
+**Goal**: Resolve Item 17 (Client Ref: F20 / F19 in review doc):
+1. Scope checkpoint dropdown in Screen S15 (`CapCreateScreen`) strictly to the failed checkpoints of the selected audit.
+2. Support daily, weekly (e.g. CW.7), and monthly (e.g. MC.2) audit non-compliances by loading checkpoints across all frequencies (`loadAllCheckpoints`).
+3. Reorder origin card so Origin Audit is selected first and Failed Checkpoint second, displaying fail counts on audit items.
+4. Show honest notice if the selected audit has 0 fails and block submission.
+5. Add repository-level guard in `CapRepository.createCap` rejecting non-pattern CAPs on checkpoints that did not fail (`result != 'F'`).
+6. Automatically link `originResultId` to the matching audit result row.
+
+- **Completed Implementations**:
+  1. **CapRepository Layer (`lib/data/repositories/cap_repository.dart`)**:
+     - `createCap`: Added origin checkpoint validation checking `audit_results`. If `!isPattern` and a result exists where `result != 'F'`, throws `ArgumentError('Cannot create CAP for checkpoint $originCheckpointId: checkpoint did not fail in audit $originAuditId')`. Also validates `originResultId` if provided.
+  2. **Screen S15 CAP Create (`lib/ui/screens/s15_cap_create/cap_create_screen.dart`)**:
+     - Loads all checkpoints across frequencies using `CheckpointRepository.instance.loadAllCheckpoints()`.
+     - In `_loadData()` and `_onAuditChanged()`, queries `audit_results` for the selected audit and populates `_checkpoints` strictly with non-compliant items (`result == 'F'`).
+     - Origin card layout updated: Origin Audit dropdown is at the top with fail counts (e.g. `2026-10-25 · MONTHLY (1 fail)`), and Failed Checkpoint dropdown is below it.
+     - When an audit has 0 fails, replaces the checkpoint dropdown with an amber informational card (`s15NoFailsFound`) and blocks submit with a clear snackbar error.
+     - Automatically resolves `originResultId` from the selected checkpoint's fail result so audit detail displays the linked CAP chip.
+  3. **Bilingual Parity (Rule #8)**:
+     - Added `s15NoFailsFound` in `assets/translations/app_en.arb` and `assets/translations/app_mr.arb` (`"This audit has no failed checkpoints. CAPs can only be created for failed items."` / `"या ऑडिटमध्ये कोणतेही नापास तपासणी बिंदू नाहीत. केवळ नापास बाबींसाठीच CAP तयार करता येते."`).
+     - Regenerated localizations via `flutter gen-l10n`.
+  4. **Automated Testing Suite**:
+     - `test/cap_create_screen_test.dart`: Updated setup to seed `audit_results` with fails; added dedicated tests for monthly failed checkpoints (`MC.2`), passed checkpoints exclusion (`MC.1`), and 0-fails honest notice + submission blocking (9/9 tests passed).
+     - `test/cap_repository_test.dart`: Added test verifying `createCap` throws `ArgumentError` when attempting to create a CAP for a passed checkpoint (19/19 tests passed).
+     - `test/backup_export_test.dart`: Hardened async timer pump to 800ms for parallel test runner stability (8/8 tests passed).
+     - Full automated test suite: **401/401 passing (100% green)**.
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze lib test`: **No issues found!** (ran in 8.2s).
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5).
+  - `flutter test`: **All 401/401 tests passed!** (ran in 58s).
+- **Next Immediate Task**:
+  - Request user / Claude review for commit approval per Rule 6.
+  - Present physical device verification steps for Item 17.
+  - Proceed with next bug fix.
+
+---
+
+### Handoff: 30 October 2026 — Item 6 Loophole Closure: Self-Reopen & Self-Extension Prevention
+**Author**: Antigravity  
+**Goal**: Address physical device QA finding from User where GM (Santosh Hajare), assigned a CAP by Owner and having marked it done, bypassed segregation of duties on S18 via the "Verification Failed" button, which allowed him to reopen his own CAP with dummy reason (`iiiiikjnibibibib`):
+1. Completely seal self-verification on Screen S16: Hide "Verify" button from responsible user and who marked done (`canVerify = isGmOrOwner && !isResponsible && !isDoneByMe`), displaying italic segregation note instead.
+2. Seal verification rejection on Screen S18: Disable "Verification Failed" button if `isSelfVerification == true` and guard `_onVerificationFailed()`.
+3. Restrict "Request Extension" on Screen S16: Hide "Request Extension" button when status is `done` (completed CAPs cannot request extension; extension from `done` is an outcome of verification failure on S18). For `open`/`reopened`, restrict to Owner or non-responsible GM (`canExtend = (cap.isOpen || cap.isReopened) && (isOwner || (isGm && !isResponsible))`).
+4. Enforce repository-level segregation of duties in `CapRepository.reopenCap`: If `status == 'done'`, reject with `StateError` if `actorId == cap.responsibleUserId` or `actorId == lastMarkedDoneUserId`.
+5. Enforce repository-level segregation of duties in `CapRepository.extendCap`: If `status == 'done'`, reject with `StateError` if `actorId == cap.responsibleUserId` or `actorId == lastMarkedDoneUserId`.
+
+- **Completed Implementations**:
+  1. `lib/ui/screens/s16_cap_detail/cap_detail_screen.dart`:
+     - Hid "Verify" button if responsible user or who marked done, displaying `s16SelfVerificationBlocked`.
+     - Hid "Request Extension" when `done`; prevented responsible GM from self-extending.
+  2. `lib/ui/screens/cap/s18_cap_verify_screen.dart`:
+     - Disabled `s18_fail_verify_button` when `isSelfVerification == true`.
+     - Guarded `_onVerificationFailed()` with snackbar warning.
+  3. `lib/data/repositories/cap_repository.dart`:
+     - Added segregation of duties guards in `reopenCap` and `extendCap`.
+  4. Localization: Added `s16SelfVerificationBlocked` in `app_en.arb` and `app_mr.arb`.
+  5. Automated Testing:
+     - `test/cap_lifecycle_test.dart`: Added test 10d (reopenCap rejects self-reopening) and test 7c (extendCap rejects self-extension).
+     - Full automated test suite: **403/403 tests passing (100% green)**.
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze lib test`: **No issues found! (ran in 7.0s)**.
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5).
+  - `flutter test`: **All 403/403 tests passed! (ran in 53s across 46 files)**.
+- **Next Immediate Task**:
+  - Await user commit & push approval per Rule 6.
+  - Proceed to next bug fix (Cluster A: Audit Submit & Escalations flow).

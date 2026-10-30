@@ -499,6 +499,7 @@
   "s15SelectAudit": "Select Audit",
   "s15SelectCheckpoint": "Select Checkpoint",
   "s15NoAuditsFound": "No audits found. Complete an audit first.",
+  "s15NoFailsFound": "This audit has no failed checkpoints. CAPs can only be created for failed items.",
   "s15SectionProblem": "2. Problem & 5-Whys Analysis",
   "s15ProblemStatement": "Problem Statement",
   "s15ProblemStatementHint": "Describe what failed (1 sentence)",
@@ -739,6 +740,7 @@
       "name": {"type": "String"}
     }
   },
+  "s16SelfVerificationBlocked": "Pending verification by another manager or Owner (Segregation of Duties).",
   "s17SectionEvidencePhoto": "Completion Evidence Photo",
   "s17TakePhoto": "Take Photo",
   "s17RetakePhoto": "Retake Photo",

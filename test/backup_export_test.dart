@@ -276,10 +276,9 @@ void main() {
       // Tap Export Database button and wait for File I/O to complete inside runAsync
       await tester.runAsync(() async {
         await tester.tap(find.text('Export Database JSON'));
-        await Future<void>.delayed(const Duration(milliseconds: 300));
+        await Future<void>.delayed(const Duration(milliseconds: 800));
       });
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pumpAndSettle();
 
       // Verify success dialog is shown
       expect(find.byType(AlertDialog), findsOneWidget);

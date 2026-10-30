@@ -1212,6 +1212,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s15NoAuditsFound => 'No audits found. Complete an audit first.';
 
   @override
+  String get s15NoFailsFound =>
+      'This audit has no failed checkpoints. CAPs can only be created for failed items.';
+
+  @override
   String get s15SectionProblem => '2. Problem & 5-Whys Analysis';
 
   @override
@@ -1612,6 +1616,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String s16OnlyResponsibleCanMarkDone(String name) {
     return 'Only the assigned responsible user ($name) can mark this CAP done.';
   }
+
+  @override
+  String get s16SelfVerificationBlocked =>
+      'Pending verification by another manager or Owner (Segregation of Duties).';
 
   @override
   String get s17SectionEvidencePhoto => 'Completion Evidence Photo';

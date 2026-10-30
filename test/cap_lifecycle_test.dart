@@ -399,6 +399,41 @@ void main() {
       },
     );
 
+    test('7c. Item 6 (Client Ref F21): extendCap rejects self-extension on completed CAP', () async {
+      fakeDb.tables['caps']!.add({
+        'id': 'CAP-2026-EXT-SELF',
+        'origin_audit_id': 'audit-ext-self',
+        'origin_checkpoint_id': '1.1',
+        'is_pattern': 0,
+        'problem_statement': 'Self extension test',
+        'why_1': 'Why',
+        'root_cause': 'Root',
+        'responsible_user_id': gmUser.id,
+        'deadline': '2026-10-31',
+        'verification_method': 'Method',
+        'status': 'done',
+        'opened_at': '2026-10-20T10:00:00Z',
+        'extension_count': 0,
+      });
+
+      // GM assigned to themselves trying to extend completed CAP throws StateError
+      expect(
+        () => repo.extendCap(
+          capId: 'CAP-2026-EXT-SELF',
+          actorId: gmUser.id,
+          newDeadline: '2026-11-05',
+          reason: 'Self extension attempt',
+        ),
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.message,
+            'message',
+            contains('Segregation of duties'),
+          ),
+        ),
+      );
+    });
+
     test('8. reopenCap happy path: verify-fail -> reopen sets status=reopened & logs', () async {
       fakeDb.tables['caps']!.add({
         'id': 'CAP-2026-W39-08',
@@ -601,6 +636,50 @@ void main() {
           ),
         ),
       );
+    });
+
+    test('10d. Item 6 (Client Ref F21): reopenCap rejects self-reopening for responsible user and who marked done', () async {
+      fakeDb.tables['caps']!.add({
+        'id': 'cap-self-reopen',
+        'origin_audit_id': 'audit-1',
+        'origin_checkpoint_id': '1.1',
+        'problem_statement': 'Self reopen problem',
+        'why_1': 'w',
+        'root_cause': 'r',
+        'responsible_user_id': gmUser.id,
+        'deadline': '2026-10-30',
+        'verification_method': 'v',
+        'status': 'done',
+        'opened_at': '2026-09-20T10:00:00Z',
+      });
+      fakeDb.tables['cap_log']!.add({
+        'id': 'log-self-reopen',
+        'cap_id': 'cap-self-reopen',
+        'event': 'marked_done',
+        'actor_user_id': gmUser.id,
+        'device_id': 'dev-1',
+        'timestamp': '2026-09-24T12:00:00Z',
+        'note': 'Done note',
+      });
+
+      // GM tries to fail verification and reopen their own CAP -> must throw StateError
+      expect(
+        () => repo.reopenCap(
+          capId: 'cap-self-reopen',
+          actorId: gmUser.id,
+          reason: 'I want to redo this verification myself',
+        ),
+        throwsStateError,
+      );
+
+      // Owner reopens it -> succeeds
+      await repo.reopenCap(
+        capId: 'cap-self-reopen',
+        actorId: ownerUser.id,
+        reason: 'Owner inspection failed: action steps must be redone',
+      );
+      final reopened = fakeDb.tables['caps']!.firstWhere((c) => c['id'] == 'cap-self-reopen');
+      expect(reopened['status'], 'reopened');
     });
 
     test('10c. Item 6 & 18: markDone segregation of duties, mandatory notes, and photo validation', () async {

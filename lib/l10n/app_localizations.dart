@@ -2301,6 +2301,12 @@ abstract class AppLocalizations {
   /// **'No audits found. Complete an audit first.'**
   String get s15NoAuditsFound;
 
+  /// No description provided for @s15NoFailsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This audit has no failed checkpoints. CAPs can only be created for failed items.'**
+  String get s15NoFailsFound;
+
   /// No description provided for @s15SectionProblem.
   ///
   /// In en, this message translates to:
@@ -2996,6 +3002,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Only the assigned responsible user ({name}) can mark this CAP done.'**
   String s16OnlyResponsibleCanMarkDone(String name);
+
+  /// No description provided for @s16SelfVerificationBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending verification by another manager or Owner (Segregation of Duties).'**
+  String get s16SelfVerificationBlocked;
 
   /// No description provided for @s17SectionEvidencePhoto.
   ///

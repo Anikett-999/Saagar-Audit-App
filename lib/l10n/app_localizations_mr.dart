@@ -1214,6 +1214,10 @@ class AppLocalizationsMr extends AppLocalizations {
       'कोणतेही ऑडिट सापडले नाही. प्रथम ऑडिट पूर्ण करा.';
 
   @override
+  String get s15NoFailsFound =>
+      'या ऑडिटमध्ये कोणतेही नापास तपासणी बिंदू नाहीत. केवळ नापास बाबींसाठीच CAP तयार करता येते.';
+
+  @override
   String get s15SectionProblem => '२. समस्या आणि ५-का? विश्लेषण';
 
   @override
@@ -1614,6 +1618,10 @@ class AppLocalizationsMr extends AppLocalizations {
   String s16OnlyResponsibleCanMarkDone(String name) {
     return 'केवळ नियुक्त जबाबदार वापरकर्ता ($name) हे CAP पूर्ण म्हणून चिन्हांकित करू शकतात.';
   }
+
+  @override
+  String get s16SelfVerificationBlocked =>
+      'दुसऱ्या व्यवस्थापकाकडून किंवा मालकाकडून पडताळणी प्रलंबित (कर्तव्य पृथक्करण नियम).';
 
   @override
   String get s17SectionEvidencePhoto => 'पूर्णता पुरावा फोटो';

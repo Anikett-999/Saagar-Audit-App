@@ -13,10 +13,10 @@
 | **A. Backup, Cloud Sync & Data Safety** (Items 1–5) | 5 | 2 (Items 1, 3) | 0 | 3 (Items 2, 4, 5) |
 | **B. Roles, Controls & Security** (Items 6–8) | 3 | 2 (Items 6, 7) | 0 | 1 (Item 8) |
 | **C. Alerts, Escalations, Cash & Reports** (Items 9–16) | 8 | 3 (Items 13, 14, 15) | 0 | 5 (Items 9–12, 16) |
-| **D. Corrective Action Plan (CAP) Controls** (Items 17–19) | 3 | 2 (Items 18, 19) | 0 | 1 (Item 17) |
+| **D. Corrective Action Plan (CAP) Controls** (Items 17–19) | 3 | 3 (Items 17, 18, 19) | 0 | 0 |
 | **E. Language, Permissions & Layout** (Items 20–26) | 7 | 2 (Items 25, 26) | 0 | 5 (Items 20–24) |
 | **F. General Ease of Use** (Item 27 UX Points) | 1 | 0 | 0 | 1 (Item 27) |
-| **TOTAL** | **27** | **11 Solved** | **0 In Progress** | **16 Pending** |
+| **TOTAL** | **27** | **12 Solved** | **0 In Progress** | **15 Pending** |
 
 ---
 
@@ -80,12 +80,17 @@
 
 #### Item 6: GM can mark a CAP done and verify it himself
 - **Priority:** High | **Client Ref:** F21
-- **Problem:** GM assigned CAP to SM, but GM was able to click "Mark CAP Done" and then immediately verify it himself. Also "Reopen at Plan" left action steps ticked and didn't require a failed verification reason.
-- **Required Fix:** Only assigned responsible user can mark CAP done. Verifier MUST be a different user (Four-Eyes Principle). Reopening resets action steps. Failed verification requires mandatory reason note (min 10 chars).
+- **Problem:** GM assigned CAP to SM, but GM was able to click "Mark CAP Done" and then immediately verify it himself. Also "Reopen at Plan" left action steps ticked and didn't require a failed verification reason. In user device testing, when GM was assigned a CAP and completed it, GM navigated to S18 where "Pass & Verify" was disabled, but "Verification Failed" was clickable and allowed GM to reopen his own CAP with dummy text.
+- **Required Fix:** 
+  1. Only assigned responsible user can mark CAP done.
+  2. Verifier MUST be a different user (Four-Eyes Principle / Segregation of Duties): hide "Verify" button on S16 for responsible user and who marked done (`s16SelfVerificationBlocked`).
+  3. Reopen & Rejection guard: disable "Verification Failed" on S18 for self-verification; repository guard in `reopenCap` and `extendCap` throws `StateError` if actor is responsible user or who marked done.
+  4. Hide "Request Extension" when CAP status is `done` (only verifiable on S18) and prevent responsible GM from self-extending.
+  5. Reopening resets all action steps to incomplete. Failed verification requires mandatory reason note (min 10 chars).
 - **Status:** ✅ **SOLVED & VERIFIED**
-- **Commit:** `eb22124` (`fix(cap): enforce segregation of duties, action steps reset on reopen, and mandatory evidence (Items 6 & 18)`)
+- **Commit:** `eb22124` + uncommitted hardening (`fix(cap): scope checkpoint dropdown to audit failures and seal self-reopening loophole (Items 17 & 6)`)
 - **Files Changed:** `lib/data/repositories/cap_repository.dart`, `lib/ui/screens/s16_cap_detail/cap_detail_screen.dart`, `lib/ui/screens/s17_cap_mark_done/cap_mark_done_screen.dart`, `lib/ui/screens/cap/s18_cap_verify_screen.dart`, `test/helpers/fake_database.dart`, `test/cap_lifecycle_test.dart`, `test/cap_detail_screen_test.dart`, `test/cap_mark_done_screen_test.dart`, `test/s18_cap_verify_screen_test.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`
-- **Verification:** 10/10 tests in `test/s18_cap_verify_screen_test.dart`, 12/12 tests in `test/cap_detail_screen_test.dart`, 16/16 tests in `test/cap_lifecycle_test.dart`, 9/9 tests in `test/cap_mark_done_screen_test.dart`. Full suite 398/398 passing. 0 analyzer issues.
+- **Verification:** 10/10 tests in `test/s18_cap_verify_screen_test.dart`, 12/12 tests in `test/cap_detail_screen_test.dart`, 18/18 tests in `test/cap_lifecycle_test.dart`, 9/9 tests in `test/cap_mark_done_screen_test.dart`. Full suite 403/403 passing (100% green). 0 analyzer issues.
 
 ---
 
@@ -208,12 +213,19 @@
 ### Category D: Corrective Action Plan (CAP) Controls
 
 #### Item 17: CAP form shows wrong checkpoints, and monthly/weekly failures cannot get a CAP
-- **Priority:** High | **Client Ref:** F20
-- **Problem:** Opening CAP creation screen displays wrong checkpoint list; weekly and monthly audit failures have no way to create a CAP.
-- **Required Fix:** Scope checkpoint selection to the specific audit's failed items. Support daily, weekly, and monthly audit failures in CAP workflow.
-- **Status:** ⏳ **PENDING (Tier 2)**
-- **Commit:** —
-- **Files Changed:** —
+- **Priority:** High | **Client Ref:** F20 (F19 in review doc)
+- **Problem:** Opening CAP creation screen displays wrong checkpoint list (all 68 daily checkpoints 2.1 to 8.8, pre-selecting 2.1) regardless of which audit is selected. Weekly (e.g., CW.7) and monthly (e.g., MC.2) checkpoints are not in the list at all. User was able to create a CAP against checkpoint 6.5 which passed in that audit.
+- **Required Fix:**
+  1. Scope checkpoint dropdown to ONLY the failed checkpoints (`result == 'F'`) of the selected audit.
+  2. Support daily, weekly, and monthly failed checkpoints by loading across all frequencies.
+  3. Reorder origin card so Origin Audit is selected first and Failed Checkpoint second. Show fail count on audit dropdown item.
+  4. If the selected audit has 0 recorded fails, display honest alert notice and disable/block CAP creation.
+  5. Add repository-level validation in `CapRepository.createCap` rejecting non-pattern CAPs on checkpoints that did not fail (`result != 'F'`).
+  6. Automatically bind `originResultId` from the audit result row so audit detail reflects the linked CAP.
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** pending review
+- **Files Changed:** `lib/data/repositories/cap_repository.dart`, `lib/ui/screens/s15_cap_create/cap_create_screen.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `test/cap_create_screen_test.dart`, `test/cap_repository_test.dart`, `test/backup_export_test.dart`
+- **Verification:** 9/9 tests in `test/cap_create_screen_test.dart` (including dedicated Item 17 monthly MC.2 test & 0-fails notice test), 19/19 in `test/cap_repository_test.dart` (including non-failed checkpoint rejection guard), 12/12 canonical score tests green, full test suite 401/401 tests passing (100% green). 0 analyzer issues.
 
 ---
 

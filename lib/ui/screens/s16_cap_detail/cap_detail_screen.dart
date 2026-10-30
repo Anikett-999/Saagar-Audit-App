@@ -1157,7 +1157,14 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
     final isResponsible = currentUser != null && currentUser.id == cap.responsibleUserId;
     final isGmOrOwner = currentUser != null && (currentUser.isGm || currentUser.isOwner);
     final isOwner = currentUser != null && currentUser.isOwner;
+    final isGm = currentUser != null && currentUser.isGm;
     final canMarkDone = isResponsible && allActionsDone;
+
+    final doneLogs = _logs.where((l) => l.event == 'marked_done').toList();
+    final doneByUserId = doneLogs.isNotEmpty ? doneLogs.last.actorUserId : null;
+    final isDoneByMe = currentUser != null && doneByUserId != null && currentUser.id == doneByUserId;
+    final canVerify = isGmOrOwner && !isResponsible && !isDoneByMe;
+    final canExtend = (cap.isOpen || cap.isReopened) && (isOwner || (isGm && !isResponsible));
 
     final responsibleUser = _userMap[cap.responsibleUserId];
     final responsibleName = responsibleUser != null
@@ -1207,8 +1214,8 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
           const SizedBox(height: 8),
         ],
 
-        // 2. Request Extension (for open/done/reopened status, GM/Owner)
-        if ((cap.isOpen || cap.isDone) && isGmOrOwner) ...[
+        // 2. Request Extension (for open/reopened status, Owner or non-responsible GM)
+        if (canExtend) ...[
           OutlinedButton.icon(
             key: const ValueKey('s16_request_extension_button'),
             onPressed: () => _showExtensionDialog(l10n, cap),
@@ -1225,26 +1232,36 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
 
         // 3. Verify button (for done status, GM/Owner)
         if (cap.isDone && isGmOrOwner) ...[
-          ElevatedButton.icon(
-            key: const ValueKey('s16_verify_button'),
-            onPressed: () async {
-              final res = await context.push<bool>('/caps/${cap.id}/verify');
-              if (res == true) {
-                _loadData();
-              }
-            },
-            icon: const Icon(Icons.verified),
-            label: Text(
-              l10n.s16VerifyButton,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          if (canVerify)
+            ElevatedButton.icon(
+              key: const ValueKey('s16_verify_button'),
+              onPressed: () async {
+                final res = await context.push<bool>('/caps/${cap.id}/verify');
+                if (res == true) {
+                  _loadData();
+                }
+              },
+              icon: const Icon(Icons.verified),
+              label: Text(
+                l10n.s16VerifyButton,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.navy,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Text(
+                l10n.s16SelfVerificationBlocked,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 11, color: AppColors.gray600, fontStyle: FontStyle.italic),
+              ),
             ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.navy,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-          ),
           const SizedBox(height: 8),
         ],
 
