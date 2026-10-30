@@ -718,9 +718,28 @@
     }
   },
   "s17IncompleteStepsWarning": "Warning: Incomplete action steps remain. You must complete all action steps before marking this CAP done.",
-  "s17SectionDoneNotes": "Done Notes / Reflection (optional)",
-  "s17DoneNotesHint": "Describe how the issue was resolved or notes for verification...",
-  "s17SectionEvidencePhoto": "Completion Evidence Photo (optional)",
+  "s17SectionDoneNotes": "Completion Notes (Mandatory)",
+  "s17DoneNotesHint": "Describe how the issue was resolved (min 10 characters)...",
+  "s17NotesMinLength": "Minimum 10 characters required ({count}/10)",
+  "@s17NotesMinLength": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s17PhotoRequiredNotice": "Evidence photo is mandatory for this checkpoint before marking done.",
+  "s17OnlyResponsibleCanMarkDone": "Only the assigned responsible user ({name}) can mark this CAP done.",
+  "@s17OnlyResponsibleCanMarkDone": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "s16OnlyResponsibleCanMarkDone": "Only the assigned responsible user ({name}) can mark this CAP done.",
+  "@s16OnlyResponsibleCanMarkDone": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "s17SectionEvidencePhoto": "Completion Evidence Photo",
   "s17TakePhoto": "Take Photo",
   "s17RetakePhoto": "Retake Photo",
   "s17RemovePhoto": "Remove Photo",
@@ -1084,6 +1103,8 @@
   "s18PhotoRequiredError": "Please capture a verification photo before verifying.",
   "s18MissingReasonError": "Please provide a valid reason.",
   "s18PatternMarker": "Pattern Issue",
+  "s18SelfVerificationWarning": "Self-verification not permitted: Segregation of duties requires a different person to verify this CAP.",
+  "s18ReopenReasonMinLength": "Please provide a detailed reason (at least 10 characters).",
   "s18AccessDenied": "Access Denied. Only GM and Owner may verify CAPs.",
   "s18Back": "Back",
   "s18PhotoRequiredBadge": "REQUIRED",

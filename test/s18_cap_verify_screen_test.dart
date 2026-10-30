@@ -480,5 +480,123 @@ void main() {
       );
       expect(find.text('आवश्यक'), findsOneWidget);
     });
+
+    testWidgets('9. Item 6 (Client Ref F21): Verification Failed -> Reopen at Plan requires >= 10 chars and resets steps', (tester) async {
+      fakeDb.tables['caps'] = [
+        {
+          'id': 'CAP-V-09',
+          'origin_audit_id': 'audit-1',
+          'origin_checkpoint_id': '1.1',
+          'problem_statement': 'Floor dirty',
+          'why_1': 'w',
+          'root_cause': 'r',
+          'responsible_user_id': smUser.id,
+          'deadline': '2026-10-01',
+          'verification_method': 'm',
+          'status': 'done',
+          'opened_at': '2026-09-20T10:00:00Z',
+          'extension_count': 0,
+        },
+      ];
+      fakeDb.tables['cap_actions'] = [
+        {
+          'id': 'act-v-09',
+          'cap_id': 'CAP-V-09',
+          'sequence': 1,
+          'action_text': 'Clean floor',
+          'is_done': 1,
+          'done_at': '2026-09-24T10:00:00Z',
+          'done_by': smUser.id,
+        },
+      ];
+
+      await pumpVerify(
+        tester,
+        authState: const AuthState(user: gmUser),
+        capId: 'CAP-V-09',
+      );
+
+      // Tap Verification Failed
+      await tester.tap(find.byKey(const ValueKey('s18_fail_verify_button')));
+      await tester.pumpAndSettle();
+
+      // Tap Reopen at Plan choice
+      await tester.tap(find.byKey(const ValueKey('s18_fail_reopen_choice')));
+      await tester.pumpAndSettle();
+
+      // Confirm reopen dialog opens
+      expect(find.text('Reopen CAP at Plan'), findsOneWidget);
+
+      // Reason < 10 characters -> rejected
+      await tester.enterText(find.byKey(const ValueKey('s18_reopen_reason_input')), 'Short');
+      await tester.tap(find.byKey(const ValueKey('s18_confirm_reopen_button')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Please provide a detailed reason (at least 10 characters).'), findsOneWidget);
+
+      // Enter detailed reason >= 10 chars
+      await tester.enterText(
+        find.byKey(const ValueKey('s18_reopen_reason_input')),
+        'Floor inspection failed: deep stains remain near counter.',
+      );
+      await tester.tap(find.byKey(const ValueKey('s18_confirm_reopen_button')));
+      await tester.pumpAndSettle();
+
+      // CAP updated to reopened
+      final cap = fakeDb.tables['caps']!.firstWhere((c) => c['id'] == 'CAP-V-09');
+      expect(cap['status'], equals('reopened'));
+
+      // Action steps reset
+      final action = fakeDb.tables['cap_actions']!.firstWhere((a) => a['id'] == 'act-v-09');
+      expect(action['is_done'], equals(0));
+      expect(action['done_at'], isNull);
+    });
+
+    testWidgets('10. Item 6 (Client Ref F21): Self-verification is blocked with warning banner', (tester) async {
+      fakeDb.tables['caps'] = [
+        {
+          'id': 'CAP-V-10',
+          'origin_audit_id': 'audit-1',
+          'origin_checkpoint_id': '1.1',
+          'problem_statement': 'Cash count issue',
+          'why_1': 'w',
+          'root_cause': 'r',
+          'responsible_user_id': smUser.id,
+          'deadline': '2026-10-01',
+          'verification_method': 'm',
+          'status': 'done',
+          'opened_at': '2026-09-20T10:00:00Z',
+          'extension_count': 0,
+        },
+      ];
+      fakeDb.tables['cap_log'] = [
+        {
+          'id': 'log-v-10',
+          'cap_id': 'CAP-V-10',
+          'event': 'marked_done',
+          'from_status': 'open',
+          'to_status': 'done',
+          'actor_user_id': gmUser.id, // marked done by GM
+          'device_id': 'dev-1',
+          'timestamp': '2026-09-24T12:00:00Z',
+          'note': 'Done note',
+        },
+      ];
+
+      await pumpVerify(
+        tester,
+        authState: const AuthState(user: gmUser),
+        capId: 'CAP-V-10',
+      );
+
+      // Warning banner displayed
+      expect(find.textContaining('Self-verification not permitted'), findsOneWidget);
+
+      // Pass & Verify button is DISABLED
+      final passBtn = tester.widget<ElevatedButton>(
+        find.byKey(const ValueKey('s18_pass_verify_button')),
+      );
+      expect(passBtn.onPressed, isNull);
+    });
   });
 }

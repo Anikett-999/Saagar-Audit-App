@@ -599,9 +599,28 @@
   "s17SectionCompletedSteps": "पूर्ण झालेली कृती पावले",
   "s17AllStepsCompletedNotice": "सर्व {count} कृती पावले पूर्ण झाली आहेत.",
   "s17IncompleteStepsWarning": "चेतावणी: अपूर्ण कृती पावले शिल्लक आहेत. ही CAP पूर्ण चिन्हांकित करण्यापूर्वी सर्व कृती पावले पूर्ण केली पाहिजेत.",
-  "s17SectionDoneNotes": "पूर्ण नोंदी / शेरे (ऐच्छिक)",
-  "s17DoneNotesHint": "समस्या कशी सोडवली गेली याचे वर्णन किंवा पडताळणीसाठी नोंदी...",
-  "s17SectionEvidencePhoto": "पूर्णता पुरावा फोटो (ऐच्छिक)",
+  "s17SectionDoneNotes": "पूर्णता नोंदी (अनिवार्य)",
+  "s17DoneNotesHint": "समस्या कशी सोडवली गेली याचे वर्णन करा (किमान १० अक्षरे)...",
+  "s17NotesMinLength": "किमान १० अक्षरे आवश्यक आहेत ({count}/१०)",
+  "@s17NotesMinLength": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s17PhotoRequiredNotice": "हे CAP पूर्ण म्हणून चिन्हांकित करण्यापूर्वी या तपासणीसाठी पुरावा फोटो अनिवार्य आहे.",
+  "s17OnlyResponsibleCanMarkDone": "केवळ नियुक्त जबाबदार वापरकर्ता ({name}) हे CAP पूर्ण म्हणून चिन्हांकित करू शकतात.",
+  "@s17OnlyResponsibleCanMarkDone": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "s16OnlyResponsibleCanMarkDone": "केवळ नियुक्त जबाबदार वापरकर्ता ({name}) हे CAP पूर्ण म्हणून चिन्हांकित करू शकतात.",
+  "@s16OnlyResponsibleCanMarkDone": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "s17SectionEvidencePhoto": "पूर्णता पुरावा फोटो",
   "s17TakePhoto": "फोटो काढा",
   "s17RetakePhoto": "पुन्हा फोटो काढा",
   "s17RemovePhoto": "फोटो काढून टाका",
@@ -881,6 +900,8 @@
   "s18PhotoRequiredError": "कृपया पडताळणी करण्यापूर्वी पडताळणी फोटो घ्या.",
   "s18MissingReasonError": "कृपया वैध कारण प्रविष्ट करा.",
   "s18PatternMarker": "वारंवार आढळलेली समस्या",
+  "s18SelfVerificationWarning": "स्वतः पडताळणी करण्याची परवानगी नाही: कामाचे विभाजन नियमानुसार CAP पूर्ण करणाऱ्या व्यक्तीपेक्षा पडताळणी करणारी व्यक्ती वेगळी असणे आवश्यक आहे.",
+  "s18ReopenReasonMinLength": "कृपया सविस्तर कारण द्या (किमान १० अक्षरे).",
   "s18AccessDenied": "प्रवेश नाकारला. केवळ GM आणि मालकच CAP पडताळणी करू शकतात.",
   "s18Back": "मागे",
   "s18PhotoRequiredBadge": "आवश्यक",

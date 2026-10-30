@@ -1588,14 +1588,33 @@ class AppLocalizationsEn extends AppLocalizations {
       'Warning: Incomplete action steps remain. You must complete all action steps before marking this CAP done.';
 
   @override
-  String get s17SectionDoneNotes => 'Done Notes / Reflection (optional)';
+  String get s17SectionDoneNotes => 'Completion Notes (Mandatory)';
 
   @override
   String get s17DoneNotesHint =>
-      'Describe how the issue was resolved or notes for verification...';
+      'Describe how the issue was resolved (min 10 characters)...';
 
   @override
-  String get s17SectionEvidencePhoto => 'Completion Evidence Photo (optional)';
+  String s17NotesMinLength(int count) {
+    return 'Minimum 10 characters required ($count/10)';
+  }
+
+  @override
+  String get s17PhotoRequiredNotice =>
+      'Evidence photo is mandatory for this checkpoint before marking done.';
+
+  @override
+  String s17OnlyResponsibleCanMarkDone(String name) {
+    return 'Only the assigned responsible user ($name) can mark this CAP done.';
+  }
+
+  @override
+  String s16OnlyResponsibleCanMarkDone(String name) {
+    return 'Only the assigned responsible user ($name) can mark this CAP done.';
+  }
+
+  @override
+  String get s17SectionEvidencePhoto => 'Completion Evidence Photo';
 
   @override
   String get s17TakePhoto => 'Take Photo';
@@ -2306,6 +2325,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s18PatternMarker => 'Pattern Issue';
+
+  @override
+  String get s18SelfVerificationWarning =>
+      'Self-verification not permitted: Segregation of duties requires a different person to verify this CAP.';
+
+  @override
+  String get s18ReopenReasonMinLength =>
+      'Please provide a detailed reason (at least 10 characters).';
 
   @override
   String get s18AccessDenied =>

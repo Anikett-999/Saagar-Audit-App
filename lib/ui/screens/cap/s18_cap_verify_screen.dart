@@ -45,6 +45,7 @@ class _S18CapVerifyScreenState extends ConsumerState<S18CapVerifyScreen> {
   Audit? _originAudit;
   User? _responsibleUser;
   String? _photoPath;
+  String? _doneByUserId;
 
   bool _isLoading = true;
   bool _isSubmitting = false;
@@ -64,6 +65,9 @@ class _S18CapVerifyScreenState extends ConsumerState<S18CapVerifyScreen> {
         final cp = await CheckpointRepository.instance.getById(cap.originCheckpointId);
         final audit = await AuditRepository.instance.getById(cap.originAuditId);
         final user = await UserRepository.instance.getById(cap.responsibleUserId);
+        final logs = await CapRepository.instance.logFor(widget.capId);
+        final doneLogs = logs.where((l) => l.event == 'marked_done').toList();
+        final doneBy = doneLogs.isNotEmpty ? doneLogs.last.actorUserId : null;
 
         if (mounted) {
           setState(() {
@@ -71,6 +75,7 @@ class _S18CapVerifyScreenState extends ConsumerState<S18CapVerifyScreen> {
             _checkpoint = cp;
             _originAudit = audit;
             _responsibleUser = user;
+            _doneByUserId = doneBy;
             _requiresPhoto = cp != null && cp.requiresPhotoOnFail;
             _isLoading = false;
           });
@@ -115,6 +120,18 @@ class _S18CapVerifyScreenState extends ConsumerState<S18CapVerifyScreen> {
     final authState = ref.read(authProvider);
     final user = authState.user;
     if (user == null || (!user.isGm && !user.isOwner)) {
+      return;
+    }
+
+    final cap = _cap;
+    if (cap != null && (user.id == _doneByUserId || user.id == cap.responsibleUserId)) {
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s18SelfVerificationWarning),
+          backgroundColor: AppColors.red,
+        ),
+      );
       return;
     }
 
@@ -381,9 +398,9 @@ class _S18CapVerifyScreenState extends ConsumerState<S18CapVerifyScreen> {
             key: const ValueKey('s18_confirm_reopen_button'),
             onPressed: () {
               final reason = reasonController.text.trim();
-              if (reason.isEmpty) {
+              if (reason.length < 10) {
                 ScaffoldMessenger.of(ctx).showSnackBar(
-                  SnackBar(content: Text(l10n.s18MissingReasonError)),
+                  SnackBar(content: Text(l10n.s18ReopenReasonMinLength)),
                 );
                 return;
               }
@@ -898,10 +915,44 @@ class _S18CapVerifyScreenState extends ConsumerState<S18CapVerifyScreen> {
   }
 
   Widget _buildDecisionButtons(AppLocalizations l10n) {
-    final canPass = !_requiresPhoto || (_photoPath != null && _photoPath!.trim().isNotEmpty);
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
+    final cap = _cap;
+    final isSelfVerification = user != null &&
+        cap != null &&
+        (_doneByUserId == user.id || cap.responsibleUserId == user.id);
+    final canPass = !isSelfVerification &&
+        (!_requiresPhoto || (_photoPath != null && _photoPath!.trim().isNotEmpty));
 
     return Column(
       children: [
+        if (isSelfVerification) ...[
+          Container(
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: AppColors.redPale,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.red),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.block, color: AppColors.red, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    l10n.s18SelfVerificationWarning,
+                    style: const TextStyle(
+                      color: AppColors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
         // Pass & Verify Button
         SizedBox(
           width: double.infinity,

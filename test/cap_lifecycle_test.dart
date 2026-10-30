@@ -414,6 +414,16 @@ void main() {
         'status': 'done',
         'opened_at': '2026-09-20T10:00:00Z',
       });
+      fakeDb.tables['cap_actions']!.add({
+        'id': 'act-reopen-1',
+        'cap_id': 'CAP-2026-W39-08',
+        'sequence': 1,
+        'action_text': 'Step 1',
+        'is_done': 1,
+        'done_at': '2026-09-24T10:00:00Z',
+        'done_by': 'user-sm-1',
+        'done_notes': 'Completed',
+      });
 
       await repo.reopenCap(
         capId: 'CAP-2026-W39-08',
@@ -425,6 +435,12 @@ void main() {
       expect(updated!.status, equals('reopened'));
       expect(updated.isReopened, isTrue);
       expect(updated.isOpen, isTrue);
+
+      // Item 6 (Client Ref F21): Action steps must be reset to incomplete on reopen
+      final actions = await repo.actionsFor('CAP-2026-W39-08');
+      expect(actions.first.isDone, isFalse);
+      expect(actions.first.doneAt, isNull);
+      expect(actions.first.doneBy, isNull);
 
       final logs = await repo.logFor('CAP-2026-W39-08');
       final reopenLog = logs.lastWhere((l) => l.event == 'reopened');
@@ -487,10 +503,187 @@ void main() {
         () => repo.reopenCap(
           capId: 'CAP-2026-W39-10',
           actorId: gmUser.id,
-          reason: 'Some reason',
+          reason: 'Valid reopen reason for test',
         ),
         throwsA(isA<StateError>()),
       );
+
+      // Reopen reason < 10 characters rejected
+      fakeDb.tables['caps']!.add({
+        'id': 'CAP-2026-W39-10-DONE',
+        'origin_audit_id': 'audit-10',
+        'origin_checkpoint_id': '1.1',
+        'problem_statement': 'Test',
+        'why_1': 'Why',
+        'root_cause': 'Root',
+        'responsible_user_id': 'user-sm-1',
+        'deadline': '2026-09-25',
+        'verification_method': 'Method',
+        'status': 'done',
+        'opened_at': '2026-09-20T10:00:00Z',
+      });
+      expect(
+        () => repo.reopenCap(
+          capId: 'CAP-2026-W39-10-DONE',
+          actorId: gmUser.id,
+          reason: 'Short',
+        ),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('10b. Item 6 (Client Ref F21): verifyCap rejects self-verification', () async {
+      // 1. Verifier is the responsible user
+      fakeDb.tables['caps']!.add({
+        'id': 'CAP-SELF-VERIFY-1',
+        'origin_audit_id': 'audit-sv1',
+        'origin_checkpoint_id': '1.1',
+        'problem_statement': 'Self verify test',
+        'why_1': 'Why',
+        'root_cause': 'Root',
+        'responsible_user_id': gmUser.id, // assigned to GM
+        'deadline': '2026-10-01',
+        'verification_method': 'Inspection',
+        'status': 'done',
+        'opened_at': '2026-09-20T10:00:00Z',
+      });
+
+      expect(
+        () => repo.verifyCap(
+          capId: 'CAP-SELF-VERIFY-1',
+          verifierId: gmUser.id,
+        ),
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.message,
+            'message',
+            contains('cannot verify a CAP assigned to themselves'),
+          ),
+        ),
+      );
+
+      // 2. Verifier is the user who marked it done (Four-Eyes Principle)
+      fakeDb.tables['caps']!.add({
+        'id': 'CAP-SELF-VERIFY-2',
+        'origin_audit_id': 'audit-sv2',
+        'origin_checkpoint_id': '1.1',
+        'problem_statement': 'Self verify test 2',
+        'why_1': 'Why',
+        'root_cause': 'Root',
+        'responsible_user_id': 'user-sm-1',
+        'deadline': '2026-10-01',
+        'verification_method': 'Inspection',
+        'status': 'done',
+        'opened_at': '2026-09-20T10:00:00Z',
+      });
+      fakeDb.tables['cap_log']!.add({
+        'id': 'log-done-2',
+        'cap_id': 'CAP-SELF-VERIFY-2',
+        'event': 'marked_done',
+        'from_status': 'open',
+        'to_status': 'done',
+        'actor_user_id': gmUser.id, // marked done by GM
+        'device_id': 'dev-1',
+        'timestamp': '2026-09-24T12:00:00Z',
+        'note': 'Done by GM',
+      });
+
+      expect(
+        () => repo.verifyCap(
+          capId: 'CAP-SELF-VERIFY-2',
+          verifierId: gmUser.id,
+        ),
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.message,
+            'message',
+            contains('Four-Eyes Principle'),
+          ),
+        ),
+      );
+    });
+
+    test('10c. Item 6 & 18: markDone segregation of duties, mandatory notes, and photo validation', () async {
+      fakeDb.tables['caps']!.add({
+        'id': 'CAP-VAL-1',
+        'origin_audit_id': 'audit-val1',
+        'origin_checkpoint_id': '1.2', // CP 1.2 requires photo on fail
+        'problem_statement': 'Validation test',
+        'why_1': 'Why',
+        'root_cause': 'Root',
+        'responsible_user_id': 'user-sm-1',
+        'deadline': '2026-10-01',
+        'verification_method': 'Inspection',
+        'status': 'open',
+        'opened_at': '2026-09-20T10:00:00Z',
+      });
+      fakeDb.tables['cap_actions']!.add({
+        'id': 'act-val-1',
+        'cap_id': 'CAP-VAL-1',
+        'sequence': 1,
+        'action_text': 'Step 1',
+        'is_done': 1,
+        'done_at': '2026-09-24T10:00:00Z',
+        'done_by': 'user-sm-1',
+      });
+
+      // 1. Non-responsible user (GM) attempts markDone -> rejected
+      expect(
+        () => repo.markDone(
+          capId: 'CAP-VAL-1',
+          userId: gmUser.id,
+          doneNotes: 'Valid completion notes text',
+        ),
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.message,
+            'message',
+            contains('Segregation of duties: only the assigned responsible user'),
+          ),
+        ),
+      );
+
+      // 2. Notes < 10 characters -> rejected
+      expect(
+        () => repo.markDone(
+          capId: 'CAP-VAL-1',
+          userId: 'user-sm-1',
+          doneNotes: 'Too short',
+        ),
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            contains('at least 10 characters'),
+          ),
+        ),
+      );
+
+      // 3. Photo checkpoint without photo -> rejected
+      expect(
+        () => repo.markDone(
+          capId: 'CAP-VAL-1',
+          userId: 'user-sm-1',
+          doneNotes: 'Valid completion notes text',
+        ),
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            contains('Evidence photo is mandatory'),
+          ),
+        ),
+      );
+
+      // 4. Valid completion notes and photo -> succeeds
+      await repo.markDone(
+        capId: 'CAP-VAL-1',
+        userId: 'user-sm-1',
+        doneNotes: 'Valid completion notes text with sufficient detail',
+        photoPath: '/mock/evidence/fix.jpg',
+      );
+      final updated = await repo.getById('CAP-VAL-1');
+      expect(updated!.status, equals('done'));
     });
 
     test('11. Pattern CAP end-to-end: is_pattern=1 flows open -> done -> verified -> closed seamlessly', () async {
@@ -523,7 +716,11 @@ void main() {
       }
 
       // Mark CAP done
-      await repo.markDone(capId: cap.id, userId: smUser.id);
+      await repo.markDone(
+        capId: cap.id,
+        userId: smUser.id,
+        doneNotes: 'All pattern corrective actions implemented.',
+      );
       final doneCap = await repo.getById(cap.id);
       expect(doneCap!.status, equals('done'));
       expect(doneCap.isPattern, isTrue);

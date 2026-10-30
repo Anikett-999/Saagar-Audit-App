@@ -2964,19 +2964,43 @@ abstract class AppLocalizations {
   /// No description provided for @s17SectionDoneNotes.
   ///
   /// In en, this message translates to:
-  /// **'Done Notes / Reflection (optional)'**
+  /// **'Completion Notes (Mandatory)'**
   String get s17SectionDoneNotes;
 
   /// No description provided for @s17DoneNotesHint.
   ///
   /// In en, this message translates to:
-  /// **'Describe how the issue was resolved or notes for verification...'**
+  /// **'Describe how the issue was resolved (min 10 characters)...'**
   String get s17DoneNotesHint;
+
+  /// No description provided for @s17NotesMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum 10 characters required ({count}/10)'**
+  String s17NotesMinLength(int count);
+
+  /// No description provided for @s17PhotoRequiredNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Evidence photo is mandatory for this checkpoint before marking done.'**
+  String get s17PhotoRequiredNotice;
+
+  /// No description provided for @s17OnlyResponsibleCanMarkDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the assigned responsible user ({name}) can mark this CAP done.'**
+  String s17OnlyResponsibleCanMarkDone(String name);
+
+  /// No description provided for @s16OnlyResponsibleCanMarkDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the assigned responsible user ({name}) can mark this CAP done.'**
+  String s16OnlyResponsibleCanMarkDone(String name);
 
   /// No description provided for @s17SectionEvidencePhoto.
   ///
   /// In en, this message translates to:
-  /// **'Completion Evidence Photo (optional)'**
+  /// **'Completion Evidence Photo'**
   String get s17SectionEvidencePhoto;
 
   /// No description provided for @s17TakePhoto.
@@ -4220,6 +4244,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pattern Issue'**
   String get s18PatternMarker;
+
+  /// No description provided for @s18SelfVerificationWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Self-verification not permitted: Segregation of duties requires a different person to verify this CAP.'**
+  String get s18SelfVerificationWarning;
+
+  /// No description provided for @s18ReopenReasonMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide a detailed reason (at least 10 characters).'**
+  String get s18ReopenReasonMinLength;
 
   /// No description provided for @s18AccessDenied.
   ///

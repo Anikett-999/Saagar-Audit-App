@@ -1157,7 +1157,12 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
     final isResponsible = currentUser != null && currentUser.id == cap.responsibleUserId;
     final isGmOrOwner = currentUser != null && (currentUser.isGm || currentUser.isOwner);
     final isOwner = currentUser != null && currentUser.isOwner;
-    final canMarkDone = (isResponsible || isGmOrOwner) && allActionsDone;
+    final canMarkDone = isResponsible && allActionsDone;
+
+    final responsibleUser = _userMap[cap.responsibleUserId];
+    final responsibleName = responsibleUser != null
+        ? '${responsibleUser.name} (${responsibleUser.role})'
+        : cap.responsibleUserId;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1181,7 +1186,16 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
-          if (!allActionsDone)
+          if (!isResponsible)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                l10n.s16OnlyResponsibleCanMarkDone(responsibleName.isEmpty ? cap.responsibleUserId : responsibleName),
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 11, color: AppColors.gray600, fontStyle: FontStyle.italic),
+              ),
+            )
+          else if (!allActionsDone)
             Padding(
               padding: const EdgeInsets.only(top: 6),
               child: Text(

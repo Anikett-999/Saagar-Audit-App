@@ -1590,14 +1590,33 @@ class AppLocalizationsMr extends AppLocalizations {
       'चेतावणी: अपूर्ण कृती पावले शिल्लक आहेत. ही CAP पूर्ण चिन्हांकित करण्यापूर्वी सर्व कृती पावले पूर्ण केली पाहिजेत.';
 
   @override
-  String get s17SectionDoneNotes => 'पूर्ण नोंदी / शेरे (ऐच्छिक)';
+  String get s17SectionDoneNotes => 'पूर्णता नोंदी (अनिवार्य)';
 
   @override
   String get s17DoneNotesHint =>
-      'समस्या कशी सोडवली गेली याचे वर्णन किंवा पडताळणीसाठी नोंदी...';
+      'समस्या कशी सोडवली गेली याचे वर्णन करा (किमान १० अक्षरे)...';
 
   @override
-  String get s17SectionEvidencePhoto => 'पूर्णता पुरावा फोटो (ऐच्छिक)';
+  String s17NotesMinLength(int count) {
+    return 'किमान १० अक्षरे आवश्यक आहेत ($count/१०)';
+  }
+
+  @override
+  String get s17PhotoRequiredNotice =>
+      'हे CAP पूर्ण म्हणून चिन्हांकित करण्यापूर्वी या तपासणीसाठी पुरावा फोटो अनिवार्य आहे.';
+
+  @override
+  String s17OnlyResponsibleCanMarkDone(String name) {
+    return 'केवळ नियुक्त जबाबदार वापरकर्ता ($name) हे CAP पूर्ण म्हणून चिन्हांकित करू शकतात.';
+  }
+
+  @override
+  String s16OnlyResponsibleCanMarkDone(String name) {
+    return 'केवळ नियुक्त जबाबदार वापरकर्ता ($name) हे CAP पूर्ण म्हणून चिन्हांकित करू शकतात.';
+  }
+
+  @override
+  String get s17SectionEvidencePhoto => 'पूर्णता पुरावा फोटो';
 
   @override
   String get s17TakePhoto => 'फोटो काढा';
@@ -2309,6 +2328,14 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s18PatternMarker => 'वारंवार आढळलेली समस्या';
+
+  @override
+  String get s18SelfVerificationWarning =>
+      'स्वतः पडताळणी करण्याची परवानगी नाही: कामाचे विभाजन नियमानुसार CAP पूर्ण करणाऱ्या व्यक्तीपेक्षा पडताळणी करणारी व्यक्ती वेगळी असणे आवश्यक आहे.';
+
+  @override
+  String get s18ReopenReasonMinLength =>
+      'कृपया सविस्तर कारण द्या (किमान १० अक्षरे).';
 
   @override
   String get s18AccessDenied =>

@@ -646,6 +646,57 @@ void main() {
   });
 
   testWidgets(
+      'S16 CAP Detail Screen Tests (Spec §5 S16) Item 6: Mark Done button is disabled for GM when assigned to SM',
+      (tester) async {
+    const capId = 'CAP-SEG-DUTIES';
+
+    fakeDb.tables['caps'] = [
+      {
+        'id': capId,
+        'origin_audit_id': 'audit-1',
+        'origin_checkpoint_id': '1.1',
+        'problem_statement': 'Segregation test',
+        'why_1': 'Why 1',
+        'root_cause': 'Root cause',
+        'responsible_user_id': smUser.id, // assigned to SM
+        'deadline': '2026-10-01',
+        'verification_method': 'Inspection',
+        'status': 'open',
+        'opened_at': '2026-09-24T00:00:00Z',
+      },
+    ];
+
+    fakeDb.tables['cap_actions'] = [
+      {
+        'id': 'act-seg-1',
+        'cap_id': capId,
+        'sequence': 1,
+        'action_text': 'Action step 1',
+        'is_done': 1,
+      },
+    ];
+
+    fakeDb.tables['cap_log'] = [];
+
+    // GM views the CAP
+    await pumpCapDetail(
+      tester,
+      authState: const AuthState(user: gmUser),
+      capId: capId,
+    );
+
+    // Button should be disabled for GM even though all actions are done
+    final buttonFinder = find.byKey(const ValueKey('s16_mark_done_button'));
+    expect(buttonFinder, findsOneWidget);
+    final elevatedButton = tester.widget<ElevatedButton>(buttonFinder);
+    expect(elevatedButton.onPressed, isNull);
+    expect(
+      find.textContaining('can mark this CAP done'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets(
       'S16 CAP Detail Screen Tests (Spec §5 S16) Phase 2: Open CAP has enabled Request Extension button for GM',
       (tester) async {
     fakeDb.tables['caps'] = [

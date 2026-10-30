@@ -269,8 +269,8 @@ void main() {
       expect(find.textContaining('Audit key log twice daily'), findsOneWidget);
 
       // Verify Done Notes & Evidence Photo sections
-      expect(find.text('Done Notes / Reflection (optional)'), findsOneWidget);
-      expect(find.text('Completion Evidence Photo (optional)'), findsOneWidget);
+      expect(find.text('Completion Notes (Mandatory)'), findsOneWidget);
+      expect(find.text('Completion Evidence Photo'), findsOneWidget);
       expect(find.byKey(const ValueKey('s17_take_photo_button')), findsOneWidget);
 
       // Verify Advisory Card
@@ -279,8 +279,20 @@ void main() {
         findsOneWidget,
       );
 
-      // Verify Confirm button is ENABLED
-      final confirmBtn = tester.widget<ElevatedButton>(
+      // Item 18 (Client Ref F20): Confirm button is DISABLED before entering notes
+      var confirmBtn = tester.widget<ElevatedButton>(
+        find.byKey(const ValueKey('s17_confirm_button')),
+      );
+      expect(confirmBtn.onPressed, isNull);
+
+      // Enter note >= 10 chars -> Confirm button becomes ENABLED
+      await tester.enterText(
+        find.byKey(const ValueKey('s17_done_notes_input')),
+        'All corrective actions executed successfully.',
+      );
+      await tester.pumpAndSettle();
+
+      confirmBtn = tester.widget<ElevatedButton>(
         find.byKey(const ValueKey('s17_confirm_button')),
       );
       expect(confirmBtn.onPressed, isNotNull);
@@ -429,11 +441,87 @@ void main() {
       expect(find.textContaining('जबाबदार:'), findsOneWidget);
       expect(find.text('पूर्ण झालेली कृती पावले'), findsOneWidget);
       expect(find.textContaining('कृती पावले पूर्ण झाली आहेत'), findsOneWidget);
-      expect(find.text('पूर्ण नोंदी / शेरे (ऐच्छिक)'), findsOneWidget);
-      expect(find.text('पूर्णता पुरावा फोटो (ऐच्छिक)'), findsOneWidget);
+      expect(find.text('पूर्ण नोंदी / शेरे (ऐच्छिक)'), findsNothing);
+      expect(find.text('पूर्णता नोंदी (अनिवार्य)'), findsOneWidget);
+      expect(find.text('पूर्णता पुरावा फोटो'), findsOneWidget);
       expect(find.text('फोटो काढा'), findsOneWidget);
       expect(find.text('पुष्टी करा आणि पूर्ण खूण करा'), findsOneWidget);
       expect(find.text('रद्द करा'), findsOneWidget);
+    });
+
+    testWidgets('Item 6: Disables Confirm button and displays banner if viewer is NOT responsible user', (tester) async {
+      await pumpCapMarkDone(
+        tester,
+        authState: const AuthState(user: AuthUser(id: 'user-gm-1', name: 'Priya Patel', role: 'GM', languagePref: 'en')),
+        capId: 'CAP-2026-W38-01',
+      );
+
+      // Banner displayed
+      expect(find.textContaining('Only the assigned responsible user'), findsOneWidget);
+
+      // Even with notes entered, confirm button remains disabled
+      await tester.enterText(
+        find.byKey(const ValueKey('s17_done_notes_input')),
+        'All corrective actions executed successfully.',
+      );
+      await tester.pumpAndSettle();
+
+      final confirmBtn = tester.widget<ElevatedButton>(
+        find.byKey(const ValueKey('s17_confirm_button')),
+      );
+      expect(confirmBtn.onPressed, isNull);
+    });
+
+    testWidgets('Item 18: Requires photo if checkpoint has requires_photo_on_fail=1', (tester) async {
+      // Seed checkpoint with requires_photo_on_fail = 1
+      fakeDb.tables['checkpoints'] = [
+        {
+          'id': 'cp-cash-01',
+          'sop_id': 'sop-6',
+          'frequency': 'daily',
+          'sequence': 1,
+          'text_en': 'Cash drawer locked',
+          'text_mr': 'कॅश ड्रॉवर लॉक',
+          'weight': 2,
+          'allows_na': 0,
+          'requires_photo_on_fail': 1,
+          'display_order': 1,
+        },
+      ];
+
+      await pumpCapMarkDone(
+        tester,
+        authState: authStateSm,
+        capId: 'CAP-2026-W38-01',
+        onPickPhoto: () async => '/mock/evidence/drawer_locked.jpg',
+      );
+
+      // Enter notes >= 10 chars
+      await tester.enterText(
+        find.byKey(const ValueKey('s17_done_notes_input')),
+        'Drawer locked and verified.',
+      );
+      await tester.pumpAndSettle();
+
+      // REQUIRED badge visible and photo notice visible
+      expect(find.text('REQUIRED'), findsOneWidget);
+      expect(find.textContaining('Evidence photo is mandatory'), findsOneWidget);
+
+      // Confirm button is DISABLED without photo
+      var confirmBtn = tester.widget<ElevatedButton>(
+        find.byKey(const ValueKey('s17_confirm_button')),
+      );
+      expect(confirmBtn.onPressed, isNull);
+
+      // Attach photo
+      await tester.tap(find.byKey(const ValueKey('s17_take_photo_button')));
+      await tester.pumpAndSettle();
+
+      // Confirm button is now ENABLED
+      confirmBtn = tester.widget<ElevatedButton>(
+        find.byKey(const ValueKey('s17_confirm_button')),
+      );
+      expect(confirmBtn.onPressed, isNotNull);
     });
   });
 }

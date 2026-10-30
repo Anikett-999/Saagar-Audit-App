@@ -9,6 +9,7 @@ import '../../../data/models/cap_action.dart';
 import '../../../data/models/user.dart';
 import '../../../data/photo_service.dart';
 import '../../../data/repositories/cap_repository.dart';
+import '../../../data/repositories/checkpoint_repository.dart';
 import '../../../data/repositories/user_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
@@ -51,15 +52,22 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
 
   bool _isLoading = true;
   bool _isSubmitting = false;
+  bool _requiresPhoto = false;
 
   @override
   void initState() {
     super.initState();
+    _notesController.addListener(_onNotesChanged);
     _loadData();
+  }
+
+  void _onNotesChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
+    _notesController.removeListener(_onNotesChanged);
     _notesController.dispose();
     super.dispose();
   }
@@ -71,11 +79,13 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
       if (cap != null) {
         final actions = await CapRepository.instance.actionsFor(widget.capId);
         final user = await UserRepository.instance.getById(cap.responsibleUserId);
+        final cp = await CheckpointRepository.instance.getById(cap.originCheckpointId);
         if (mounted) {
           setState(() {
             _cap = cap;
             _actions = actions;
             _responsibleUser = user;
+            _requiresPhoto = cp != null && cp.requiresPhotoOnFail;
             _isLoading = false;
           });
         }
@@ -127,14 +137,49 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
     }
 
     final l10n = AppLocalizations.of(context)!;
+
+    // Item 6: Segregation of duties - only responsible user can mark done
+    if (user.id != cap.responsibleUserId) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s17OnlyResponsibleCanMarkDone(_responsibleUser?.name ?? cap.responsibleUserId)),
+          backgroundColor: AppColors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    final notesText = _notesController.text.trim();
+    if (notesText.length < 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s17NotesMinLength(notesText.length)),
+          backgroundColor: AppColors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    if (_requiresPhoto && (_photoPath == null || _photoPath!.trim().isEmpty)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s17PhotoRequiredNotice),
+          backgroundColor: AppColors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isSubmitting = true);
 
     try {
-      final notesText = _notesController.text.trim();
       await CapRepository.instance.markDone(
         capId: cap.id,
         userId: user.id,
-        doneNotes: notesText.isEmpty ? null : notesText,
+        doneNotes: notesText,
         photoPath: _photoPath,
       );
 
@@ -222,15 +267,49 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
 
   Widget _buildContent(AppLocalizations l10n) {
     final cap = _cap!;
+    final auth = ref.watch(authProvider);
+    final currentUser = auth.user;
+    final isResponsible = currentUser != null && currentUser.id == cap.responsibleUserId;
     final allActionsDone = _actions.isNotEmpty && _actions.every((a) => a.isDone);
     final isCapActionable = cap.isOpen;
-    final canSubmit = isCapActionable && allActionsDone && !_isSubmitting;
+    final hasValidNotes = _notesController.text.trim().length >= 10;
+    final hasPhotoIfRequired = !_requiresPhoto || (_photoPath != null && _photoPath!.trim().isNotEmpty);
+    final canSubmit = isCapActionable && allActionsDone && isResponsible && hasValidNotes && hasPhotoIfRequired && !_isSubmitting;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Role Guard Notice: only responsible user can mark done
+          if (!isResponsible) ...[
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.redPale,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.red),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.lock_outline, color: AppColors.red, size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      l10n.s17OnlyResponsibleCanMarkDone(_responsibleUser?.name ?? cap.responsibleUserId),
+                      style: const TextStyle(
+                        color: AppColors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+
           // 1. Summary Card
           _buildSummaryCard(l10n, cap),
           const SizedBox(height: 16),
@@ -239,11 +318,11 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
           _buildActionStepsCard(l10n, allActionsDone),
           const SizedBox(height: 16),
 
-          // 3. Optional Done Notes
+          // 3. Mandatory Done Notes (min 10 chars)
           _buildDoneNotesCard(l10n),
           const SizedBox(height: 16),
 
-          // 4. Optional Evidence Photo
+          // 4. Evidence Photo (Mandatory if requires_photo_on_fail)
           _buildEvidencePhotoCard(l10n),
           const SizedBox(height: 16),
 
@@ -524,6 +603,9 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
   }
 
   Widget _buildDoneNotesCard(AppLocalizations l10n) {
+    final noteLength = _notesController.text.trim().length;
+    final isValid = noteLength >= 10;
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -546,6 +628,22 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
                     ),
                   ),
                 ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: isValid ? AppColors.greenPale : AppColors.amberPale,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: isValid ? AppColors.green : AppColors.amber),
+                  ),
+                  child: Text(
+                    '$noteLength/10',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: isValid ? AppColors.green : AppColors.amber,
+                    ),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -565,6 +663,13 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
                 contentPadding: const EdgeInsets.all(12),
               ),
             ),
+            if (!isValid) ...[
+              const SizedBox(height: 6),
+              Text(
+                l10n.s17NotesMinLength(noteLength),
+                style: const TextStyle(fontSize: 11, color: AppColors.amberDark, fontWeight: FontWeight.w500),
+              ),
+            ],
           ],
         ),
       ),
@@ -594,8 +699,32 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
                     ),
                   ),
                 ),
+                if (_requiresPhoto)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: _photoPath != null ? AppColors.greenPale : AppColors.redPale,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: _photoPath != null ? AppColors.green : AppColors.red),
+                    ),
+                    child: Text(
+                      l10n.s18PhotoRequiredBadge,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: _photoPath != null ? AppColors.green : AppColors.red,
+                      ),
+                    ),
+                  ),
               ],
             ),
+            if (_requiresPhoto && _photoPath == null) ...[
+              const SizedBox(height: 8),
+              Text(
+                l10n.s17PhotoRequiredNotice,
+                style: const TextStyle(fontSize: 12, color: AppColors.red, fontWeight: FontWeight.w500),
+              ),
+            ],
             const SizedBox(height: 12),
             if (_photoPath == null)
               OutlinedButton.icon(

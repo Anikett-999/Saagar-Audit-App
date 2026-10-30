@@ -370,7 +370,11 @@ void main() {
       );
 
       expect(
-        () => repo.markDone(capId: capId, userId: 'user-sm-1'),
+        () => repo.markDone(
+          capId: capId,
+          userId: 'user-sm-1',
+          doneNotes: 'Step 1 done only',
+        ),
         throwsStateError,
       );
     });
@@ -408,11 +412,19 @@ void main() {
       for (final id in actionIds) {
         await repo.toggleAction(actionId: id, done: true, userId: 'user-sm-1');
       }
-      await repo.markDone(capId: capId, userId: 'user-sm-1');
+      await repo.markDone(
+        capId: capId,
+        userId: 'user-sm-1',
+        doneNotes: 'All physical replacements completed.',
+      );
 
       // Attempt second markDone
       expect(
-        () => repo.markDone(capId: capId, userId: 'user-sm-1'),
+        () => repo.markDone(
+          capId: capId,
+          userId: 'user-sm-1',
+          doneNotes: 'All physical replacements completed.',
+        ),
         throwsStateError,
       );
     });
