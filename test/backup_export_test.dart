@@ -273,18 +273,13 @@ void main() {
         localeNotifier: localeNotifier,
       );
 
-      // Tap Export Database button within runAsync so real File I/O completes
+      // Tap Export Database button and wait for File I/O to complete inside runAsync
       await tester.runAsync(() async {
         await tester.tap(find.text('Export Database JSON'));
-        await Future<void>.delayed(const Duration(milliseconds: 50));
-        var pollCount = 0;
-        while (find.byType(CircularProgressIndicator).evaluate().isNotEmpty && pollCount < 120) {
-          await Future<void>.delayed(const Duration(milliseconds: 50));
-          pollCount++;
-        }
+        await Future<void>.delayed(const Duration(milliseconds: 300));
       });
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump(const Duration(milliseconds: 200));
 
       // Verify success dialog is shown
       expect(find.byType(AlertDialog), findsOneWidget);

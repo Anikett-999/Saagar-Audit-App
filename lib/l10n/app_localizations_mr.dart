@@ -1823,20 +1823,45 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s13ExportPdf => 'PDF निर्यात';
 
   @override
-  String get s13ExportPdfTooltip => 'PDF निर्यात टप्पा २ साठी नियोजित आहे';
+  String get s13ExportPdfTooltip => '१-पानाचा ऑडिट PDF निर्यात करा';
 
   @override
   String get s13ShareWhatsApp => 'WhatsApp ला शेअर करा';
 
   @override
-  String get s13ShareWhatsAppTooltip =>
-      'WhatsApp शेअर टप्पा २ साठी नियोजित आहे';
+  String get s13ShareWhatsAppTooltip => 'WhatsApp वर ऑडिट सारांश शेअर करा';
 
   @override
   String get s13VerifyAudit => 'ऑडिट पडताळा';
 
   @override
-  String get s13VerifyAuditTooltip => 'ऑडिट पडताळणी टप्पा २ साठी नियोजित आहे';
+  String get s13VerifyAuditTooltip => 'GM किंवा मालक म्हणून हे ऑडिट पडताळा';
+
+  @override
+  String get s13VerifyConfirmTitle => 'ऑडिट पडताळणी';
+
+  @override
+  String s13VerifyConfirmMessage(String role, String name) {
+    return 'तुम्हाला खात्री आहे का की तुम्ही $role: $name म्हणून हे ऑडिट पडताळू इच्छिता?';
+  }
+
+  @override
+  String get s13VerifySuccess => 'ऑडिट यशस्वीरित्या पडताळले गेले.';
+
+  @override
+  String get s13PdfGenerating => 'ऑडिट PDF तयार करत आहे...';
+
+  @override
+  String s13PdfExportError(String error) {
+    return 'PDF निर्यात अयशस्वी: $error';
+  }
+
+  @override
+  String get s13WhatsAppSuccess => 'WhatsApp उघडत आहे...';
+
+  @override
+  String get s13WhatsAppCopied =>
+      'WhatsApp उघडता आले नाही. सारांश क्लिपबोर्डवर कॉपी केला!';
 
   @override
   String get s13NotFound => 'ऑडिट आढळले नाही';

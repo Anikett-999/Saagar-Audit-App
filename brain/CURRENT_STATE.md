@@ -15,7 +15,7 @@
 | **S10** | Daily Audit Summary | ✅ Complete | Localized, score card, SOP table, mandatory-photo validation |
 | **S11** | Submit Confirmation | ✅ Complete | Localized, animated checkmark, final score, offline sync indicator |
 | **S12**    | Audit History | ✅ Complete | Role-scoped (SM own, GM/Owner all), filter chips (All, Daily, Unverified), compliance % pill, band color, fail count, infinite scroll (30/pg), pull-to-refresh |
-| **S13**    | Audit Detail | ✅ Complete | Read-only immutable view of submitted audits, score card, SOP breakdown table, expandable checkpoints, non-compliances with photos & linked CAP chip, "+ Create CAP" launch to S15 |
+| **S13**    | Audit Detail | ✅ Complete | Read-only immutable view of submitted audits, score card, SOP breakdown table, expandable checkpoints, non-compliances with photos & linked CAP chip, "+ Create CAP" launch to S15, role-based Verify Audit (GM & Owner), Daily Audit PDF export & share sheet, and WhatsApp sharing |
 | **S14**    | CAP List | ✅ Complete | Filterable/searchable CAP list, deadline color-coding, S05 nav wired, EN/MR parity |
 | **S15**    | CAP Create | ✅ Complete | 10-field template, 5-Whys, 3–5 dynamic action steps, responsible dropdown, deadline picker, EN/MR parity |
 | **S16**    | CAP Detail | ✅ Complete | Full CAP view, action checklist, event log timeline, state/role-gated buttons, Phase 2 stubs |

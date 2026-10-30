@@ -12,11 +12,11 @@
 |---|:---:|:---:|:---:|:---:|
 | **A. Backup, Cloud Sync & Data Safety** (Items 1–5) | 5 | 2 (Items 1, 3) | 0 | 3 (Items 2, 4, 5) |
 | **B. Roles, Controls & Security** (Items 6–8) | 3 | 1 (Item 7) | 0 | 2 (Items 6, 8) |
-| **C. Alerts, Escalations, Cash & Reports** (Items 9–16) | 8 | 2 (Items 13, 14) | 0 | 6 (Items 9–12, 15, 16) |
+| **C. Alerts, Escalations, Cash & Reports** (Items 9–16) | 8 | 3 (Items 13, 14, 15) | 0 | 5 (Items 9–12, 16) |
 | **D. Corrective Action Plan (CAP) Controls** (Items 17–19) | 3 | 1 (Item 19) | 0 | 2 (Items 17, 18) |
 | **E. Language, Permissions & Layout** (Items 20–26) | 7 | 2 (Items 25, 26) | 0 | 5 (Items 20–24) |
 | **F. General Ease of Use** (Item 27 UX Points) | 1 | 0 | 0 | 1 (Item 27) |
-| **TOTAL** | **27** | **8 Solved** | **0 In Progress** | **19 Pending** |
+| **TOTAL** | **27** | **9 Solved** | **0 In Progress** | **18 Pending** |
 
 ---
 
@@ -182,10 +182,15 @@
 #### Item 15: Daily audit detail buttons are "Phase 2" placeholders
 - **Priority:** Medium | **Client Ref:** F03
 - **Problem:** Tapping "Export PDF", "Verify", or "Share" on S13 Daily Audit Detail shows "scheduled for Phase 2" snackbar.
-- **Required Fix:** Wire real PDF export / preview, share intent, and route GM verification directly to 7-Day Review.
-- **Status:** ⏳ **PENDING (Tier 1-4)**
-- **Commit:** —
-- **Files Changed:** —
+- **Required Fix:** Wire real PDF export / preview, WhatsApp share intent, and role-based verification directly on S13.
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** Pending commit
+- **Files Changed:** `lib/ui/screens/s13_audit_detail/audit_detail_screen.dart`, `lib/services/daily_audit_pdf_service.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `test/audit_detail_screen_test.dart`, `test/daily_audit_pdf_service_test.dart`, `test/backup_export_test.dart`
+- **Verification:**
+  1. **Verify Audit:** Role-based verification (GM & Owner only). Confirms without asking user to pick a role — automatically stamps the logged-in user's role and name. Updates database `status = 'verified'`, `verifier_id = user.id`, UTC timestamp. UI refreshes, replaces amber "SUBMITTED" badge with green "VERIFIED: <Name> (<Date>)" badge, and hides the verify button.
+  2. **Export PDF:** Created `DailyAuditPdfService` generating bilingual daily audit PDF (store metadata, score card, SOP breakdown table, fail findings, auditor/verifier signature blocks) and opens native system share modal using `Printing.sharePdf`.
+  3. **Share to WhatsApp:** Formats structured plain-text daily audit summary (Store, Date, Auditor, Score %, Band, Points, Status, Non-compliances list) and launches WhatsApp via `whatsapp://send` / `api.whatsapp.com` with clipboard copy fallback and toast feedback.
+  4. **Tests:** All 14/14 tests in `test/audit_detail_screen_test.dart` passing. 2/2 tests in `test/daily_audit_pdf_service_test.dart` passing. Full test suite: 391/391 tests passing (100% green). 0 analyzer issues.
 
 ---
 

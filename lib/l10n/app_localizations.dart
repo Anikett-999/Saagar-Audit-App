@@ -3348,7 +3348,7 @@ abstract class AppLocalizations {
   /// No description provided for @s13ExportPdfTooltip.
   ///
   /// In en, this message translates to:
-  /// **'PDF export is scheduled for Phase 2'**
+  /// **'Export 1-Page Audit PDF'**
   String get s13ExportPdfTooltip;
 
   /// No description provided for @s13ShareWhatsApp.
@@ -3360,7 +3360,7 @@ abstract class AppLocalizations {
   /// No description provided for @s13ShareWhatsAppTooltip.
   ///
   /// In en, this message translates to:
-  /// **'WhatsApp share is scheduled for Phase 2'**
+  /// **'Share audit summary on WhatsApp'**
   String get s13ShareWhatsAppTooltip;
 
   /// No description provided for @s13VerifyAudit.
@@ -3372,8 +3372,50 @@ abstract class AppLocalizations {
   /// No description provided for @s13VerifyAuditTooltip.
   ///
   /// In en, this message translates to:
-  /// **'Audit verification is scheduled for Phase 2'**
+  /// **'Verify this audit as GM or Owner'**
   String get s13VerifyAuditTooltip;
+
+  /// No description provided for @s13VerifyConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Audit'**
+  String get s13VerifyConfirmTitle;
+
+  /// No description provided for @s13VerifyConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to verify this audit as {role}: {name}?'**
+  String s13VerifyConfirmMessage(String role, String name);
+
+  /// No description provided for @s13VerifySuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit verified successfully.'**
+  String get s13VerifySuccess;
+
+  /// No description provided for @s13PdfGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating Audit PDF...'**
+  String get s13PdfGenerating;
+
+  /// No description provided for @s13PdfExportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to export PDF: {error}'**
+  String s13PdfExportError(String error);
+
+  /// No description provided for @s13WhatsAppSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening WhatsApp...'**
+  String get s13WhatsAppSuccess;
+
+  /// No description provided for @s13WhatsAppCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp could not be opened. Summary copied to clipboard!'**
+  String get s13WhatsAppCopied;
 
   /// No description provided for @s13NotFound.
   ///

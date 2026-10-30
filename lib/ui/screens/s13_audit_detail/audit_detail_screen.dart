@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../data/models/audit.dart';
 import '../../../data/models/audit_result.dart';
@@ -19,6 +21,7 @@ import '../../../data/repositories/report_repository.dart';
 import '../../../data/repositories/user_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../services/daily_audit_pdf_service.dart';
 import '../../../utils/app_date_format.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
@@ -60,6 +63,9 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
   Map<String, Cro> _crosById = const {};
   bool _loading = true;
   bool _notFound = false;
+  bool _verifying = false;
+  bool _exportingPdf = false;
+  bool _sharingWhatsApp = false;
 
   @override
   void initState() {
@@ -1210,6 +1216,187 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
     );
   }
 
+  Future<void> _handleVerifyAudit(AppLocalizations l10n) async {
+    final auth = ref.read(authProvider);
+    final user = auth.user;
+    if (user == null || (!user.isGm && !user.isOwner)) return;
+    final audit = _audit;
+    if (audit == null || audit.status != 'submitted') return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.s13VerifyConfirmTitle),
+        content: Text(
+          l10n.s13VerifyConfirmMessage(user.role, user.name),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.btnCancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.green,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(l10n.s13VerifyAudit),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _verifying = true);
+    try {
+      await AuditRepository.instance.verifyDailyAudit(
+        auditId: audit.id,
+        verifierId: user.id,
+        notes: 'Verified by ${user.role}: ${user.name}',
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s13VerifySuccess),
+          backgroundColor: AppColors.green,
+        ),
+      );
+      await _loadData();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to verify audit: $e'),
+          backgroundColor: AppColors.red,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _verifying = false);
+    }
+  }
+
+  Future<void> _handleExportPdf(AppLocalizations l10n) async {
+    final audit = _audit;
+    if (audit == null) return;
+
+    setState(() => _exportingPdf = true);
+    try {
+      await DailyAuditPdfService.instance.shareOrPrintPdf(
+        audit: audit,
+        auditorName: _auditorName,
+        verifierName: _verifierName,
+        sops: _sops,
+        checkpointsById: _checkpointsById,
+        results: _results,
+        crosById: _crosById,
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.s13PdfExportError(e.toString())),
+            backgroundColor: AppColors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _exportingPdf = false);
+    }
+  }
+
+  Future<void> _handleShareWhatsApp(AppLocalizations l10n) async {
+    final audit = _audit;
+    if (audit == null) return;
+
+    setState(() => _sharingWhatsApp = true);
+    try {
+      const storeName = 'Titan World (WLMHW) - Latur';
+      final fails = _results.where((r) => r.result.toUpperCase() == 'FAIL' || r.result.toUpperCase() == 'F').toList();
+      final complianceStr = (audit.compliancePct ?? 0.0).toStringAsFixed(1);
+      final bandStr = audit.band?.toUpperCase() ?? 'UNKNOWN';
+
+      final buffer = StringBuffer();
+      buffer.writeln('📋 *DAILY COMPLIANCE AUDIT REPORT*');
+      buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      buffer.writeln('🏬 *Store:* $storeName');
+      buffer.writeln('📅 *Date:* ${AppDateFormat.formatDate(audit.auditDate)}');
+      buffer.writeln('👤 *Auditor:* $_auditorName');
+      buffer.writeln('📊 *Score:* $complianceStr% ($bandStr)');
+      buffer.writeln('🎯 *Points:* ${(audit.rawScore ?? 0.0).toStringAsFixed(1)} / ${(audit.maxScore ?? 0.0).toStringAsFixed(0)}');
+      buffer.writeln('🔒 *Status:* ${audit.status.toUpperCase()}${audit.status == 'verified' && _verifierName != null ? " (Verified by $_verifierName)" : ""}');
+      buffer.writeln('');
+
+      if (fails.isEmpty) {
+        buffer.writeln('✅ *All checkpoints compliant — 0 defects!*');
+      } else {
+        buffer.writeln('⚠️ *Non-Compliances / Fails (${fails.length}):*');
+        for (var i = 0; i < fails.length; i++) {
+          final f = fails[i];
+          final cp = _checkpointsById[f.checkpointId];
+          final code = cp != null ? cp.id : f.checkpointId;
+          final title = cp?.textEn ?? f.checkpointId;
+          final cro = f.croId != null ? _crosById[f.croId] : null;
+          buffer.writeln('${i + 1}. *[$code] $title*');
+          buffer.writeln('   • *Finding:* ${f.findingText ?? "Defect observed"}');
+          if (cro != null) {
+            buffer.writeln('   • *CRO:* ${cro.name}');
+          }
+        }
+      }
+      buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      buffer.writeln('_Generated by Saagar Audit App_');
+
+      final messageText = buffer.toString();
+      final encodedText = Uri.encodeComponent(messageText);
+
+      final primaryUri = Uri.parse('whatsapp://send?text=$encodedText');
+      final fallbackUri = Uri.parse('https://api.whatsapp.com/send?text=$encodedText');
+
+      var launched = false;
+      try {
+        launched = await launchUrl(primaryUri, mode: LaunchMode.externalApplication);
+      } catch (_) {
+        try {
+          launched = await launchUrl(fallbackUri, mode: LaunchMode.externalApplication);
+        } catch (_) {
+          launched = false;
+        }
+      }
+
+      if (!mounted) return;
+      if (launched) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.s13WhatsAppSuccess),
+            backgroundColor: AppColors.green,
+          ),
+        );
+      } else {
+        await Clipboard.setData(ClipboardData(text: messageText));
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.s13WhatsAppCopied),
+            backgroundColor: AppColors.amber,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error sharing to WhatsApp: $e'),
+            backgroundColor: AppColors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _sharingWhatsApp = false);
+    }
+  }
+
   Widget _buildActionsSection(AppLocalizations l10n, String? userRole) {
     final isSubmitted = _audit?.status == 'submitted';
     final isManagement = userRole == 'OWNER' || userRole == 'GM';
@@ -1217,17 +1404,19 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // GM/Owner Verify Audit button (Phase 2 stub)
+        // GM/Owner Verify Audit button (Role-based verification)
         if (isSubmitted && isManagement) ...[
           Tooltip(
             message: l10n.s13VerifyAuditTooltip,
             child: OutlinedButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.s13VerifyAuditTooltip)),
-                );
-              },
-              icon: const Icon(Icons.verified_outlined, size: 18),
+              onPressed: _verifying ? null : () => _handleVerifyAudit(l10n),
+              icon: _verifying
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.verified_outlined, size: 18),
               label: Text(l10n.s13VerifyAudit),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.green,
@@ -1241,7 +1430,7 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
           ),
           const SizedBox(height: 12),
         ],
-        // PDF Export & WhatsApp Share Row (Phase 2 stubs per sprint plan)
+        // PDF Export & WhatsApp Share Row
         SizedBox(
           width: double.infinity,
           child: Wrap(
@@ -1251,24 +1440,28 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
               Tooltip(
                 message: l10n.s13ExportPdfTooltip,
                 child: OutlinedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.s13ExportPdfTooltip)),
-                    );
-                  },
-                  icon: const Icon(Icons.picture_as_pdf_outlined, size: 16),
+                  onPressed: _exportingPdf ? null : () => _handleExportPdf(l10n),
+                  icon: _exportingPdf
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.picture_as_pdf_outlined, size: 16),
                   label: Text(l10n.s13ExportPdf),
                 ),
               ),
               Tooltip(
                 message: l10n.s13ShareWhatsAppTooltip,
                 child: OutlinedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.s13ShareWhatsAppTooltip)),
-                    );
-                  },
-                  icon: const Icon(Icons.share, size: 16),
+                  onPressed: _sharingWhatsApp ? null : () => _handleShareWhatsApp(l10n),
+                  icon: _sharingWhatsApp
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.share, size: 16),
                   label: Text(l10n.s13ShareWhatsApp),
                 ),
               ),

@@ -867,11 +867,35 @@
   "s13CreateCap": "+ Create CAP",
   "s13NotesTitle": "Auditor Notes",
   "s13ExportPdf": "Export PDF",
-  "s13ExportPdfTooltip": "PDF export is scheduled for Phase 2",
+  "s13ExportPdfTooltip": "Export 1-Page Audit PDF",
   "s13ShareWhatsApp": "Share to WhatsApp",
-  "s13ShareWhatsAppTooltip": "WhatsApp share is scheduled for Phase 2",
+  "s13ShareWhatsAppTooltip": "Share audit summary on WhatsApp",
   "s13VerifyAudit": "Verify Audit",
-  "s13VerifyAuditTooltip": "Audit verification is scheduled for Phase 2",
+  "s13VerifyAuditTooltip": "Verify this audit as GM or Owner",
+  "s13VerifyConfirmTitle": "Verify Audit",
+  "s13VerifyConfirmMessage": "Are you sure you want to verify this audit as {role}: {name}?",
+  "@s13VerifyConfirmMessage": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "s13VerifySuccess": "Audit verified successfully.",
+  "s13PdfGenerating": "Generating Audit PDF...",
+  "s13PdfExportError": "Failed to export PDF: {error}",
+  "@s13PdfExportError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "s13WhatsAppSuccess": "Opening WhatsApp...",
+  "s13WhatsAppCopied": "WhatsApp could not be opened. Summary copied to clipboard!",
   "s13NotFound": "Audit not found",
   "s13BackToHistory": "Back to Audit History",
   "s13RefreshTooltip": "Refresh audit detail",

@@ -7159,3 +7159,45 @@ app-release.aab   54955804  04-10-2026 19:48:39
   - Push commit `34952a5` to remote.
   - Present physical device verification steps for Item 25 to user.
   - Proceed with next bug fix.
+
+---
+
+### Handoff: 30 October 2026 — S13 Audit Detail Buttons (Item 15 · F03)
+**Author**: Antigravity  
+**Goal**: Wire the 3 placeholder buttons on Screen S13 (Daily Audit Detail) for UAT Item 15 (Client Ref: F03): Role-based Verify Audit (GM/Owner only), Daily Audit PDF Export & Share Sheet, and WhatsApp Sharing with formatted summary.
+
+- **Completed Implementations**:
+  1. **Role-Based Verify Audit (`AuditDetailScreen` & `AuditRepository`)**:
+     - Visible strictly when `audit.status == 'submitted'` AND user is `GM` or `OWNER` (hidden from SM per Spec §5 S13).
+     - Directly verifies audit using logged-in user's role and user ID without prompting to select "verify as GM/Owner".
+     - Confirmation dialog confirms verification: `Are you sure you want to verify this audit as {role}: {name}?`.
+     - Executes `AuditRepository.instance.verifyDailyAudit(auditId: audit.id, verifierId: user.id, notes: 'Verified by ${user.role}: ${user.name}')`.
+     - Automatically refreshes audit data: button disappears immediately, header switches from amber `SUBMITTED` to green `VERIFIED`, displaying verifier's full name and formatted date.
+  2. **Daily Audit PDF Export (`DailyAuditPdfService`)**:
+     - Built `DailyAuditPdfService` in `lib/services/daily_audit_pdf_service.dart`.
+     - Formats clean 1-to-2 page PDF layout: Store header & date metadata, Score card (Points, Compliance %, Band badge), SOP Breakdown summary table, Non-Compliances table with fail finding text and assigned CRO, Auditor notes, and Auditor/Verifier signature blocks.
+     - Utilizes bundled `NotoSansDevanagari` font with automatic Helvetica fallback.
+     - Invokes `Printing.sharePdf(bytes: bytes, filename: 'Daily_Audit_${audit.auditDate}.pdf')` to trigger the native Android/system share sheet.
+  3. **Share to WhatsApp Intent (`_handleShareWhatsApp`)**:
+     - Builds structured plain-text daily audit summary (Store, Date, Auditor, Score %, Band, Points, Verification Status, Non-compliances list with Checkpoint ID, finding description, and CRO attribution).
+     - Attempts deep link via `whatsapp://send?text=...` and fallback `https://api.whatsapp.com/send?text=...` (`LaunchMode.externalApplication`).
+     - Automatic Clipboard fallback with snackbar notification if WhatsApp app is not installed on device.
+  4. **Localization & Translations**:
+     - Added/updated strings in `assets/translations/app_en.arb` and `assets/translations/app_mr.arb` (`s13ExportPdfTooltip`, `s13ShareWhatsAppTooltip`, `s13VerifyAuditTooltip`, `s13VerifyConfirmTitle`, `s13VerifyConfirmMessage`, `s13VerifySuccess`, `s13PdfGenerating`, `s13PdfExportError`, `s13WhatsAppSuccess`, `s13WhatsAppCopied`).
+     - Regenerated localizations with `flutter gen-l10n`.
+  5. **Automated Testing Suite**:
+     - Added 2 new tests in `test/daily_audit_pdf_service_test.dart` (2/2 passing).
+     - Updated `test/audit_detail_screen_test.dart` with GM role-based verification, Owner role-based verification, and PDF/WhatsApp button interaction tests (14/14 passing).
+     - Fixed `test/backup_export_test.dart` async File I/O pump timing (8/8 passing).
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze lib test`: **No issues found!** (ran in 4.3s).
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5).
+  - `flutter test test/audit_detail_screen_test.dart`: **All 14 tests passed!**
+  - `flutter test test/daily_audit_pdf_service_test.dart`: **All 2 tests passed!**
+  - `flutter test test/backup_export_test.dart`: **All 8 tests passed!**
+  - `flutter test`: **All 391/391 tests passed!** (100% green across entire repository).
+- **Next Immediate Task**:
+  - Review changes and commit Item 15 to `fix/part-b-bugs`.
+  - Push branch to `origin/fix/part-b-bugs`.
+  - Present physical device verification steps for Item 15 to user.
+

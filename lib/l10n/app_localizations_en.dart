@@ -1820,21 +1820,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s13ExportPdf => 'Export PDF';
 
   @override
-  String get s13ExportPdfTooltip => 'PDF export is scheduled for Phase 2';
+  String get s13ExportPdfTooltip => 'Export 1-Page Audit PDF';
 
   @override
   String get s13ShareWhatsApp => 'Share to WhatsApp';
 
   @override
-  String get s13ShareWhatsAppTooltip =>
-      'WhatsApp share is scheduled for Phase 2';
+  String get s13ShareWhatsAppTooltip => 'Share audit summary on WhatsApp';
 
   @override
   String get s13VerifyAudit => 'Verify Audit';
 
   @override
-  String get s13VerifyAuditTooltip =>
-      'Audit verification is scheduled for Phase 2';
+  String get s13VerifyAuditTooltip => 'Verify this audit as GM or Owner';
+
+  @override
+  String get s13VerifyConfirmTitle => 'Verify Audit';
+
+  @override
+  String s13VerifyConfirmMessage(String role, String name) {
+    return 'Are you sure you want to verify this audit as $role: $name?';
+  }
+
+  @override
+  String get s13VerifySuccess => 'Audit verified successfully.';
+
+  @override
+  String get s13PdfGenerating => 'Generating Audit PDF...';
+
+  @override
+  String s13PdfExportError(String error) {
+    return 'Failed to export PDF: $error';
+  }
+
+  @override
+  String get s13WhatsAppSuccess => 'Opening WhatsApp...';
+
+  @override
+  String get s13WhatsAppCopied =>
+      'WhatsApp could not be opened. Summary copied to clipboard!';
 
   @override
   String get s13NotFound => 'Audit not found';
