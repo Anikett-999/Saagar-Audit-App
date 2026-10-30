@@ -7201,3 +7201,52 @@ app-release.aab   54955804  04-10-2026 19:48:39
   - Push branch to `origin/fix/part-b-bugs`.
   - Present physical device verification steps for Item 15 to user.
 
+---
+
+### Handoff: 30 October 2026 — CAP Segregation of Duties & Mandatory Evidence (Item 6 · F21 & Item 18 · F20)
+**Author**: Antigravity  
+**Goal**: Resolve Item 6 (Client Ref: F21) & Item 18 (Client Ref: F20) per Sagar Bora's UAT feedback:
+1. Prevent GM or non-responsible users from marking CAP done when assigned to someone else.
+2. Prevent self-verification: verifier must be a different user from who completed the CAP (Four-Eyes Principle) and cannot verify a CAP assigned to themselves.
+3. Reset all action steps (`cap_actions`) to incomplete upon CAP reopening so actions must be redone.
+4. Enforce mandatory completion notes (minimum 10 characters) and photo evidence (where origin checkpoint requires evidence on fail) before marking done.
+5. Enforce mandatory detailed reason (minimum 10 characters) on verification failure / reopening.
+
+- **Completed Implementations**:
+  1. **CapRepository Layer (`lib/data/repositories/cap_repository.dart`)**:
+     - `markDone`: Enforces `cap.responsibleUserId == userId` (throws `StateError`). Validates `doneNotes.trim().length >= 10` (throws `ArgumentError`). Validates photo attachment when `originCheckpoint.requiresPhotoOnFail == true` (throws `ArgumentError`).
+     - `verifyCap`: Enforces segregation of duties — rejects self-verification if `cap.responsibleUserId == verifierId` or if `lastMarkedDoneUserId == verifierId` via `cap_log` query (throws `StateError`).
+     - `reopenCap`: Enforces `reason.trim().length >= 10` (throws `ArgumentError`). In transaction, resets all `cap_actions` (`is_done = 0`, `done_at = null`, `done_by = null`, `done_notes = null`) and logs `event = 'reopened'`.
+  2. **Screen S16 CAP Detail (`lib/ui/screens/s16_cap_detail/cap_detail_screen.dart`)**:
+     - Updated `canMarkDone = isResponsible && allActionsDone;` (removed `|| isGmOrOwner`).
+     - When viewer is not the responsible user and CAP is open, displays an explanatory italic message: *"Only the assigned responsible user ({name}) can mark this CAP done."*
+  3. **Screen S17 CAP Mark Done (`lib/ui/screens/s17_cap_mark_done/cap_mark_done_screen.dart`)**:
+     - Fetches checkpoint to check `requiresPhotoOnFail`.
+     - Displays role guard alert card if viewer is not the assigned responsible user and disables confirm button.
+     - Changed section title to *"Completion Notes (Mandatory)"* with live character counter (`{count}/10`).
+     - Renders `REQUIRED` badge on photo card when origin checkpoint requires photo on fail, with warning notice if not attached.
+     - Added text controller listener so confirm button dynamically enables only when all steps are done, notes >= 10 chars, photo attached if required, and viewer is responsible user.
+  4. **Screen S18 CAP Verify (`lib/ui/screens/cap/s18_cap_verify_screen.dart`)**:
+     - Queries `cap_log` for the user who marked it done (`_doneByUserId`).
+     - If current user is the user who completed the CAP or responsible user, displays prominent red warning banner: *"Self-verification not permitted: Segregation of duties requires a different person to verify this CAP."* and disables `Pass & Verify` button.
+     - Validates Reopen at Plan dialog reason length >= 10 characters.
+  5. **Bilingual Parity (Rule #8)**:
+     - Added English & authentic Marathi strings in `app_en.arb` and `app_mr.arb` (`s17NotesMinLength`, `s17PhotoRequiredNotice`, `s17OnlyResponsibleCanMarkDone`, `s18SelfVerificationWarning`, `s18ReopenReasonMinLength`, `s16OnlyResponsibleCanMarkDone`).
+     - Generated with `flutter gen-l10n`.
+  6. **Automated Testing Suite**:
+     - `test/helpers/fake_database.dart`: Added `where == 'cap_id = ?'` support to `update` for action reset testing.
+     - `test/cap_lifecycle_test.dart`: Added test 10b (rejects self-verification for responsible user & who marked done), test 10c (markDone segregation, note length, and mandatory photo validation), and verified action steps reset in test 8 (16/16 passing).
+     - `test/cap_detail_screen_test.dart`: Added test for GM disabled Mark Done button with segregation message (12/12 passing).
+     - `test/cap_mark_done_screen_test.dart`: Added tests for non-responsible viewer disabled state, min note length enforcement, and photo requirement on fail-photo checkpoints (9/9 passing).
+     - `test/s18_cap_verify_screen_test.dart`: Added test 9 (Reopen at Plan reason >= 10 chars and action steps reset) and test 10 (Self-verification banner and disabled button) (10/10 passing).
+     - Full automated test suite: **398/398 passing (100% green)**.
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze lib test`: **No issues found!** (ran in 5.3s).
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5).
+  - `flutter test`: **All 398/398 tests passed!** (ran in 1m 4s).
+- **Next Immediate Task**:
+  - Review changes and commit Item 6 & Item 18 to `fix/part-b-bugs`.
+  - Push branch to `origin/fix/part-b-bugs`.
+  - Hand baton to user / Claude for physical device verification.
+
+

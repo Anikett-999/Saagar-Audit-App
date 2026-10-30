@@ -11,12 +11,12 @@
 | Category | Total | ✅ Solved & Verified | 🔄 In Progress | ⏳ Pending |
 |---|:---:|:---:|:---:|:---:|
 | **A. Backup, Cloud Sync & Data Safety** (Items 1–5) | 5 | 2 (Items 1, 3) | 0 | 3 (Items 2, 4, 5) |
-| **B. Roles, Controls & Security** (Items 6–8) | 3 | 1 (Item 7) | 0 | 2 (Items 6, 8) |
+| **B. Roles, Controls & Security** (Items 6–8) | 3 | 2 (Items 6, 7) | 0 | 1 (Item 8) |
 | **C. Alerts, Escalations, Cash & Reports** (Items 9–16) | 8 | 3 (Items 13, 14, 15) | 0 | 5 (Items 9–12, 16) |
-| **D. Corrective Action Plan (CAP) Controls** (Items 17–19) | 3 | 1 (Item 19) | 0 | 2 (Items 17, 18) |
+| **D. Corrective Action Plan (CAP) Controls** (Items 17–19) | 3 | 2 (Items 18, 19) | 0 | 1 (Item 17) |
 | **E. Language, Permissions & Layout** (Items 20–26) | 7 | 2 (Items 25, 26) | 0 | 5 (Items 20–24) |
 | **F. General Ease of Use** (Item 27 UX Points) | 1 | 0 | 0 | 1 (Item 27) |
-| **TOTAL** | **27** | **9 Solved** | **0 In Progress** | **18 Pending** |
+| **TOTAL** | **27** | **11 Solved** | **0 In Progress** | **16 Pending** |
 
 ---
 
@@ -81,10 +81,11 @@
 #### Item 6: GM can mark a CAP done and verify it himself
 - **Priority:** High | **Client Ref:** F21
 - **Problem:** GM assigned CAP to SM, but GM was able to click "Mark CAP Done" and then immediately verify it himself. Also "Reopen at Plan" left action steps ticked and didn't require a failed verification reason.
-- **Required Fix:** Only assigned responsible user can mark CAP done. Verifier MUST be a different user. Reopening resets action steps. Failed verification requires mandatory reason note.
-- **Status:** ⏳ **PENDING (Tier 2)**
-- **Commit:** —
-- **Files Changed:** —
+- **Required Fix:** Only assigned responsible user can mark CAP done. Verifier MUST be a different user (Four-Eyes Principle). Reopening resets action steps. Failed verification requires mandatory reason note (min 10 chars).
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** `eb22124` (`fix(cap): enforce segregation of duties, action steps reset on reopen, and mandatory evidence (Items 6 & 18)`)
+- **Files Changed:** `lib/data/repositories/cap_repository.dart`, `lib/ui/screens/s16_cap_detail/cap_detail_screen.dart`, `lib/ui/screens/s17_cap_mark_done/cap_mark_done_screen.dart`, `lib/ui/screens/cap/s18_cap_verify_screen.dart`, `test/helpers/fake_database.dart`, `test/cap_lifecycle_test.dart`, `test/cap_detail_screen_test.dart`, `test/cap_mark_done_screen_test.dart`, `test/s18_cap_verify_screen_test.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`
+- **Verification:** 10/10 tests in `test/s18_cap_verify_screen_test.dart`, 12/12 tests in `test/cap_detail_screen_test.dart`, 16/16 tests in `test/cap_lifecycle_test.dart`, 9/9 tests in `test/cap_mark_done_screen_test.dart`. Full suite 398/398 passing. 0 analyzer issues.
 
 ---
 
@@ -217,12 +218,13 @@
 ---
 
 #### Item 18: CAP can be marked done with no note or photo
-- **Priority:** Medium | **Client Ref:** F22
+- **Priority:** Medium | **Client Ref:** F20 (F22 in review doc)
 - **Problem:** Store Manager can mark a CAP resolved without providing any evidence photo or completion note.
-- **Required Fix:** Enforce mandatory completion note (minimum 10 characters) and photo evidence before allowing "Mark CAP Done".
-- **Status:** ⏳ **PENDING (Tier 2)**
-- **Commit:** —
-- **Files Changed:** —
+- **Required Fix:** Enforce mandatory completion note (minimum 10 characters) and photo evidence (when origin checkpoint has `requires_photo_on_fail == 1`) before allowing "Mark CAP Done".
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** `eb22124` (`fix(cap): enforce segregation of duties, action steps reset on reopen, and mandatory evidence (Items 6 & 18)`)
+- **Files Changed:** `lib/data/repositories/cap_repository.dart`, `lib/ui/screens/s17_cap_mark_done/cap_mark_done_screen.dart`, `test/cap_lifecycle_test.dart`, `test/cap_mark_done_screen_test.dart`, `test/cap_repository_test.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`
+- **Verification:** 9/9 tests in `test/cap_mark_done_screen_test.dart`, 16/16 tests in `test/cap_lifecycle_test.dart`. Full suite 398/398 passing. 0 analyzer issues.
 
 #### Item 19: "Request Extension" can move deadline earlier
 - **Priority:** Low | **Client Ref:** F19 (F22 in review doc)
