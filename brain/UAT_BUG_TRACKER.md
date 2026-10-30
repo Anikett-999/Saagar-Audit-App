@@ -113,7 +113,7 @@
 - **Problem:** 5 wrong PINs locked the whole screen for everyone (Owner couldn't log in if SM got locked out). Wrong digits remained stuck in box. Lockout duration didn't increase on repeated failures.
 - **Required Fix:** Track lockout per user ID. Increase lockout progressively (60s ➔ 5m ➔ 15m). Clear PIN box immediately on wrong entry. Alert Super Admin on repeated lockouts.
 - **Status:** ✅ **SOLVED & VERIFIED**
-- **Commit:** uncommitted (`fix(auth): implement per-user lockout, progressive backoff (60s/5m/15m), and instant PIN reset (Item 8)`)
+- **Commit:** `555650d` (`fix(auth): implement per-user lockout, progressive backoff (60s/5m/15m), and instant PIN reset (Item 8 / F23)`)
 - **Files Changed:** `lib/providers/auth_provider.dart`, `lib/ui/screens/s04_login/login_screen.dart`, `lib/ui/widgets/pin_numpad.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `test/auth_lockout_test.dart`
 - **Verification:** 10/10 tests passing in `test/auth_lockout_test.dart`, 12/12 canonical score tests green, 406/406 full test suite green. 0 analyzer issues. Verified per-user isolation, progressive durations (60s -> 300s -> 900s), instant numpad dot clearing, and dropdown non-blocking.
 
