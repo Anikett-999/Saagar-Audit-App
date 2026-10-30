@@ -124,5 +124,90 @@ void main() {
       expect(notifier2.state.isLockedOut, isTrue);
     });
   });
+
+  group('Per-User Lockout & Progressive Back-Off (Item 8 / Client Ref F23)', () {
+    setUp(() {
+      SharedPreferences.setMockInitialValues({});
+    });
+
+    test('Wrong attempts for User A (SM) lock out User A only, leaving User B (Owner) unlocked', () {
+      final notifier = AuthNotifier();
+      const smId = 'user-sm-001';
+      const ownerId = 'user-owner-001';
+
+      // SM fails 5 times
+      for (var i = 0; i < 5; i++) {
+        notifier.registerFailureForUser(smId);
+      }
+
+      // SM is locked out
+      expect(notifier.state.isUserLockedOut(smId), isTrue);
+      expect(notifier.state.userLockoutRemaining(smId).inSeconds, inInclusiveRange(55, 60));
+      expect(notifier.state.userFailedAttempts(smId), 0); // reset upon lockout trigger
+
+      // Owner is completely unlocked
+      expect(notifier.state.isUserLockedOut(ownerId), isFalse);
+      expect(notifier.state.userLockoutRemaining(ownerId), Duration.zero);
+      expect(notifier.state.userFailedAttempts(ownerId), 0);
+    });
+
+    test('Progressive lockout increases penalty: 60s -> 300s (5m) -> 900s (15m)', () {
+      final notifier = AuthNotifier();
+      const gmId = 'user-gm-001';
+      final now = DateTime.now();
+
+      // Lockout 1: 5 fails -> 60s
+      for (var i = 0; i < 5; i++) {
+        notifier.registerFailureForUser(gmId, at: now.add(Duration(seconds: i)));
+      }
+      expect(notifier.state.isUserLockedOut(gmId), isTrue);
+      final info1 = notifier.state.userLockouts[gmId]!;
+      expect(info1.consecutiveLockouts, 1);
+      expect(info1.lockoutUntil!.difference(now.add(const Duration(seconds: 4))).inSeconds, 60);
+
+      // Fast-forward after 60s: Lockout 2 -> 5 fails -> 300s (5 minutes)
+      final afterLockout1 = now.add(const Duration(seconds: 65));
+      for (var i = 0; i < 5; i++) {
+        notifier.registerFailureForUser(gmId, at: afterLockout1.add(Duration(seconds: i)));
+      }
+      expect(notifier.state.isUserLockedOut(gmId), isTrue);
+      final info2 = notifier.state.userLockouts[gmId]!;
+      expect(info2.consecutiveLockouts, 2);
+      expect(info2.lockoutUntil!.difference(afterLockout1.add(const Duration(seconds: 4))).inSeconds, 300);
+
+      // Fast-forward after 300s: Lockout 3 -> 5 fails -> 900s (15 minutes)
+      final afterLockout2 = afterLockout1.add(const Duration(seconds: 305));
+      for (var i = 0; i < 5; i++) {
+        notifier.registerFailureForUser(gmId, at: afterLockout2.add(Duration(seconds: i)));
+      }
+      expect(notifier.state.isUserLockedOut(gmId), isTrue);
+      final info3 = notifier.state.userLockouts[gmId]!;
+      expect(info3.consecutiveLockouts, 3);
+      expect(info3.lockoutUntil!.difference(afterLockout2.add(const Duration(seconds: 4))).inSeconds, 900);
+    });
+
+    test('Per-user lockout persists and rehydrates across app restarts', () async {
+      final prefs = await SharedPreferences.getInstance();
+      final notifier1 = AuthNotifier(prefs: prefs);
+      const smId = 'user-sm-persisted';
+      const ownerId = 'user-owner-persisted';
+
+      // SM fails 5 times
+      for (var i = 0; i < 5; i++) {
+        notifier1.registerFailureForUser(smId);
+      }
+      await notifier1.lastPersistOperation;
+
+      // Verify stored in prefs under auth_user_lockouts_v2
+      expect(prefs.getString('auth_user_lockouts_v2'), isNotNull);
+
+      // Rehydrate in new notifier instance
+      final notifier2 = AuthNotifier(prefs: prefs);
+      await notifier2.loadPersistedState(prefs: prefs);
+
+      expect(notifier2.state.isUserLockedOut(smId), isTrue);
+      expect(notifier2.state.isUserLockedOut(ownerId), isFalse);
+    });
+  });
 }
 

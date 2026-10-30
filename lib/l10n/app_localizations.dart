@@ -620,6 +620,12 @@ abstract class AppLocalizations {
   /// **'Wrong PIN. {attempts} attempts left.'**
   String s04WrongPinAttemptsLeft(int attempts);
 
+  /// No description provided for @s04WrongPinOneAttemptLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong PIN. 1 attempt left.'**
+  String get s04WrongPinOneAttemptLeft;
+
   /// No description provided for @s04TooManyAttempts.
   ///
   /// In en, this message translates to:

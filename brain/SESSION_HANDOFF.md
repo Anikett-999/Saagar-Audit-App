@@ -7321,3 +7321,44 @@ app-release.aab   54955804  04-10-2026 19:48:39
 - **Git Commit**: `f72f5df` (`fix(cap): scope checkpoint dropdown to audit failures and seal self-reopening loophole (Items 17 & 6)`) pushed to `origin/fix/part-b-bugs`.
 - **Next Immediate Task**:
   - Proceed to next bug fix (Cluster A: Audit Submit & Escalations flow).
+
+
+---
+
+### Handoff: 30 October 2026 — Per-User PIN Lockout, Progressive Backoff & Instant Numpad Reset (Item 8 — Client Ref: F23)
+**Author**: Antigravity  
+**Goal**: Resolve Item 8 (Client Ref: F23 / Section B) addressing Saagar Bora's exact observations from physical UAT:
+1. **Per-User Lockout Isolation**: Prevent global screen lockout when one user fails their PIN 5 times. If Store Manager is locked out, Owner and GM must remain completely unlocked and able to log in.
+2. **Progressive Back-Off Lockout Durations**:
+   - 1st lockout (5 wrong PINs in 60s): **60 seconds** (1 minute)
+   - 2nd consecutive lockout: **300 seconds** (5 minutes)
+   - 3rd+ consecutive lockout: **900 seconds** (15 minutes)
+   - Successful login resets the consecutive lockout counter for that user.
+3. **Instant Numpad Clearing & Responsive Keypad**:
+   - Fixed bug where toggling `_shakeNumpad = !_shakeNumpad` caused every 2nd wrong attempt to skip resetting the PIN dots and leave the keypad frozen until backspaced 4 times.
+   - Added `errorCount` triggering immediate `setState(() => _pin = '')` and shake animation on *every single failed attempt*.
+   - Added `key: ValueKey(_selectedUserId)` so switching names immediately resets numpad state.
+4. **Always-Active Dropdown**:
+   - Removed `onChanged: locked ? null : ...` so user dropdown is NEVER disabled during a lockout. Switching users shows the selected user's active timer or numpad.
+5. **Security Audit Logging**:
+   - Logged lockout events to SQLite `audit_log` with operation `'update'`, user ID, duration, and consecutive lockout count.
+6. **Grammatical Pluralization Fix**:
+   - Fixed `"1 attempts left"` to display `"1 attempt left"` (EN: `s04WrongPinOneAttemptLeft`, MR: `चुकीचा पिन. १ प्रयत्न शिल्लक आहे.`).
+
+- **Files Changed**:
+  - `lib/providers/auth_provider.dart`: Added `UserLockoutInfo`, per-user lockout map `userLockouts`, progressive backoff helper `getLockoutDuration`, `isUserLockedOut`, `userLockoutRemaining`, `userFailedAttempts`, `registerFailureForUser`, `audit_log` insertion, and SharedPreferences persistence (`auth_user_lockouts_v2`).
+  - `lib/ui/screens/s04_login/login_screen.dart`: Wired per-user lockout queries, always-active dropdown, reactive timer for selected user, singular/plural attempt message, and `errorCount` on `PinNumpad`.
+  - `lib/ui/widgets/pin_numpad.dart`: Added `errorCount` prop and immediate `_pin = ''` reset on error.
+  - `assets/translations/app_en.arb` & `app_mr.arb`: Added `s04WrongPinOneAttemptLeft`.
+  - `test/auth_lockout_test.dart`: Added 3 comprehensive tests verifying per-user isolation, progressive lockout durations (60s -> 300s -> 900s), and persistence.
+
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze`: **No issues found! (ran in 8.8s)**
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5)
+  - `flutter test test/auth_lockout_test.dart`: **All 10 tests passed!**
+  - `flutter test`: **All 406/406 tests passed! (ran in 1m 01s across 46 files)**
+
+- **Next Immediate Task**:
+  - Present verification steps to user for Item 8.
+  - Commit changes to `fix/part-b-bugs` following user/Claude review.
+  - Proceed to next pending bug (Item 9: WhatsApp Sent confirmation / F01).

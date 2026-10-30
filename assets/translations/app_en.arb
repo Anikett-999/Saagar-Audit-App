@@ -104,6 +104,7 @@
   "@s04LockedCountdown": {"placeholders": {"seconds": {"type": "int"}}},
   "s04WrongPinAttemptsLeft": "Wrong PIN. {attempts} attempts left.",
   "@s04WrongPinAttemptsLeft": {"placeholders": {"attempts": {"type": "int"}}},
+  "s04WrongPinOneAttemptLeft": "Wrong PIN. 1 attempt left.",
   "s04TooManyAttempts": "Too many wrong attempts. Try again in {seconds}s.",
   "@s04TooManyAttempts": {"placeholders": {"seconds": {"type": "int"}}},
 

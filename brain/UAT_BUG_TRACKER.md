@@ -11,12 +11,12 @@
 | Category | Total | ✅ Solved & Verified | 🔄 In Progress | ⏳ Pending |
 |---|:---:|:---:|:---:|:---:|
 | **A. Backup, Cloud Sync & Data Safety** (Items 1–5) | 5 | 2 (Items 1, 3) | 0 | 3 (Items 2, 4, 5) |
-| **B. Roles, Controls & Security** (Items 6–8) | 3 | 2 (Items 6, 7) | 0 | 1 (Item 8) |
+| **B. Roles, Controls & Security** (Items 6–8) | 3 | 3 (Items 6, 7, 8) | 0 | 0 |
 | **C. Alerts, Escalations, Cash & Reports** (Items 9–16) | 8 | 3 (Items 13, 14, 15) | 0 | 5 (Items 9–12, 16) |
 | **D. Corrective Action Plan (CAP) Controls** (Items 17–19) | 3 | 3 (Items 17, 18, 19) | 0 | 0 |
 | **E. Language, Permissions & Layout** (Items 20–26) | 7 | 2 (Items 25, 26) | 0 | 5 (Items 20–24) |
 | **F. General Ease of Use** (Item 27 UX Points) | 1 | 0 | 0 | 1 (Item 27) |
-| **TOTAL** | **27** | **12 Solved** | **0 In Progress** | **15 Pending** |
+| **TOTAL** | **27** | **13 Solved** | **0 In Progress** | **14 Pending** |
 
 ---
 
@@ -112,9 +112,10 @@
 - **Priority:** Medium | **Client Ref:** F23
 - **Problem:** 5 wrong PINs locked the whole screen for everyone (Owner couldn't log in if SM got locked out). Wrong digits remained stuck in box. Lockout duration didn't increase on repeated failures.
 - **Required Fix:** Track lockout per user ID. Increase lockout progressively (60s ➔ 5m ➔ 15m). Clear PIN box immediately on wrong entry. Alert Super Admin on repeated lockouts.
-- **Status:** ⏳ **PENDING (Tier 2)**
-- **Commit:** —
-- **Files Changed:** —
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** uncommitted (`fix(auth): implement per-user lockout, progressive backoff (60s/5m/15m), and instant PIN reset (Item 8)`)
+- **Files Changed:** `lib/providers/auth_provider.dart`, `lib/ui/screens/s04_login/login_screen.dart`, `lib/ui/widgets/pin_numpad.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `test/auth_lockout_test.dart`
+- **Verification:** 10/10 tests passing in `test/auth_lockout_test.dart`, 12/12 canonical score tests green, 406/406 full test suite green. 0 analyzer issues. Verified per-user isolation, progressive durations (60s -> 300s -> 900s), instant numpad dot clearing, and dropdown non-blocking.
 
 ---
 

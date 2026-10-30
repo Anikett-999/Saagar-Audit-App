@@ -280,6 +280,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get s04WrongPinOneAttemptLeft => 'Wrong PIN. 1 attempt left.';
+
+  @override
   String s04TooManyAttempts(int seconds) {
     return 'Too many wrong attempts. Try again in ${seconds}s.';
   }

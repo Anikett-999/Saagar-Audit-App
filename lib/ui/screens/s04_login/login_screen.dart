@@ -32,6 +32,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   List<Map<String, Object?>> _users = const [];
   String? _selectedUserId;
   bool _shakeNumpad = false;
+  int _errorCount = 0;
   String? _error;
   bool _loading = true;
   Timer? _lockoutTimer;
@@ -58,7 +59,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _syncLockoutTimer(AuthState auth) {
-    if (auth.isLockedOut) {
+    final uid = _selectedUserId;
+    if (uid != null && auth.isUserLockedOut(uid)) {
       if (_lockoutTimer == null || !_lockoutTimer!.isActive) {
         _lockoutTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
           if (!mounted) {
@@ -66,7 +68,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             return;
           }
           final currentAuth = ref.read(authProvider);
-          if (!currentAuth.isLockedOut) {
+          if (!currentAuth.isUserLockedOut(_selectedUserId)) {
             timer.cancel();
             _lockoutTimer = null;
             setState(() {
@@ -74,10 +76,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             });
           } else {
             final l10n = AppLocalizations.of(context);
+            final rem = currentAuth.userLockoutRemaining(_selectedUserId);
             setState(() {
               _error = l10n != null
-                  ? l10n.s04TooManyAttempts(currentAuth.lockoutRemaining.inSeconds)
-                  : 'Too many wrong attempts. Try again in ${currentAuth.lockoutRemaining.inSeconds}s.';
+                  ? l10n.s04TooManyAttempts(rem.inSeconds)
+                  : 'Too many wrong attempts. Try again in ${rem.inSeconds}s.';
             });
           }
         });
@@ -136,13 +139,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     final auth = ref.read(authProvider);
     final l10n = AppLocalizations.of(context)!;
+    final userLocked = auth.isUserLockedOut(uid);
+    final attemptsLeft = 5 - auth.userFailedAttempts(uid);
+
     setState(() {
+      _errorCount++;
       _shakeNumpad = !_shakeNumpad;
-      if (auth.isLockedOut) {
-        _error = l10n.s04TooManyAttempts(auth.lockoutRemaining.inSeconds);
+      if (userLocked) {
+        final rem = auth.userLockoutRemaining(uid);
+        _error = l10n.s04TooManyAttempts(rem.inSeconds);
         _syncLockoutTimer(auth);
       } else {
-        _error = l10n.s04WrongPinAttemptsLeft(5 - auth.failedAttempts);
+        if (attemptsLeft == 1) {
+          _error = l10n.s04WrongPinOneAttemptLeft;
+        } else {
+          _error = l10n.s04WrongPinAttemptsLeft(attemptsLeft);
+        }
       }
     });
   }
@@ -157,7 +169,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     final l10n = AppLocalizations.of(context)!;
     final auth = ref.watch(authProvider);
-    final locked = auth.isLockedOut;
+    final userLocked = auth.isUserLockedOut(_selectedUserId);
+    final userRemaining = auth.userLockoutRemaining(_selectedUserId);
     _syncLockoutTimer(auth);
 
     return Scaffold(
@@ -191,9 +204,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: Text('${u['name']}  ·  ${u['role']}'),
                     ),
                 ],
-                onChanged: locked
-                    ? null
-                    : (v) => setState(() => _selectedUserId = v),
+                onChanged: (v) {
+                  setState(() {
+                    _selectedUserId = v;
+                    _error = null;
+                  });
+                },
               ),
               const SizedBox(height: 32),
               Text(
@@ -204,11 +220,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               const SizedBox(height: 16),
               Expanded(
                 child: Center(
-                  child: locked
-                      ? _buildLockout(l10n, auth.lockoutRemaining)
+                  child: userLocked
+                      ? _buildLockout(l10n, userRemaining)
                       : PinNumpad(
+                          key: ValueKey(_selectedUserId),
                           onPinComplete: _onPin,
                           shake: _shakeNumpad,
+                          errorCount: _errorCount,
                         ),
                 ),
               ),

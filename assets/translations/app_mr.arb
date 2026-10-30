@@ -103,6 +103,7 @@
   "@s04LockedCountdown": {"placeholders": {"seconds": {"type": "int"}}},
   "s04WrongPinAttemptsLeft": "चुकीचा पिन. {attempts} प्रयत्न शिल्लक आहेत.",
   "@s04WrongPinAttemptsLeft": {"placeholders": {"attempts": {"type": "int"}}},
+  "s04WrongPinOneAttemptLeft": "चुकीचा पिन. १ प्रयत्न शिल्लक आहे.",
   "s04TooManyAttempts": "अनेक चुकीचे प्रयत्न. {seconds} सेकंदात पुन्हा प्रयत्न करा.",
   "@s04TooManyAttempts": {"placeholders": {"seconds": {"type": "int"}}},
 

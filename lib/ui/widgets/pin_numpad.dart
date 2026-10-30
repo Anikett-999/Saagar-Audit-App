@@ -11,6 +11,7 @@ class PinNumpad extends StatefulWidget {
   const PinNumpad({
     required this.onPinComplete,
     this.shake = false,
+    this.errorCount = 0,
     super.key,
   });
 
@@ -18,6 +19,9 @@ class PinNumpad extends StatefulWidget {
 
   /// Set true to trigger an error shake animation (used after a wrong PIN).
   final bool shake;
+
+  /// Incremented whenever a PIN error occurs to guarantee shake + reset.
+  final int errorCount;
 
   @override
   State<PinNumpad> createState() => _PinNumpadState();
@@ -40,11 +44,13 @@ class _PinNumpadState extends State<PinNumpad>
   @override
   void didUpdateWidget(PinNumpad oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.shake && !oldWidget.shake) {
+    final shouldShake =
+        (widget.errorCount > 0 && widget.errorCount != oldWidget.errorCount) ||
+        (widget.shake && !oldWidget.shake);
+    if (shouldShake) {
       HapticFeedback.heavyImpact();
-      _shakeController.forward(from: 0).then((_) {
-        if (mounted) setState(() => _pin = '');
-      });
+      if (mounted) setState(() => _pin = '');
+      _shakeController.forward(from: 0);
     }
   }
 

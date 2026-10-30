@@ -280,6 +280,9 @@ class AppLocalizationsMr extends AppLocalizations {
   }
 
   @override
+  String get s04WrongPinOneAttemptLeft => 'चुकीचा पिन. १ प्रयत्न शिल्लक आहे.';
+
+  @override
   String s04TooManyAttempts(int seconds) {
     return 'अनेक चुकीचे प्रयत्न. $seconds सेकंदात पुन्हा प्रयत्न करा.';
   }
