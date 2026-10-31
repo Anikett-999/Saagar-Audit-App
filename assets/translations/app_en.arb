@@ -1376,7 +1376,20 @@
   "exitAuditDialogTitle": "Exit Audit?",
   "exitAuditDialogMessage": "Your progress has been automatically saved as a draft. You can resume at any time from the Home screen.",
   "btnResumeAudit": "Resume Audit",
-  "btnSaveAndExit": "Save & Exit"
+  "btnSaveAndExit": "Save & Exit",
+  "s03RecoveryCodeTitle": "Master Recovery Code",
+  "s03RecoveryCodeSubtitle": "Save this code securely. If you ever forget your Owner PIN, this is the only way to reset it without losing store data.",
+  "s03RecoveryCodeCopied": "Recovery code copied to clipboard",
+  "btnContinueToApp": "Continue to App",
+  "s04ForgotPin": "Forgot PIN?",
+  "s04RecoveryTitle": "Owner PIN Recovery",
+  "s04RecoveryPrompt": "Enter your Master Recovery Code to reset your Owner PIN:",
+  "s04RecoveryInvalid": "Invalid Recovery Code. Please check and try again.",
+  "s04ResetPinTitle": "Set New 4-Digit PIN",
+  "s04ConfirmNewPin": "Confirm New PIN",
+  "s04PinResetSuccess": "Owner PIN reset successfully. Please log in with your new PIN.",
+  "btnVerifyCode": "Verify Code",
+  "btnResetPin": "Reset PIN"
 }
 
 

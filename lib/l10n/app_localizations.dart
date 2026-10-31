@@ -5156,6 +5156,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save & Exit'**
   String get btnSaveAndExit;
+
+  /// No description provided for @s03RecoveryCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Master Recovery Code'**
+  String get s03RecoveryCodeTitle;
+
+  /// No description provided for @s03RecoveryCodeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save this code securely. If you ever forget your Owner PIN, this is the only way to reset it without losing store data.'**
+  String get s03RecoveryCodeSubtitle;
+
+  /// No description provided for @s03RecoveryCodeCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery code copied to clipboard'**
+  String get s03RecoveryCodeCopied;
+
+  /// No description provided for @btnContinueToApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to App'**
+  String get btnContinueToApp;
+
+  /// No description provided for @s04RecoveryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner PIN Recovery'**
+  String get s04RecoveryTitle;
+
+  /// No description provided for @s04RecoveryPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your Master Recovery Code to reset your Owner PIN:'**
+  String get s04RecoveryPrompt;
+
+  /// No description provided for @s04RecoveryInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid Recovery Code. Please check and try again.'**
+  String get s04RecoveryInvalid;
+
+  /// No description provided for @s04ResetPinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set New 4-Digit PIN'**
+  String get s04ResetPinTitle;
+
+  /// No description provided for @s04ConfirmNewPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm New PIN'**
+  String get s04ConfirmNewPin;
+
+  /// No description provided for @s04PinResetSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner PIN reset successfully. Please log in with your new PIN.'**
+  String get s04PinResetSuccess;
+
+  /// No description provided for @btnVerifyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Code'**
+  String get btnVerifyCode;
+
+  /// No description provided for @btnResetPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset PIN'**
+  String get btnResetPin;
 }
 
 class _AppLocalizationsDelegate

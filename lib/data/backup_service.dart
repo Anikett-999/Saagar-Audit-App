@@ -72,10 +72,11 @@ class BackupService {
       try {
         final rows = await db.query(table);
         if (table == 'users') {
-          // Inviolable Rule: Never export PIN hashes in any backup
+          // Inviolable Rule: Never export PIN hashes or recovery keys in any backup
           tablesData[table] = rows.map((r) {
             final map = Map<String, Object?>.from(r);
             map.remove('pin_hash');
+            map.remove('recovery_code_hash');
             return map;
           }).toList();
         } else {

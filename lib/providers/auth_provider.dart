@@ -458,6 +458,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
     }
   }
+
+  /// Sets the active user directly (used after first-time setup or PIN recovery).
+  void setCurrentUser(AuthUser user) {
+    state = state.copyWith(user: user);
+  }
+
+  /// Clears any lockout for a user (e.g. after successful PIN reset with recovery code).
+  Future<void> unlockUser(String userId) async {
+    await _clearUserLockout(userId);
+  }
 }
 
 final authProvider =

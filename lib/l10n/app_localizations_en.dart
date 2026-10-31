@@ -2851,4 +2851,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get btnSaveAndExit => 'Save & Exit';
+
+  @override
+  String get s03RecoveryCodeTitle => 'Master Recovery Code';
+
+  @override
+  String get s03RecoveryCodeSubtitle =>
+      'Save this code securely. If you ever forget your Owner PIN, this is the only way to reset it without losing store data.';
+
+  @override
+  String get s03RecoveryCodeCopied => 'Recovery code copied to clipboard';
+
+  @override
+  String get btnContinueToApp => 'Continue to App';
+
+  @override
+  String get s04RecoveryTitle => 'Owner PIN Recovery';
+
+  @override
+  String get s04RecoveryPrompt =>
+      'Enter your Master Recovery Code to reset your Owner PIN:';
+
+  @override
+  String get s04RecoveryInvalid =>
+      'Invalid Recovery Code. Please check and try again.';
+
+  @override
+  String get s04ResetPinTitle => 'Set New 4-Digit PIN';
+
+  @override
+  String get s04ConfirmNewPin => 'Confirm New PIN';
+
+  @override
+  String get s04PinResetSuccess =>
+      'Owner PIN reset successfully. Please log in with your new PIN.';
+
+  @override
+  String get btnVerifyCode => 'Verify Code';
+
+  @override
+  String get btnResetPin => 'Reset PIN';
 }

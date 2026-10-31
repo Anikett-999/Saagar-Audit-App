@@ -2857,4 +2857,44 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get btnSaveAndExit => 'जतन करा आणि बाहेर पडा';
+
+  @override
+  String get s03RecoveryCodeTitle => 'मास्टर रिकव्हरी कोड';
+
+  @override
+  String get s03RecoveryCodeSubtitle =>
+      'हा कोड सुरक्षितपणे जतन करा. तुम्ही तुमचा मालक पिन विसरल्यास, स्टोअर डेटा न गमावता तो रीसेट करण्याचा हा एकमेव मार्ग आहे.';
+
+  @override
+  String get s03RecoveryCodeCopied => 'रिकव्हरी कोड क्लिपबोर्डवर कॉपी केला';
+
+  @override
+  String get btnContinueToApp => 'ॲप सुरू करा';
+
+  @override
+  String get s04RecoveryTitle => 'मालक पिन पुनर्प्राप्ती';
+
+  @override
+  String get s04RecoveryPrompt =>
+      'तुमचा मालक पिन रीसेट करण्यासाठी मास्टर रिकव्हरी कोड प्रविष्ट करा:';
+
+  @override
+  String get s04RecoveryInvalid =>
+      'अवैध रिकव्हरी कोड. कृपया तपासून पुन्हा प्रयत्न करा.';
+
+  @override
+  String get s04ResetPinTitle => 'नवीन ४-अंकी पिन सेट करा';
+
+  @override
+  String get s04ConfirmNewPin => 'नवीन पिनची पुष्टी करा';
+
+  @override
+  String get s04PinResetSuccess =>
+      'मालक पिन यशस्वीरित्या रीसेट झाला. कृपया नवीन पिनने लॉगिन करा.';
+
+  @override
+  String get btnVerifyCode => 'कोड पडताळा';
+
+  @override
+  String get btnResetPin => 'पिन रीसेट करा';
 }

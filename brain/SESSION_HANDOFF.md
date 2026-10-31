@@ -7548,3 +7548,46 @@ app-release.aab   54955804  04-10-2026 19:48:39
 3. **Next Immediate Task**:
    - Stage and commit Items 20, 21, 22, 23, and 24 to `fix/part-b-bugs`.
    - Category E is now 100% complete (7/7 items solved). Only Items 2, 4, 5, and 27 remain.
+
+
+---
+
+### Handoff: 31 October 2026 — Resolution of Item 5 (Client Ref: F16 / ¶364): Owner Master Recovery Code & Forgot PIN Flow
+**Author**: Antigravity  
+**Goal**: Complete implementation and full verification of Sagar Bora's UAT review feedback for Item 5 (Client Ref: F16): "No way to recover a forgotten Owner PIN", plus the setup flow streamlining from Section F (¶364).
+
+1. **Implementation Details**:
+   - **`OwnerRecoveryService` (`lib/services/owner_recovery_service.dart`)**:
+     - Generates an 8-character uppercase alphanumeric code formatted as `SG-XXXX-YYYY` (e.g. `SG-7492-BX41`) omitting confusing visual glyphs (0/O, 1/I, L).
+     - Cryptographically stores the salted `BCrypt` hash (cost 10) in private `SharedPreferences`. The plaintext code is NEVER stored.
+     - Provides `normalizeCode` to handle case-insensitivity, spaces, and hyphens (`sg7492bx41` == `SG-7492-BX41`).
+     - Implements `resetOwnerPinWithRecoveryCode` which verifies the code, hashes the new 4-digit PIN, and updates `users.pin_hash` for the Owner in SQLite without touching any audit records, photos, or CAP history.
+   - **First-Time Setup Streamlining (`lib/ui/screens/s03_first_setup/first_setup_screen.dart`)**:
+     - Upfront name validation: Displays error immediately if name is empty/short before confirming PIN (resolves Sagar's note in ¶364).
+     - Generates and presents the Master Recovery Code card with a one-tap Copy button and clear warning to save it.
+     - Auto-logs in the Owner upon setup completion via `ref.read(authProvider.notifier).setCurrentUser(...)` and navigates directly to Home (S05), eliminating the redundant 3rd PIN prompt (resolves ¶364).
+   - **Login Screen PIN Recovery (`lib/ui/screens/s04_login/login_screen.dart`)**:
+     - Added "Forgot PIN?" text button when the Owner role is selected.
+     - Tapping opens a secure recovery modal asking for the Master Recovery Code.
+     - Verifies code via `OwnerRecoveryService.instance.verifyRecoveryCode`.
+     - Upon verification, opens the Set New 4-Digit PIN dialog.
+     - Resets the PIN, unlocks the user from any lockout state, and displays a success confirmation snackbar.
+   - **Export Sanitization Guard (`lib/data/backup_service.dart`)**:
+     - Enforces explicit stripping: neither `pin_hash` nor `recovery_code_hash` can ever be included in any database export or diagnostic dump.
+   - **Dual-Language Parity (Rule #8)**:
+     - Added all 12 localization keys in `app_en.arb` and `app_mr.arb`.
+
+2. **Verification & Raw Command Outputs**:
+   - `test/owner_recovery_test.dart`: **5/5 tests green!**
+     - Code format validation (12-char formatted string `SG-XXXX-YYYY`).
+     - Salted BCrypt hash verification (plaintext never stored).
+     - Case/hyphen normalization verification.
+     - SQLite Owner PIN update and login authentication verification.
+     - Zero-leak export verification: asserts neither `pin_hash` nor `recovery_code_hash` exists in `BackupService.exportDatabaseToJson()`.
+   - `test/change_pin_test.dart` & `test/auth_lockout_test.dart`: **18/18 tests green!**
+   - Canonical Score Engine (`test/score_engine_test.dart`): **12/12 passed (100% green)**.
+   - `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+
+3. **Next Immediate Task**:
+   - Commit Item 5 to `fix/part-b-bugs`.
+   - Proceed to Step 2: Item 4 (Client Ref: F27) — Store Account Sign-in & Tenant Shield before Cloud Sync.

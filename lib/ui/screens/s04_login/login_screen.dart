@@ -9,6 +9,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/cloud_sync_provider.dart';
 import '../../../providers/locale_provider.dart';
+import '../../../services/owner_recovery_service.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
 import '../../widgets/pin_numpad.dart';
@@ -241,11 +242,222 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 8),
               ],
+              if (_isOwnerSelected) ...[
+                TextButton(
+                  onPressed: _showForgotPinDialog,
+                  child: Text(
+                    l10n.s04ForgotPin,
+                    style: const TextStyle(
+                      fontFamily: 'DMSans',
+                      fontSize: 14,
+                      color: AppColors.navy,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
             ],
           ),
         ),
       ),
     );
+  }
+
+  bool get _isOwnerSelected {
+    if (_selectedUserId == null) return false;
+    final user = _users.firstWhere(
+      (u) => u['id'] == _selectedUserId,
+      orElse: () => {},
+    );
+    return user['role'] == 'OWNER';
+  }
+
+  Future<void> _showForgotPinDialog() async {
+    final l10n = AppLocalizations.of(context)!;
+    final codeController = TextEditingController();
+    String? dialogError;
+
+    final verifiedCode = await showDialog<String>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: Row(
+            children: [
+              const Icon(Icons.vpn_key_outlined, color: AppColors.gold, size: 24),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.s04RecoveryTitle,
+                  style: const TextStyle(fontFamily: 'DMSerifDisplay', fontSize: 20),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.s04RecoveryPrompt,
+                style: const TextStyle(
+                  fontFamily: 'DMSans',
+                  fontSize: 13,
+                  color: AppColors.gray800,
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: codeController,
+                autofocus: true,
+                textCapitalization: TextCapitalization.characters,
+                decoration: InputDecoration(
+                  hintText: 'e.g. SG-7492-BX41',
+                  errorText: dialogError,
+                  prefixIcon: const Icon(Icons.shield_outlined, size: 20),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(l10n.btnCancel),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.navy,
+                foregroundColor: AppColors.gold,
+              ),
+              onPressed: () async {
+                final code = codeController.text.trim();
+                final ok = await OwnerRecoveryService.instance.verifyRecoveryCode(code);
+                if (!ok) {
+                  setDialogState(() {
+                    dialogError = l10n.s04RecoveryInvalid;
+                  });
+                  return;
+                }
+                if (ctx.mounted) {
+                  Navigator.of(ctx).pop(code);
+                }
+              },
+              child: Text(l10n.btnVerifyCode),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    codeController.dispose();
+    if (verifiedCode == null || !mounted) return;
+
+    await _showResetPinDialog(verifiedCode);
+  }
+
+  Future<void> _showResetPinDialog(String verifiedCode) async {
+    final l10n = AppLocalizations.of(context)!;
+    final pinController = TextEditingController();
+    final confirmController = TextEditingController();
+    String? dialogError;
+
+    final success = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: Text(
+            l10n.s04ResetPinTitle,
+            style: const TextStyle(fontFamily: 'DMSerifDisplay', fontSize: 20),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: pinController,
+                keyboardType: TextInputType.number,
+                maxLength: 4,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: l10n.s03OwnerPin,
+                  counterText: '',
+                  prefixIcon: const Icon(Icons.lock_outline, size: 20),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: confirmController,
+                keyboardType: TextInputType.number,
+                maxLength: 4,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: l10n.s04ConfirmNewPin,
+                  counterText: '',
+                  errorText: dialogError,
+                  prefixIcon: const Icon(Icons.lock_outline, size: 20),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(l10n.btnCancel),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.navy,
+                foregroundColor: AppColors.gold,
+              ),
+              onPressed: () async {
+                final p1 = pinController.text.trim();
+                final p2 = confirmController.text.trim();
+                if (p1.length != 4 || int.tryParse(p1) == null) {
+                  setDialogState(() {
+                    dialogError = 'PIN must be exactly 4 digits.';
+                  });
+                  return;
+                }
+                if (p1 != p2) {
+                  setDialogState(() {
+                    dialogError = l10n.s03PinsMismatch;
+                  });
+                  return;
+                }
+
+                await OwnerRecoveryService.instance.resetOwnerPinWithRecoveryCode(
+                  recoveryCode: verifiedCode,
+                  newPin: p1,
+                );
+
+                if (_selectedUserId != null) {
+                  await ref.read(authProvider.notifier).unlockUser(_selectedUserId!);
+                }
+                if (ctx.mounted) {
+                  Navigator.of(ctx).pop(true);
+                }
+              },
+              child: Text(l10n.btnResetPin),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    pinController.dispose();
+    confirmController.dispose();
+
+    if (success == true && mounted) {
+      setState(() {
+        _error = null;
+        _errorCount = 0;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s04PinResetSuccess),
+          backgroundColor: AppColors.green,
+        ),
+      );
+    }
   }
 
   Widget _buildLockout(AppLocalizations l10n, Duration remaining) {

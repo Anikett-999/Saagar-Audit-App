@@ -10,13 +10,13 @@
 
 | Category | Total | ✅ Solved & Verified | 🔄 In Progress | ⏳ Pending |
 |---|:---:|:---:|:---:|:---:|
-| **A. Backup, Cloud Sync & Data Safety** (Items 1–5) | 5 | 2 (Items 1, 3) | 0 | 3 (Items 2, 4, 5) |
+| **A. Backup, Cloud Sync & Data Safety** (Items 1–5) | 5 | 3 (Items 1, 3, 5) | 0 | 2 (Items 2, 4) |
 | **B. Roles, Controls & Security** (Items 6–8) | 3 | 3 (Items 6, 7, 8) | 0 | 0 |
 | **C. Alerts, Escalations, Cash & Reports** (Items 9–16) | 8 | 8 (Items 9–16) | 0 | 0 |
 | **D. Corrective Action Plan (CAP) Controls** (Items 17–19) | 3 | 3 (Items 17, 18, 19) | 0 | 0 |
 | **E. Language, Permissions & Layout** (Items 20–26) | 7 | 7 (Items 20–26) | 0 | 0 |
 | **F. General Ease of Use** (Item 27 UX Points) | 1 | 0 | 0 | 1 (Item 27) |
-| **TOTAL** | **27** | **23 Solved** | **0 In Progress** | **4 Pending** |
+| **TOTAL** | **27** | **24 Solved** | **0 In Progress** | **3 Pending** |
 
 ---
 
@@ -68,11 +68,12 @@
 
 #### Item 5: No way to recover a forgotten Owner PIN
 - **Priority:** High | **Client Ref:** F16
-- **Problem:** If the Owner forgets their 4-digit PIN, there is no "Forgot PIN" option. Reinstalling previously wiped data.
-- **Required Fix:** "Forgot PIN" option on login verifying against the Store Cloud Account password / recovery code to reset Owner PIN without data loss.
-- **Status:** ⏳ **PENDING (Tier 2 Architectural)**
-- **Commit:** —
-- **Files Changed:** —
+- **Problem:** If the Owner forgets their 4-digit PIN, there was no "Forgot PIN" option on Screen S04. Reinstalling previously wiped un-synced data.
+- **Required Fix:** Generate a cryptographic Master Recovery Code (e.g. `SG-XXXX-YYYY`) at setup (Screen S03). Store salted BCrypt hash locally, with absolute exclusion from backup exports. Add "Forgot PIN?" on Login Screen (S04) verifying the Recovery Code and allowing setting a new 4-digit PIN without data loss. Auto-login after setup to eliminate redundant 3rd PIN entry (Section F / ¶364).
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** Pending
+- **Files Changed:** `lib/services/owner_recovery_service.dart`, `lib/ui/screens/s03_first_setup/first_setup_screen.dart`, `lib/ui/screens/s04_login/login_screen.dart`, `lib/providers/auth_provider.dart`, `lib/data/backup_service.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `test/owner_recovery_test.dart`
+- **Verification:** 5/5 unit tests passing in `test/owner_recovery_test.dart`. Export sanitization verified (neither `pin_hash` nor `recovery_code_hash` in backup export). 0 analyzer issues, canonical score engine 12/12 passing.
 
 ---
 
