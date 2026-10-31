@@ -126,7 +126,7 @@
 - **Problem:** Opening a `wa.me` web link set `whatsapp_sent = 1` and green "WhatsApp Sent" badge, even if user backed out without picking contact or sending.
 - **Required Fix:** Show "Share opened" or "Not confirmed". Only mark confirmed if delivery callback or explicit user confirmation ("Did you send this message?"). Provide retroactive "Mark as Sent".
 - **Status:** ✅ **SOLVED & VERIFIED**
-- **Commit:** pending review
+- **Commit:** `c2a89bf`
 - **Files Changed:** `lib/services/escalation_service.dart`, `lib/ui/screens/s11_submitted/submitted_screen.dart`, `lib/ui/screens/s33_escalations/escalations_list_screen.dart`, `lib/data/repositories/escalation_repository.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`
 - **Technical & Architectural Rationale for Sagar:**
   - *Standard Deep Links vs. WhatsApp Business Cloud API*: In native mobile development, launching WhatsApp via deep links (`wa.me` or `whatsapp://send` OS intents) hands execution off to the external WhatsApp application. The OS intent system does not provide any return callback, event hook, or delivery receipt stating whether the message was actually dispatched or if the user cancelled. True programmatic delivery receipts (Sent, Delivered, Read) are strictly exclusive to the official **Meta WhatsApp Business Cloud API**, which requires server infrastructure, approved message templates, and recurring Meta messaging fees.
@@ -134,7 +134,7 @@
     1. Default status on generation is now honestly flagged as amber badge: **"WhatsApp: Not Confirmed"** (`whatsapp_sent = 0`).
     2. When WhatsApp is launched, the app no longer assumes delivery. When the auditor returns to the app, an interactive confirmation dialog is presented: *"Did you send the escalation alert to [Recipient] on WhatsApp?"*. Tapping *"Yes, Sent"* stamps `whatsapp_sent = 1` and turns the badge green (**"WhatsApp Sent"**).
     3. If the user sent the message in WhatsApp and closed the app before answering the dialog, both Screen S11 and Screen S33 (Escalations Hub) feature a direct, one-tap **[Mark as Sent]** button to retroactively confirm delivery at any time without re-launching WhatsApp.
-- **Verification:** 0 analyzer issues (`flutter analyze`). Score engine canonical suite 12/12 passed (`test/score_engine_test.dart`). Full test suite 406/406 passed (`flutter test`).
+- **Verification:** 0 analyzer issues (`flutter analyze`). Score engine canonical suite 12/12 passed (`test/score_engine_test.dart`). Full test suite 407/407 passed (`flutter test`). Device physical test verified.
 
 ---
 
@@ -143,13 +143,13 @@
 - **Problem:** On audit submission with escalation, app immediately launched WhatsApp URL. Auditor thought save failed until pressing back.
 - **Required Fix:** Show S11 Submission Confirmation screen first ("Audit saved, escalation created"), with a distinct "Share Alert via WhatsApp" button.
 - **Status:** ✅ **SOLVED & VERIFIED**
-- **Commit:** pending review
+- **Commit:** `c2a89bf`
 - **Files Changed:** `lib/services/escalation_service.dart`, `lib/ui/screens/s10_review/review_submit_screen.dart`, `lib/ui/screens/s11_submitted/submitted_screen.dart`, `lib/data/repositories/escalation_repository.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`
 - **Technical & Architectural Rationale for Sagar:**
   - *Submission Decoupling*: Submitting an audit (`ReviewSubmitScreen` S10) now evaluates escalation triggers and saves them to SQLite in the background without automatically launching external WhatsApp URLs (`autoLaunchWhatsApp = false`).
   - *Immediate S11 Confirmation*: The user is immediately routed to Screen S11 (`SubmittedScreen`), which displays the celebration animation, score and band card, and the reassuring *"Saved to SQLite · Offline-first"* indicator.
   - *Actionable Escalation Cards on S11*: If the submitted audit activated escalation triggers (e.g., Trigger 1 for Critical/Poor score), Screen S11 dynamically loads and renders dedicated escalation action cards. Each card clearly shows the trigger level, urgency, recipient (e.g. GM), delivery badge, and explicit action buttons: **[Share Alert via WhatsApp]**, **[Mark as Sent]**, and **[Copy Alert]**. The auditor is in complete control and never surprised by unexpected OS intent redirects.
-- **Verification:** 0 analyzer issues (`flutter analyze`). Score engine canonical suite 12/12 passed (`test/score_engine_test.dart`). Full test suite 406/406 passed (`flutter test`).
+- **Verification:** 0 analyzer issues (`flutter analyze`). Score engine canonical suite 12/12 passed (`test/score_engine_test.dart`). Full test suite 407/407 passed (`flutter test`). Device physical test verified.
 
 ---
 
@@ -162,7 +162,9 @@
   2. For Weekly and Monthly audits, route the escalation directly to the **OWNER** with urgency `same_day` and delivery channel `whatsapp`.
   3. Render the actionable escalation card on Screen S11 with the `[Share Alert via WhatsApp]` button, `[Mark as Sent]`, and confirmation dialog.
 - **Status:** ✅ **SOLVED & VERIFIED**
-- **Commit:** pending review
+- **Commit:** `c2a89bf`
+- **Files Changed:** `lib/domain/escalation_engine.dart`, `test/escalation_engine_test.dart`
+- **Verification:** Unit test `Fires Trigger 1 to OWNER via WhatsApp on Weekly Audit Critical band (e.g. 40%)` added and passing in `test/escalation_engine_test.dart` (14/14 tests green). 0 analyzer issues (`flutter analyze`). Score engine canonical suite 12/12 passed (`test/score_engine_test.dart`). Full test suite 407/407 passed (`flutter test`). Device physical test verified.
 - **Files Changed:** `lib/domain/escalation_engine.dart`, `test/escalation_engine_test.dart`
 - **Verification:** Unit test `Fires Trigger 1 to OWNER via WhatsApp on Weekly Audit Critical band (e.g. 40%)` added and passing in `test/escalation_engine_test.dart` (14/14 tests green). 0 analyzer issues (`flutter analyze`). Score engine canonical suite 12/12 passed (`test/score_engine_test.dart`). Full test suite 407/407 passed (`flutter test`).
 
