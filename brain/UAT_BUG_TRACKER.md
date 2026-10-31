@@ -239,7 +239,7 @@
   7. Resolve real human auditor names from `UserRepository` with role titles, format `readByOwnerAt` with local datetime, and label Monthly auditor as `Store Owner`.
   8. Export confirmation snackbars in S21 and S13.
 - **Status:** ✅ **SOLVED & VERIFIED**
-- **Commit:** `pending-commit`
+- **Commit:** `ebda68f`
 - **Files Changed:** `lib/utils/devanagari_shaper.dart`, `lib/data/repositories/report_repository.dart`, `lib/services/weekly_report_pdf_service.dart`, `lib/services/daily_audit_pdf_service.dart`, `lib/ui/screens/reports/report_detail_screen.dart`, `lib/ui/screens/s13_audit_detail/audit_detail_screen.dart`, `test/devanagari_shaper_test.dart`, `test/daily_audit_pdf_service_test.dart`, `test/weekly_report_test.dart`
 - **Verification:** 3/3 tests in `test/devanagari_shaper_test.dart`, 3/3 in `test/daily_audit_pdf_service_test.dart`, 7/7 in `test/weekly_report_test.dart`, 5/5 in `test/monthly_report_integration_test.dart`, 12/12 canonical score tests green, 413/413 full test suite green, 0 analyzer issues.
 
