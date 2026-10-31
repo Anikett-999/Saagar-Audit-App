@@ -4905,6 +4905,66 @@ abstract class AppLocalizations {
   /// **'WhatsApp Sent'**
   String get s33WhatsAppSentBadge;
 
+  /// No description provided for @s11EscalationsAlertTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalation Alert Required'**
+  String get s11EscalationsAlertTitle;
+
+  /// No description provided for @s11ShareWhatsApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Alert via WhatsApp'**
+  String get s11ShareWhatsApp;
+
+  /// No description provided for @s11MarkAsSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Sent'**
+  String get s11MarkAsSent;
+
+  /// No description provided for @s11MessageCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalation message copied to clipboard!'**
+  String get s11MessageCopied;
+
+  /// No description provided for @s33ConfirmWhatsAppTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm WhatsApp Delivery'**
+  String get s33ConfirmWhatsAppTitle;
+
+  /// No description provided for @s33ConfirmWhatsAppPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Did you send the escalation alert to {name} on WhatsApp?'**
+  String s33ConfirmWhatsAppPrompt(String name);
+
+  /// No description provided for @s33ConfirmWhatsAppYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, Sent'**
+  String get s33ConfirmWhatsAppYes;
+
+  /// No description provided for @s33ConfirmWhatsAppNo.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Sent / Later'**
+  String get s33ConfirmWhatsAppNo;
+
+  /// No description provided for @s33WhatsAppUnconfirmedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp: Not Confirmed'**
+  String get s33WhatsAppUnconfirmedBadge;
+
+  /// No description provided for @s33MarkAsSentAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Sent'**
+  String get s33MarkAsSentAction;
+
   /// No description provided for @fieldRequired.
   ///
   /// In en, this message translates to:

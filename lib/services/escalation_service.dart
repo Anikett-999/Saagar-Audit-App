@@ -21,8 +21,10 @@ class EscalationService {
   ///
   /// Designed to run outside the audit submission transaction so that any delivery
   /// or notification error never rolls back a submitted audit (Rule 5).
+  /// [autoLaunchWhatsApp] is false by default so submission can transition smoothly to S11 (Item 10).
   Future<List<Escalation>> evaluateAndDispatch({
     required String auditId,
+    bool autoLaunchWhatsApp = false,
   }) async {
     final audit = await AuditRepository.instance.findById(auditId);
     if (audit == null) return const [];
@@ -87,9 +89,9 @@ class EscalationService {
         payload: escalation.id,
       );
 
-      // 2. High urgency WhatsApp deep link if requested
-      if (draft.deliveryChannel == 'whatsapp') {
-        await launchWhatsAppForEscalation(escalation, msg.full);
+      // 2. High urgency WhatsApp deep link only if explicitly requested (Item 10)
+      if (autoLaunchWhatsApp && draft.deliveryChannel == 'whatsapp') {
+        await launchWhatsAppForEscalation(escalation, msg.full, markSent: false);
       }
     }
 
@@ -97,7 +99,12 @@ class EscalationService {
   }
 
   /// Attempts to launch WhatsApp deep link for the escalation recipient (Spec §07).
-  Future<bool> launchWhatsAppForEscalation(Escalation escalation, String fullMessage) async {
+  /// [markSent] controls whether to automatically set whatsapp_sent = 1 (default false per Item 9).
+  Future<bool> launchWhatsAppForEscalation(
+    Escalation escalation,
+    String fullMessage, {
+    bool markSent = false,
+  }) async {
     try {
       final recipient = await UserRepository.instance.getById(escalation.raisedToUserId);
       final phone = recipient?.phone?.trim();
@@ -129,10 +136,10 @@ class EscalationService {
         }
       }
 
-      if (launched) {
+      if (launched && markSent) {
         await EscalationRepository.instance.markWhatsAppSent(escalation.id);
-        return true;
       }
+      return launched;
     } catch (_) {
       // Non-blocking fallback
     }

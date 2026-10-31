@@ -2717,6 +2717,38 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s33WhatsAppSentBadge => 'व्हॉट्सअॅप पाठवले';
 
   @override
+  String get s11EscalationsAlertTitle => 'एस्केलेशन अलर्ट आवश्यक';
+
+  @override
+  String get s11ShareWhatsApp => 'व्हॉट्सअॅपवर अलर्ट पाठवा';
+
+  @override
+  String get s11MarkAsSent => 'पाठवले म्हणून खूण करा';
+
+  @override
+  String get s11MessageCopied => 'एस्केलेशन संदेश क्लिपबोर्डवर कॉपी केला!';
+
+  @override
+  String get s33ConfirmWhatsAppTitle => 'व्हॉट्सअॅप संदेश पुष्टी करा';
+
+  @override
+  String s33ConfirmWhatsAppPrompt(String name) {
+    return 'तुम्ही हा एस्केलेशन अलर्ट $name यांना व्हॉट्सअॅपवर पाठवला आहे का?';
+  }
+
+  @override
+  String get s33ConfirmWhatsAppYes => 'हो, पाठवला';
+
+  @override
+  String get s33ConfirmWhatsAppNo => 'नाही / नंतर';
+
+  @override
+  String get s33WhatsAppUnconfirmedBadge => 'व्हॉट्सअॅप: अपुष्ट';
+
+  @override
+  String get s33MarkAsSentAction => 'पाठवले म्हणून खूण करा';
+
+  @override
   String get fieldRequired => 'हे फील्ड आवश्यक आहे';
 
   @override

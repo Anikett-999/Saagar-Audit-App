@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../data/models/escalation.dart';
 import '../../../data/repositories/escalation_repository.dart';
+import '../../../data/repositories/user_repository.dart';
 import '../../../domain/escalation_engine.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
@@ -221,11 +222,57 @@ class _EscalationsListScreenState extends ConsumerState<EscalationsListScreen> {
       );
 
       if (draft.deliveryChannel == 'whatsapp') {
-        await EscalationService.instance.launchWhatsAppForEscalation(esc, msg.full);
+        final launched = await EscalationService.instance.launchWhatsAppForEscalation(
+          esc,
+          msg.full,
+          markSent: false,
+        );
+        if (launched && mounted) {
+          final recipientUser = await UserRepository.instance.getById(esc.raisedToUserId);
+          final recipientName = recipientUser?.name ?? 'the recipient';
+          if (mounted) {
+            final confirmed = await _confirmWhatsAppDialog(recipientName, l10n);
+            if (confirmed == true) {
+              await EscalationRepository.instance.markWhatsAppSent(esc.id);
+            }
+          }
+        }
       }
 
       await _loadEscalations();
     }
+  }
+
+  Future<bool?> _confirmWhatsAppDialog(String recipientName, AppLocalizations l10n) {
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.chat, color: AppColors.green, size: 22),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                l10n.s33ConfirmWhatsAppTitle,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+          ],
+        ),
+        content: Text(l10n.s33ConfirmWhatsAppPrompt(recipientName)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.s33ConfirmWhatsAppNo),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.green),
+            child: Text(l10n.s33ConfirmWhatsAppYes),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -457,31 +504,37 @@ class _EscalationsListScreenState extends ConsumerState<EscalationsListScreen> {
                   formattedDate,
                   style: const TextStyle(fontSize: 12, color: AppColors.gray600),
                 ),
-                if (esc.whatsappSent) ...[
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: AppColors.green.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.check, size: 12, color: AppColors.green),
-                        const SizedBox(width: 4),
-                        Text(
-                          l10n.s33WhatsAppSentBadge,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.green,
-                          ),
-                        ),
-                      ],
-                    ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: esc.whatsappSent
+                        ? AppColors.green.withValues(alpha: 0.12)
+                        : AppColors.amber.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                ],
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        esc.whatsappSent ? Icons.check : Icons.access_time,
+                        size: 12,
+                        color: esc.whatsappSent ? AppColors.green : AppColors.amberDark,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        esc.whatsappSent
+                            ? l10n.s33WhatsAppSentBadge
+                            : l10n.s33WhatsAppUnconfirmedBadge,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: esc.whatsappSent ? AppColors.green : AppColors.amberDark,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -552,23 +605,44 @@ class _EscalationsListScreenState extends ConsumerState<EscalationsListScreen> {
                 OutlinedButton.icon(
                   onPressed: () async {
                     final messenger = ScaffoldMessenger.of(context);
-                    final launched = await EscalationService.instance.launchWhatsAppForEscalation(esc, msg.full);
+                    final launched = await EscalationService.instance.launchWhatsAppForEscalation(
+                      esc,
+                      msg.full,
+                      markSent: false,
+                    );
                     if (!launched) {
                       await EscalationService.instance.copyToClipboard(msg.full);
                       if (!mounted) return;
                       messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text('WhatsApp not launched. Message copied to clipboard!'),
+                        SnackBar(
+                          content: Text(l10n.s11MessageCopied),
                           backgroundColor: AppColors.amber,
                         ),
                       );
-                    } else if (mounted) {
-                      await _loadEscalations();
+                      return;
+                    }
+                    if (!mounted) return;
+                    final recipientUser = await UserRepository.instance.getById(esc.raisedToUserId);
+                    final recipientName = recipientUser?.name ?? 'the recipient';
+                    if (!mounted) return;
+                    final confirmed = await _confirmWhatsAppDialog(recipientName, l10n);
+                    if (confirmed == true) {
+                      await EscalationRepository.instance.markWhatsAppSent(esc.id);
+                      if (mounted) await _loadEscalations();
                     }
                   },
                   icon: const Icon(Icons.chat_outlined, size: 16, color: AppColors.green),
                   label: Text(l10n.s33WhatsAppAction),
                 ),
+                if (!esc.whatsappSent)
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      await EscalationRepository.instance.markWhatsAppSent(esc.id);
+                      if (mounted) await _loadEscalations();
+                    },
+                    icon: const Icon(Icons.check, size: 16, color: AppColors.green),
+                    label: Text(l10n.s33MarkAsSentAction),
+                  ),
                 if (esc.isOpen)
                   FilledButton(
                     onPressed: () => _acknowledge(esc, l10n),

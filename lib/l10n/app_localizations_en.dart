@@ -2713,6 +2713,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s33WhatsAppSentBadge => 'WhatsApp Sent';
 
   @override
+  String get s11EscalationsAlertTitle => 'Escalation Alert Required';
+
+  @override
+  String get s11ShareWhatsApp => 'Share Alert via WhatsApp';
+
+  @override
+  String get s11MarkAsSent => 'Mark as Sent';
+
+  @override
+  String get s11MessageCopied => 'Escalation message copied to clipboard!';
+
+  @override
+  String get s33ConfirmWhatsAppTitle => 'Confirm WhatsApp Delivery';
+
+  @override
+  String s33ConfirmWhatsAppPrompt(String name) {
+    return 'Did you send the escalation alert to $name on WhatsApp?';
+  }
+
+  @override
+  String get s33ConfirmWhatsAppYes => 'Yes, Sent';
+
+  @override
+  String get s33ConfirmWhatsAppNo => 'Not Sent / Later';
+
+  @override
+  String get s33WhatsAppUnconfirmedBadge => 'WhatsApp: Not Confirmed';
+
+  @override
+  String get s33MarkAsSentAction => 'Mark as Sent';
+
+  @override
   String get fieldRequired => 'This field is required';
 
   @override

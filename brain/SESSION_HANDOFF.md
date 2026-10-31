@@ -7362,3 +7362,51 @@ app-release.aab   54955804  04-10-2026 19:48:39
   - Present verification steps to user for Item 8.
   - Commit changes to `fix/part-b-bugs` following user/Claude review.
   - Proceed to next pending bug (Item 9: WhatsApp Sent confirmation / F01).
+
+---
+
+### Handoff: 31 October 2026 — WhatsApp Escalation Decoupling & Honest Delivery Confirmation (Items 9 & 10 — Client Ref: F01 & F09)
+**Author**: Antigravity  
+**Goal**: Resolve Item 9 (Client Ref: F01) and Item 10 (Client Ref: F09) addressing Saagar Bora's exact observations from physical UAT:
+1. **Item 10 (Submit Jump Decoupled)**: Submitting an audit previously immediately launched an external `wa.me` intent before the user could see that the audit was successfully saved. We decoupled the submit flow: submitting an audit evaluates triggers in the background without launching WhatsApp (`autoLaunchWhatsApp = false`), smoothly routing the user to Screen S11 (`SubmittedScreen`).
+2. **Item 10 (Actionable S11 Escalation Hub)**: If the audit triggered escalations (e.g. Critical/Poor score Trigger 1), Screen S11 dynamically displays dedicated actionable escalation cards showing trigger level, urgency, recipient name, delivery badge, and explicit buttons: **[Share Alert via WhatsApp]**, **[Mark as Sent]**, and **[Copy Alert]**.
+3. **Item 9 (Honest Delivery Tracking & Return Confirmation)**: Because standard OS deep links (`wa.me` / `whatsapp://send`) cannot programmatically detect if a message was actually sent by the user without Meta's WhatsApp Business Cloud API, the app no longer assumes delivery upon launch:
+   - Initial status badge is amber: **"WhatsApp: Not Confirmed"** (`whatsapp_sent = 0`).
+   - When returning to the app from WhatsApp, an explicit confirmation dialog prompts: *"Did you send the escalation alert to [Name] on WhatsApp?"*. Only answering *"Yes, Sent"* stamps `whatsapp_sent = 1` and turns the badge green (**"WhatsApp Sent"**).
+   - If the user closes the app or cancels the dialog, both Screen S11 and Screen S33 (Escalations Hub) provide a one-tap retroactive **[Mark as Sent]** button to confirm delivery without re-launching WhatsApp.
+   - S33 manual escalation creation also adopts this confirmation prompt.
+
+- **Files Changed**:
+  - `lib/domain/escalation_engine.dart`: Expanded Trigger 1 to evaluate on Weekly and Monthly audits scoring in the Critical band (< 80%, e.g. 40%) or Weekly Poor band (< 85%), routing directly to the Owner via WhatsApp. (Resolves Item 11 / Client Ref: F18).
+  - `lib/services/escalation_service.dart`: Added `autoLaunchWhatsApp = false` and `markSent = false` parameters to `evaluateAndDispatch` and `launchWhatsAppForEscalation`.
+  - `lib/data/repositories/escalation_repository.dart`: Added `listForAudit(String auditId)` method.
+  - `lib/ui/screens/s11_submitted/submitted_screen.dart`: Added escalation loading, interactive confirmation dialog, retroactive manual mark button, message copy, and actionable escalation cards above bottom navigation.
+  - `lib/ui/screens/s33_escalations/escalations_list_screen.dart`: Updated delivery badge to show amber "WhatsApp: Not Confirmed" / green "WhatsApp Sent", wired confirmation dialog on WhatsApp return, and added retroactive "Mark as Sent" button.
+  - `assets/translations/app_en.arb` & `app_mr.arb`: Added keys `s11EscalationsAlertTitle`, `s11ShareWhatsApp`, `s11MarkAsSent`, `s11MessageCopied`, `s33ConfirmWhatsAppTitle`, `s33ConfirmWhatsAppPrompt`, `s33ConfirmWhatsAppYes`, `s33ConfirmWhatsAppNo`, `s33WhatsAppUnconfirmedBadge`, `s33MarkAsSentAction`.
+  - `test/escalation_engine_test.dart`: Added unit test asserting Trigger 1 fires to Owner via WhatsApp on Weekly Audit Critical band (e.g. 40%).
+
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze`: **No issues found! (ran in 16.2s)**
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5)
+  - `flutter test test/escalation_engine_test.dart`: **All 14 tests passed!**
+  - `flutter test`: **All 407/407 tests passed! (100% green)**
+
+- **Git Status**:
+  - Modified files ready for commit:
+    - `assets/translations/app_en.arb`
+    - `assets/translations/app_mr.arb`
+    - `lib/data/repositories/escalation_repository.dart`
+    - `lib/domain/escalation_engine.dart`
+    - `lib/l10n/app_localizations.dart`
+    - `lib/l10n/app_localizations_en.dart`
+    - `lib/l10n/app_localizations_mr.dart`
+    - `lib/services/escalation_service.dart`
+    - `lib/ui/screens/s11_submitted/submitted_screen.dart`
+    - `lib/ui/screens/s33_escalations/escalations_list_screen.dart`
+    - `test/escalation_engine_test.dart`
+    - `brain/UAT_BUG_TRACKER.md`
+    - `brain/SESSION_HANDOFF.md`
+
+- **Next Immediate Task**:
+  - Obtain user verification on physical device or sign-off to commit & push to `fix/part-b-bugs`.
+  - Proceed to next pending issue in the UAT tracker (Item 12 / F14: Weekly report escalation section or Item 16 / F06: PDF Marathi font rendering).
