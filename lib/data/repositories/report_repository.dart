@@ -110,11 +110,16 @@ class ReportRepository {
 
     // Section 1: Headline
     final weekEndingDate = dailyDateStrs.isNotEmpty ? dailyDateStrs.last : weeklyAudit.auditDate;
-    final failCount = weeklyResults.where((r) => r.result == 'F').length;
+    final weeklyFailCount = weeklyResults.where((r) => r.result == 'F').length;
+    final dailyFailCount = failPoints.length;
+    final totalFailCount = weeklyFailCount + dailyFailCount;
     final patternCount = patterns.length;
     final bandUpper = weeklyScore.band.name.toUpperCase();
+    final String failPart = dailyFailCount > 0
+        ? '$weeklyFailCount Failures ($totalFailCount Total)'
+        : '$weeklyFailCount Failures';
     final headline =
-        'Week $weekNumber Ending $weekEndingDate · ${weeklyScore.compliancePct.toStringAsFixed(1)}% $bandUpper · $failCount Failures · $patternCount Patterns';
+        'Week $weekNumber Ending $weekEndingDate · ${weeklyScore.compliancePct.toStringAsFixed(1)}% $bandUpper · $failPart · $patternCount Patterns';
 
     // Section 2: Compliance Table
     // Compute per-SOP breakdown for weekly checkpoints

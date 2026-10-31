@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -177,6 +178,35 @@ void main() {
       expect(bytes.isNotEmpty, isTrue);
       final headerStr = String.fromCharCodes(bytes.take(5));
       expect(headerStr, startsWith('%PDF'));
+    });
+
+    test('Generates and saves daily PDF with standardized filename in local directory', () async {
+      final tempDir = await Directory.systemTemp.createTemp('saagar_daily_pdf_test_');
+      DailyAuditPdfService.setDirectoryForTesting(tempDir);
+
+      try {
+        final filePath = await DailyAuditPdfService.instance.generateAndSavePdf(
+          audit: testAudit,
+          auditorName: 'Sagar Bora (SM)',
+          verifierName: 'Amit GM',
+          sops: testSops,
+          checkpointsById: testCheckpoints,
+          results: testResults,
+          crosById: testCros,
+        );
+
+        final file = File(filePath);
+        expect(file.existsSync(), isTrue);
+        expect(file.uri.pathSegments.last, equals('Saagar_Daily_Audit_2026-10-30.pdf'));
+        final bytes = await file.readAsBytes();
+        expect(bytes.length, greaterThan(100));
+        expect(String.fromCharCodes(bytes.take(5)), startsWith('%PDF'));
+      } finally {
+        DailyAuditPdfService.setDirectoryForTesting(null);
+        if (tempDir.existsSync()) {
+          tempDir.deleteSync(recursive: true);
+        }
+      }
     });
   });
 }

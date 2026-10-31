@@ -7450,3 +7450,52 @@ app-release.aab   54955804  04-10-2026 19:48:39
 - **Next Immediate Task**:
   - Stage and commit Item 12 to `fix/part-b-bugs`.
   - Proceed to next pending bug in the UAT tracker (Item 16 / F06: PDF Marathi font rendering).
+
+
+---
+
+### Handoff: 31 October 2026 — Comprehensive PDF Marathi & English Text Fixes, Shaping, Dynamic Titles, Signatures & Local Saving (Item 16 — Client Ref: F06 / F14 / Review P146-P155)
+**Author**: Antigravity  
+**Goal**: Complete resolution of Sagar Bora's UAT review feedback for Item 16 (Client Ref: F06 / Review P146-P155): "Marathi text is broken in all PDFs, and other PDF issues", encompassing an exhaustive audit of all Marathi Devanagari and English text, numbers, dynamic totals, signatures, timestamps, filenames, and local document persistence across Daily, Weekly, and Monthly PDFs.
+
+1. **Root Cause Analysis & Comprehensive Inventory**:
+   - The Flutter `pdf` package lacks HarfBuzz/OpenType complex-script GSUB shaping, causing TrueType fonts (`NotoSansDevanagari`) to draw pre-base vowel signs (*hrasva velanti* `ि` / `\u093F`) after the consonant (e.g. `विभाग` -> `वभिाग`, `साप्ताहिक` -> `साप्ताहकि`, `मासिक` -> `मासकि`, `दैनिक` -> `दैनकि`, `ऑडिट` -> `ऑडटि`).
+   - Hardcoded Section 2 header (`१२४-गुण अनुपालन`) contradicted actual max points when checkpoints were N/A.
+   - Weekly report headline in `ReportRepository` counted only weekly failures, omitting the 7 daily audits' failures.
+   - Auditor signature printed raw code IDs (e.g. `usr-gm-01`) instead of resolved human names.
+   - Owner verification printed raw UTC ISO string (`2026-10-23T19:43:45.860586Z`).
+   - PDF export bypassed saving local copies to application documents directory, failed to update `reports.pdf_local_path`, exported with long UUID filenames, and had no confirmation snackbar.
+
+2. **Core Implementation**:
+   - **`DevanagariShaper` (`lib/utils/devanagari_shaper.dart`)**:
+     Created pure-Dart Devanagari text pre-shaper that reorders pre-base vowel signs (`\u093F`) before their preceding consonant cluster, traversing across conjuncts (`halant` + `consonant`) and nuktas, restoring visually authentic Marathi typography across all PDFs.
+   - **`WeeklyReportPdfService` (`lib/services/weekly_report_pdf_service.dart`)**:
+     - Applied `DevanagariShaper.shape` to all Devanagari strings and table content.
+     - Section 2 title made dynamic: `${totalMax.toStringAsFixed(0)}-POINT ROLLUP / एकूण अनुपालन`.
+     - Auditor signature resolves real name via `UserRepository` (`Rahul Sharma (General Manager)`).
+     - Formatted `readByOwnerAt` using `AppDateFormat.formatDateTime`.
+     - Monthly report labels author as `Store Owner (Auditor)`.
+     - Standardized filenames: `Saagar_Weekly_Report_W<week>_<year>.pdf` and `Saagar_Monthly_Report_<Month>_<year>.pdf`.
+     - Updated `generateAndSavePdf` to write to application documents directory and update `reports.pdf_local_path`.
+     - Updated `shareOrPrintPdf` to persist locally first before opening share sheet.
+   - **`DailyAuditPdfService` (`lib/services/daily_audit_pdf_service.dart`)**:
+     - Applied `DevanagariShaper.shape` to all Devanagari strings and findings.
+     - Standardized filename: `Saagar_Daily_Audit_<Date>.pdf`.
+     - Added `generateAndSavePdf` saving to application documents directory.
+     - Updated `shareOrPrintPdf` to persist locally first.
+   - **`ReportRepository.generateWeeklyReport` (`lib/data/repositories/report_repository.dart`)**:
+     - Combined daily fails + weekly fails: `$weeklyFailCount Failures ($totalFailCount Total)`.
+   - **UI Screens (`report_detail_screen.dart` & `audit_detail_screen.dart`)**:
+     - Added persistent local save and confirmation snackbars with saved filename.
+
+3. **Verification & Raw Command Outputs**:
+   - `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**
+   - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5)
+   - `flutter test test/devanagari_shaper_test.dart`: **All 3 tests passed!**
+   - `flutter test test/daily_audit_pdf_service_test.dart`: **All 3 tests passed!**
+   - `flutter test test/weekly_report_test.dart`: **All 7 tests passed!**
+   - `flutter test test/monthly_report_integration_test.dart`: **All 5 tests passed!**
+   - Full test suite `flutter test`: **413/413 tests passed! 100% green!**
+
+4. **Next Immediate Task**:
+   - Commit all Item 16 fixes to `fix/part-b-bugs`.

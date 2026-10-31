@@ -89,9 +89,29 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _exportingPdf = true);
     try {
-      await WeeklyReportPdfService.instance.shareOrPrintPdf(report);
-      if (!mounted) return;
-      setState(() => _exportingPdf = false);
+      final savedPath = await WeeklyReportPdfService.instance.shareOrPrintPdf(report);
+      final updated = await ReportRepository.instance.getById(report.id);
+      if (mounted) {
+        if (updated != null) {
+          setState(() {
+            _report = updated;
+            _exportingPdf = false;
+          });
+        } else {
+          setState(() => _exportingPdf = false);
+        }
+        final fileName = savedPath.split(RegExp(r'[/\\]')).last;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              report.reportType == 'monthly'
+                  ? 'Monthly report PDF saved ($fileName) and ready to share.'
+                  : 'Weekly report PDF saved ($fileName) and ready to share.',
+            ),
+            backgroundColor: AppColors.green,
+          ),
+        );
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _exportingPdf = false);

@@ -7,16 +7,23 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 import '../data/models/report.dart';
+import '../data/repositories/audit_repository.dart';
 import '../data/repositories/report_repository.dart';
+import '../data/repositories/user_repository.dart';
 import '../utils/app_date_format.dart';
+import '../utils/devanagari_shaper.dart';
 
-/// 1-Page Bilingual PDF Generator Service for Weekly Audit Reports (Workbook Day 3 §3.6).
+/// 1-Page Bilingual PDF Generator Service for Weekly & Monthly Reports (Workbook Day 3 §3.6 & §3.7).
 class WeeklyReportPdfService {
   WeeklyReportPdfService._();
   static final WeeklyReportPdfService instance = WeeklyReportPdfService._();
 
   static pw.Font? _cachedRegular;
   static pw.Font? _cachedBold;
+  static Directory? _testingDirectory;
+
+  /// Sets a custom output directory for testing purposes.
+  static void setDirectoryForTesting(Directory? dir) => _testingDirectory = dir;
 
   /// Loads the bundled Noto Sans Devanagari regular font.
   static Future<pw.Font> getRegularFont() async {
@@ -47,10 +54,14 @@ class WeeklyReportPdfService {
     }
   }
 
+  static String _s(String? text) => DevanagariShaper.shape(text);
+
   /// Builds the 1-page bilingual PDF document bytes for a given [report].
-  /// Uses Noto Sans Devanagari with font fallbacks supporting English and authentic Marathi.
+  /// Uses Noto Sans Devanagari with font fallbacks and [DevanagariShaper]
+  /// for authentic, visually correct Marathi text rendering.
   Future<Uint8List> buildPdfBytes(
     Report report, {
+    String? auditorName,
     pw.Font? font,
     pw.Font? boldFont,
   }) async {
@@ -93,6 +104,7 @@ class WeeklyReportPdfService {
     if (report.reportType == 'monthly') {
       return _buildMonthlyPdfBytes(
         report: report,
+        auditorName: auditorName,
         pdf: pdf,
         baseFont: baseFont,
         headerFont: headerFont,
@@ -146,14 +158,14 @@ class WeeklyReportPdfService {
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
                       pw.Text(
-                        'SAAGAR TRADERS - सागर ट्रेडर्स',
+                        _s('SAAGAR TRADERS · सागर ट्रेडर्स'),
                         style: headerStyle(
                           fontSize: 13,
                           color: PdfColors.blueGrey900,
                         ),
                       ),
                       pw.Text(
-                        'Weekly Executive Report - साप्ताहिक अनुपालन अहवाल (९ विभाग - §3.6)',
+                        _s('Weekly Executive Report · साप्ताहिक अनुपालन अहवाल (९ विभाग - §3.6)'),
                         style: baseStyle(
                           fontSize: 8,
                           color: PdfColors.grey700,
@@ -175,7 +187,7 @@ class WeeklyReportPdfService {
                       ),
                     ),
                     child: pw.Text(
-                      '${compliancePct.toStringAsFixed(1)}% - ${_marathiBand(compliancePct)}',
+                      '${compliancePct.toStringAsFixed(1)}% - ${_s(_marathiBand(compliancePct))}',
                       style: headerStyle(
                         fontSize: 9.5,
                         color: compliancePct >= 90.0
@@ -198,12 +210,12 @@ class WeeklyReportPdfService {
                 child: pw.Row(
                   children: [
                     pw.Text(
-                      'SECTION 1 - विभाग १ (HEADLINE / मथळा): ',
+                      _s('SECTION 1 · EXECUTIVE HEADLINE / मथळा: '),
                       style: headerStyle(fontSize: 8),
                     ),
                     pw.Expanded(
                       child: pw.Text(
-                        headlineText,
+                        _s(headlineText),
                         style: baseStyle(fontSize: 8),
                         maxLines: 1,
                       ),
@@ -223,7 +235,10 @@ class WeeklyReportPdfService {
                     child: pw.Column(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
-                        _sectionTitle('SECTION 2 - विभाग २: १२४-गुण अनुपालन (ROLLUP)', headerStyle),
+                        _sectionTitle(
+                          _s('SECTION 2 · ${totalMax.toStringAsFixed(0)}-POINT ROLLUP / एकूण अनुपालन'),
+                          headerStyle,
+                        ),
                         pw.Container(
                           padding: const pw.EdgeInsets.all(6),
                           decoration: pw.BoxDecoration(
@@ -234,18 +249,18 @@ class WeeklyReportPdfService {
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
                               _scoreRow(
-                                'Daily Contribution - दैनिक योगदान (Avg% * 0.68):',
+                                _s('Daily Contribution / दैनिक योगदान (Avg% * 0.68):'),
                                 '${dailyContrib.toStringAsFixed(1)} / 68.0 pts',
                                 baseStyle,
                               ),
                               _scoreRow(
-                                'Weekly CPs - साप्ताहिक तपासणी (36 CPs):',
+                                _s('Weekly CPs / साप्ताहिक तपासणी (36 CPs):'),
                                 '${weeklyRaw.toStringAsFixed(1)} / ${weeklyMax.toStringAsFixed(0)} pts',
                                 baseStyle,
                               ),
                               pw.Divider(color: PdfColors.grey300, height: 4),
                               _scoreRow(
-                                'Total Score - एकूण गुण:',
+                                _s('Total Score / एकूण गुण:'),
                                 '${totalRaw.toStringAsFixed(1)} / ${totalMax.toStringAsFixed(0)} (${compliancePct.toStringAsFixed(1)}%)',
                                 headerStyle,
                               ),
@@ -253,7 +268,7 @@ class WeeklyReportPdfService {
                           ),
                         ),
                         pw.SizedBox(height: 6),
-                        _sectionTitle('SOP BREAKDOWN - विभागनिहाय गुण', headerStyle),
+                        _sectionTitle(_s('SOP BREAKDOWN / विभागनिहाय गुण'), headerStyle),
                         pw.Table(
                           border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
                           children: [
@@ -261,8 +276,8 @@ class WeeklyReportPdfService {
                               decoration: const pw.BoxDecoration(color: PdfColors.grey200),
                               children: [
                                 _cell('SOP', headerStyle, isHeader: true),
-                                _cell('Name - नाव', headerStyle, isHeader: true),
-                                _cell('Score - गुण', headerStyle, isHeader: true),
+                                _cell(_s('Name / नाव'), headerStyle, isHeader: true),
+                                _cell(_s('Score / गुण'), headerStyle, isHeader: true),
                                 _cell('%', headerStyle, isHeader: true),
                               ],
                             ),
@@ -272,7 +287,7 @@ class WeeklyReportPdfService {
                                   _cell('SOP ${s['sop_number'] ?? ''}', baseStyle),
                                   _cell(
                                     s['name_mr'] != null && s['name_mr'].toString().isNotEmpty
-                                        ? '${s['name_en'] ?? ''} (${s['name_mr']})'
+                                        ? '${s['name_en'] ?? ''} (${_s(s['name_mr'].toString())})'
                                         : '${s['name_en'] ?? ''}',
                                     baseStyle,
                                   ),
@@ -296,7 +311,7 @@ class WeeklyReportPdfService {
                     child: pw.Column(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
-                        _sectionTitle('SECTION 3 - विभाग ३: ७-दिवस कल (TREND & WOW)', headerStyle),
+                        _sectionTitle(_s('SECTION 3 · 7-DAY TREND & WOW / ७-दिवस कल'), headerStyle),
                         pw.Container(
                           padding: const pw.EdgeInsets.all(6),
                           decoration: pw.BoxDecoration(
@@ -336,11 +351,11 @@ class WeeklyReportPdfService {
                               pw.Row(
                                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                                 children: [
-                                  pw.Text('WoW Change - आठवडा बदल:', style: baseStyle(fontSize: 7)),
+                                  pw.Text(_s('WoW Change / आठवडा बदल:'), style: baseStyle(fontSize: 7)),
                                   pw.Text(
                                     wowDelta != null
                                         ? '${wowDelta >= 0 ? '+' : ''}${wowDelta.toStringAsFixed(1)}%'
-                                        : '- (लागू नाही / Base)',
+                                        : _s('- (लागू नाही / Base)'),
                                     style: headerStyle(fontSize: 7),
                                   ),
                                 ],
@@ -349,10 +364,10 @@ class WeeklyReportPdfService {
                           ),
                         ),
                         pw.SizedBox(height: 6),
-                        _sectionTitle('SECTION 4 - विभाग ४: त्रुटी (${findings.length})', headerStyle),
+                        _sectionTitle(_s('SECTION 4 · NON-COMPLIANCES / त्रुटी (${findings.length})'), headerStyle),
                         if (findings.isEmpty)
                           pw.Text(
-                            'Zero weekly non-compliances - कोणतीही साप्ताहिक त्रुटी नाही.',
+                            _s('Zero weekly non-compliances · कोणतीही साप्ताहिक त्रुटी नाही.'),
                             style: baseStyle(fontSize: 7, color: PdfColors.grey700),
                           )
                         else
@@ -373,7 +388,7 @@ class WeeklyReportPdfService {
                                   ),
                                   pw.Expanded(
                                     child: pw.Text(
-                                      f['finding_text']?.toString() ?? '',
+                                      _s(f['finding_text']?.toString() ?? ''),
                                       style: baseStyle(fontSize: 7),
                                     ),
                                   ),
@@ -388,7 +403,7 @@ class WeeklyReportPdfService {
               pw.SizedBox(height: 6),
 
               // --- Section 5: Patterns (T2.4) ---
-              _sectionTitle('SECTION 5 - विभाग ५: आढळलेले पॅटर्न (PATTERNS: ${patterns.length})', headerStyle),
+              _sectionTitle(_s('SECTION 5 · PATTERNS / आढळलेले पॅटर्न (${patterns.length})'), headerStyle),
               if (patterns.isEmpty)
                 pw.Container(
                   padding: const pw.EdgeInsets.all(5),
@@ -397,7 +412,7 @@ class WeeklyReportPdfService {
                     borderRadius: pw.BorderRadius.all(pw.Radius.circular(2)),
                   ),
                   child: pw.Text(
-                    'No cross-day patterns detected - या आठवड्यात कोणतेही पॅटर्न आढळले नाहीत.',
+                    _s('No cross-day patterns detected · कोणतेही पॅटर्न आढळले नाहीत.'),
                     style: baseStyle(fontSize: 7, color: PdfColors.grey700),
                   ),
                 )
@@ -415,11 +430,11 @@ class WeeklyReportPdfService {
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
                         pw.Text(
-                          'तपासणी बिंदू ${p.checkpointId}: ${p.failCount} दिवस अयशस्वी (${p.weekdaysMr.join(", ")}) - Pattern',
+                          _s('तपासणी बिंदू ${p.checkpointId}: ${p.failCount} दिवस अयशस्वी (${p.weekdaysMr.map(_s).join(", ")}) - Pattern'),
                           style: headerStyle(fontSize: 7.5, color: PdfColors.amber900),
                         ),
                         pw.Text(
-                          'सुचवलेली कृती / Action: ${p.toSuggestedCap().suggestedActionMr} | ${p.toSuggestedCap().suggestedActionEn}',
+                          'Action: ${_s(p.toSuggestedCap().suggestedActionMr)} | ${p.toSuggestedCap().suggestedActionEn}',
                           style: baseStyle(fontSize: 7),
                         ),
                       ],
@@ -428,16 +443,16 @@ class WeeklyReportPdfService {
               pw.SizedBox(height: 6),
 
               // --- Sections 6, 7, 8: CAPs (Opened, Closed, Aged) ---
-              _sectionTitle('SECTIONS 6-8 - विभाग ६-८: सुधारात्मक कृती योजना (CAPs)', headerStyle),
+              _sectionTitle(_s('SECTIONS 6-8 · CAPs / सुधारात्मक कृती योजना'), headerStyle),
               pw.Row(
                 children: [
                   pw.Expanded(
                     child: _capBox(
-                      'SEC 6 - विभाग ६ (सुरू / OPENED)',
-                      '${capsOpened.length} New CAPs / नवीन',
+                      _s('SEC 6 · OPENED / सुरू'),
+                      _s('${capsOpened.length} New CAPs / नवीन'),
                       capsOpened.isNotEmpty
-                          ? (capsOpened.first['is_pattern'] == true ? '१ पॅटर्न CAP समाविष्ट (1 Pattern)' : 'साप्ताहिक त्रुटी (Direct)')
-                          : 'कोणतीही नवीन CAP नाही',
+                          ? (capsOpened.first['is_pattern'] == true ? _s('१ पॅटर्न CAP समाविष्ट (1 Pattern)') : _s('साप्ताहिक त्रुटी (Direct)'))
+                          : _s('कोणतीही नवीन CAP नाही'),
                       baseStyle,
                       headerStyle,
                     ),
@@ -445,10 +460,10 @@ class WeeklyReportPdfService {
                   pw.SizedBox(width: 6),
                   pw.Expanded(
                     child: _capBox(
-                      'SEC 7 - विभाग ७ (बंद / CLOSED)',
-                      '${capsClosed.length} Closed / बंद',
+                      _s('SEC 7 · CLOSED / बंद'),
+                      _s('${capsClosed.length} Closed / बंद'),
                       capsClosed.isEmpty
-                          ? 'या आठवड्यात कोणतीही कॅप बंद नाही'
+                          ? _s('या आठवड्यात कोणतीही कॅप बंद नाही')
                           : '${capsClosed.length} CAPs verified & closed',
                       baseStyle,
                       headerStyle,
@@ -457,10 +472,10 @@ class WeeklyReportPdfService {
                   pw.SizedBox(width: 6),
                   pw.Expanded(
                     child: _capBox(
-                      'SEC 8 - विभाग ८ (प्रलंबित / AGED)',
-                      '${capsAged.length} Aged / प्रलंबित',
+                      _s('SEC 8 · AGED / प्रलंबित'),
+                      _s('${capsAged.length} Aged / प्रलंबित'),
                       capsAged.isEmpty
-                          ? 'कोणतीही जुनी कॅप नाही'
+                          ? _s('कोणतीही जुनी कॅप नाही')
                           : '${capsAged.length} CAPs overdue / aged',
                       baseStyle,
                       headerStyle,
@@ -471,7 +486,7 @@ class WeeklyReportPdfService {
               pw.SizedBox(height: 6),
 
               // --- Section 9 & Signature of Record ---
-              _sectionTitle('SECTION 9 - विभाग ९: एस्केलेशन आणि स्वाक्षरी (ESCALATION & SIGNATURE)', headerStyle),
+              _sectionTitle(_s('SECTION 9 · ESCALATIONS & SIGNATURES / एस्केलेशन व स्वाक्षरी'), headerStyle),
               pw.Container(
                 padding: const pw.EdgeInsets.all(6),
                 decoration: pw.BoxDecoration(
@@ -488,11 +503,11 @@ class WeeklyReportPdfService {
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
                             pw.Text(
-                              'एस्केलेशन नोंद / Escalations: ${escalations.length}${escalations.isEmpty ? " (None / निरंक)" : ""}',
+                              _s('एस्केलेशन नोंद / Escalations: ${escalations.length}${escalations.isEmpty ? " (None / निरंक)" : ""}'),
                               style: headerStyle(fontSize: 7.5),
                             ),
                             pw.Text(
-                              'GM / ऑडिटर स्वाक्षरी: ${report.authorUserId ?? "GM Auditor"} - ${report.submittedAt != null ? AppDateFormat.formatDate(report.submittedAt) : "Submitted"}',
+                              'GM / Auditor: ${auditorName ?? report.authorUserId ?? "General Manager"} · ${report.submittedAt != null ? AppDateFormat.formatDate(report.submittedAt!) : "Submitted"}',
                               style: baseStyle(fontSize: 7),
                             ),
                           ],
@@ -509,8 +524,8 @@ class WeeklyReportPdfService {
                           ),
                           child: pw.Text(
                             report.isReadByOwner
-                                ? 'मालकाने वाचले (Read): ${report.readByOwnerAt ?? ""}'
-                                : 'मालक पुनरावलोकन: प्रलंबित (Pending)',
+                                ? _s('मालकाने वाचले (Read): ${_formatReadAt(report.readByOwnerAt)}')
+                                : _s('मालक पुनरावलोकन: प्रलंबित (Pending)'),
                             style: headerStyle(
                               fontSize: 7,
                               color: report.isReadByOwner ? PdfColors.green900 : PdfColors.grey700,
@@ -527,7 +542,7 @@ class WeeklyReportPdfService {
                         pw.Padding(
                           padding: const pw.EdgeInsets.only(bottom: 2),
                           child: pw.Text(
-                            '• [T${esc['trigger_number'] ?? '?'}] ${esc['trigger_label'] ?? ''} (${esc['urgency'] ?? ''}): ${esc['what_happened'] ?? ''}',
+                            _s('• [T${esc['trigger_number'] ?? '?'}] ${esc['trigger_label'] ?? ''} (${esc['urgency'] ?? ''}): ${esc['what_happened'] ?? ''}'),
                             style: baseStyle(fontSize: 6.5),
                             maxLines: 2,
                           ),
@@ -544,11 +559,11 @@ class WeeklyReportPdfService {
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
                   pw.Text(
-                    'सागर रिटेल ऑडिट प्रणाली - अपरिवर्तनीयता सक्रिय (Immutability Active)',
+                    _s('सागर रिटेल ऑडिट प्रणाली · अपरिवर्तनीयता सक्रिय (Immutability Active)'),
                     style: baseStyle(fontSize: 6, color: PdfColors.grey600),
                   ),
                   pw.Text(
-                    'पान १ पैकी १ - Page 1 of 1',
+                    _s('पान १ पैकी १ · Page 1 of 1'),
                     style: baseStyle(fontSize: 6, color: PdfColors.grey600),
                   ),
                 ],
@@ -564,11 +579,46 @@ class WeeklyReportPdfService {
 
   /// Generates the PDF bytes, writes to local application directory,
   /// updates [report.pdfLocalPath], and returns the saved file path.
-  Future<String> generateAndSavePdf(Report report) async {
-    final bytes = await buildPdfBytes(report);
-    final outputDir = await getApplicationDocumentsDirectory();
-    final typePrefix = report.reportType == 'monthly' ? 'monthly' : 'weekly';
-    final fileName = '${typePrefix}_report_${report.auditId}.pdf';
+  Future<String> generateAndSavePdf(
+    Report report, {
+    String? auditorName,
+  }) async {
+    String resolvedAuditor = auditorName ?? report.authorUserId ?? 'Auditor';
+    if (auditorName == null && report.authorUserId != null) {
+      try {
+        final user = await UserRepository.instance.getById(report.authorUserId!);
+        if (user != null) {
+          final roleTitle = user.role.toLowerCase() == 'owner'
+              ? 'Owner'
+              : (user.role.toLowerCase() == 'gm' ? 'General Manager' : 'Store Manager');
+          resolvedAuditor = '${user.name} ($roleTitle)';
+        }
+      } catch (_) {}
+    }
+
+    final bytes = await buildPdfBytes(report, auditorName: resolvedAuditor);
+    final outputDir = _testingDirectory ?? await getApplicationDocumentsDirectory();
+
+    int? weekNum;
+    int? monthNum;
+    int year = DateTime.now().year;
+    try {
+      final audit = await AuditRepository.instance.getById(report.auditId);
+      if (audit != null) {
+        weekNum = audit.weekNumber;
+        monthNum = audit.monthNumber;
+        year = audit.year;
+      }
+    } catch (_) {}
+
+    final String fileName;
+    if (report.reportType == 'monthly') {
+      final month = _monthName(monthNum ?? DateTime.now().month);
+      fileName = 'Saagar_Monthly_Report_${month}_$year.pdf';
+    } else {
+      fileName = 'Saagar_Weekly_Report_W${weekNum ?? 'X'}_$year.pdf';
+    }
+
     final file = File('${outputDir.path}/$fileName');
     await file.writeAsBytes(bytes);
 
@@ -581,17 +631,25 @@ class WeeklyReportPdfService {
   }
 
   /// Generates and shares or prints the PDF using printing package.
-  Future<void> shareOrPrintPdf(Report report) async {
-    final bytes = await buildPdfBytes(report);
-    final typePrefix = report.reportType == 'monthly' ? 'monthly' : 'weekly';
+  /// Always saves a persistent local copy to the device first and updates [report.pdfLocalPath].
+  Future<String> shareOrPrintPdf(
+    Report report, {
+    String? auditorName,
+  }) async {
+    final filePath = await generateAndSavePdf(report, auditorName: auditorName);
+    final file = File(filePath);
+    final bytes = await file.readAsBytes();
+    final fileName = file.uri.pathSegments.last;
     await Printing.sharePdf(
       bytes: bytes,
-      filename: '${typePrefix}_report_${report.auditId}.pdf',
+      filename: fileName,
     );
+    return filePath;
   }
 
   Future<Uint8List> _buildMonthlyPdfBytes({
     required Report report,
+    String? auditorName,
     required pw.Document pdf,
     required pw.Font baseFont,
     required pw.Font headerFont,
@@ -641,11 +699,11 @@ class WeeklyReportPdfService {
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
                       pw.Text(
-                        'SAAGAR TRADERS - सागर ट्रेडर्स',
+                        _s('SAAGAR TRADERS · सागर ट्रेडर्स'),
                         style: headerStyle(fontSize: 13, color: PdfColors.blueGrey900),
                       ),
                       pw.Text(
-                        'Monthly Strategic Trend Report - मासिक धोरणात्मक व कल अहवाल (Workbook §3.7)',
+                        _s('Monthly Strategic Trend Report · मासिक धोरणात्मक व कल अहवाल (Workbook §3.7)'),
                         style: baseStyle(fontSize: 8, color: PdfColors.grey700),
                       ),
                     ],
@@ -664,7 +722,7 @@ class WeeklyReportPdfService {
                       ),
                     ),
                     child: pw.Text(
-                      '${monthlyPct.toStringAsFixed(1)}% - ${_marathiBand(monthlyPct)}',
+                      '${monthlyPct.toStringAsFixed(1)}% - ${_s(_marathiBand(monthlyPct))}',
                       style: headerStyle(
                         fontSize: 9.5,
                         color: monthlyPct >= 95.0
@@ -686,9 +744,9 @@ class WeeklyReportPdfService {
                 ),
                 child: pw.Row(
                   children: [
-                    pw.Text('SECTION 1 - विभाग १ (HEADLINE / मथळा): ', style: headerStyle(fontSize: 8)),
+                    pw.Text(_s('SECTION 1 · EXECUTIVE HEADLINE / मथळा: '), style: headerStyle(fontSize: 8)),
                     pw.Expanded(
-                      child: pw.Text(headlineText, style: baseStyle(fontSize: 8), maxLines: 1),
+                      child: pw.Text(_s(headlineText), style: baseStyle(fontSize: 8), maxLines: 1),
                     ),
                   ],
                 ),
@@ -705,7 +763,7 @@ class WeeklyReportPdfService {
                     child: pw.Column(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
-                        _sectionTitle('SECTION 2 - विभाग २: धोरणात्मक तपासण्या (SPOT-CHECKS)', headerStyle),
+                        _sectionTitle(_s('SECTION 2 · STRATEGIC SPOT-CHECKS / धोरणात्मक तपासण्या'), headerStyle),
                         pw.Container(
                           padding: const pw.EdgeInsets.all(6),
                           decoration: pw.BoxDecoration(
@@ -715,10 +773,10 @@ class WeeklyReportPdfService {
                           child: pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
-                              _scoreRow('Spot-Check Score / स्पॉट-तपासणी:', '${monthlyPct.toStringAsFixed(1)}% (${_marathiBand(monthlyPct)})', headerStyle),
+                              _scoreRow(_s('Spot-Check Score / स्पॉट-तपासणी:'), '${monthlyPct.toStringAsFixed(1)}% (${_s(_marathiBand(monthlyPct))})', headerStyle),
                               if (weeklyAvgPct != null) ...[
                                 pw.Divider(color: PdfColors.grey200, height: 4),
-                                _scoreRow('Weekly Audits Avg / साप्ताहिक सरासरी:', '${weeklyAvgPct.toStringAsFixed(1)}%', baseStyle),
+                                _scoreRow(_s('Weekly Audits Avg / साप्ताहिक सरासरी:'), '${weeklyAvgPct.toStringAsFixed(1)}%', baseStyle),
                               ],
                               pw.SizedBox(height: 4),
                               pw.Table(
@@ -728,7 +786,7 @@ class WeeklyReportPdfService {
                                     decoration: const pw.BoxDecoration(color: PdfColors.grey100),
                                     children: [
                                       _cell('SOP', headerStyle, isHeader: true),
-                                      _cell('Score', headerStyle, isHeader: true),
+                                      _cell(_s('Score'), headerStyle, isHeader: true),
                                       _cell('%', headerStyle, isHeader: true),
                                     ],
                                   ),
@@ -747,7 +805,7 @@ class WeeklyReportPdfService {
                         ),
                         pw.SizedBox(height: 6),
 
-                        _sectionTitle('SECTION 4 - विभाग ४: त्रुटी तपशील (FINDINGS)', headerStyle),
+                        _sectionTitle(_s('SECTION 4 · FINDINGS / त्रुटी तपशील'), headerStyle),
                         pw.Container(
                           padding: const pw.EdgeInsets.all(6),
                           decoration: pw.BoxDecoration(
@@ -755,7 +813,7 @@ class WeeklyReportPdfService {
                             borderRadius: const pw.BorderRadius.all(pw.Radius.circular(3)),
                           ),
                           child: findings.isEmpty
-                              ? pw.Text('No spot-check non-compliances recorded. (कोणतीही त्रुटी नाही)', style: baseStyle(fontSize: 7, color: PdfColors.grey600))
+                              ? pw.Text(_s('No spot-check non-compliances recorded. (कोणतीही त्रुटी नाही)'), style: baseStyle(fontSize: 7, color: PdfColors.grey600))
                               : pw.Column(
                                   children: [
                                     for (final f in findings)
@@ -767,7 +825,7 @@ class WeeklyReportPdfService {
                                             pw.Text('- ', style: headerStyle(fontSize: 7, color: PdfColors.red800)),
                                             pw.Expanded(
                                               child: pw.Text(
-                                                '${f['checkpoint_id']}: ${f['finding_text'] ?? ''}',
+                                                '${f['checkpoint_id']}: ${_s(f['finding_text']?.toString() ?? '')}',
                                                 style: baseStyle(fontSize: 7),
                                               ),
                                             ),
@@ -779,7 +837,7 @@ class WeeklyReportPdfService {
                         ),
                         pw.SizedBox(height: 6),
 
-                        _sectionTitle('SECTION 7 - स्वाक्षरी (SIGNATURE OF RECORD)', headerStyle),
+                        _sectionTitle(_s('SECTION 7 · SIGNATURE OF RECORD / स्वाक्षरी'), headerStyle),
                         pw.Container(
                           padding: const pw.EdgeInsets.all(5),
                           decoration: pw.BoxDecoration(
@@ -789,9 +847,9 @@ class WeeklyReportPdfService {
                           child: pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
-                              pw.Text('Auditor: ${report.authorUserId ?? "Owner"} · ${report.submittedAt != null ? AppDateFormat.formatDate(report.submittedAt) : ""}', style: headerStyle(fontSize: 6.5)),
+                              pw.Text('Store Owner (Auditor): ${auditorName ?? report.authorUserId ?? "Store Owner"} · ${report.submittedAt != null ? AppDateFormat.formatDate(report.submittedAt!) : ""}', style: headerStyle(fontSize: 6.5)),
                               pw.SizedBox(height: 2),
-                              pw.Text('Owner Review: ${report.isReadByOwner ? "Read on ${report.readByOwnerAt != null ? AppDateFormat.formatDate(report.readByOwnerAt) : ""}" : "Pending Owner Review"}', style: baseStyle(fontSize: 6.5, color: report.isReadByOwner ? PdfColors.green800 : PdfColors.amber800)),
+                              pw.Text('Owner Review: ${report.isReadByOwner ? "Read on ${_formatReadAt(report.readByOwnerAt)}" : "Pending Owner Review"}', style: baseStyle(fontSize: 6.5, color: report.isReadByOwner ? PdfColors.green800 : PdfColors.amber800)),
                             ],
                           ),
                         ),
@@ -806,7 +864,7 @@ class WeeklyReportPdfService {
                     child: pw.Column(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
-                        _sectionTitle('SECTION 3 - विभाग ३: बहु-आठवडा कल विश्लेषण (TREND ANALYTICS)', headerStyle),
+                        _sectionTitle(_s('SECTION 3 · MULTI-WEEK TREND / बहु-आठवडा कल विश्लेषण'), headerStyle),
                         pw.Container(
                           padding: const pw.EdgeInsets.all(6),
                           decoration: pw.BoxDecoration(
@@ -825,7 +883,7 @@ class WeeklyReportPdfService {
                                     pw.TableRow(
                                       decoration: const pw.BoxDecoration(color: PdfColors.grey100),
                                       children: [
-                                        _cell('Week / आठवडा', headerStyle, isHeader: true),
+                                        _cell(_s('Week / आठवडा'), headerStyle, isHeader: true),
                                         _cell('Score %', headerStyle, isHeader: true),
                                         _cell('4-Wk MA', headerStyle, isHeader: true),
                                       ],
@@ -858,7 +916,7 @@ class WeeklyReportPdfService {
                         ),
                         pw.SizedBox(height: 6),
 
-                        _sectionTitle('SECTION 5 - विभाग ५: आढळलेले कल (DETECTED PATTERNS)', headerStyle),
+                        _sectionTitle(_s('SECTION 5 · DETECTED TRENDS / आढळलेले कल'), headerStyle),
                         pw.Container(
                           padding: const pw.EdgeInsets.all(6),
                           decoration: pw.BoxDecoration(
@@ -866,7 +924,7 @@ class WeeklyReportPdfService {
                             borderRadius: const pw.BorderRadius.all(pw.Radius.circular(3)),
                           ),
                           child: patterns.isEmpty
-                              ? pw.Text('No critical multi-week patterns detected. (कोणताही गंभीर कल आढळला नाही)', style: baseStyle(fontSize: 7, color: PdfColors.grey600))
+                              ? pw.Text(_s('No critical multi-week patterns detected. (कोणताही गंभीर कल आढळला नाही)'), style: baseStyle(fontSize: 7, color: PdfColors.grey600))
                               : pw.Column(
                                   children: [
                                     for (final p in patterns)
@@ -877,7 +935,7 @@ class WeeklyReportPdfService {
                                             pw.Text('- ', style: headerStyle(fontSize: 7, color: PdfColors.orange800)),
                                             pw.Expanded(
                                               child: pw.Text(
-                                                '${p['name_en'] ?? p['pattern_type']}: ${p['description_en'] ?? ''}',
+                                                '${p['name_en'] ?? p['pattern_type']}: ${_s(p['description_en']?.toString() ?? '')}',
                                                 style: baseStyle(fontSize: 7),
                                               ),
                                             ),
@@ -889,7 +947,7 @@ class WeeklyReportPdfService {
                         ),
                         pw.SizedBox(height: 6),
 
-                        _sectionTitle('SECTION 6 - विभाग ६: कॅप आणि एस्केलेशन सारांश (CAP & ESCALATIONS)', headerStyle),
+                        _sectionTitle(_s('SECTION 6 · CAP & ESCALATION SUMMARY / कॅप व एस्केलेशन सारांश'), headerStyle),
                         pw.Container(
                           padding: const pw.EdgeInsets.all(6),
                           decoration: pw.BoxDecoration(
@@ -899,13 +957,13 @@ class WeeklyReportPdfService {
                           child: pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
-                              _scoreRow('CAPs Opened This Month / उघडलेले:', '${capsOpened.length}', baseStyle),
+                              _scoreRow(_s('CAPs Opened This Month / उघडलेले:'), '${capsOpened.length}', baseStyle),
                               pw.Divider(color: PdfColors.grey200, height: 4),
-                              _scoreRow('CAPs Closed This Month / बंद झालेले:', '${capsClosed.length}', baseStyle),
+                              _scoreRow(_s('CAPs Closed This Month / बंद झालेले:'), '${capsClosed.length}', baseStyle),
                               pw.Divider(color: PdfColors.grey200, height: 4),
-                              _scoreRow('Currently Aged CAPs / जुने झालेले:', '${capsAged.length}', baseStyle),
+                              _scoreRow(_s('Currently Aged CAPs / जुने झालेले:'), '${capsAged.length}', baseStyle),
                               pw.Divider(color: PdfColors.grey200, height: 4),
-                              _scoreRow('Escalations Raised / एस्केलेशन्स:', '${escalations.length}', baseStyle),
+                              _scoreRow(_s('Escalations Raised / एस्केलेशन्स:'), '${escalations.length}', baseStyle),
                             ],
                           ),
                         ),
@@ -921,10 +979,10 @@ class WeeklyReportPdfService {
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
                   pw.Text(
-                    'सागर रिटेल ऑडिट प्रणाली - अपरिवर्तनीयता सक्रिय (Immutability Active) · मासिक कल अहवाल',
+                    _s('सागर रिटेल ऑडिट प्रणाली · अपरिवर्तनीयता सक्रिय (Immutability Active) · मासिक कल अहवाल'),
                     style: baseStyle(fontSize: 6, color: PdfColors.grey600),
                   ),
-                  pw.Text('पान १ पैकी १ - Page 1 of 1', style: baseStyle(fontSize: 6, color: PdfColors.grey600)),
+                  pw.Text(_s('पान १ पैकी १ · Page 1 of 1'), style: baseStyle(fontSize: 6, color: PdfColors.grey600)),
                 ],
               ),
             ],
@@ -950,9 +1008,27 @@ class WeeklyReportPdfService {
     final daysEn = ['D1(Mon)', 'D2(Tue)', 'D3(Wed)', 'D4(Thu)', 'D5(Fri)', 'D6(Sat)', 'D7(Sun)'];
     final daysMr = ['सोम', 'मंगळ', 'बुध', 'गुरू', 'शुक्र', 'शनि', 'रवि'];
     if (i < 7) {
-      return '${daysEn[i]}\n${daysMr[i]}';
+      return '${daysEn[i]}\n${_s(daysMr[i])}';
     }
     return 'D${i + 1}';
+  }
+
+  static String _monthName(int month) {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
+    ];
+    if (month >= 1 && month <= 12) return months[month - 1];
+    return 'Month$month';
+  }
+
+  static String _formatReadAt(String? readByOwnerAt) {
+    if (readByOwnerAt == null || readByOwnerAt.isEmpty) return '';
+    final dt = DateTime.tryParse(readByOwnerAt);
+    if (dt != null) {
+      return AppDateFormat.formatDateTime(dt);
+    }
+    return readByOwnerAt;
   }
 
   pw.Widget _sectionTitle(String title, pw.TextStyle Function({double fontSize, PdfColor? color, pw.FontWeight? fontWeight}) styleBuilder) {

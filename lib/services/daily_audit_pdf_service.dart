@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -11,6 +12,7 @@ import '../data/models/checkpoint.dart';
 import '../data/models/cro.dart';
 import '../data/models/sop.dart';
 import '../utils/app_date_format.dart';
+import '../utils/devanagari_shaper.dart';
 
 /// PDF Generator Service for Daily Audit Reports (Spec §5 Screen S13 & Section 10).
 class DailyAuditPdfService {
@@ -19,6 +21,10 @@ class DailyAuditPdfService {
 
   static pw.Font? _cachedRegular;
   static pw.Font? _cachedBold;
+  static Directory? _testingDirectory;
+
+  /// Sets a custom output directory for testing purposes.
+  static void setDirectoryForTesting(Directory? dir) => _testingDirectory = dir;
 
   /// Loads the bundled Noto Sans Devanagari regular font.
   static Future<pw.Font> getRegularFont() async {
@@ -48,6 +54,8 @@ class DailyAuditPdfService {
       rethrow;
     }
   }
+
+  static String _s(String? text) => DevanagariShaper.shape(text);
 
   /// Builds the bilingual PDF document bytes for a given daily audit.
   Future<Uint8List> buildPdfBytes({
@@ -170,7 +178,7 @@ class DailyAuditPdfService {
                       style: headerStyle(fontSize: 12, color: PdfColors.blueGrey900),
                     ),
                     pw.Text(
-                      'DAILY COMPLIANCE AUDIT / दैनिक अनुपालन ऑडिट',
+                      _s('DAILY COMPLIANCE AUDIT / दैनिक अनुपालन ऑडिट'),
                       style: headerStyle(fontSize: 9, color: PdfColors.blueGrey700),
                     ),
                   ],
@@ -183,7 +191,7 @@ class DailyAuditPdfService {
                     border: pw.Border.all(color: bandBorderColor, width: 1),
                   ),
                   child: pw.Text(
-                    '${compliancePct.toStringAsFixed(1)}% - ${_marathiBand(compliancePct)}',
+                    '${compliancePct.toStringAsFixed(1)}% - ${_s(_marathiBand(compliancePct))}',
                     style: headerStyle(fontSize: 9, color: bandTextColor),
                   ),
                 ),
@@ -226,23 +234,23 @@ class DailyAuditPdfService {
                 pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    _metaRow('Audit Date / तारीख:', AppDateFormat.formatDate(audit.auditDate), baseStyle, headerStyle),
+                    _metaRow(_s('Audit Date / तारीख:'), AppDateFormat.formatDate(audit.auditDate), baseStyle, headerStyle),
                     pw.SizedBox(height: 2),
-                    _metaRow('Auditor / ऑडिटर:', auditorName, baseStyle, headerStyle),
+                    _metaRow(_s('Auditor / ऑडिटर:'), auditorName, baseStyle, headerStyle),
                   ],
                 ),
                 pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
                     _metaRow(
-                      'Submitted / सादर केले:',
+                      _s('Submitted / सादर केले:'),
                       audit.submittedAt != null ? AppDateFormat.formatDateTime(audit.submittedAt!) : 'Draft',
                       baseStyle,
                       headerStyle,
                     ),
                     pw.SizedBox(height: 2),
                     _metaRow(
-                      'Status / स्थिती:',
+                      _s('Status / स्थिती:'),
                       audit.status.toUpperCase(),
                       baseStyle,
                       headerStyle,
@@ -254,7 +262,7 @@ class DailyAuditPdfService {
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
                     _metaRow(
-                      'Verified By / पडताळणी:',
+                      _s('Verified By / पडताळणी:'),
                       verifierName ?? (audit.status == 'verified' ? 'Verified' : 'Pending'),
                       baseStyle,
                       headerStyle,
@@ -293,7 +301,7 @@ class DailyAuditPdfService {
           pw.SizedBox(height: 12),
 
           // SOP Breakdown Section
-          _sectionTitle('SOP BREAKDOWN / एसओपी तपशील', headerStyle),
+          _sectionTitle(_s('SOP BREAKDOWN / एसओपी तपशील'), headerStyle),
           pw.Table(
             border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
             columnWidths: const {
@@ -309,7 +317,7 @@ class DailyAuditPdfService {
                 decoration: const pw.BoxDecoration(color: PdfColors.grey200),
                 children: [
                   _cell('SOP', headerStyle, isHeader: true),
-                  _cell('Title / नाव', headerStyle, isHeader: true),
+                  _cell(_s('Title / नाव'), headerStyle, isHeader: true),
                   _cell('Pass', headerStyle, isHeader: true, align: pw.TextAlign.center),
                   _cell('Fail', headerStyle, isHeader: true, align: pw.TextAlign.center),
                   _cell('NA', headerStyle, isHeader: true, align: pw.TextAlign.center),
@@ -327,7 +335,7 @@ class DailyAuditPdfService {
                       children: [
                         _cell('SOP ${sop.number}', headerStyle),
                         _cell(
-                          sop.nameMr.isNotEmpty ? '${sop.nameEn} / ${sop.nameMr}' : sop.nameEn,
+                          sop.nameMr.isNotEmpty ? '${sop.nameEn} / ${_s(sop.nameMr)}' : sop.nameEn,
                           baseStyle,
                         ),
                         _cell('$p', baseStyle, align: pw.TextAlign.center),
@@ -349,7 +357,7 @@ class DailyAuditPdfService {
           pw.SizedBox(height: 12),
 
           // Non-Compliances & Fails Section
-          _sectionTitle('NON-COMPLIANCES & FINDINGS / त्रुटी आणि निरीक्षणे (${fails.length})', headerStyle),
+          _sectionTitle(_s('NON-COMPLIANCES & FINDINGS / त्रुटी आणि निरीक्षणे (${fails.length})'), headerStyle),
           if (fails.isEmpty)
             pw.Container(
               padding: const pw.EdgeInsets.all(10),
@@ -361,7 +369,7 @@ class DailyAuditPdfService {
               child: pw.Row(
                 children: [
                   pw.Text(
-                    'All audited checkpoints passed without any non-compliances. (सर्व तपासणी निकष यशस्वी!)',
+                    _s('All audited checkpoints passed without any non-compliances. (सर्व तपासणी निकष यशस्वी!)'),
                     style: headerStyle(fontSize: 8, color: PdfColors.green900),
                   ),
                 ],
@@ -382,7 +390,7 @@ class DailyAuditPdfService {
                   children: [
                     _cell('Code', headerStyle, isHeader: true),
                     _cell('Checkpoint Description', headerStyle, isHeader: true),
-                    _cell('Observed Finding / Defect', headerStyle, isHeader: true),
+                    _cell(_s('Observed Finding / Defect'), headerStyle, isHeader: true),
                     _cell('Responsible CRO', headerStyle, isHeader: true),
                   ],
                 ),
@@ -397,8 +405,8 @@ class DailyAuditPdfService {
                     return pw.TableRow(
                       children: [
                         _cell(code, headerStyle, textColor: PdfColors.red900),
-                        _cell(desc, baseStyle),
-                        _cell(finding, baseStyle, textColor: PdfColors.red800),
+                        _cell(_s(desc), baseStyle),
+                        _cell(_s(finding), baseStyle, textColor: PdfColors.red800),
                         _cell(croName, baseStyle),
                       ],
                     );
@@ -410,7 +418,7 @@ class DailyAuditPdfService {
 
           // Auditor Notes (if any)
           if (audit.notes != null && audit.notes!.isNotEmpty) ...[
-            _sectionTitle('AUDITOR & VERIFICATION NOTES / नोंदी', headerStyle),
+            _sectionTitle(_s('AUDITOR & VERIFICATION NOTES / नोंदी'), headerStyle),
             pw.Container(
               padding: const pw.EdgeInsets.all(6),
               decoration: pw.BoxDecoration(
@@ -418,7 +426,7 @@ class DailyAuditPdfService {
                 color: PdfColors.grey50,
                 borderRadius: const pw.BorderRadius.all(pw.Radius.circular(3)),
               ),
-              child: pw.Text(audit.notes!, style: baseStyle(fontSize: 7.5)),
+              child: pw.Text(_s(audit.notes!), style: baseStyle(fontSize: 7.5)),
             ),
             pw.SizedBox(height: 14),
           ],
@@ -475,8 +483,8 @@ class DailyAuditPdfService {
     return pdf.save();
   }
 
-  /// Generates and shares or prints the PDF using printing package.
-  Future<void> shareOrPrintPdf({
+  /// Generates the daily audit PDF bytes and writes to application documents directory.
+  Future<String> generateAndSavePdf({
     required Audit audit,
     required String auditorName,
     String? verifierName,
@@ -485,6 +493,8 @@ class DailyAuditPdfService {
     required List<AuditResult> results,
     required Map<String, Cro> crosById,
     String storeName = 'Titan World (WLMHW) - Latur',
+    pw.Font? font,
+    pw.Font? boldFont,
   }) async {
     final bytes = await buildPdfBytes(
       audit: audit,
@@ -495,11 +505,46 @@ class DailyAuditPdfService {
       results: results,
       crosById: crosById,
       storeName: storeName,
+      font: font,
+      boldFont: boldFont,
     );
+    final outputDir = _testingDirectory ?? await getApplicationDocumentsDirectory();
+    final fileName = 'Saagar_Daily_Audit_${audit.auditDate}.pdf';
+    final file = File('${outputDir.path}/$fileName');
+    await file.writeAsBytes(bytes);
+    return file.path;
+  }
+
+  /// Generates and shares or prints the PDF using printing package.
+  /// Always saves a persistent local copy to the device documents first.
+  Future<String> shareOrPrintPdf({
+    required Audit audit,
+    required String auditorName,
+    String? verifierName,
+    required List<Sop> sops,
+    required Map<String, Checkpoint> checkpointsById,
+    required List<AuditResult> results,
+    required Map<String, Cro> crosById,
+    String storeName = 'Titan World (WLMHW) - Latur',
+  }) async {
+    final filePath = await generateAndSavePdf(
+      audit: audit,
+      auditorName: auditorName,
+      verifierName: verifierName,
+      sops: sops,
+      checkpointsById: checkpointsById,
+      results: results,
+      crosById: crosById,
+      storeName: storeName,
+    );
+    final file = File(filePath);
+    final bytes = await file.readAsBytes();
+    final fileName = file.uri.pathSegments.last;
     await Printing.sharePdf(
       bytes: bytes,
-      filename: 'Daily_Audit_${audit.auditDate}.pdf',
+      filename: fileName,
     );
+    return filePath;
   }
 
   static pw.Widget _metaRow(

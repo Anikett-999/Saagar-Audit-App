@@ -227,12 +227,21 @@
 ---
 
 #### Item 16: Marathi text is broken in all PDFs, and other PDF issues
-- **Priority:** High | **Client Ref:** F06
-- **Problem:** Devanagari Marathi characters render broken/overlapping in PDF outputs because `pdf` package lacks complex script shaping. Signatures show raw code IDs.
-- **Required Fix:** Embed shaped Marathi font / HarfBuzz rendering for PDF, and resolve auditor/GM user IDs to real human names.
-- **Status:** ⏳ **PENDING (Tier 2)**
-- **Commit:** —
-- **Files Changed:** —
+- **Priority:** High | **Client Ref:** F06 (Review P146-P155)
+- **Problem:** Devanagari Marathi vowel signs (*hrasva velanti* `ि` / `\u093F`) and conjuncts rendered broken in all PDF outputs (विभाग → वभिाग, साप्ताहिक → साप्ताहकि, मासिक → मासकि). Hardcoded 124-point rollup title contradicted reduced max scores from N/A checkpoints. Weekly headline showed 0 failures despite daily failures. PDF export bypassed local document persistence and lacked confirmation. Long raw UUID filenames instead of standardized human-readable names. Signatures showed raw user IDs and raw ISO timestamps.
+- **Required Fix:**
+  1. Implement `DevanagariShaper` in `lib/utils/devanagari_shaper.dart` to reorder pre-base vowel signs (`ि`) before their preceding consonant cluster for TrueType font PDF drawing.
+  2. Apply clean executive typography across Daily, Weekly, and Monthly PDF generators (`DailyAuditPdfService` and `WeeklyReportPdfService`).
+  3. Dynamic Section 2 rollup title (`${totalMax.toStringAsFixed(0)}-Point Rollup`).
+  4. Weekly Report headline in `ReportRepository` reports combined total failures.
+  5. Persistent local saving to application documents directory and SQLite `pdf_local_path` update.
+  6. Standardized filenames (`Saagar_Weekly_Report_W<week>_<year>.pdf`, `Saagar_Monthly_Report_<Month>_<year>.pdf`, `Saagar_Daily_Audit_<Date>.pdf`).
+  7. Resolve real human auditor names from `UserRepository` with role titles, format `readByOwnerAt` with local datetime, and label Monthly auditor as `Store Owner`.
+  8. Export confirmation snackbars in S21 and S13.
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** `pending-commit`
+- **Files Changed:** `lib/utils/devanagari_shaper.dart`, `lib/data/repositories/report_repository.dart`, `lib/services/weekly_report_pdf_service.dart`, `lib/services/daily_audit_pdf_service.dart`, `lib/ui/screens/reports/report_detail_screen.dart`, `lib/ui/screens/s13_audit_detail/audit_detail_screen.dart`, `test/devanagari_shaper_test.dart`, `test/daily_audit_pdf_service_test.dart`, `test/weekly_report_test.dart`
+- **Verification:** 3/3 tests in `test/devanagari_shaper_test.dart`, 3/3 in `test/daily_audit_pdf_service_test.dart`, 7/7 in `test/weekly_report_test.dart`, 5/5 in `test/monthly_report_integration_test.dart`, 12/12 canonical score tests green, 413/413 full test suite green, 0 analyzer issues.
 
 ---
 

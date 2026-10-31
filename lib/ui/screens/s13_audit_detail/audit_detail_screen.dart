@@ -1283,7 +1283,7 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
 
     setState(() => _exportingPdf = true);
     try {
-      await DailyAuditPdfService.instance.shareOrPrintPdf(
+      final savedPath = await DailyAuditPdfService.instance.shareOrPrintPdf(
         audit: audit,
         auditorName: _auditorName,
         verifierName: _verifierName,
@@ -1292,6 +1292,15 @@ class _AuditDetailScreenState extends ConsumerState<AuditDetailScreen> {
         results: _results,
         crosById: _crosById,
       );
+      if (mounted) {
+        final fileName = savedPath.split(RegExp(r'[/\\]')).last;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Daily audit PDF saved ($fileName) and ready to share.'),
+            backgroundColor: AppColors.green,
+          ),
+        );
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -461,6 +462,52 @@ void main() {
       expect(header, '%PDF-');
       // Substantial bytes generated (> 50KB due to embedded subset font)
       expect(pdfBytes.length, greaterThan(10000));
+    });
+
+    test('3b. Weekly and monthly report PDFs are saved locally with standardized filenames and database path update', () async {
+      final tempDir = await Directory.systemTemp.createTemp('saagar_report_pdf_test_');
+      WeeklyReportPdfService.setDirectoryForTesting(tempDir);
+
+      try {
+        await fakeDb.insert('audits', {
+          'id': 'audit-test-w39',
+          'audit_type': 'weekly',
+          'audit_date': '2026-09-27',
+          'week_number': 39,
+          'year': 2026,
+          'auditor_id': 'usr-gm-01',
+          'device_id': 'dev-1',
+          'status': 'submitted',
+        });
+
+        await fakeDb.insert('reports', {
+          'id': 'rep-test-save',
+          'audit_id': 'audit-test-w39',
+          'report_type': 'weekly',
+          'headline': 'Week 39 Report',
+          'author_user_id': 'usr-gm-01',
+          'submitted_at': '2026-09-27T18:00:00Z',
+        });
+
+        final report = (await ReportRepository.instance.getById('rep-test-save'))!;
+        final savedPath = await WeeklyReportPdfService.instance.generateAndSavePdf(
+          report,
+          auditorName: 'Rahul Sharma (GM)',
+        );
+
+        final file = File(savedPath);
+        expect(file.existsSync(), isTrue);
+        expect(file.uri.pathSegments.last, equals('Saagar_Weekly_Report_W39_2026.pdf'));
+
+        // Verify SQLite reports.pdf_local_path was updated
+        final updatedReport = await ReportRepository.instance.getById('rep-test-save');
+        expect(updatedReport?.pdfLocalPath, equals(savedPath));
+      } finally {
+        WeeklyReportPdfService.setDirectoryForTesting(null);
+        if (tempDir.existsSync()) {
+          tempDir.deleteSync(recursive: true);
+        }
+      }
     });
 
     testWidgets('4. S20 Reports List Screen renders reports and Owner-only read dot', (tester) async {
