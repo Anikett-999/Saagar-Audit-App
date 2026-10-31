@@ -71,7 +71,7 @@
 - **Problem:** If the Owner forgets their 4-digit PIN, there was no "Forgot PIN" option on Screen S04. Reinstalling previously wiped un-synced data.
 - **Required Fix:** Generate a cryptographic Master Recovery Code (e.g. `SG-XXXX-YYYY`) at setup (Screen S03). Store salted BCrypt hash locally, with absolute exclusion from backup exports. Add "Forgot PIN?" on Login Screen (S04) verifying the Recovery Code and allowing setting a new 4-digit PIN without data loss. Auto-login after setup to eliminate redundant 3rd PIN entry (Section F / ¶364).
 - **Status:** ✅ **SOLVED & VERIFIED**
-- **Commit:** Pending
+- **Commit:** `8be2cd9`
 - **Files Changed:** `lib/services/owner_recovery_service.dart`, `lib/ui/screens/s03_first_setup/first_setup_screen.dart`, `lib/ui/screens/s04_login/login_screen.dart`, `lib/providers/auth_provider.dart`, `lib/data/backup_service.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `test/owner_recovery_test.dart`
 - **Verification:** 5/5 unit tests passing in `test/owner_recovery_test.dart`. Export sanitization verified (neither `pin_hash` nor `recovery_code_hash` in backup export). 0 analyzer issues, canonical score engine 12/12 passing.
 
