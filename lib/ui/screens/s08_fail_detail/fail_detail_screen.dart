@@ -8,6 +8,7 @@ import '../../../data/repositories/audit_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/draft_audit_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/camera_permission_dialog.dart';
 
 /// S8 Fail Detail — capture finding text, CRO involved, and evidence photos
 /// for the current FAIL mark. S9 photo capture is collapsed into this screen
@@ -81,11 +82,23 @@ class _FailDetailScreenState extends ConsumerState<FailDetailScreen> {
     if (audit == null) return;
     if (_pendingPhotoPaths.length >= _maxPhotos) return;
 
-    final path = await PhotoService.instance.captureAndStore(
-      auditId: audit.id,
-    );
-    if (path == null || !mounted) return;
-    setState(() => _pendingPhotoPaths = [..._pendingPhotoPaths, path]);
+    try {
+      final path = await PhotoService.instance.captureAndStore(
+        auditId: audit.id,
+      );
+      if (path == null || !mounted) return;
+      setState(() => _pendingPhotoPaths = [..._pendingPhotoPaths, path]);
+    } on CameraPermissionDeniedException {
+      if (mounted) {
+        await showCameraPermissionDeniedDialog(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to capture photo: $e')),
+        );
+      }
+    }
   }
 
   Future<void> _save() async {

@@ -2828,4 +2828,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s21ExportMonthlyPdfButton => 'Export Monthly PDF';
+
+  @override
+  String get cameraPermissionRequiredTitle => 'Camera Permission Required';
+
+  @override
+  String get cameraPermissionRequiredMessage =>
+      'Camera permission is required to capture evidence photos. Please open Settings and enable camera access.';
+
+  @override
+  String get btnOpenSettings => 'Open Settings';
+
+  @override
+  String get exitAuditDialogTitle => 'Exit Audit?';
+
+  @override
+  String get exitAuditDialogMessage =>
+      'Your progress has been automatically saved as a draft. You can resume at any time from the Home screen.';
+
+  @override
+  String get btnResumeAudit => 'Resume Audit';
+
+  @override
+  String get btnSaveAndExit => 'Save & Exit';
 }

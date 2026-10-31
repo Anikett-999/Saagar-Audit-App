@@ -7,6 +7,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'app.dart';
 import 'data/db/database.dart';
 import 'services/cloud_sync_service.dart';
+import 'services/notification_service.dart';
 import 'services/workmanager_service.dart';
 
 Future<void> main() async {
@@ -57,6 +58,9 @@ Future<void> main() async {
 
   // Safe, non-blocking Firebase initialization in background (Spec §1, §16.4)
   unawaited(CloudSyncService.instance.initialize());
+
+  // Request notifications permission on Android 13+ (Item 22 / F25)
+  unawaited(NotificationService.instance.init());
 
   runApp(const ProviderScope(child: SaagarAuditApp()));
 }

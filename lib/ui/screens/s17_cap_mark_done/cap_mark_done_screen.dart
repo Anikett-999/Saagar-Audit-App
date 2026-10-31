@@ -15,6 +15,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../utils/app_date_format.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/camera_permission_dialog.dart';
 import '../../widgets/language_toggle_button.dart';
 
 /// Screen S17 — CAP Action — Mark Done Modal / Screen.
@@ -111,6 +112,10 @@ class _CapMarkDoneScreenState extends ConsumerState<CapMarkDoneScreen> {
       final path = await picker();
       if (path != null && mounted) {
         setState(() => _photoPath = path);
+      }
+    } on CameraPermissionDeniedException {
+      if (mounted) {
+        await showCameraPermissionDeniedDialog(context);
       }
     } catch (e) {
       if (mounted) {

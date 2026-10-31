@@ -46,23 +46,40 @@ class SeedLoader {
     final batch = db.batch();
     for (final row in rows.cast<Map<String, dynamic>>()) {
       if (row['id'] == null) continue;
-      batch.insert(
-        'checkpoints',
-        {
-          'id': row['id'],
-          'sop_id': row['sop_id'],
-          'frequency': row['frequency'],
-          'sequence': row['sequence'],
-          'text_en': row['text_en'],
-          'text_mr': row['text_mr'],
-          'evidence_en': row['evidence_en'],
-          'evidence_mr': row['evidence_mr'],
-          'weight': row['weight'],
-          'allows_na': row['allows_na'],
-          'requires_photo_on_fail': row['requires_photo_on_fail'],
-          'display_order': row['display_order'],
-        },
-        conflictAlgorithm: ConflictAlgorithm.ignore,
+      batch.rawInsert(
+        '''
+        INSERT INTO checkpoints (
+          id, sop_id, frequency, sequence, text_en, text_mr,
+          evidence_en, evidence_mr, weight, allows_na,
+          requires_photo_on_fail, display_order
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          sop_id = excluded.sop_id,
+          frequency = excluded.frequency,
+          sequence = excluded.sequence,
+          text_en = excluded.text_en,
+          text_mr = excluded.text_mr,
+          evidence_en = excluded.evidence_en,
+          evidence_mr = excluded.evidence_mr,
+          weight = excluded.weight,
+          allows_na = excluded.allows_na,
+          requires_photo_on_fail = excluded.requires_photo_on_fail,
+          display_order = excluded.display_order
+        ''',
+        [
+          row['id'],
+          row['sop_id'],
+          row['frequency'],
+          row['sequence'],
+          row['text_en'],
+          row['text_mr'],
+          row['evidence_en'],
+          row['evidence_mr'],
+          row['weight'],
+          row['allows_na'],
+          row['requires_photo_on_fail'],
+          row['display_order'],
+        ],
       );
     }
     await batch.commit(noResult: true);

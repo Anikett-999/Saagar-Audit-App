@@ -1369,7 +1369,14 @@
   "s21MonthlyWeeklyAvgLabel": "Month Weekly Audits Average",
   "s21MonthlyNoCaps": "No CAPs opened, closed, or aged this month.",
   "s21MonthlyNoEscalations": "No escalations triggered during this month.",
-  "s21ExportMonthlyPdfButton": "Export Monthly PDF"
+  "s21ExportMonthlyPdfButton": "Export Monthly PDF",
+  "cameraPermissionRequiredTitle": "Camera Permission Required",
+  "cameraPermissionRequiredMessage": "Camera permission is required to capture evidence photos. Please open Settings and enable camera access.",
+  "btnOpenSettings": "Open Settings",
+  "exitAuditDialogTitle": "Exit Audit?",
+  "exitAuditDialogMessage": "Your progress has been automatically saved as a draft. You can resume at any time from the Home screen.",
+  "btnResumeAudit": "Resume Audit",
+  "btnSaveAndExit": "Save & Exit"
 }
 
 

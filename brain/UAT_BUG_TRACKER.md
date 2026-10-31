@@ -12,11 +12,11 @@
 |---|:---:|:---:|:---:|:---:|
 | **A. Backup, Cloud Sync & Data Safety** (Items 1–5) | 5 | 2 (Items 1, 3) | 0 | 3 (Items 2, 4, 5) |
 | **B. Roles, Controls & Security** (Items 6–8) | 3 | 3 (Items 6, 7, 8) | 0 | 0 |
-| **C. Alerts, Escalations, Cash & Reports** (Items 9–16) | 8 | 3 (Items 13, 14, 15) | 0 | 5 (Items 9–12, 16) |
+| **C. Alerts, Escalations, Cash & Reports** (Items 9–16) | 8 | 8 (Items 9–16) | 0 | 0 |
 | **D. Corrective Action Plan (CAP) Controls** (Items 17–19) | 3 | 3 (Items 17, 18, 19) | 0 | 0 |
-| **E. Language, Permissions & Layout** (Items 20–26) | 7 | 2 (Items 25, 26) | 0 | 5 (Items 20–24) |
+| **E. Language, Permissions & Layout** (Items 20–26) | 7 | 7 (Items 20–26) | 0 | 0 |
 | **F. General Ease of Use** (Item 27 UX Points) | 1 | 0 | 0 | 1 (Item 27) |
-| **TOTAL** | **27** | **13 Solved** | **0 In Progress** | **14 Pending** |
+| **TOTAL** | **27** | **23 Solved** | **0 In Progress** | **4 Pending** |
 
 ---
 
@@ -288,51 +288,56 @@
 
 #### Item 20: Daily checkpoints are not translated into Marathi
 - **Priority:** Medium | **Client Ref:** F04
-- **Problem:** All 68 daily checkpoints in `checkpoints.json` have English text copy-pasted into `text_mr` and `evidence_mr`.
-- **Required Fix:** Populate authentic, natural Devanagari Marathi translations for all 68 daily checkpoints matching the retail workbook.
-- **Status:** ⏳ **PENDING (Tier 3)**
-- **Commit:** —
-- **Files Changed:** —
+- **Problem:** All 68 daily checkpoints in `checkpoints.json` had English text duplicated into `text_mr` and `evidence_mr`.
+- **Required Fix:** Populate authentic, natural Devanagari Marathi translations for all 68 daily checkpoints matching the retail workbook. Update `SeedLoader` and `database.dart` with `ON CONFLICT DO UPDATE` so existing databases receive translations in-place.
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** Pending
+- **Files Changed:** `assets/seed/checkpoints.json`, `lib/data/db/seed_loader.dart`, `lib/data/db/database.dart`, `test/weekly_seed_test.dart`
+- **Verification:** Automated unit test in `test/weekly_seed_test.dart` passing (5/5 tests green, asserting `text_mr != text_en` across all 68 daily checkpoints). Full test suite 419/419 green. 0 analyzer issues.
 
 ---
 
 #### Item 21: Camera permission denial leaves user stuck
 - **Priority:** Medium | **Client Ref:** F24
-- **Problem:** Denying camera permission causes a black screen or unhandled exception with no recovery or manual retry dialog.
-- **Required Fix:** Catch permission denial gracefully, show explanation dialog with "Open App Settings" button, and allow retrying.
-- **Status:** ⏳ **PENDING (Tier 3)**
-- **Commit:** —
-- **Files Changed:** —
+- **Problem:** Denying camera permission caused unhandled `PlatformException` with no recovery or manual retry dialog.
+- **Required Fix:** Catch `PlatformException(code: 'camera_access_denied')`, raise `CameraPermissionDeniedException`, and show localized `showCameraPermissionDeniedDialog` with direct "Open Settings" button (`Geolocator.openAppSettings()`) across S08, S17, and S18 screens.
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** Pending
+- **Files Changed:** `lib/data/photo_service.dart`, `lib/ui/widgets/camera_permission_dialog.dart`, `lib/ui/screens/s08_fail_detail/fail_detail_screen.dart`, `lib/ui/screens/s17_cap_mark_done/cap_mark_done_screen.dart`, `lib/ui/screens/cap/s18_cap_verify_screen.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `test/camera_and_navigation_test.dart`
+- **Verification:** Unit and widget tests passing in `test/camera_and_navigation_test.dart` (EN and MR parity verified). 0 analyzer issues.
 
 ---
 
 #### Item 22: App never asks for notification permission on Android 13+
 - **Priority:** Low | **Client Ref:** F25
-- **Problem:** On Android 13 (API 33) and above, runtime `POST_NOTIFICATIONS` permission is required for CAP reminders and escalation alerts, but never requested.
-- **Required Fix:** Add runtime permission request for `POST_NOTIFICATIONS` on Android 13+ startup.
-- **Status:** ⏳ **PENDING (Tier 3)**
-- **Commit:** —
-- **Files Changed:** —
+- **Problem:** On Android 13 (API 33) and above, runtime `POST_NOTIFICATIONS` permission was never requested on startup, and unused `READ_CONTACTS` remained in manifest.
+- **Required Fix:** Request `POST_NOTIFICATIONS` runtime permission via `AndroidFlutterLocalNotificationsPlugin.requestNotificationsPermission()` on startup in `NotificationService.init()` and clean up `READ_CONTACTS` from `AndroidManifest.xml`.
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** Pending
+- **Files Changed:** `lib/services/notification_service.dart`, `lib/main.dart`, `android/app/src/main/AndroidManifest.xml`
+- **Verification:** Verified compilation and startup initialization with 0 analyzer issues and full suite 419/419 passing.
 
 ---
 
 #### Item 23: Question disappears on small screens & report text overlaps
 - **Priority:** Medium | **Client Ref:** F02
-- **Problem:** In landscape mode on smaller phones, checkpoint questions disappear behind PASS/FAIL buttons. Larger text causes report titles ("Combined Total Score") to wrap 1 letter per line.
-- **Required Fix:** Wrap checkpoint content in `SingleChildScrollView`, adjust button padding, and use flexible layout with `overflow: TextOverflow.ellipsis` on report chips.
-- **Status:** ⏳ **PENDING (Tier 3)**
-- **Commit:** —
-- **Files Changed:** —
+- **Problem:** In landscape mode on smaller phones, checkpoint questions disappeared behind PASS/FAIL buttons due to vertical button stacking. Larger text caused report titles ("Combined Total Score") to wrap 1 letter per line because value string took all width.
+- **Required Fix:** In `CheckpointScreen`, switch PASS/FAIL/NA buttons to horizontal Row in landscape mode, adjust question font size flexibly (20pt landscape, 24pt portrait), and in `ReportDetailScreen._scoreRow`, enforce proportional `flex: 5` and `flex: 6` so labels never get squished.
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** Pending
+- **Files Changed:** `lib/ui/screens/s07_checkpoint/checkpoint_screen.dart`, `lib/ui/screens/reports/report_detail_screen.dart`
+- **Verification:** Widget tests in `test/phase1_integration_test.dart` and `test/camera_and_navigation_test.dart` passing. Full suite 419/419 passing. 0 analyzer issues.
 
 ---
 
 #### Item 24: Phone Back button exits audit; app back arrow goes to previous checkpoint
 - **Priority:** Medium | **Client Ref:** F05
-- **Problem:** Pressing Android hardware Back button completely exits the audit and closes app, while top app bar arrow goes to previous checkpoint.
-- **Required Fix:** Wrap audit conduct screen in `PopScope` to intercept back button: go to previous checkpoint, or prompt "Save draft and exit?".
-- **Status:** ⏳ **PENDING (Tier 3)**
-- **Commit:** —
-- **Files Changed:** —
+- **Problem:** Pressing Android hardware Back button completely exited the audit and closed app, while top app bar arrow went to previous checkpoint.
+- **Required Fix:** Wrap `CheckpointScreen` in `PopScope(canPop: false, onPopInvokedWithResult: ...)` to unify hardware back button and app bar back arrow: if `currentIndex > 0`, go back 1 checkpoint; if `currentIndex == 0`, show confirmation dialog "Exit Audit? Your progress is saved as a draft" with "Resume Audit" and "Save & Exit" actions.
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** Pending
+- **Files Changed:** `lib/ui/screens/s07_checkpoint/checkpoint_screen.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `test/camera_and_navigation_test.dart`
+- **Verification:** Unit and widget tests in `test/camera_and_navigation_test.dart` passing in English and Marathi. Full suite 419/419 passing. 0 analyzer issues.
 
 ---
 

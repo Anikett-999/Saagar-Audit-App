@@ -5114,6 +5114,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Export Monthly PDF'**
   String get s21ExportMonthlyPdfButton;
+
+  /// No description provided for @cameraPermissionRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera Permission Required'**
+  String get cameraPermissionRequiredTitle;
+
+  /// No description provided for @cameraPermissionRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera permission is required to capture evidence photos. Please open Settings and enable camera access.'**
+  String get cameraPermissionRequiredMessage;
+
+  /// No description provided for @btnOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get btnOpenSettings;
+
+  /// No description provided for @exitAuditDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Audit?'**
+  String get exitAuditDialogTitle;
+
+  /// No description provided for @exitAuditDialogMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your progress has been automatically saved as a draft. You can resume at any time from the Home screen.'**
+  String get exitAuditDialogMessage;
+
+  /// No description provided for @btnResumeAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume Audit'**
+  String get btnResumeAudit;
+
+  /// No description provided for @btnSaveAndExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Save & Exit'**
+  String get btnSaveAndExit;
 }
 
 class _AppLocalizationsDelegate

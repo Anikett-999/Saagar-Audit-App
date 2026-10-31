@@ -7499,3 +7499,52 @@ app-release.aab   54955804  04-10-2026 19:48:39
 
 4. **Next Immediate Task**:
    - Commit all Item 16 fixes to `fix/part-b-bugs`.
+
+
+---
+
+### Handoff: 31 October 2026 — Resolution of Items 20, 21, 22, 23, and 24 (Category E: Language, Permissions & Layout)
+**Author**: Antigravity  
+**Goal**: Complete implementation and full verification of Sagar Bora's UAT review feedback for Items 20, 21, 22, 23, and 24:
+- **Item 20 (Client Ref: F04)**: Complete authentic Devanagari Marathi translations for all 68 daily checkpoints.
+- **Item 21 (Client Ref: F24)**: Camera permission denial handling with an accessible "Open Settings" explanation dialog.
+- **Item 22 (Client Ref: F25)**: Runtime `POST_NOTIFICATIONS` permission request on Android 13+ and unused `READ_CONTACTS` cleanup.
+- **Item 23 (Client Ref: F02 / U07)**: Screen layout, landscape orientation, and 130% accessibility scaling in S07 & report tables.
+- **Item 24 (Client Ref: F05)**: Unified back navigation via `PopScope` with unsaved draft exit confirmation.
+
+1. **Implementation Details**:
+   - **Item 20**:
+     - Updated all 68 daily checkpoints in `assets/seed/checkpoints.json` with authentic, natural Devanagari translations matching the retail workbook.
+     - Updated `SeedLoader.loadCheckpoints` with `ON CONFLICT(id) DO UPDATE SET` so pre-existing databases receive translations in-place.
+     - Added auto-reload trigger in `AppDatabase.onOpen` if daily checkpoints have `text_en = text_mr`.
+     - Automated test in `test/weekly_seed_test.dart` verifying all 68 daily checkpoints have authentic Marathi (`text_mr != text_en`, `evidence_mr != evidence_en`). Passing 5/5.
+   - **Item 21**:
+     - Defined `CameraPermissionDeniedException` in `lib/data/photo_service.dart`.
+     - Caught `PlatformException` with `camera_access_denied` and rethrew `CameraPermissionDeniedException`.
+     - Created `lib/ui/widgets/camera_permission_dialog.dart` with localized title, explanation, and "Open Settings" button calling `Geolocator.openAppSettings()`.
+     - Handled in `fail_detail_screen.dart` (S08), `cap_mark_done_screen.dart` (S17), and `s18_cap_verify_screen.dart` (S18).
+   - **Item 22**:
+     - Removed unused `android.permission.READ_CONTACTS` from `android/app/src/main/AndroidManifest.xml`.
+     - Added `await androidImpl.requestNotificationsPermission()` on Android 13+ (API 33+) in `NotificationService.init()`.
+     - Called `unawaited(NotificationService.instance.init())` in `main.dart` on application startup.
+   - **Item 23**:
+     - In `checkpoint_screen.dart`, adapted layout to device orientation: in landscape mode, rendered PASS, FAIL, and NA buttons horizontally in a single `Row` (44px height), preventing question text from disappearing.
+     - Adjusted question font size flexibly (20pt landscape, 24pt portrait) and preserved `SingleChildScrollView`.
+     - In `report_detail_screen.dart._scoreRow`, made both `label` (`flex: 5`) and `value` (`flex: 6`) bounded so `label` never gets squished to 1 character per line under large text or 130% accessibility scaling.
+   - **Item 24**:
+     - Wrapped `CheckpointScreen` in `PopScope(canPop: false, onPopInvokedWithResult: ...)`.
+     - Unified both Android system back navigation (hardware/gesture) and top app bar back arrow:
+       - If `currentIndex > 0`: calls `draftAuditProvider.notifier.goBack()`.
+       - If `currentIndex == 0`: presents confirmation dialog ("Exit Audit? Progress is saved as a draft") with "Resume Audit" and "Save & Exit" (`context.goNamed('s05_home')`).
+     - Added full English and Marathi localization keys for exit dialog and camera permission dialog.
+
+2. **Verification & Raw Command Outputs**:
+   - `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**
+   - `flutter test test/score_engine_test.dart`: **12/12 canonical score tests green!** (Mandatory Rule #5)
+   - `flutter test test/weekly_seed_test.dart`: **5/5 tests green!**
+   - `test/camera_and_navigation_test.dart`: **5/5 tests green!**
+   - Full test suite `flutter test`: **419/419 tests passed! 100% green!**
+
+3. **Next Immediate Task**:
+   - Stage and commit Items 20, 21, 22, 23, and 24 to `fix/part-b-bugs`.
+   - Category E is now 100% complete (7/7 items solved). Only Items 2, 4, 5, and 27 remain.

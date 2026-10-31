@@ -16,6 +16,7 @@ import '../../../data/repositories/user_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/camera_permission_dialog.dart';
 import '../../widgets/language_toggle_button.dart';
 
 /// Screen S18 — CAP Verification Screen (GM / Owner only).
@@ -102,6 +103,10 @@ class _S18CapVerifyScreenState extends ConsumerState<S18CapVerifyScreen> {
       final path = await picker();
       if (path != null && mounted) {
         setState(() => _photoPath = path);
+      }
+    } on CameraPermissionDeniedException {
+      if (mounted) {
+        await showCameraPermissionDeniedDialog(context);
       }
     } catch (e) {
       if (mounted) {

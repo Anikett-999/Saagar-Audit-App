@@ -1156,7 +1156,14 @@
   "s21MonthlyWeeklyAvgLabel": "महिन्यातील साप्ताहिक सरासरी",
   "s21MonthlyNoCaps": "या महिन्यात कोणतीही कॅप उघडलेली, बंद किंवा जुनी झालेली नाही.",
   "s21MonthlyNoEscalations": "या महिन्यात कोणतीही वाढ किंवा इशारा नोंदवला गेला नाही.",
-  "s21ExportMonthlyPdfButton": "मासिक PDF निर्यात करा"
+  "s21ExportMonthlyPdfButton": "मासिक PDF निर्यात करा",
+  "cameraPermissionRequiredTitle": "कॅमेरा परवानगी आवश्यक",
+  "cameraPermissionRequiredMessage": "पुरावा फोटो घेण्यासाठी कॅमेरा परवानगी आवश्यक आहे. कृपया सेटिंग्ज उघडा आणि कॅमेरा परवानगी सुरू करा.",
+  "btnOpenSettings": "सेटिंग्ज उघडा",
+  "exitAuditDialogTitle": "ऑडिटमधून बाहेर पडायचे?",
+  "exitAuditDialogMessage": "तुमची प्रगती मसुदा (ड्राफ्ट) म्हणून आपोआप जतन झाली आहे. तुम्ही होम स्क्रीनवरून कधीही हे पुढे सुरू ठेवू शकता.",
+  "btnResumeAudit": "ऑडिट सुरू ठेवा",
+  "btnSaveAndExit": "जतन करा आणि बाहेर पडा"
 }
 
 

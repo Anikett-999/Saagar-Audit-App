@@ -2834,4 +2834,27 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s21ExportMonthlyPdfButton => 'मासिक PDF निर्यात करा';
+
+  @override
+  String get cameraPermissionRequiredTitle => 'कॅमेरा परवानगी आवश्यक';
+
+  @override
+  String get cameraPermissionRequiredMessage =>
+      'पुरावा फोटो घेण्यासाठी कॅमेरा परवानगी आवश्यक आहे. कृपया सेटिंग्ज उघडा आणि कॅमेरा परवानगी सुरू करा.';
+
+  @override
+  String get btnOpenSettings => 'सेटिंग्ज उघडा';
+
+  @override
+  String get exitAuditDialogTitle => 'ऑडिटमधून बाहेर पडायचे?';
+
+  @override
+  String get exitAuditDialogMessage =>
+      'तुमची प्रगती मसुदा (ड्राफ्ट) म्हणून आपोआप जतन झाली आहे. तुम्ही होम स्क्रीनवरून कधीही हे पुढे सुरू ठेवू शकता.';
+
+  @override
+  String get btnResumeAudit => 'ऑडिट सुरू ठेवा';
+
+  @override
+  String get btnSaveAndExit => 'जतन करा आणि बाहेर पडा';
 }
