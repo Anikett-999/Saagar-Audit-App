@@ -291,7 +291,7 @@
 - **Problem:** All 68 daily checkpoints in `checkpoints.json` had English text duplicated into `text_mr` and `evidence_mr`.
 - **Required Fix:** Populate authentic, natural Devanagari Marathi translations for all 68 daily checkpoints matching the retail workbook. Update `SeedLoader` and `database.dart` with `ON CONFLICT DO UPDATE` so existing databases receive translations in-place.
 - **Status:** ✅ **SOLVED & VERIFIED**
-- **Commit:** Pending
+- **Commit:** `03866f4`
 - **Files Changed:** `assets/seed/checkpoints.json`, `lib/data/db/seed_loader.dart`, `lib/data/db/database.dart`, `test/weekly_seed_test.dart`
 - **Verification:** Automated unit test in `test/weekly_seed_test.dart` passing (5/5 tests green, asserting `text_mr != text_en` across all 68 daily checkpoints). Full test suite 419/419 green. 0 analyzer issues.
 
@@ -302,7 +302,7 @@
 - **Problem:** Denying camera permission caused unhandled `PlatformException` with no recovery or manual retry dialog.
 - **Required Fix:** Catch `PlatformException(code: 'camera_access_denied')`, raise `CameraPermissionDeniedException`, and show localized `showCameraPermissionDeniedDialog` with direct "Open Settings" button (`Geolocator.openAppSettings()`) across S08, S17, and S18 screens.
 - **Status:** ✅ **SOLVED & VERIFIED**
-- **Commit:** Pending
+- **Commit:** `03866f4`
 - **Files Changed:** `lib/data/photo_service.dart`, `lib/ui/widgets/camera_permission_dialog.dart`, `lib/ui/screens/s08_fail_detail/fail_detail_screen.dart`, `lib/ui/screens/s17_cap_mark_done/cap_mark_done_screen.dart`, `lib/ui/screens/cap/s18_cap_verify_screen.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `test/camera_and_navigation_test.dart`
 - **Verification:** Unit and widget tests passing in `test/camera_and_navigation_test.dart` (EN and MR parity verified). 0 analyzer issues.
 
@@ -313,7 +313,7 @@
 - **Problem:** On Android 13 (API 33) and above, runtime `POST_NOTIFICATIONS` permission was never requested on startup, and unused `READ_CONTACTS` remained in manifest.
 - **Required Fix:** Request `POST_NOTIFICATIONS` runtime permission via `AndroidFlutterLocalNotificationsPlugin.requestNotificationsPermission()` on startup in `NotificationService.init()` and clean up `READ_CONTACTS` from `AndroidManifest.xml`.
 - **Status:** ✅ **SOLVED & VERIFIED**
-- **Commit:** Pending
+- **Commit:** `03866f4`
 - **Files Changed:** `lib/services/notification_service.dart`, `lib/main.dart`, `android/app/src/main/AndroidManifest.xml`
 - **Verification:** Verified compilation and startup initialization with 0 analyzer issues and full suite 419/419 passing.
 
@@ -324,7 +324,7 @@
 - **Problem:** In landscape mode on smaller phones, checkpoint questions disappeared behind PASS/FAIL buttons due to vertical button stacking. Larger text caused report titles ("Combined Total Score") to wrap 1 letter per line because value string took all width.
 - **Required Fix:** In `CheckpointScreen`, switch PASS/FAIL/NA buttons to horizontal Row in landscape mode, adjust question font size flexibly (20pt landscape, 24pt portrait), and in `ReportDetailScreen._scoreRow`, enforce proportional `flex: 5` and `flex: 6` so labels never get squished.
 - **Status:** ✅ **SOLVED & VERIFIED**
-- **Commit:** Pending
+- **Commit:** `03866f4`
 - **Files Changed:** `lib/ui/screens/s07_checkpoint/checkpoint_screen.dart`, `lib/ui/screens/reports/report_detail_screen.dart`
 - **Verification:** Widget tests in `test/phase1_integration_test.dart` and `test/camera_and_navigation_test.dart` passing. Full suite 419/419 passing. 0 analyzer issues.
 
@@ -335,7 +335,7 @@
 - **Problem:** Pressing Android hardware Back button completely exited the audit and closed app, while top app bar arrow went to previous checkpoint.
 - **Required Fix:** Wrap `CheckpointScreen` in `PopScope(canPop: false, onPopInvokedWithResult: ...)` to unify hardware back button and app bar back arrow: if `currentIndex > 0`, go back 1 checkpoint; if `currentIndex == 0`, show confirmation dialog "Exit Audit? Your progress is saved as a draft" with "Resume Audit" and "Save & Exit" actions.
 - **Status:** ✅ **SOLVED & VERIFIED**
-- **Commit:** Pending
+- **Commit:** `03866f4`
 - **Files Changed:** `lib/ui/screens/s07_checkpoint/checkpoint_screen.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `test/camera_and_navigation_test.dart`
 - **Verification:** Unit and widget tests in `test/camera_and_navigation_test.dart` passing in English and Marathi. Full suite 419/419 passing. 0 analyzer issues.
 
