@@ -180,7 +180,7 @@
   3. In `ReportDetailScreen` (S21), render actual escalation rows (trigger badge, urgency, description, status) and real closed/aged CAP entries. If empty, display clean strings without phase tags.
   4. In `WeeklyReportPdfService`, render real escalation counts and up to 3 escalation summary rows in Section 9, and real closed/aged counts in Sections 7 & 8, removing all "Phase 3" and "P2-5" text.
 - **Status:** ✅ **SOLVED & VERIFIED**
-- **Commit:** pending review
+- **Commit:** `4555b2c`
 - **Files Changed:** `lib/data/repositories/report_repository.dart`, `lib/ui/screens/reports/report_detail_screen.dart`, `lib/services/weekly_report_pdf_service.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `test/report_repository_test.dart`
 - **Verification:** Unit test `2. Generates 9-section weekly report populating real escalations and CAPs (Item 12 / F14)` in `test/report_repository_test.dart` passing (2/2 tests green). Full weekly report test suite `test/weekly_report_test.dart` passing (7/7 tests green). 0 analyzer issues (`flutter analyze`). Score engine canonical suite 12/12 passed (`test/score_engine_test.dart`).
 
@@ -249,7 +249,7 @@
   5. Add repository-level validation in `CapRepository.createCap` rejecting non-pattern CAPs on checkpoints that did not fail (`result != 'F'`).
   6. Automatically bind `originResultId` from the audit result row so audit detail reflects the linked CAP.
 - **Status:** ✅ **SOLVED & VERIFIED**
-- **Commit:** pending review
+- **Commit:** `4555b2c`
 - **Files Changed:** `lib/data/repositories/cap_repository.dart`, `lib/ui/screens/s15_cap_create/cap_create_screen.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `test/cap_create_screen_test.dart`, `test/cap_repository_test.dart`, `test/backup_export_test.dart`
 - **Verification:** 9/9 tests in `test/cap_create_screen_test.dart` (including dedicated Item 17 monthly MC.2 test & 0-fails notice test), 19/19 in `test/cap_repository_test.dart` (including non-failed checkpoint rejection guard), 12/12 canonical score tests green, full test suite 401/401 tests passing (100% green). 0 analyzer issues.
 
