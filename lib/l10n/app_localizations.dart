@@ -4602,7 +4602,7 @@ abstract class AppLocalizations {
   /// No description provided for @s21CapsClosedEmpty.
   ///
   /// In en, this message translates to:
-  /// **'No CAPs closed this week (Verification & Close workflow active in P2-5).'**
+  /// **'No CAPs closed during this week.'**
   String get s21CapsClosedEmpty;
 
   /// No description provided for @s21CapsAgedHeader.
@@ -4614,7 +4614,7 @@ abstract class AppLocalizations {
   /// No description provided for @s21CapsAgedEmpty.
   ///
   /// In en, this message translates to:
-  /// **'No aged CAPs recorded (Lifecycle tracking active in P2-5).'**
+  /// **'No aged or overdue CAPs.'**
   String get s21CapsAgedEmpty;
 
   /// No description provided for @s21EscalationsSection.
@@ -4626,7 +4626,7 @@ abstract class AppLocalizations {
   /// No description provided for @s21EscalationsEmpty.
   ///
   /// In en, this message translates to:
-  /// **'No escalations triggered (Escalation engine active in Phase 3).'**
+  /// **'No escalations triggered during this week.'**
   String get s21EscalationsEmpty;
 
   /// No description provided for @s21SignatureSection.

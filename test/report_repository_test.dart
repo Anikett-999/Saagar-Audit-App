@@ -255,5 +255,90 @@ void main() {
       expect(reportsList.length, 1);
       expect(reportsList.first.id, report.id);
     });
+
+    test('2. Generates 9-section weekly report populating real escalations and CAPs (Item 12 / F14)', () async {
+      // 1. Seed weekly audit for week 39 (2026-09-27)
+      await fakeDb.insert('audits', {
+        'id': 'audit-weekly-39b',
+        'audit_type': 'weekly',
+        'audit_date': '2026-09-27',
+        'week_number': 39,
+        'month_number': 9,
+        'year': 2026,
+        'auditor_id': 'usr-gm-01',
+        'device_id': 'dev-1',
+        'status': 'submitted',
+        'submitted_at': '2026-09-27T18:00:00.000Z',
+        'raw_score': 100.0,
+        'max_score': 124.0,
+        'compliance_pct': 80.6,
+        'band': 'poor',
+      });
+
+      // 2. Seed an escalation that occurred during week 39 (e.g. ₹600 cash variance)
+      await fakeDb.insert('escalations', {
+        'id': 'esc-w39-1',
+        'trigger_number': 3,
+        'trigger_label': 'Single-day cash variance',
+        'source_type': 'audit',
+        'source_audit_id': 'audit-daily-2026-09-23',
+        'raised_by_user_id': 'usr-sm-01',
+        'raised_to_user_id': 'usr-gm-01',
+        'urgency': 'same_day',
+        'delivery_channel': 'whatsapp',
+        'what_happened': 'Closing cash variance of ₹600 observed on 2026-09-23',
+        'impact': 'Direct financial discrepancy in daily cash till',
+        'status': 'open',
+        'raised_at': '2026-09-23T20:00:00.000Z',
+        'whatsapp_sent': 0,
+      });
+
+      // 3. Seed a closed CAP and an aged CAP during week 39
+      await fakeDb.insert('caps', {
+        'id': 'cap-closed-1',
+        'checkpoint_id': 'CW.1',
+        'origin_audit_id': 'audit-weekly-39b',
+        'problem_statement': 'Cash drawer discrepancy resolved',
+        'action_steps': 'Verify logs and recount',
+        'responsible_user_id': 'usr-sm-01',
+        'status': 'closed',
+        'deadline': '2026-09-25',
+        'opened_at': '2026-09-22T10:00:00.000Z',
+        'closed_at': '2026-09-25T14:00:00.000Z',
+      });
+
+      await fakeDb.insert('caps', {
+        'id': 'cap-aged-1',
+        'checkpoint_id': 'CW.2',
+        'origin_audit_id': 'audit-weekly-39b',
+        'problem_statement': 'Unreconciled petty cash voucher',
+        'action_steps': 'Obtain missing receipt',
+        'responsible_user_id': 'usr-sm-01',
+        'status': 'aged',
+        'deadline': '2026-09-20',
+        'opened_at': '2026-09-15T10:00:00.000Z',
+        'aged_count': 2,
+      });
+
+      // 4. Generate report
+      final report = await ReportRepository.instance.generateWeeklyReport(
+        weeklyAuditId: 'audit-weekly-39b',
+        authorUserId: 'usr-gm-01',
+      );
+
+      // 5. Assert Section 9 (Escalations) is populated with real escalation record
+      expect(report.escalations.length, 1);
+      final esc = report.escalations.first;
+      expect(esc['id'], 'esc-w39-1');
+      expect(esc['trigger_number'], 3);
+      expect(esc['what_happened'], contains('₹600'));
+
+      // 6. Assert Section 7 (CAPs Closed) and Section 8 (CAPs Aged) are populated
+      expect(report.capsClosed.length, 1);
+      expect(report.capsClosed.first['id'], 'cap-closed-1');
+
+      expect(report.capsAged.length, 1);
+      expect(report.capsAged.first['id'], 'cap-aged-1');
+    });
   });
 }

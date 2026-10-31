@@ -2543,22 +2543,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s21CapsClosedHeader => 'Section 7: CAPs Closed This Week';
 
   @override
-  String get s21CapsClosedEmpty =>
-      'No CAPs closed this week (Verification & Close workflow active in P2-5).';
+  String get s21CapsClosedEmpty => 'No CAPs closed during this week.';
 
   @override
   String get s21CapsAgedHeader => 'Section 8: Aged / Overdue CAPs';
 
   @override
-  String get s21CapsAgedEmpty =>
-      'No aged CAPs recorded (Lifecycle tracking active in P2-5).';
+  String get s21CapsAgedEmpty => 'No aged or overdue CAPs.';
 
   @override
   String get s21EscalationsSection => 'Section 9: Escalation Log';
 
   @override
   String get s21EscalationsEmpty =>
-      'No escalations triggered (Escalation engine active in Phase 3).';
+      'No escalations triggered during this week.';
 
   @override
   String get s21SignatureSection => 'Signature of Record';

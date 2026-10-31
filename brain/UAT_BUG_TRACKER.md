@@ -172,11 +172,17 @@
 
 #### Item 12: Weekly report escalation section is a placeholder
 - **Priority:** Medium | **Client Ref:** F14
-- **Problem:** Section 5 of Weekly Report shows hardcoded text or empty placeholder instead of real escalations raised during the week.
-- **Required Fix:** Query SQLite `escalations` table for the week's date range and render actual escalation rows and outcomes in report and PDF.
-- **Status:** ⏳ **PENDING (Tier 2)**
-- **Commit:** —
-- **Files Changed:** —
+- **Problem:** Section 9 of Weekly Report and weekly PDF showed hardcoded text "No escalations triggered (Escalation engine active in Phase 3)" and "Escalations: 0 (Phase 3)", and CAP sections showed "P2-5" placeholders, ignoring open cash/audit escalations.
+- **Root Cause:** In `ReportRepository.generateWeeklyReport`, `escalationsPayload`, `capsClosedPayload`, and `capsAgedPayload` were initialized as empty static lists (`[]`). Furthermore, Screen S21 (`report_detail_screen.dart`) and `weekly_report_pdf_service.dart` hardcoded Phase 3 and P2-5 placeholder strings instead of reading from `report.escalations`, `report.capsClosed`, and `report.capsAged`.
+- **Required Fix:**
+  1. In `ReportRepository.generateWeeklyReport`, query SQLite `escalations` table for the week's date range and linked audits (`weeklyAuditId` + daily audit IDs), populating `escalationsPayload` with actual records (trigger number, label, urgency, what happened, status, whatsapp sent).
+  2. Query SQLite `caps` table for CAPs opened, closed, and aged during the week, populating `capsOpenedPayload`, `capsClosedPayload`, and `capsAgedPayload`.
+  3. In `ReportDetailScreen` (S21), render actual escalation rows (trigger badge, urgency, description, status) and real closed/aged CAP entries. If empty, display clean strings without phase tags.
+  4. In `WeeklyReportPdfService`, render real escalation counts and up to 3 escalation summary rows in Section 9, and real closed/aged counts in Sections 7 & 8, removing all "Phase 3" and "P2-5" text.
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** pending review
+- **Files Changed:** `lib/data/repositories/report_repository.dart`, `lib/ui/screens/reports/report_detail_screen.dart`, `lib/services/weekly_report_pdf_service.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `test/report_repository_test.dart`
+- **Verification:** Unit test `2. Generates 9-section weekly report populating real escalations and CAPs (Item 12 / F14)` in `test/report_repository_test.dart` passing (2/2 tests green). Full weekly report test suite `test/weekly_report_test.dart` passing (7/7 tests green). 0 analyzer issues (`flutter analyze`). Score engine canonical suite 12/12 passed (`test/score_engine_test.dart`).
 
 ---
 

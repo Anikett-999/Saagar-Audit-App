@@ -213,7 +213,7 @@ class ReportRepository {
     // Section 5: Patterns (T2.4)
     final patternsPayload = patterns.map((p) => p.toJson()).toList();
 
-    // Section 6: CAPs Opened (Weekly fails + suggested pattern CAPs)
+    // Section 6: CAPs Opened (Weekly fails + suggested pattern CAPs + real CAPs opened this week)
     final List<Map<String, dynamic>> capsOpenedPayload = [];
     // Suggested pattern CAPs (Single-CAP rule)
     for (final p in patterns) {
@@ -227,14 +227,114 @@ class ReportRepository {
       });
     }
 
-    // Section 7: CAPs Closed (P2-5 honest empty-state)
-    final List<Map<String, dynamic>> capsClosedPayload = [];
+    final weekStartDate = dailyDateStrs.isNotEmpty ? dailyDateStrs.first : weeklyAudit.auditDate;
+    final weekEndDateNextDay = weekDates.isNotEmpty
+        ? weekDates.last.add(const Duration(days: 1)).toIso8601String().split('T').first
+        : weeklyAudit.auditDate;
+    final dailyAuditIds = dailyAudits.map((a) => a.id).toList();
 
-    // Section 8: CAPs Aged (P2-5 honest empty-state)
-    final List<Map<String, dynamic>> capsAgedPayload = [];
+    // Query real CAPs opened during this week (or linked to this weekly audit or daily audits)
+    final openedWhere = <String>['(opened_at >= ? AND opened_at < ?)', 'origin_audit_id = ?'];
+    final openedArgs = <dynamic>[weekStartDate, weekEndDateNextDay, weeklyAuditId];
+    if (dailyAuditIds.isNotEmpty) {
+      final placeholders = List.filled(dailyAuditIds.length, '?').join(',');
+      openedWhere.add('origin_audit_id IN ($placeholders)');
+      openedArgs.addAll(dailyAuditIds);
+    }
 
-    // Section 9: Escalations (Phase 3 honest empty-state)
-    final List<Map<String, dynamic>> escalationsPayload = [];
+    final capsOpenedRows = await db.query(
+      'caps',
+      where: openedWhere.join(' OR '),
+      whereArgs: openedArgs,
+      orderBy: 'opened_at DESC',
+    );
+    for (final r in capsOpenedRows) {
+      capsOpenedPayload.add({
+        'id': r['id'],
+        'checkpoint_id': r['checkpoint_id'],
+        'problem_statement': r['problem_statement'],
+        'problem_statement_en': r['problem_statement'],
+        'problem_statement_mr': r['problem_statement'],
+        'action_plan_en': r['action_steps'],
+        'action_plan_mr': r['action_steps'],
+        'status': r['status'],
+        'deadline': r['deadline'],
+        'opened_at': r['opened_at'],
+        'is_pattern': r['is_pattern'] == 1,
+      });
+    }
+
+    // Section 7: CAPs Closed during this week
+    final capsClosedRows = await db.query(
+      'caps',
+      where: "status IN ('closed', 'verified') AND closed_at >= ? AND closed_at < ?",
+      whereArgs: [weekStartDate, weekEndDateNextDay],
+      orderBy: 'closed_at DESC',
+    );
+    final List<Map<String, dynamic>> capsClosedPayload = capsClosedRows
+        .map(
+          (r) => {
+            'id': r['id'],
+            'checkpoint_id': r['checkpoint_id'],
+            'problem_statement': r['problem_statement'],
+            'status': r['status'],
+            'closed_at': r['closed_at'],
+          },
+        )
+        .toList();
+
+    // Section 8: CAPs Aged / Overdue during this week
+    final capsAgedRows = await db.query(
+      'caps',
+      where: "status = 'aged' OR (status = 'open' AND deadline < ?)",
+      whereArgs: [weekEndDateNextDay],
+      orderBy: 'deadline ASC',
+    );
+    final List<Map<String, dynamic>> capsAgedPayload = capsAgedRows
+        .map(
+          (r) => {
+            'id': r['id'],
+            'checkpoint_id': r['checkpoint_id'],
+            'problem_statement': r['problem_statement'],
+            'status': r['status'],
+            'deadline': r['deadline'],
+            'aged_count': r['aged_count'],
+          },
+        )
+        .toList();
+
+    // Section 9: Escalations raised during this week
+    final escWhere = <String>['(raised_at >= ? AND raised_at < ?)', 'source_audit_id = ?'];
+    final escArgs = <dynamic>[weekStartDate, weekEndDateNextDay, weeklyAuditId];
+    if (dailyAuditIds.isNotEmpty) {
+      final placeholders = List.filled(dailyAuditIds.length, '?').join(',');
+      escWhere.add('source_audit_id IN ($placeholders)');
+      escArgs.addAll(dailyAuditIds);
+    }
+
+    final escalationRows = await db.query(
+      'escalations',
+      where: escWhere.join(' OR '),
+      whereArgs: escArgs,
+      orderBy: 'raised_at DESC',
+    );
+
+    final List<Map<String, dynamic>> escalationsPayload = escalationRows
+        .map(
+          (r) => {
+            'id': r['id'],
+            'trigger_number': r['trigger_number'],
+            'trigger_label': r['trigger_label'],
+            'urgency': r['urgency'],
+            'status': r['status'],
+            'raised_at': r['raised_at'],
+            'what_happened': r['what_happened'],
+            'impact': r['impact'],
+            'whatsapp_sent': r['whatsapp_sent'] == 1,
+            'raised_to_user_id': r['raised_to_user_id'],
+          },
+        )
+        .toList();
 
     // 6. Check if report already exists for this audit
     final existing = await getByAuditId(weeklyAuditId);

@@ -7410,3 +7410,43 @@ app-release.aab   54955804  04-10-2026 19:48:39
 - **Next Immediate Task**:
   - Obtain user verification on physical device or sign-off to commit & push to `fix/part-b-bugs`.
   - Proceed to next pending issue in the UAT tracker (Item 12 / F14: Weekly report escalation section or Item 16 / F06: PDF Marathi font rendering).
+
+---
+
+### Handoff: 31 October 2026 — Weekly Report Real Escalations & CAP Populating (Item 12 — Client Ref: F14)
+**Author**: Antigravity  
+**Goal**: Resolve Item 12 (Client Ref: F14) addressing Sagar Bora's observation that the weekly report and its PDF showed "No escalations triggered (Escalation engine active in Phase 3)", "Escalations: 0 (Phase 3)", and "Phase 2-5" placeholders in CAP boxes, despite active weekly cash escalations.
+1. **`ReportRepository.generateWeeklyReport`**:
+   - Replaced empty placeholders with live SQLite queries against `escalations` and `caps` tables for the weekly date range (`weekStartDate` to `weekEndDateNextDay`) and linked audits (`weeklyAuditId` + daily audit IDs).
+   - Populated `escalationsPayload`, `capsOpenedPayload`, `capsClosedPayload`, and `capsAgedPayload`.
+2. **`ReportDetailScreen` (S21)**:
+   - Section 9 (Escalations): Renders actual escalation rows with trigger labels, urgency, description, and status. Displays clean empty state without Phase tags if none.
+   - Section 7 (CAPs Closed) & Section 8 (CAPs Aged): Render actual closed and aged CAP entries or clean empty state without P2-5 tags.
+3. **`WeeklyReportPdfService`**:
+   - Section 9 (PDF): Renders true escalation count (`Escalations: N`) and up to 3 summary rows of active escalations.
+   - Section 7 & 8 (PDF): Renders true closed count and aged count. Removed all "Phase 3" and "P2-5" placeholder strings.
+4. **Localization**: Updated `s21CapsClosedEmpty`, `s21CapsAgedEmpty`, and `s21EscalationsEmpty` in English and Marathi without Phase tags.
+
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze`: **No issues found! (ran in 15.9s)**
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5)
+  - `flutter test test/report_repository_test.dart`: **All 2 tests passed!** (including dedicated Item 12 real escalation/CAP assertion)
+  - `flutter test test/weekly_report_test.dart`: **All 5 tests passed!**
+
+- **Git Status**:
+  - Modified files ready for commit:
+    - `assets/translations/app_en.arb`
+    - `assets/translations/app_mr.arb`
+    - `lib/data/repositories/report_repository.dart`
+    - `lib/l10n/app_localizations.dart`
+    - `lib/l10n/app_localizations_en.dart`
+    - `lib/l10n/app_localizations_mr.dart`
+    - `lib/services/weekly_report_pdf_service.dart`
+    - `lib/ui/screens/reports/report_detail_screen.dart`
+    - `test/report_repository_test.dart`
+    - `brain/UAT_BUG_TRACKER.md`
+    - `brain/SESSION_HANDOFF.md`
+
+- **Next Immediate Task**:
+  - Stage and commit Item 12 to `fix/part-b-bugs`.
+  - Proceed to next pending bug in the UAT tracker (Item 16 / F06: PDF Marathi font rendering).

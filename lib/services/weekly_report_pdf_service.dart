@@ -107,6 +107,9 @@ class WeeklyReportPdfService {
     final findings = report.findings;
     final patterns = report.patterns;
     final capsOpened = report.capsOpened;
+    final capsClosed = report.capsClosed;
+    final capsAged = report.capsAged;
+    final escalations = report.escalations;
 
     final compliancePct = (compTable['compliance_pct'] as num?)?.toDouble() ?? 0.0;
     final totalRaw = (compTable['total_raw'] as num?)?.toDouble() ?? 0.0;
@@ -443,8 +446,10 @@ class WeeklyReportPdfService {
                   pw.Expanded(
                     child: _capBox(
                       'SEC 7 - विभाग ७ (बंद / CLOSED)',
-                      '0 Closed / बंद',
-                      'पडताळणी आणि बंद टप्पा २-५ मध्ये (P2-5)',
+                      '${capsClosed.length} Closed / बंद',
+                      capsClosed.isEmpty
+                          ? 'या आठवड्यात कोणतीही कॅप बंद नाही'
+                          : '${capsClosed.length} CAPs verified & closed',
                       baseStyle,
                       headerStyle,
                     ),
@@ -453,8 +458,10 @@ class WeeklyReportPdfService {
                   pw.Expanded(
                     child: _capBox(
                       'SEC 8 - विभाग ८ (प्रलंबित / AGED)',
-                      '0 Aged / प्रलंबित',
-                      'कालावधी ट्रॅकिंग टप्पा २-५ मध्ये (P2-5)',
+                      '${capsAged.length} Aged / प्रलंबित',
+                      capsAged.isEmpty
+                          ? 'कोणतीही जुनी कॅप नाही'
+                          : '${capsAged.length} CAPs overdue / aged',
                       baseStyle,
                       headerStyle,
                     ),
@@ -471,42 +478,61 @@ class WeeklyReportPdfService {
                   border: pw.Border.all(color: PdfColors.grey300),
                   borderRadius: const pw.BorderRadius.all(pw.Radius.circular(3)),
                 ),
-                child: pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       children: [
-                        pw.Text(
-                          'एस्केलेशन नोंद / Escalations: 0 (टप्पा ३ मध्ये सक्रिय / Phase 3)',
-                          style: baseStyle(fontSize: 7),
+                        pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Text(
+                              'एस्केलेशन नोंद / Escalations: ${escalations.length}${escalations.isEmpty ? " (None / निरंक)" : ""}',
+                              style: headerStyle(fontSize: 7.5),
+                            ),
+                            pw.Text(
+                              'GM / ऑडिटर स्वाक्षरी: ${report.authorUserId ?? "GM Auditor"} - ${report.submittedAt != null ? AppDateFormat.formatDate(report.submittedAt) : "Submitted"}',
+                              style: baseStyle(fontSize: 7),
+                            ),
+                          ],
                         ),
-                        pw.Text(
-                          'GM / ऑडिटर स्वाक्षरी: ${report.authorUserId ?? "GM Auditor"} - ${report.submittedAt != null ? AppDateFormat.formatDate(report.submittedAt) : "Submitted"}',
-                          style: headerStyle(fontSize: 7.5),
+                        pw.Container(
+                          padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: pw.BoxDecoration(
+                            color: report.isReadByOwner ? PdfColors.green50 : PdfColors.grey100,
+                            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(3)),
+                            border: pw.Border.all(
+                              color: report.isReadByOwner ? PdfColors.green700 : PdfColors.grey400,
+                              width: 0.5,
+                            ),
+                          ),
+                          child: pw.Text(
+                            report.isReadByOwner
+                                ? 'मालकाने वाचले (Read): ${report.readByOwnerAt ?? ""}'
+                                : 'मालक पुनरावलोकन: प्रलंबित (Pending)',
+                            style: headerStyle(
+                              fontSize: 7,
+                              color: report.isReadByOwner ? PdfColors.green900 : PdfColors.grey700,
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    pw.Container(
-                      padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: pw.BoxDecoration(
-                        color: report.isReadByOwner ? PdfColors.green50 : PdfColors.grey100,
-                        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(3)),
-                        border: pw.Border.all(
-                          color: report.isReadByOwner ? PdfColors.green700 : PdfColors.grey400,
-                          width: 0.5,
+                    if (escalations.isNotEmpty) ...[
+                      pw.SizedBox(height: 3),
+                      pw.Divider(color: PdfColors.grey300, height: 1),
+                      pw.SizedBox(height: 3),
+                      for (final esc in escalations.take(3))
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.only(bottom: 2),
+                          child: pw.Text(
+                            '• [T${esc['trigger_number'] ?? '?'}] ${esc['trigger_label'] ?? ''} (${esc['urgency'] ?? ''}): ${esc['what_happened'] ?? ''}',
+                            style: baseStyle(fontSize: 6.5),
+                            maxLines: 2,
+                          ),
                         ),
-                      ),
-                      child: pw.Text(
-                        report.isReadByOwner
-                            ? 'मालकाने वाचले (Read): ${report.readByOwnerAt ?? ""}'
-                            : 'मालक पुनरावलोकन: प्रलंबित (Pending)',
-                        style: headerStyle(
-                          fontSize: 7,
-                          color: report.isReadByOwner ? PdfColors.green900 : PdfColors.grey700,
-                        ),
-                      ),
-                    ),
+                    ],
                   ],
                 ),
               ),

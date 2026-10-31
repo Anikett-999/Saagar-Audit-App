@@ -153,6 +153,9 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
     final findings = report.findings;
     final patterns = report.patterns;
     final capsOpened = report.capsOpened;
+    final capsClosed = report.capsClosed;
+    final capsAged = report.capsAged;
+    final escalations = report.escalations;
 
     return Scaffold(
       appBar: AppBar(
@@ -451,41 +454,96 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
                   ),
                 const Divider(height: 16),
 
-                // Section 7: CAPs Closed (P2-5 honest empty state)
+                // Section 7: CAPs Closed
                 Text(
                   l10n.s21CapsClosedHeader,
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  l10n.s21CapsClosedEmpty,
-                  style: const TextStyle(color: AppColors.gray600, fontSize: 12, fontStyle: FontStyle.italic),
-                ),
+                if (capsClosed.isEmpty)
+                  Text(
+                    isMr ? 'या आठवड्यात कोणतीही कॅप बंद केलेली नाही.' : 'No CAPs were closed during this week.',
+                    style: const TextStyle(color: AppColors.gray600, fontSize: 12, fontStyle: FontStyle.italic),
+                  )
+                else
+                  for (final c in capsClosed)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        '• ${c['problem_statement'] ?? ''} [${c['status'] ?? 'closed'}]',
+                        style: const TextStyle(fontSize: 12, color: AppColors.green),
+                      ),
+                    ),
                 const Divider(height: 16),
 
-                // Section 8: Aged CAPs (P2-5 honest empty state)
+                // Section 8: Aged CAPs
                 Text(
                   l10n.s21CapsAgedHeader,
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  l10n.s21CapsAgedEmpty,
-                  style: const TextStyle(color: AppColors.gray600, fontSize: 12, fontStyle: FontStyle.italic),
-                ),
+                if (capsAged.isEmpty)
+                  Text(
+                    isMr ? 'कोणतीही प्रलंबित किंवा जुनी कॅप नाही.' : 'No aged or overdue CAPs.',
+                    style: const TextStyle(color: AppColors.gray600, fontSize: 12, fontStyle: FontStyle.italic),
+                  )
+                else
+                  for (final c in capsAged)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        '• ${c['problem_statement'] ?? ''} (Aged count: ${c['aged_count'] ?? 1}, Deadline: ${c['deadline'] ?? ''})',
+                        style: const TextStyle(fontSize: 12, color: AppColors.amber),
+                      ),
+                    ),
               ],
             ),
           ),
           const SizedBox(height: 12),
 
-          // --- Section 9: Escalations (Phase 3 honest empty state) ---
+          // --- Section 9: Escalations ---
           _sectionCard(
             title: l10n.s21EscalationsSection,
             icon: Icons.campaign_outlined,
-            child: Text(
-              l10n.s21EscalationsEmpty,
-              style: const TextStyle(color: AppColors.gray600, fontStyle: FontStyle.italic),
-            ),
+            child: escalations.isEmpty
+                ? Text(
+                    l10n.s21EscalationsEmpty,
+                    style: const TextStyle(color: AppColors.gray600, fontStyle: FontStyle.italic),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (final esc in escalations)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(Icons.warning, color: AppColors.amber, size: 18),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${esc['trigger_label'] ?? 'Trigger'} · ${esc['urgency'] ?? ''}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    Text(
+                                      esc['what_happened']?.toString() ?? '',
+                                      style: const TextStyle(fontSize: 12, color: AppColors.gray800),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
           ),
           const SizedBox(height: 12),
 

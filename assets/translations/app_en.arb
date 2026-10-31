@@ -1245,11 +1245,11 @@
     }
   },
   "s21CapsClosedHeader": "Section 7: CAPs Closed This Week",
-  "s21CapsClosedEmpty": "No CAPs closed this week (Verification & Close workflow active in P2-5).",
+  "s21CapsClosedEmpty": "No CAPs closed during this week.",
   "s21CapsAgedHeader": "Section 8: Aged / Overdue CAPs",
-  "s21CapsAgedEmpty": "No aged CAPs recorded (Lifecycle tracking active in P2-5).",
+  "s21CapsAgedEmpty": "No aged or overdue CAPs.",
   "s21EscalationsSection": "Section 9: Escalation Log",
-  "s21EscalationsEmpty": "No escalations triggered (Escalation engine active in Phase 3).",
+  "s21EscalationsEmpty": "No escalations triggered during this week.",
   "s21SignatureSection": "Signature of Record",
   "s21AuditorSignature": "GM / Auditor Signature: {author} · Submitted {time}",
   "@s21AuditorSignature": {

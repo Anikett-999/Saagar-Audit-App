@@ -2545,22 +2545,20 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s21CapsClosedHeader => 'विभाग ७: या आठवड्यात बंद झालेले कॅप';
 
   @override
-  String get s21CapsClosedEmpty =>
-      'या आठवड्यात कोणतेही कॅप बंद झाले नाहीत (सत्यापन आणि बंद करणे P2-5 मध्ये उपलब्ध).';
+  String get s21CapsClosedEmpty => 'या आठवड्यात कोणतेही कॅप बंद झालेले नाहीत.';
 
   @override
   String get s21CapsAgedHeader => 'विभाग ८: जुने / मुदत संपलेले कॅप';
 
   @override
-  String get s21CapsAgedEmpty =>
-      'कोणतेही जुने कॅप नोंदवले नाहीत (P2-5 मध्ये उपलब्ध).';
+  String get s21CapsAgedEmpty => 'कोणतेही जुने किंवा प्रलंबित कॅप नाहीत.';
 
   @override
   String get s21EscalationsSection => 'विभाग ९: एस्केलेशन नोंद';
 
   @override
   String get s21EscalationsEmpty =>
-      'कोणतेही एस्केलेशन ट्रिगर झाले नाही (फेज ३ मध्ये उपलब्ध).';
+      'या आठवड्यात कोणतेही एस्केलेशन ट्रिगर झालेले नाही.';
 
   @override
   String get s21SignatureSection => 'अधिकृत स्वाक्षरी';
