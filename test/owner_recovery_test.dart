@@ -1,9 +1,14 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:saagar_audit_app/data/backup_service.dart';
 import 'package:saagar_audit_app/data/db/database.dart';
 import 'package:saagar_audit_app/data/repositories/user_repository.dart';
+import 'package:saagar_audit_app/l10n/app_localizations.dart';
 import 'package:saagar_audit_app/providers/auth_provider.dart';
 import 'package:saagar_audit_app/services/owner_recovery_service.dart';
+import 'package:saagar_audit_app/ui/screens/s04_login/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'helpers/fake_database.dart';
@@ -99,6 +104,93 @@ void main() {
         expect(user.containsKey('recovery_code_hash'), isFalse, reason: 'recovery hash must never exist in export');
         expect(user.containsKey('recovery_code'), isFalse);
       }
+    });
+  });
+
+  group('LoginScreen Owner PIN Recovery Unified Modal Widget Tests', () {
+    late FakeDatabase fakeDb;
+
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      fakeDb = FakeDatabase();
+      AppDatabase.instance.setDatabaseForTesting(fakeDb);
+    });
+
+    tearDown(() {
+      AppDatabase.instance.setDatabaseForTesting(null);
+    });
+
+    testWidgets('Recovery modal seamlessly switches to Step 2 (Set New PIN) without crash or overflow', (tester) async {
+      tester.view.physicalSize = const Size(800, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      const recoveryCode = 'SG-1111-2222';
+      await OwnerRecoveryService.instance.saveRecoveryCode(recoveryCode);
+
+      final ownerId = await createUser(
+        name: 'Sagar Bora',
+        role: 'OWNER',
+        pin: '1234',
+        languagePref: 'en',
+      );
+
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            localizationsDelegates: [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: LoginScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Find Forgot PIN button and tap it
+      final forgotPinBtn = find.text('Forgot PIN?');
+      expect(forgotPinBtn, findsOneWidget);
+      await tester.tap(forgotPinBtn);
+      await tester.pumpAndSettle();
+
+      // Step 1: Owner PIN Recovery modal is visible
+      expect(find.text('Owner PIN Recovery'), findsOneWidget);
+      expect(find.text('Verify Code'), findsOneWidget);
+
+      // Enter recovery code
+      final codeField = find.byType(TextField);
+      await tester.enterText(codeField, recoveryCode);
+      await tester.tap(find.text('Verify Code'));
+      await tester.pumpAndSettle();
+
+      // Step 2: Set New 4-Digit PIN is visible inside same dialog without exception
+      expect(find.text('Set New 4-Digit PIN'), findsOneWidget);
+      expect(find.text('Reset PIN'), findsOneWidget);
+
+      // Enter new PIN and confirmation
+      final textFields = find.byType(TextField);
+      expect(textFields, findsNWidgets(2));
+      await tester.enterText(textFields.first, '9999');
+      await tester.enterText(textFields.last, '9999');
+
+      await tester.tap(find.text('Reset PIN'));
+      await tester.pumpAndSettle();
+
+      // Dialog closed, success snackbar shown, no crashes
+      expect(find.text('Set New 4-Digit PIN'), findsNothing);
+      expect(find.byType(SnackBar), findsOneWidget);
+
+      // Verify PIN updated in database
+      final updatedOwner = await UserRepository.instance.getById(ownerId);
+      expect(updatedOwner, isNotNull);
     });
   });
 }

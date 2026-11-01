@@ -1877,43 +1877,43 @@ abstract class AppLocalizations {
   /// No description provided for @s32ExportCardTitle.
   ///
   /// In en, this message translates to:
-  /// **'Export Local Database (JSON)'**
+  /// **'Audit Records Data Export (JSON)'**
   String get s32ExportCardTitle;
 
   /// No description provided for @s32ExportCardDesc.
   ///
   /// In en, this message translates to:
-  /// **'Export all SQLite database tables into a timestamped JSON file. Intended for Owner use before app updates.'**
+  /// **'Export database table records into a timestamped JSON file. Notice: This exports table records only, not photos. For full backup and device recovery including photos, use Cloud Synchronization above.'**
   String get s32ExportCardDesc;
 
   /// No description provided for @s32ExportSecurityNotice.
   ///
   /// In en, this message translates to:
-  /// **'Security Notice: Exported backup contains audit trails, findings, and store records. Store and transfer this file securely.'**
+  /// **'Data Export Notice: Exported file contains audit trails and findings (without binary photos). The primary and complete recovery path for this store is Cloud Synchronization.'**
   String get s32ExportSecurityNotice;
 
   /// No description provided for @s32ExportButton.
   ///
   /// In en, this message translates to:
-  /// **'Export Database JSON'**
+  /// **'Export Data Records (JSON)'**
   String get s32ExportButton;
 
   /// No description provided for @s32Exporting.
   ///
   /// In en, this message translates to:
-  /// **'Exporting database...'**
+  /// **'Exporting records...'**
   String get s32Exporting;
 
   /// No description provided for @s32ExportSuccessTitle.
   ///
   /// In en, this message translates to:
-  /// **'Export Successful'**
+  /// **'Data Export Successful'**
   String get s32ExportSuccessTitle;
 
   /// No description provided for @s32ExportSuccessMessage.
   ///
   /// In en, this message translates to:
-  /// **'Backup saved successfully ({records} records across {tables} tables).\n\nFile: {fileName}\nPath:\n{path}'**
+  /// **'Audit data records exported successfully ({records} records across {tables} tables).\n\nNotice: Photos and full store recovery are securely maintained via Cloud Sync.\n\nFile: {fileName}\nPath:\n{path}'**
   String s32ExportSuccessMessage(
       int records, int tables, String fileName, String path);
 
@@ -5228,6 +5228,294 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reset PIN'**
   String get btnResetPin;
+
+  /// No description provided for @s32StoreAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Store Account (Tenant Shield)'**
+  String get s32StoreAccountTitle;
+
+  /// No description provided for @s32StoreAccountConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Store Account Connected'**
+  String get s32StoreAccountConnected;
+
+  /// No description provided for @s32StoreAccountRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Store Account Required'**
+  String get s32StoreAccountRequired;
+
+  /// No description provided for @s32StoreAccountConnectedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This device is securely paired with {storeName}. Cloud backup and sync are active.'**
+  String s32StoreAccountConnectedDesc(String storeName);
+
+  /// No description provided for @s32StoreAccountRequiredDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with your Saagar Traders store passcode to enable cloud synchronization and protect store data.'**
+  String get s32StoreAccountRequiredDesc;
+
+  /// No description provided for @s32ConnectStoreBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In to Store Account'**
+  String get s32ConnectStoreBtn;
+
+  /// No description provided for @s32DisconnectStoreBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get s32DisconnectStoreBtn;
+
+  /// No description provided for @s32StorePasscodeDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Store Account Sign-In'**
+  String get s32StorePasscodeDialogTitle;
+
+  /// No description provided for @s32StorePasscodeDialogDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the authorized Saagar Traders store passcode for the Latur combo store (WLMHW & HEMW):'**
+  String get s32StorePasscodeDialogDesc;
+
+  /// No description provided for @s32StorePasscodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. ST-LATUR-2026'**
+  String get s32StorePasscodeHint;
+
+  /// No description provided for @s32StorePasscodeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid store passcode. Please check and try again.'**
+  String get s32StorePasscodeInvalid;
+
+  /// No description provided for @s32StorePasscodeSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Device successfully paired to store account.'**
+  String get s32StorePasscodeSuccess;
+
+  /// No description provided for @s32DisconnectStoreConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect this device from the store account? Cloud sync will be blocked until reconnected.'**
+  String get s32DisconnectStoreConfirm;
+
+  /// No description provided for @s32DisconnectStoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect Store Account'**
+  String get s32DisconnectStoreTitle;
+
+  /// No description provided for @s32Disconnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get s32Disconnect;
+
+  /// No description provided for @s32Cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get s32Cancel;
+
+  /// No description provided for @s32AutoSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic Background Sync'**
+  String get s32AutoSyncTitle;
+
+  /// No description provided for @s32AutoSyncSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync changes automatically when connected to internet'**
+  String get s32AutoSyncSubtitle;
+
+  /// No description provided for @s03StoreActivationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Store Account Activation (Tenant Shield)'**
+  String get s03StoreActivationTitle;
+
+  /// No description provided for @s03StoreActivationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the Saagar Traders store passcode to link this phone with the Latur cloud (WLMHW & HEMW):'**
+  String get s03StoreActivationSubtitle;
+
+  /// No description provided for @s03StoreActivationSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Device linked to Saagar Traders — Latur. Cloud backup active.'**
+  String get s03StoreActivationSuccess;
+
+  /// No description provided for @s32ChangeStorePasscodeBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Passcode'**
+  String get s32ChangeStorePasscodeBtn;
+
+  /// No description provided for @s32ChangeStorePasscodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate Store Passcode'**
+  String get s32ChangeStorePasscodeTitle;
+
+  /// No description provided for @s32ChangeStorePasscodeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Update the master store passcode for Latur combo store. Requires internet connection.'**
+  String get s32ChangeStorePasscodeDesc;
+
+  /// No description provided for @s32CurrentPasscode.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Store Passcode'**
+  String get s32CurrentPasscode;
+
+  /// No description provided for @s32NewPasscode.
+  ///
+  /// In en, this message translates to:
+  /// **'New Store Passcode (min 6 chars)'**
+  String get s32NewPasscode;
+
+  /// No description provided for @s32ConfirmNewPasscode.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm New Passcode'**
+  String get s32ConfirmNewPasscode;
+
+  /// No description provided for @s32PasscodeUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Store passcode successfully rotated and protected with BCrypt.'**
+  String get s32PasscodeUpdatedSuccess;
+
+  /// No description provided for @s32PasscodeMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'New passcodes do not match.'**
+  String get s32PasscodeMismatch;
+
+  /// No description provided for @s32PasscodeTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Passcode must be at least 6 characters.'**
+  String get s32PasscodeTooShort;
+
+  /// No description provided for @s32InternetRequiredForPasscode.
+  ///
+  /// In en, this message translates to:
+  /// **'Internet connection is required to rotate store passcode.'**
+  String get s32InternetRequiredForPasscode;
+
+  /// No description provided for @s32InternetRequiredForStoreLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Internet connection is required to sign in to store account. Please connect to Wi-Fi or mobile data.'**
+  String get s32InternetRequiredForStoreLogin;
+
+  /// No description provided for @s32AuthorizedDevicesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected Store Devices ({count})'**
+  String s32AuthorizedDevicesTitle(int count);
+
+  /// No description provided for @s32RevokeDeviceBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke Access'**
+  String get s32RevokeDeviceBtn;
+
+  /// No description provided for @s32RevokeDeviceConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to revoke access for this device? It will be disconnected from the store cloud immediately.'**
+  String get s32RevokeDeviceConfirm;
+
+  /// No description provided for @s32RevokeDeviceSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Device access revoked successfully.'**
+  String get s32RevokeDeviceSuccess;
+
+  /// No description provided for @s32ThisDeviceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'(This device)'**
+  String get s32ThisDeviceLabel;
+
+  /// No description provided for @s32RenameDeviceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename Device'**
+  String get s32RenameDeviceTitle;
+
+  /// No description provided for @s32RenameDeviceDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a recognizable label for this device (e.g. Owner Phone, Counter Tablet, SM Rahul).'**
+  String get s32RenameDeviceDesc;
+
+  /// No description provided for @s32RenameDeviceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Device Name / Label'**
+  String get s32RenameDeviceHint;
+
+  /// No description provided for @s32RenameDeviceBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Name'**
+  String get s32RenameDeviceBtn;
+
+  /// No description provided for @s32RenameDeviceSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Device name updated successfully.'**
+  String get s32RenameDeviceSuccess;
+
+  /// No description provided for @s32DeviceLastUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Last user: {role} ({name})'**
+  String s32DeviceLastUser(String role, String name);
+
+  /// No description provided for @s32DeviceLastUserRoleOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Last user: {role}'**
+  String s32DeviceLastUserRoleOnly(String role);
+
+  /// No description provided for @s32DeviceLastActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active: {time}'**
+  String s32DeviceLastActive(String time);
+
+  /// No description provided for @s32DeviceEnrolled.
+  ///
+  /// In en, this message translates to:
+  /// **'Enrolled: {date}'**
+  String s32DeviceEnrolled(String date);
+
+  /// No description provided for @s05CloudInactiveBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Backup Inactive — Tap to link store account'**
+  String get s05CloudInactiveBanner;
+
+  /// No description provided for @s05LinkNowBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Now'**
+  String get s05LinkNowBtn;
 }
 
 class _AppLocalizationsDelegate

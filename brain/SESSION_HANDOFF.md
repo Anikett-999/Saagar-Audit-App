@@ -7591,3 +7591,264 @@ app-release.aab   54955804  04-10-2026 19:48:39
 3. **Next Immediate Task**:
    - Commit Item 5 to `fix/part-b-bugs`.
    - Proceed to Step 2: Item 4 (Client Ref: F27) — Store Account Sign-in & Tenant Shield before Cloud Sync.
+
+
+---
+
+## Handoff — 2026-10-31 (Item 4: Store Account Device Pairing & Tenant Shield — F27)
+**Author**: Antigravity
+**Branch**: `fix/part-b-bugs`
+**Status**: Step 2 (Item 4 / F27) Completed & Verified. 25 of 27 UAT items now resolved (92.6%).
+
+### 1. Work Completed
+- **`StoreAccountService` (`lib/services/store_account_service.dart`)**:
+  - Encapsulates combo store identity: **Saagar Traders — Latur (WLMHW & HEMW)**.
+  - Manages device-level pairing state in `SharedPreferences`.
+  - Validates authorized store passcode (`ST-LATUR-2026` / `STLATUR2026` / `SAAGAR2026`).
+  - Provides `pairStoreAccount()` and `unpairStoreAccount()`.
+- **Engine Security Gate (`lib/services/cloud_sync_service.dart`)**:
+  - Implemented **Step 0: Store Account Security Gate** in `syncAll()`.
+  - If device is not paired, sync pass is strictly blocked upfront:
+    `SyncResult.unconfigured('Cloud Sync blocked: Device is not signed in to an authorized store account.')`
+  - Zero cloud reads or writes can execute without authorized store pairing.
+- **Provider & Auto-Sync Persistence (`lib/providers/cloud_sync_provider.dart`)**:
+  - Tracks `isStorePaired`, `pairedStoreName`, and `isAutoSyncEnabled`.
+  - Persists auto-sync toggle setting in `SharedPreferences` (`cloud_auto_sync_enabled`).
+  - Gated background launch sync and network reconnect sync: only runs if `isStorePaired && isAutoSyncEnabled`.
+- **UI Presentation (`lib/ui/screens/s32_backup_export/backup_export_screen.dart`)**:
+  - **Store Account Card (Tenant Shield)**:
+    - When paired: Green badge, shield icon, and text confirming pairing with *Saagar Traders — Latur (WLMHW & HEMW)*. Owner has option to disconnect.
+    - When unpaired: Amber notice, warning icon, and **[Sign In to Store Account]** button.
+  - **Store Passcode Dialog**:
+    - Clean stateful dialog with input validation, error shake/display, and confirmation toast.
+  - **Auto-Sync Switch**:
+    - Live switch for automatic background synchronization.
+  - **Sync Now Guard**:
+    - Tapping "Sync Now" on an unpaired device automatically opens the Store Passcode dialog.
+- **Dual-Language Parity (Rule #8)**:
+  - Added all English and Marathi strings in `app_en.arb` and `app_mr.arb`.
+
+### 2. Verification & Raw Command Outputs
+- **`test/cloud_sync_service_test.dart`**: **11/11 tests passed!**
+  - Verified unauthenticated device sync block (returns `unconfigured` status and 0 records pushed).
+  - Verified S32 Store Account Card rendering and auto-sync switch.
+  - Verified S32 passcode authentication dialog flow (rejects wrong passcode, accepts `ST-LATUR-2026`, updates UI).
+- **`test/score_engine_test.dart`**: **12/12 passed (100% green)**.
+- **Full Auth & Sync Suite (46 tests)**: **46/46 tests passed!**
+  (`cloud_sync_service_test.dart`, `owner_recovery_test.dart`, `score_engine_test.dart`, `change_pin_test.dart`, `auth_lockout_test.dart`).
+- **`flutter analyze`**: **No issues found! (0 errors, 0 warnings, 0 info)**.
+
+### 3. Next Immediate Task
+- Claude review & sign-off on Item 4 (`F27`).
+- Proceed to Step 4: Item 2 (Client Ref: `F10`) — Self-contained ZIP backup bundle export (SQLite + binary photos) with in-app restore.
+
+
+---
+
+## Handoff — 2026-10-31 (Fix: S04 Keyboard Overflow & Owner Recovery Modal Crash)
+**Author**: Antigravity
+**Branch**: `fix/part-b-bugs`
+**Status**: Resolved both physical device defects reported in user screenshots.
+
+### 1. Root Cause Analysis
+1. **Pixel Overflow (`BOTTOM OVERFLOWED BY 183 PIXELS`)**:
+   - `LoginScreen` Scaffold defaulted to `resizeToAvoidBottomInset: true`. When the software keyboard appeared for the Owner Recovery dialog, Android resized the Scaffold, squashing the `PinNumpad` Column.
+   - **Fix**: Added `resizeToAvoidBottomInset: false` to `LoginScreen` Scaffold.
+2. **Crash & Black Screen (`_dependents.isEmpty: is not true`)**:
+   - The recovery flow chained two consecutive dialogs (`_showForgotPinDialog` ➔ pop ➔ `_showResetPinDialog`).
+   - The first dialog's `codeController.dispose()` was called synchronously while the dialog was still in its pop animation, throwing a controller disposal exception.
+   - Immediately pushing the second dialog while the first was popping caused an `InheritedElement` deactivation failure (`_dependents.isEmpty: is not true`).
+   - **Fix**: Refactored into a unified, single `_OwnerRecoveryDialog`.
+     - Step 1: Validates Master Recovery Code.
+     - Step 2: Smoothly transitions within the *same dialog* to "Set New 4-Digit PIN" without popping/re-pushing.
+     - Controllers are cleanly managed in `_OwnerRecoveryDialogState` (`initState` / `dispose`).
+     - Content is wrapped in `SingleChildScrollView`.
+
+### 2. Verification
+- `test/owner_recovery_test.dart`: **6/6 tests passed!** (including new widget test verifying seamless Step 1 ➔ Step 2 modal transition without crash or overflow).
+- `test/score_engine_test.dart`: **12/12 passed (100% green)**.
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+
+
+---
+
+## Handoff — 2026-10-31 (Implementation: Passcode Rotation, Device Cap & Remote Revocation Shield)
+**Author**: Antigravity
+**Branch**: `fix/part-b-bugs`
+**Status**: Completed full edge-case architecture for Store Account Security & Passcode Rotation.
+
+### 1. Architectural Implementation & Edge-Case Handling
+1. **Store Passcode Rotation (`StoreAccountService.rotateStorePasscode`)**:
+   - **Internet Connectivity Guard**: Strictly requires an active internet connection (`CloudSyncService.isNetworkAvailable()`). If offline, throws `SocketException` with clear guidance.
+   - **Validation**: Verifies current passcode before rotation; verifies new passcode is alphanumeric and >= 6 characters.
+   - **Atomic Cloud-First Persistence**: Computes salted BCrypt hash (10 rounds) and writes to Firestore config (`stores/{storeCode}/config/security`) *first*. Local `SharedPreferences` cache is only updated upon successful cloud confirmation, eliminating any split-brain risk if connection drops midway.
+   - **Factory Key Revocation**: Once rotated, the factory passcode (`ST-LATUR-2026`) is globally revoked and rejected by `validatePasscode()`. Existing paired store devices remain authorized without re-entry.
+2. **Strict Device Limit Cap (Max 2 Store Devices)**:
+   - Saagar Traders retail store limit: maximum 2 active devices paired simultaneously (`WLMHW` & `HEMW`).
+   - `StoreAccountService.pairStoreAccount` checks active enrolled devices. If 2 devices are already paired, throws `StoreDeviceLimitReachedException` ("Store device limit reached (2/2 devices connected). Contact Owner to authorize a new device.").
+   - Device hardware identity is registered via `DeviceService.instance.getId()`.
+3. **Remote Kill Switch / Device Revocation (Screen S32)**:
+   - Screen S32 displays an "Authorized Store Devices (N/2)" card for the Owner showing active terminals with "(This device)" and a red `[Revoke Access]` button for other devices.
+   - Tapping `[Revoke Access]` prompts confirmation and marks `is_authorized: false` in Firestore.
+   - **Sync Shield Gate**: During `syncAll()`, if the current terminal has been revoked, sync immediately terminates with an error and calls `unpairStoreAccount()`, disconnecting the revoked terminal from the cloud.
+4. **Unpaired Owner Notice Banner (Screen S05 Home)**:
+   - If the logged-in user is `OWNER` and the device has not yet paired with the store cloud, displays a gentle amber alert: *"Cloud Backup Inactive — Tap to link store account"* with a `[Link Now]` button navigating to Screen S32.
+5. **Layout Overflow Immunity**:
+   - Wrapped `PinNumpad` on `LoginScreen` in `FittedBox(fit: BoxFit.scaleDown)` to ensure zero vertical overflow regardless of screen dimensions or dialog keyboard adjustments.
+
+### 2. Verification & Test Suite
+- **`flutter analyze`**: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- **`test/score_engine_test.dart`**: **12/12 passed (100% green)**.
+- **`test/cloud_sync_service_test.dart`**: **16/16 passed** (including 5 new edge-case tests for passcode rotation, offline blocking, device limit cap, and remote kill switch).
+- **`test/owner_recovery_test.dart`**: **6/6 passed**.
+- **`test/phase1_integration_test.dart`**: **2/2 passed** (updated for streamlined setup + continue to app flow).
+- **`test/language_screen_test.dart`**: **6/6 passed**.
+
+### 3. Next Immediate Task
+- Claude review & sign-off on branch `fix/part-b-bugs`.
+- Proceed to Step 4: Item 2 (Client Ref: `F10`) — Self-contained ZIP backup bundle export (SQLite + binary photos) with in-app restore.
+
+
+---
+
+## Handoff — 2026-10-31 (Fix: Instant Offline Handling for Store Account Sign-In)
+**Author**: Antigravity
+**Branch**: `fix/part-b-bugs`
+**Status**: Resolved physical device buffering issue when attempting store sign-in while offline.
+
+### 1. Root Cause Analysis
+- When the phone was offline and the user tapped "Sign In to Store Account" (on S03 Setup or S32 Settings), the app called Firestore queries (`fetchPasscodeHash` and `fetchAuthorizedDevices`) without an upfront connectivity check or query timeout.
+- On Android, Firestore network calls hang waiting for backend connectivity by default, causing the progress spinner to buffer indefinitely.
+
+### 2. Solutions Implemented
+1. **First-Glance Network Check**:
+   - In `_showPairStoreDialog` (Screen S32) and `_onActivateStore` (Screen S03), the app immediately checks `CloudSyncService.isNetworkAvailable()`.
+   - If offline, it blocks the action instantly and informs the user:
+     *"Internet connection required to sign in to store account. Please connect to Wi-Fi or mobile data."*
+     Zero buffering, zero spinner delay.
+2. **Strict 4-Second Timeout on Cloud Queries**:
+   - Wrapped all Firestore adapter operations (`fetchPasscodeHash`, `registerDevice`, `fetchAuthorizedDevices`, `revokeDevice`) in a strict 4-second `.timeout(const Duration(seconds: 4))`, throwing a fast `SocketException` if the network stalls.
+3. **`StoreAccountService.pairStoreAccount` Offline Guard**:
+   - Throws `SocketException` if called without internet connectivity.
+
+### 3. Verification
+- `test/cloud_sync_service_test.dart`: **17/17 passed** (including new test asserting immediate `SocketException` when offline).
+- `test/score_engine_test.dart`: **12/12 passed (100% green)**.
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+
+
+---
+
+## Handoff — 2026-11-01 (Fix: S32 Store Account Card Horizontal Overflow & Header Cramming)
+**Author**: Antigravity
+**Branch**: `fix/part-b-bugs`
+**Status**: Resolved 29px horizontal overflow and vertical text break bug in Screen S32.
+
+### 1. Root Cause Analysis
+- The Store Account card header `Row` in `BackupExportScreen` (S32) placed the icon, the title text (`Store Account (Tenant Shield)` inside `Expanded`), the `[Change Passcode]` text button, and the `[Disconnect]` text button all inside a single horizontal `Row`.
+- On physical mobile screens (width ~360-390px), the two action buttons consumed over 210px of horizontal width, forcing the `Expanded` title to shrink into a narrow ~50px space. This caused the text to wrap letter-by-letter vertically and overflowed the screen by 29 pixels (`RIGHT OVERFLOWED BY 29 PIXELS`).
+
+### 2. Solutions Implemented
+- Restructured the Store Account Card:
+  - Header `Row` now strictly holds the Shield Icon and the `Store Account (Tenant Shield)` title + Connected status badge, giving it the full screen width.
+  - Moved `[Change Passcode]` (as an attractive `OutlinedButton.icon`) and `[Disconnect]` into a dedicated action row positioned directly below the store description text.
+  - Zero horizontal overflow, clean responsive layout on all screen sizes.
+
+### 3. Verification
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- `test/cloud_sync_service_test.dart` + `test/score_engine_test.dart`: **29/29 passed (100% green)**.
+
+
+---
+
+## Handoff — 2026-11-01 (Removal of Arbitrary 2-Device Limit Cap)
+**Author**: Antigravity  
+**Branch**: `fix/part-b-bugs`  
+**Status**: Removed hardcoded 2-device restriction; store devices enrollment is now unrestricted for authorized passcode holders.
+
+### 1. Root Cause & User Directive
+- The hardcoded ceiling (`activeCount >= 2`) restricted pairing to only 2 devices. In real-world retail store operations, multiple personnel (Owner, SM, GM) across shifts and surplus/replacement devices need legitimate access under the store's tenant account.
+- Per user instruction, the artificial 2-device cap was removed completely without altering any other security or tenant logic.
+
+### 2. Solutions Implemented
+1. **Removed Device Limit Cap in `StoreAccountService`**:
+   - Eliminated the `activeCount >= 2` check from `StoreAccountService.pairStoreAccount()`.
+   - Any device entering the correct Store Passcode can pair and operate.
+   - Preserved Tenant Shield isolation, remote passcode rotation, device registry tracking, and the Owner's Remote Kill Switch (`revokeDevice`).
+2. **Updated S32 Settings & S03 Setup UI**:
+   - Removed `StoreDeviceLimitReachedException` catch blocks.
+   - Updated UI text from `"Connected Devices ({count}/2)"` to `"Connected Store Devices ({count})"`.
+   - Updated localization files (`app_en.arb` and `app_mr.arb`) and regenerated with `flutter gen-l10n`.
+3. **Updated Test Suite**:
+   - In `test/cloud_sync_service_test.dart`, replaced the device limit test with a multi-device test verifying Owner, SM, GM, and surplus devices pair seamlessly.
+
+### 3. Verification
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- `test/cloud_sync_service_test.dart`: **17/17 passed (100% green)**.
+- `test/score_engine_test.dart`: **12/12 passed (100% green)**.
+- Full security logic intact.
+
+
+---
+
+## Handoff — 2026-11-01 (Smart & Recognizable Connected Device Information)
+**Author**: Antigravity  
+**Branch**: `fix/part-b-bugs`  
+**Status**: Upgraded Screen S32 connected devices list to display recognizable hardware models, custom nicknames, last active user, and friendly timestamps.
+
+### 1. Root Cause Analysis
+- Previously, Screen S32 displayed a generic title `"Store Device"` and raw technical UUID hashes (e.g. `ID: 28ae198e...`), giving the Store Owner zero indication of which phone or tablet belonged to whom or which device they were revoking.
+
+### 2. Solutions Implemented
+1. **Real Hardware Model Detection**:
+   - Integrated `device_info_plus: ^12.4.0` in `DeviceService.getDeviceModelName()`.
+   - On Android devices, detects manufacturer and model (e.g. `Xiaomi Redmi Note 12`, `Samsung Galaxy Tab A8`).
+2. **Device Renaming / Nicknames**:
+   - Owner can tap an edit ✏️ icon on any connected device card to assign a human-readable label (e.g. `"Owner Phone"`, `"Counter Tablet"`, `"SM Rahul Phone"`).
+   - Saved locally and synchronized to Firestore under `stores/{storeCode}/devices/{deviceId}`.
+3. **Last Active User & Role Tracking**:
+   - `StoreAccountService.recordDeviceHeartbeat()` records the current staff member's name and role on every login and cloud sync pass.
+   - Screen S32 shows: `Last user: OWNER (Aniket)` or `Last user: SM (Rahul)`.
+4. **Friendly Activity Timestamps**:
+   - Formatted relative and time-of-day badges: `Active: Just now` / `Active: Today, 1:15 PM` along with `Enrolled: 01 Nov 2026`.
+   - Removed technical UUID clutter from the primary UI.
+5. **Localization Parity**:
+   - Added all necessary keys in `app_en.arb` and `app_mr.arb` with complete Marathi translations.
+
+### 3. Verification
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- `test/cloud_sync_service_test.dart`: **18/18 passed (100% green)**.
+- `test/backup_export_test.dart`: **8/8 passed (100% green)**.
+- `test/score_engine_test.dart`: **12/12 passed (100% green)**.
+
+
+---
+
+## Handoff — 2026-11-01 (Resolution of Item 2 / Client Ref F10: Data Export vs Full Cloud Backup)
+**Author**: Antigravity  
+**Branch**: `fix/part-b-bugs`  
+**Status**: Implemented Sagar Bora's Option 2 per user direction. JSON export is now clearly labeled as an Audit Records Data Export, clarifying that complete device recovery and photos are securely maintained via Cloud Synchronization.
+
+### 1. Client Requirement (Sagar Bora Review, Item 2 / F10)
+- The client pointed out that the exported JSON contains database records but no binary photos, and there is no offline restore option.
+- Sagar offered two acceptable paths:
+  1. Build a complete offline ZIP package with photos + in-app restore, OR
+  2. Clearly label the export as "data export only, not a backup", with cloud restore as the real recovery path.
+- The USER explicitly chose **Option 2**.
+
+### 2. Solutions Implemented
+- In `assets/translations/app_en.arb` and `app_mr.arb`:
+  - Updated card title to `"Audit Records Data Export (JSON)"` / `"ऑडिट नोंदी डेटा निर्यात (JSON)"`.
+  - Updated description to clarify: *"Notice: This exports table records only, not photos. For full backup and device recovery including photos, use Cloud Synchronization above."*
+  - Updated security notice: *"Data Export Notice: Exported file contains audit trails and findings (without binary photos). The primary and complete recovery path for this store is Cloud Synchronization."*
+  - Updated button label to `"Export Data Records (JSON)"` / `"डेटा नोंदी निर्यात करा (JSON)"`.
+  - Updated export success message with a clear confirmation and reminder of Cloud Sync.
+  - Eliminated duplicate Marathi keys in `app_mr.arb`.
+- Updated widget tests in `test/backup_export_test.dart` to assert the updated labels in both English and Marathi.
+
+### 3. Verification
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- `test/backup_export_test.dart`: **8/8 passed (100% green)**.
+- `test/cloud_sync_service_test.dart`: **18/18 passed (100% green)**.
+- `test/score_engine_test.dart`: **12/12 passed (100% green)**.
+- Master UAT Bug Tracker: **26 of 27 items are now SOLVED & VERIFIED**.

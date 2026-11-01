@@ -236,6 +236,18 @@ void main() {
     expect(ownerRow['role'], 'OWNER');
     expect(ownerRow['is_active'], 1);
 
+    // Master Recovery Code & Continue to App button (Client Ref: F16 / ¶364)
+    expect(find.text('Master Recovery Code'), findsOneWidget);
+    await tester.tap(find.text('Continue to App'));
+    await tester.pumpAndSettle();
+
+    // Logged in directly to Home Screen
+    expect(find.byType(HomeScreen), findsOneWidget);
+
+    // Test S04 Login Screen via Logout
+    await tester.tap(find.byIcon(Icons.logout));
+    await tester.pumpAndSettle();
+
     // -------------------------------------------------------------------------
     // 2. Screen S04: Login Screen
     // -------------------------------------------------------------------------

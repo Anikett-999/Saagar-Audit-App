@@ -961,29 +961,29 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s32SubtitleSyncOnly => 'स्टोअर डेटा क्लाउड समक्रमण';
 
   @override
-  String get s32ExportCardTitle => 'स्थानिक डेटाबेस निर्यात (JSON)';
+  String get s32ExportCardTitle => 'ऑडिट नोंदी डेटा निर्यात (JSON)';
 
   @override
   String get s32ExportCardDesc =>
-      'सर्व डेटाबेस टेबल्स टाइमस्टॅम्प केलेल्या JSON फाईलमध्ये निर्यात करा. अॅप अपडेट करण्यापूर्वी मालकासाठी उपयुक्त.';
+      'डेटाबेस टेबल्समधील नोंदी टाइमस्टॅम्प केलेल्या JSON फाईलमध्ये निर्यात करा. सूचना: यामध्ये केवळ टेबल नोंदी निर्यात होतात, फोटो नाही. फोटोंसह पूर्ण बॅकअप आणि डिव्हाइस पुनर्प्राप्तीसाठी वरील क्लाउड सिंक्रोनाइझेशनचा वापर करा.';
 
   @override
   String get s32ExportSecurityNotice =>
-      'सुरक्षा सूचना: निर्यात केलेल्या बॅकअपमध्ये ऑडिट नोंदी, निष्कर्ष आणि स्टोअर डेटा समाविष्ट आहे. ही फाईल सुरक्षितपणे ठेवा.';
+      'डेटा निर्यात सूचना: निर्यात केलेल्या फाईलमध्ये ऑडिट ट्रेल आणि निष्कर्ष समाविष्ट आहेत (बायनरी फोटोंशिवाय). या स्टोअरसाठी प्राथमिक आणि परिपूर्ण पुनर्प्राप्ती मार्ग क्लाउड सिंक्रोनाइझेशन हाच आहे.';
 
   @override
-  String get s32ExportButton => 'डेटाबेस JSON निर्यात करा';
+  String get s32ExportButton => 'डेटा नोंदी निर्यात करा (JSON)';
 
   @override
-  String get s32Exporting => 'डेटाबेस निर्यात होत आहे...';
+  String get s32Exporting => 'नोंदी निर्यात होत आहेत...';
 
   @override
-  String get s32ExportSuccessTitle => 'निर्यात यशस्वी';
+  String get s32ExportSuccessTitle => 'डेटा निर्यात यशस्वी';
 
   @override
   String s32ExportSuccessMessage(
       int records, int tables, String fileName, String path) {
-    return 'बॅकअप यशस्वीरित्या जतन झाला ($tables टेबल्समधील $records नोंदी).\n\nफाईल: $fileName\nपाथ:\n$path';
+    return 'ऑडिट डेटा नोंदी यशस्वीरित्या जतन झाल्या ($tables टेबल्समधील $records नोंदी).\n\nसूचना: फोटो आणि पूर्ण स्टोअर पुनर्प्राप्ती क्लाउड सिंकद्वारे सुरक्षितपणे सांभाळली जाते.\n\nफाईल: $fileName\nपाथ:\n$path';
   }
 
   @override
@@ -2897,4 +2897,177 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get btnResetPin => 'पिन रीसेट करा';
+
+  @override
+  String get s32StoreAccountTitle => 'स्टोअर खाते (सुरक्षा कवच)';
+
+  @override
+  String get s32StoreAccountConnected => 'स्टोअर खाते जोडले आहे';
+
+  @override
+  String get s32StoreAccountRequired => 'स्टोअर खाते आवश्यक';
+
+  @override
+  String s32StoreAccountConnectedDesc(String storeName) {
+    return 'हे डिव्हाइस $storeName शी सुरक्षितपणे जोडलेले आहे. क्लाउड बॅकअप आणि सिंक सक्रिय आहे.';
+  }
+
+  @override
+  String get s32StoreAccountRequiredDesc =>
+      'क्लाउड सिंक्रोनाइझेशन सक्षम करण्यासाठी आणि स्टोअर डेटा सुरक्षित ठेवण्यासाठी सागर ट्रेडर्स स्टोअर पासकोडने साइन इन करा.';
+
+  @override
+  String get s32ConnectStoreBtn => 'स्टोअर खात्यात साइन इन करा';
+
+  @override
+  String get s32DisconnectStoreBtn => 'डिस्कनेक्ट करा';
+
+  @override
+  String get s32StorePasscodeDialogTitle => 'स्टोअर खाते साइन-इन';
+
+  @override
+  String get s32StorePasscodeDialogDesc =>
+      'लातूर कॉम्बो स्टोअर (WLMHW आणि HEMW) साठी अधिकृत सागर ट्रेडर्स स्टोअर पासकोड प्रविष्ट करा:';
+
+  @override
+  String get s32StorePasscodeHint => 'उदा. ST-LATUR-2026';
+
+  @override
+  String get s32StorePasscodeInvalid =>
+      'अवैध स्टोअर पासकोड. कृपया तपासा आणि पुन्हा प्रयत्न करा.';
+
+  @override
+  String get s32StorePasscodeSuccess =>
+      'डिव्हाइस स्टोअर खात्याशी यशस्वीरित्या जोडले गेले.';
+
+  @override
+  String get s32DisconnectStoreConfirm =>
+      'या डिव्हाइसवरून स्टोअर खाते डिस्कनेक्ट करायचे? पुन्हा कनेक्ट होईपर्यंत क्लाउड सिंक थांबवले जाईल.';
+
+  @override
+  String get s32DisconnectStoreTitle => 'स्टोअर खाते डिस्कनेक्ट करा';
+
+  @override
+  String get s32Disconnect => 'डिस्कनेक्ट करा';
+
+  @override
+  String get s32Cancel => 'रद्द करा';
+
+  @override
+  String get s32AutoSyncTitle => 'स्वयंचलित पार्श्वभूमी सिंक';
+
+  @override
+  String get s32AutoSyncSubtitle =>
+      'इंटरनेट कनेक्ट झाल्यावर डेटा आपोआप सिंक करा';
+
+  @override
+  String get s03StoreActivationTitle => 'स्टोअर खाते सक्रियीकरण (सुरक्षा कवच)';
+
+  @override
+  String get s03StoreActivationSubtitle =>
+      'लातूर क्लाउड (WLMHW आणि HEMW) सह हा फोन लिंक करण्यासाठी सागर ट्रेडर्स स्टोअर पासकोड प्रविष्ट करा:';
+
+  @override
+  String get s03StoreActivationSuccess =>
+      'डिव्हाइस सागर ट्रेडर्स — लातूरशी जोडले गेले. क्लाउड बॅकअप सक्रिय आहे.';
+
+  @override
+  String get s32ChangeStorePasscodeBtn => 'पासकोड बदला';
+
+  @override
+  String get s32ChangeStorePasscodeTitle => 'स्टोअर पासकोड बदला';
+
+  @override
+  String get s32ChangeStorePasscodeDesc =>
+      'लातूर कॉम्बो स्टोअरसाठी मास्टर स्टोअर पासकोड अपडेट करा. यासाठी इंटरनेट आवश्यक आहे.';
+
+  @override
+  String get s32CurrentPasscode => 'सध्याचा स्टोअर पासकोड';
+
+  @override
+  String get s32NewPasscode => 'नवीन स्टोअर पासकोड (किमान ६ अक्षरे)';
+
+  @override
+  String get s32ConfirmNewPasscode => 'नवीन पासकोडची पुष्टी करा';
+
+  @override
+  String get s32PasscodeUpdatedSuccess =>
+      'स्टोअर पासकोड यशस्वीरित्या बदलला गेला आणि सुरक्षित करण्यात आला.';
+
+  @override
+  String get s32PasscodeMismatch => 'नवीन पासकोड जुळत नाहीत.';
+
+  @override
+  String get s32PasscodeTooShort => 'पासकोड किमान ६ वर्णांचा असावा.';
+
+  @override
+  String get s32InternetRequiredForPasscode =>
+      'स्टोअर पासकोड बदलण्यासाठी इंटरनेट कनेक्शन आवश्यक आहे.';
+
+  @override
+  String get s32InternetRequiredForStoreLogin =>
+      'स्टोअर खात्यात साइन इन करण्यासाठी इंटरनेट आवश्यक आहे. कृपया वाय-फाय किंवा मोबाइल डेटा सुरू करा.';
+
+  @override
+  String s32AuthorizedDevicesTitle(int count) {
+    return 'जोडलेली स्टोअर डिव्हाइसेस ($count)';
+  }
+
+  @override
+  String get s32RevokeDeviceBtn => 'प्रवेश रद्द करा';
+
+  @override
+  String get s32RevokeDeviceConfirm =>
+      'आपण नक्की या डिव्हाइसचा प्रवेश रद्द करू इच्छिता? ते लगेच क्लाउडवरून डिस्कनेक्ट केले जाईल.';
+
+  @override
+  String get s32RevokeDeviceSuccess =>
+      'डिव्हाइसचा प्रवेश यशस्वीरित्या रद्द करण्यात आला.';
+
+  @override
+  String get s32ThisDeviceLabel => '(हे डिव्हाइस)';
+
+  @override
+  String get s32RenameDeviceTitle => 'डिव्हाइसचे नाव बदला';
+
+  @override
+  String get s32RenameDeviceDesc =>
+      'या डिव्हाइससाठी ओळखता येईल असे नाव प्रविष्ट करा (उदा. मालकाचा फोन, काउंटर टॅब्लेट, SM राहुल).';
+
+  @override
+  String get s32RenameDeviceHint => 'डिव्हाइसचे नाव / लेबल';
+
+  @override
+  String get s32RenameDeviceBtn => 'नाव सेव्ह करा';
+
+  @override
+  String get s32RenameDeviceSuccess =>
+      'डिव्हाइसचे नाव यशस्वीरित्या अपडेट केले.';
+
+  @override
+  String s32DeviceLastUser(String role, String name) {
+    return 'शेवटचा वापरकर्ता: $role ($name)';
+  }
+
+  @override
+  String s32DeviceLastUserRoleOnly(String role) {
+    return 'शेवटचा वापरकर्ता: $role';
+  }
+
+  @override
+  String s32DeviceLastActive(String time) {
+    return 'सक्रिय: $time';
+  }
+
+  @override
+  String s32DeviceEnrolled(String date) {
+    return 'नोंदणी: $date';
+  }
+
+  @override
+  String get s05CloudInactiveBanner =>
+      'क्लाउड बॅकअप निष्क्रिय आहे — स्टोअर खाते जोडण्यासाठी टॅप करा';
+
+  @override
+  String get s05LinkNowBtn => 'आता जोडा';
 }

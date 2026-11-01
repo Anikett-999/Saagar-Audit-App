@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../data/db/database.dart';
+import 'store_account_service.dart';
 
 /// Status of the cloud sync engine.
 enum CloudSyncStatus {
@@ -82,6 +83,9 @@ class CloudSyncState {
     this.uploadedPhotos = 0,
     this.errorMessage,
     this.progress = 0.0,
+    this.isStorePaired = false,
+    this.pairedStoreName,
+    this.isAutoSyncEnabled = true,
   });
 
   final CloudSyncStatus status;
@@ -92,6 +96,9 @@ class CloudSyncState {
   final int uploadedPhotos;
   final String? errorMessage;
   final double progress;
+  final bool isStorePaired;
+  final String? pairedStoreName;
+  final bool isAutoSyncEnabled;
 
   CloudSyncState copyWith({
     CloudSyncStatus? status,
@@ -102,6 +109,9 @@ class CloudSyncState {
     int? uploadedPhotos,
     String? errorMessage,
     double? progress,
+    bool? isStorePaired,
+    String? pairedStoreName,
+    bool? isAutoSyncEnabled,
   }) {
     return CloudSyncState(
       status: status ?? this.status,
@@ -112,6 +122,9 @@ class CloudSyncState {
       uploadedPhotos: uploadedPhotos ?? this.uploadedPhotos,
       errorMessage: errorMessage ?? this.errorMessage,
       progress: progress ?? this.progress,
+      isStorePaired: isStorePaired ?? this.isStorePaired,
+      pairedStoreName: pairedStoreName ?? this.pairedStoreName,
+      isAutoSyncEnabled: isAutoSyncEnabled ?? this.isAutoSyncEnabled,
     );
   }
 }
@@ -286,6 +299,23 @@ class CloudSyncService {
     String? userRole,
     void Function(double progress, String step)? onProgress,
   }) async {
+    // Step 0: Store Account Security Gate (Client Ref: F27)
+    final isPaired = await StoreAccountService.instance.isDevicePaired();
+    if (!isPaired) {
+      return SyncResult.unconfigured(
+        'Cloud Sync blocked: Device is not signed in to an authorized store account.',
+      );
+    }
+
+    // Step 0b: Remote Kill Switch check (Owner Device Revocation)
+    final isAuthorized = await StoreAccountService.instance.isCurrentDeviceAuthorized();
+    if (!isAuthorized) {
+      await StoreAccountService.instance.unpairStoreAccount();
+      return SyncResult.error(
+        'Device access revoked by store Owner. Cloud sync disconnected.',
+      );
+    }
+
     // Step 1: Network Check
     final hasNet = await isNetworkAvailable();
     if (!hasNet) {
@@ -344,6 +374,11 @@ class CloudSyncService {
       await setLastSyncTime(now);
 
       onProgress?.call(1.0, 'Sync completed.');
+      unawaited(
+        StoreAccountService.instance.recordDeviceHeartbeat(
+          userRole: userRole,
+        ),
+      );
       return SyncResult.success(
         pushed: totalPushed,
         pulled: totalPulled,

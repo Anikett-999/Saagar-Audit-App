@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +8,7 @@ import '../../../data/models/user.dart';
 import '../../../data/repositories/user_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../providers/cloud_sync_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
 
@@ -500,6 +503,7 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
 
     if (result == true) {
       await _loadUsers();
+      unawaited(ref.read(cloudSyncProvider.notifier).syncNow());
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -658,6 +662,7 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
       try {
         await UserRepository.instance.deactivate(user.id);
         await _loadUsers();
+        unawaited(ref.read(cloudSyncProvider.notifier).syncNow());
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -684,6 +689,7 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
   ) async {
     await UserRepository.instance.reactivate(user.id);
     await _loadUsers();
+    unawaited(ref.read(cloudSyncProvider.notifier).syncNow());
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

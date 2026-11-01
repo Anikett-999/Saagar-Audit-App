@@ -962,29 +962,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s32SubtitleSyncOnly => 'Store Data Cloud Synchronization';
 
   @override
-  String get s32ExportCardTitle => 'Export Local Database (JSON)';
+  String get s32ExportCardTitle => 'Audit Records Data Export (JSON)';
 
   @override
   String get s32ExportCardDesc =>
-      'Export all SQLite database tables into a timestamped JSON file. Intended for Owner use before app updates.';
+      'Export database table records into a timestamped JSON file. Notice: This exports table records only, not photos. For full backup and device recovery including photos, use Cloud Synchronization above.';
 
   @override
   String get s32ExportSecurityNotice =>
-      'Security Notice: Exported backup contains audit trails, findings, and store records. Store and transfer this file securely.';
+      'Data Export Notice: Exported file contains audit trails and findings (without binary photos). The primary and complete recovery path for this store is Cloud Synchronization.';
 
   @override
-  String get s32ExportButton => 'Export Database JSON';
+  String get s32ExportButton => 'Export Data Records (JSON)';
 
   @override
-  String get s32Exporting => 'Exporting database...';
+  String get s32Exporting => 'Exporting records...';
 
   @override
-  String get s32ExportSuccessTitle => 'Export Successful';
+  String get s32ExportSuccessTitle => 'Data Export Successful';
 
   @override
   String s32ExportSuccessMessage(
       int records, int tables, String fileName, String path) {
-    return 'Backup saved successfully ($records records across $tables tables).\n\nFile: $fileName\nPath:\n$path';
+    return 'Audit data records exported successfully ($records records across $tables tables).\n\nNotice: Photos and full store recovery are securely maintained via Cloud Sync.\n\nFile: $fileName\nPath:\n$path';
   }
 
   @override
@@ -2891,4 +2891,176 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get btnResetPin => 'Reset PIN';
+
+  @override
+  String get s32StoreAccountTitle => 'Store Account (Tenant Shield)';
+
+  @override
+  String get s32StoreAccountConnected => 'Store Account Connected';
+
+  @override
+  String get s32StoreAccountRequired => 'Store Account Required';
+
+  @override
+  String s32StoreAccountConnectedDesc(String storeName) {
+    return 'This device is securely paired with $storeName. Cloud backup and sync are active.';
+  }
+
+  @override
+  String get s32StoreAccountRequiredDesc =>
+      'Sign in with your Saagar Traders store passcode to enable cloud synchronization and protect store data.';
+
+  @override
+  String get s32ConnectStoreBtn => 'Sign In to Store Account';
+
+  @override
+  String get s32DisconnectStoreBtn => 'Disconnect';
+
+  @override
+  String get s32StorePasscodeDialogTitle => 'Store Account Sign-In';
+
+  @override
+  String get s32StorePasscodeDialogDesc =>
+      'Enter the authorized Saagar Traders store passcode for the Latur combo store (WLMHW & HEMW):';
+
+  @override
+  String get s32StorePasscodeHint => 'e.g. ST-LATUR-2026';
+
+  @override
+  String get s32StorePasscodeInvalid =>
+      'Invalid store passcode. Please check and try again.';
+
+  @override
+  String get s32StorePasscodeSuccess =>
+      'Device successfully paired to store account.';
+
+  @override
+  String get s32DisconnectStoreConfirm =>
+      'Disconnect this device from the store account? Cloud sync will be blocked until reconnected.';
+
+  @override
+  String get s32DisconnectStoreTitle => 'Disconnect Store Account';
+
+  @override
+  String get s32Disconnect => 'Disconnect';
+
+  @override
+  String get s32Cancel => 'Cancel';
+
+  @override
+  String get s32AutoSyncTitle => 'Automatic Background Sync';
+
+  @override
+  String get s32AutoSyncSubtitle =>
+      'Sync changes automatically when connected to internet';
+
+  @override
+  String get s03StoreActivationTitle =>
+      'Store Account Activation (Tenant Shield)';
+
+  @override
+  String get s03StoreActivationSubtitle =>
+      'Enter the Saagar Traders store passcode to link this phone with the Latur cloud (WLMHW & HEMW):';
+
+  @override
+  String get s03StoreActivationSuccess =>
+      'Device linked to Saagar Traders — Latur. Cloud backup active.';
+
+  @override
+  String get s32ChangeStorePasscodeBtn => 'Change Passcode';
+
+  @override
+  String get s32ChangeStorePasscodeTitle => 'Rotate Store Passcode';
+
+  @override
+  String get s32ChangeStorePasscodeDesc =>
+      'Update the master store passcode for Latur combo store. Requires internet connection.';
+
+  @override
+  String get s32CurrentPasscode => 'Current Store Passcode';
+
+  @override
+  String get s32NewPasscode => 'New Store Passcode (min 6 chars)';
+
+  @override
+  String get s32ConfirmNewPasscode => 'Confirm New Passcode';
+
+  @override
+  String get s32PasscodeUpdatedSuccess =>
+      'Store passcode successfully rotated and protected with BCrypt.';
+
+  @override
+  String get s32PasscodeMismatch => 'New passcodes do not match.';
+
+  @override
+  String get s32PasscodeTooShort => 'Passcode must be at least 6 characters.';
+
+  @override
+  String get s32InternetRequiredForPasscode =>
+      'Internet connection is required to rotate store passcode.';
+
+  @override
+  String get s32InternetRequiredForStoreLogin =>
+      'Internet connection is required to sign in to store account. Please connect to Wi-Fi or mobile data.';
+
+  @override
+  String s32AuthorizedDevicesTitle(int count) {
+    return 'Connected Store Devices ($count)';
+  }
+
+  @override
+  String get s32RevokeDeviceBtn => 'Revoke Access';
+
+  @override
+  String get s32RevokeDeviceConfirm =>
+      'Are you sure you want to revoke access for this device? It will be disconnected from the store cloud immediately.';
+
+  @override
+  String get s32RevokeDeviceSuccess => 'Device access revoked successfully.';
+
+  @override
+  String get s32ThisDeviceLabel => '(This device)';
+
+  @override
+  String get s32RenameDeviceTitle => 'Rename Device';
+
+  @override
+  String get s32RenameDeviceDesc =>
+      'Enter a recognizable label for this device (e.g. Owner Phone, Counter Tablet, SM Rahul).';
+
+  @override
+  String get s32RenameDeviceHint => 'Device Name / Label';
+
+  @override
+  String get s32RenameDeviceBtn => 'Save Name';
+
+  @override
+  String get s32RenameDeviceSuccess => 'Device name updated successfully.';
+
+  @override
+  String s32DeviceLastUser(String role, String name) {
+    return 'Last user: $role ($name)';
+  }
+
+  @override
+  String s32DeviceLastUserRoleOnly(String role) {
+    return 'Last user: $role';
+  }
+
+  @override
+  String s32DeviceLastActive(String time) {
+    return 'Active: $time';
+  }
+
+  @override
+  String s32DeviceEnrolled(String date) {
+    return 'Enrolled: $date';
+  }
+
+  @override
+  String get s05CloudInactiveBanner =>
+      'Cloud Backup Inactive — Tap to link store account';
+
+  @override
+  String get s05LinkNowBtn => 'Link Now';
 }

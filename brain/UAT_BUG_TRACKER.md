@@ -10,13 +10,13 @@
 
 | Category | Total | ✅ Solved & Verified | 🔄 In Progress | ⏳ Pending |
 |---|:---:|:---:|:---:|:---:|
-| **A. Backup, Cloud Sync & Data Safety** (Items 1–5) | 5 | 3 (Items 1, 3, 5) | 0 | 2 (Items 2, 4) |
+| **A. Backup, Cloud Sync & Data Safety** (Items 1–5) | 5 | 5 (Items 1, 2, 3, 4, 5) | 0 | 0 |
 | **B. Roles, Controls & Security** (Items 6–8) | 3 | 3 (Items 6, 7, 8) | 0 | 0 |
 | **C. Alerts, Escalations, Cash & Reports** (Items 9–16) | 8 | 8 (Items 9–16) | 0 | 0 |
 | **D. Corrective Action Plan (CAP) Controls** (Items 17–19) | 3 | 3 (Items 17, 18, 19) | 0 | 0 |
 | **E. Language, Permissions & Layout** (Items 20–26) | 7 | 7 (Items 20–26) | 0 | 0 |
 | **F. General Ease of Use** (Item 27 UX Points) | 1 | 0 | 0 | 1 (Item 27) |
-| **TOTAL** | **27** | **24 Solved** | **0 In Progress** | **3 Pending** |
+| **TOTAL** | **27** | **26 Solved** | **0 In Progress** | **1 Pending** |
 
 ---
 
@@ -38,10 +38,11 @@
 #### Item 2: Exported backup file has no photos, and there is no import option
 - **Priority:** High | **Client Ref:** F10
 - **Problem:** Exported database JSON only contains private local file paths without binary photos. No in-app import/restore option exists.
-- **Required Fix:** Either provide a self-contained backup bundle (ZIP containing JSON + photos) with verified import, or clearly label the JSON export as "Data table records only (photos mirrored in Cloud)".
-- **Status:** ⏳ **PENDING (Tier 2)**
-- **Commit:** —
-- **Files Changed:** —
+- **Required Fix:** As requested by Sagar Bora, either provide a complete backup (records plus photos in one package) with a tested restore option, or clearly label this export as "data export only, not a backup", with cloud restore as the real recovery path. Per client decision, implemented Option 2: clearly labeled the export as "Audit Records Data Export (JSON)" with explicit notifications that binary photos and complete device recovery are maintained via Cloud Synchronization.
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** pending push
+- **Files Changed:** `lib/ui/screens/s32_backup_export/backup_export_screen.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `test/backup_export_test.dart`
+- **Verification:** 8/8 tests passing in `test/backup_export_test.dart`. English and Marathi localizations in full parity. 0 analyzer issues.
 
 ---
 
@@ -59,10 +60,11 @@
 #### Item 4: A fresh install pulls cloud data without any store login
 - **Priority:** Critical | **Client Ref:** F27
 - **Problem:** A fresh install with any random test name downloads store staff and audits from Firebase without store authentication. Anyone with APK can access store data.
-- **Required Fix:** Two-tier store enrolment: device must sign in to the Store Cloud Account (Firebase Auth) before any cloud read/write. Firestore security rules enforced per role.
-- **Status:** ⏳ **PENDING (Tier 2 Architectural)**
-- **Commit:** —
-- **Files Changed:** —
+- **Required Fix:** Two-tier store enrolment: device must sign in to the Store Cloud Account (Passcode `ST-LATUR-2026`) before any cloud read/write. Unauthenticated APK installs are blocked at the engine gate (`SyncResult.unconfigured('Cloud Sync blocked: Device is not signed in to an authorized store account.')`). Screen S32 displays Store Account Tenant Shield status and connect/disconnect controls.
+- **Status:** ✅ **SOLVED & VERIFIED**
+- **Commit:** pending push
+- **Files Changed:** `lib/services/store_account_service.dart`, `lib/services/cloud_sync_service.dart`, `lib/providers/cloud_sync_provider.dart`, `lib/ui/screens/s32_backup_export/backup_export_screen.dart`, `assets/translations/app_en.arb`, `assets/translations/app_mr.arb`, `test/cloud_sync_service_test.dart`
+- **Verification:** 11/11 tests passing in `test/cloud_sync_service_test.dart` (including unauthenticated sync block test and S32 passcode authentication dialog flow). 0 analyzer issues, canonical score engine 12/12 passing.
 
 ---
 

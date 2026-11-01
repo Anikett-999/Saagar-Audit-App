@@ -225,9 +225,9 @@ void main() {
 
       expect(find.text('Cloud Sync & Backup'), findsOneWidget);
       expect(find.text('Data Backup & Cloud Synchronization'), findsOneWidget);
-      expect(find.text('Export Local Database (JSON)'), findsOneWidget);
-      expect(find.text('Security Notice: Exported backup contains audit trails, findings, and store records. Store and transfer this file securely.'), findsOneWidget);
-      expect(find.text('Export Database JSON'), findsOneWidget);
+      expect(find.text('Audit Records Data Export (JSON)'), findsOneWidget);
+      expect(find.text('Data Export Notice: Exported file contains audit trails and findings (without binary photos). The primary and complete recovery path for this store is Cloud Synchronization.'), findsOneWidget);
+      expect(find.text('Export Data Records (JSON)'), findsOneWidget);
       expect(find.text('About Saagar Audit App'), findsOneWidget);
       expect(find.text('Version: 0.1.0+1 (Phase 1 Baseline)'), findsOneWidget);
     });
@@ -257,8 +257,8 @@ void main() {
       expect(find.text('Cloud Sync'), findsOneWidget);
 
       // Database Export is strictly hidden from SM (Item 7)
-      expect(find.text('Export Local Database (JSON)'), findsNothing);
-      expect(find.text('Export Database JSON'), findsNothing);
+      expect(find.text('Audit Records Data Export (JSON)'), findsNothing);
+      expect(find.text('Export Data Records (JSON)'), findsNothing);
 
       // But SM has full honest Cloud Sync dashboard and Sync Now button (Item 3)
       expect(find.text('Cloud Synchronization'), findsOneWidget);
@@ -273,17 +273,17 @@ void main() {
         localeNotifier: localeNotifier,
       );
 
-      // Tap Export Database button and wait for File I/O to complete inside runAsync
+      // Tap Export Data Records button and wait for File I/O to complete inside runAsync
       await tester.runAsync(() async {
-        await tester.tap(find.text('Export Database JSON'));
+        await tester.tap(find.text('Export Data Records (JSON)'));
         await Future<void>.delayed(const Duration(milliseconds: 800));
       });
       await tester.pumpAndSettle();
 
       // Verify success dialog is shown
       expect(find.byType(AlertDialog), findsOneWidget);
-      expect(find.text('Export Successful'), findsOneWidget);
-      expect(find.textContaining('Backup saved successfully (3 records across 14 tables).'), findsOneWidget);
+      expect(find.text('Data Export Successful'), findsOneWidget);
+      expect(find.textContaining('Audit data records exported successfully (3 records across 14 tables).'), findsOneWidget);
       expect(find.text('OK'), findsOneWidget);
 
       // Tap OK to dismiss
@@ -316,8 +316,8 @@ void main() {
 
       expect(find.text('क्लाउड सिंक आणि बॅकअप'), findsOneWidget);
       expect(find.text('डेटा बॅकअप आणि क्लाउड समक्रमण'), findsOneWidget);
-      expect(find.text('स्थानिक डेटाबेस निर्यात (JSON)'), findsOneWidget);
-      expect(find.text('डेटाबेस JSON निर्यात करा'), findsOneWidget);
+      expect(find.text('ऑडिट नोंदी डेटा निर्यात (JSON)'), findsOneWidget);
+      expect(find.text('डेटा नोंदी निर्यात करा (JSON)'), findsOneWidget);
       expect(find.text('क्लाउड समक्रमण'), findsOneWidget);
       expect(find.text('सागर ऑडिट अॅपबद्दल'), findsOneWidget);
     });

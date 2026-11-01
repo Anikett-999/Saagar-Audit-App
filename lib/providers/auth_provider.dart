@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:bcrypt/bcrypt.dart';
@@ -6,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import '../data/db/database.dart';
+import '../services/store_account_service.dart';
 
 /// Logged-in user identity. Null when nobody is logged in.
 class AuthUser {
@@ -373,6 +375,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
         name: row['name']! as String,
         role: row['role']! as String,
         languagePref: row['language_pref']! as String,
+      ),
+    );
+    unawaited(
+      StoreAccountService.instance.recordDeviceHeartbeat(
+        userName: row['name'] as String?,
+        userRole: row['role'] as String?,
       ),
     );
     return true;

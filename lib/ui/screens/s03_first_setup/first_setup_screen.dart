@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,7 +8,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../providers/cloud_sync_provider.dart';
+import '../../../services/cloud_sync_service.dart';
 import '../../../services/owner_recovery_service.dart';
+import '../../../services/store_account_service.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/pin_numpad.dart';
 
@@ -22,6 +28,7 @@ class FirstSetupScreen extends ConsumerStatefulWidget {
 
 class _FirstSetupScreenState extends ConsumerState<FirstSetupScreen> {
   final _nameController = TextEditingController();
+  final _storeKeyController = TextEditingController();
   String? _firstPin;
   bool _confirming = false;
   bool _shakeNumpad = false;
@@ -29,11 +36,61 @@ class _FirstSetupScreenState extends ConsumerState<FirstSetupScreen> {
   String? _generatedRecoveryCode;
   String? _createdUserId;
   String? _createdName;
+  bool _storePaired = false;
+  String? _storeKeyError;
 
   @override
   void dispose() {
     _nameController.dispose();
+    _storeKeyController.dispose();
     super.dispose();
+  }
+
+  Future<void> _onActivateStore() async {
+    final l10n = AppLocalizations.of(context)!;
+    final key = _storeKeyController.text.trim();
+    if (key.isEmpty) return;
+
+    final hasNet = await CloudSyncService.instance.isNetworkAvailable();
+    if (!hasNet) {
+      setState(() {
+        _storeKeyError = l10n.s32InternetRequiredForStoreLogin;
+      });
+      return;
+    }
+
+    try {
+      final ok = await StoreAccountService.instance.pairStoreAccount(storeKey: key);
+      if (!mounted) return;
+
+      if (ok) {
+        setState(() {
+          _storePaired = true;
+          _storeKeyError = null;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.s03StoreActivationSuccess),
+            backgroundColor: AppColors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else {
+        setState(() {
+          _storeKeyError = l10n.s32StorePasscodeInvalid;
+        });
+      }
+    } on SocketException {
+      if (!mounted) return;
+      setState(() {
+        _storeKeyError = l10n.s32InternetRequiredForStoreLogin;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _storeKeyError = e.toString();
+      });
+    }
   }
 
   Future<void> _onPinEntered(String pin) async {
@@ -103,6 +160,8 @@ class _FirstSetupScreenState extends ConsumerState<FirstSetupScreen> {
         ),
       );
     }
+    // Auto-sync Owner record immediately if paired!
+    unawaited(ref.read(cloudSyncProvider.notifier).syncNow());
     context.goNamed('s05_home');
   }
 
@@ -112,13 +171,14 @@ class _FirstSetupScreenState extends ConsumerState<FirstSetupScreen> {
 
     if (_generatedRecoveryCode != null) {
       return Scaffold(
+        resizeToAvoidBottomInset: false,
         body: SafeArea(
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Spacer(),
+                const SizedBox(height: 16),
                 const Center(
                   child: CircleAvatar(
                     radius: 36,
@@ -126,7 +186,7 @@ class _FirstSetupScreenState extends ConsumerState<FirstSetupScreen> {
                     child: Icon(Icons.key_rounded, size: 40, color: AppColors.goldDark),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 Text(
                   l10n.s03RecoveryCodeTitle,
                   textAlign: TextAlign.center,
@@ -136,20 +196,20 @@ class _FirstSetupScreenState extends ConsumerState<FirstSetupScreen> {
                     color: AppColors.navy,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Text(
                   l10n.s03RecoveryCodeSubtitle,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontFamily: 'DMSans',
-                    fontSize: 14,
+                    fontSize: 13,
                     color: AppColors.gray600,
                     height: 1.4,
                   ),
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 20),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   decoration: BoxDecoration(
                     color: AppColors.gray100,
                     borderRadius: BorderRadius.circular(12),
@@ -162,13 +222,13 @@ class _FirstSetupScreenState extends ConsumerState<FirstSetupScreen> {
                         _generatedRecoveryCode!,
                         style: const TextStyle(
                           fontFamily: 'DMSans',
-                          fontSize: 24,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 2,
                           color: AppColors.navy,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 8),
                       IconButton(
                         icon: const Icon(Icons.copy_rounded, color: AppColors.navy),
                         tooltip: 'Copy Code',
@@ -182,13 +242,101 @@ class _FirstSetupScreenState extends ConsumerState<FirstSetupScreen> {
                     ],
                   ),
                 ),
-                const Spacer(),
+                const SizedBox(height: 24),
+
+                // Store Account Activation Card (Tenant Shield)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: _storePaired
+                        ? AppColors.green.withValues(alpha: 0.08)
+                        : AppColors.goldPale.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _storePaired
+                          ? AppColors.green.withValues(alpha: 0.4)
+                          : AppColors.gold.withValues(alpha: 0.4),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            _storePaired ? Icons.verified_user : Icons.store_mall_directory_outlined,
+                            color: _storePaired ? AppColors.green : AppColors.navy,
+                            size: 22,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _storePaired ? l10n.s32StoreAccountConnected : l10n.s03StoreActivationTitle,
+                              style: TextStyle(
+                                fontFamily: 'DMSans',
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: _storePaired ? AppColors.green : AppColors.navy,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        _storePaired
+                            ? 'Saagar Traders — Latur (WLMHW & HEMW)'
+                            : l10n.s03StoreActivationSubtitle,
+                        style: const TextStyle(
+                          fontFamily: 'DMSans',
+                          fontSize: 12,
+                          color: AppColors.gray600,
+                          height: 1.35,
+                        ),
+                      ),
+                      if (!_storePaired) ...[
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _storeKeyController,
+                                textCapitalization: TextCapitalization.characters,
+                                decoration: InputDecoration(
+                                  hintText: 'e.g. ST-LATUR-2026',
+                                  errorText: _storeKeyError,
+                                  isDense: true,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                ),
+                                onSubmitted: (_) => _onActivateStore(),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.navy,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              onPressed: _onActivateStore,
+                              child: Text(l10n.btnVerifyCode),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 32),
                 SizedBox(
                   height: 52,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.navy,
                       foregroundColor: AppColors.gold,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     onPressed: _onContinueToApp,
                     child: Text(

@@ -368,13 +368,13 @@
   "s32TitleSyncOnly": "Cloud Sync",
   "s32Subtitle": "Data Backup & Cloud Synchronization",
   "s32SubtitleSyncOnly": "Store Data Cloud Synchronization",
-  "s32ExportCardTitle": "Export Local Database (JSON)",
-  "s32ExportCardDesc": "Export all SQLite database tables into a timestamped JSON file. Intended for Owner use before app updates.",
-  "s32ExportSecurityNotice": "Security Notice: Exported backup contains audit trails, findings, and store records. Store and transfer this file securely.",
-  "s32ExportButton": "Export Database JSON",
-  "s32Exporting": "Exporting database...",
-  "s32ExportSuccessTitle": "Export Successful",
-  "s32ExportSuccessMessage": "Backup saved successfully ({records} records across {tables} tables).\n\nFile: {fileName}\nPath:\n{path}",
+  "s32ExportCardTitle": "Audit Records Data Export (JSON)",
+  "s32ExportCardDesc": "Export database table records into a timestamped JSON file. Notice: This exports table records only, not photos. For full backup and device recovery including photos, use Cloud Synchronization above.",
+  "s32ExportSecurityNotice": "Data Export Notice: Exported file contains audit trails and findings (without binary photos). The primary and complete recovery path for this store is Cloud Synchronization.",
+  "s32ExportButton": "Export Data Records (JSON)",
+  "s32Exporting": "Exporting records...",
+  "s32ExportSuccessTitle": "Data Export Successful",
+  "s32ExportSuccessMessage": "Audit data records exported successfully ({records} records across {tables} tables).\n\nNotice: Photos and full store recovery are securely maintained via Cloud Sync.\n\nFile: {fileName}\nPath:\n{path}",
   "@s32ExportSuccessMessage": {
     "placeholders": {
       "records": {"type": "int"},
@@ -1389,7 +1389,98 @@
   "s04ConfirmNewPin": "Confirm New PIN",
   "s04PinResetSuccess": "Owner PIN reset successfully. Please log in with your new PIN.",
   "btnVerifyCode": "Verify Code",
-  "btnResetPin": "Reset PIN"
+  "btnResetPin": "Reset PIN",
+  "s32StoreAccountTitle": "Store Account (Tenant Shield)",
+  "s32StoreAccountConnected": "Store Account Connected",
+  "s32StoreAccountRequired": "Store Account Required",
+  "s32StoreAccountConnectedDesc": "This device is securely paired with {storeName}. Cloud backup and sync are active.",
+  "@s32StoreAccountConnectedDesc": {
+    "placeholders": {
+      "storeName": {"type": "String"}
+    }
+  },
+  "s32StoreAccountRequiredDesc": "Sign in with your Saagar Traders store passcode to enable cloud synchronization and protect store data.",
+  "s32ConnectStoreBtn": "Sign In to Store Account",
+  "s32DisconnectStoreBtn": "Disconnect",
+  "s32StorePasscodeDialogTitle": "Store Account Sign-In",
+  "s32StorePasscodeDialogDesc": "Enter the authorized Saagar Traders store passcode for the Latur combo store (WLMHW & HEMW):",
+  "s32StorePasscodeHint": "e.g. ST-LATUR-2026",
+  "s32StorePasscodeInvalid": "Invalid store passcode. Please check and try again.",
+  "s32StorePasscodeSuccess": "Device successfully paired to store account.",
+  "s32DisconnectStoreConfirm": "Disconnect this device from the store account? Cloud sync will be blocked until reconnected.",
+  "s32DisconnectStoreTitle": "Disconnect Store Account",
+  "s32Disconnect": "Disconnect",
+  "s32Cancel": "Cancel",
+  "s32AutoSyncTitle": "Automatic Background Sync",
+  "s32AutoSyncSubtitle": "Sync changes automatically when connected to internet",
+  "s03StoreActivationTitle": "Store Account Activation (Tenant Shield)",
+  "s03StoreActivationSubtitle": "Enter the Saagar Traders store passcode to link this phone with the Latur cloud (WLMHW & HEMW):",
+  "s03StoreActivationSuccess": "Device linked to Saagar Traders — Latur. Cloud backup active.",
+  "s32ChangeStorePasscodeBtn": "Change Passcode",
+  "s32ChangeStorePasscodeTitle": "Rotate Store Passcode",
+  "s32ChangeStorePasscodeDesc": "Update the master store passcode for Latur combo store. Requires internet connection.",
+  "s32CurrentPasscode": "Current Store Passcode",
+  "s32NewPasscode": "New Store Passcode (min 6 chars)",
+  "s32ConfirmNewPasscode": "Confirm New Passcode",
+  "s32PasscodeUpdatedSuccess": "Store passcode successfully rotated and protected with BCrypt.",
+  "s32PasscodeMismatch": "New passcodes do not match.",
+  "s32PasscodeTooShort": "Passcode must be at least 6 characters.",
+  "s32InternetRequiredForPasscode": "Internet connection is required to rotate store passcode.",
+  "s32InternetRequiredForStoreLogin": "Internet connection is required to sign in to store account. Please connect to Wi-Fi or mobile data.",
+  "s32AuthorizedDevicesTitle": "Connected Store Devices ({count})",
+  "@s32AuthorizedDevicesTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "s32RevokeDeviceBtn": "Revoke Access",
+  "s32RevokeDeviceConfirm": "Are you sure you want to revoke access for this device? It will be disconnected from the store cloud immediately.",
+  "s32RevokeDeviceSuccess": "Device access revoked successfully.",
+  "s32ThisDeviceLabel": "(This device)",
+  "s32RenameDeviceTitle": "Rename Device",
+  "s32RenameDeviceDesc": "Enter a recognizable label for this device (e.g. Owner Phone, Counter Tablet, SM Rahul).",
+  "s32RenameDeviceHint": "Device Name / Label",
+  "s32RenameDeviceBtn": "Save Name",
+  "s32RenameDeviceSuccess": "Device name updated successfully.",
+  "s32DeviceLastUser": "Last user: {role} ({name})",
+  "@s32DeviceLastUser": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "s32DeviceLastUserRoleOnly": "Last user: {role}",
+  "@s32DeviceLastUserRoleOnly": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "s32DeviceLastActive": "Active: {time}",
+  "@s32DeviceLastActive": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "s32DeviceEnrolled": "Enrolled: {date}",
+  "@s32DeviceEnrolled": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "s05CloudInactiveBanner": "Cloud Backup Inactive — Tap to link store account",
+  "s05LinkNowBtn": "Link Now"
 }
 
 
