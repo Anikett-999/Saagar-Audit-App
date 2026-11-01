@@ -138,6 +138,15 @@ class AppDatabase {
           await SeedLoader.loadCheckpoints(db);
         }
 
+        // Defensive check: ensure daily checkpoints have authentic Marathi translations
+        // (updates existing pre-translated databases)
+        final untranslatedDaily = await db.rawQuery(
+          "SELECT id FROM checkpoints WHERE frequency = 'daily' AND text_en = text_mr LIMIT 1",
+        );
+        if (untranslatedDaily.isNotEmpty) {
+          await SeedLoader.loadCheckpoints(db);
+        }
+
         // Defensive check: ensure v3 columns exist on audits and audit_results
         try {
           final auditCols = await db.rawQuery('PRAGMA table_info(audits)');

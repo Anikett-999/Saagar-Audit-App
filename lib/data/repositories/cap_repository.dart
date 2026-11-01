@@ -117,6 +117,39 @@ class CapRepository {
       );
     }
 
+    // Origin check: cannot create non-pattern CAP on a checkpoint that did not fail
+    if (!isPattern) {
+      final resRows = await AppDatabase.instance.db.query(
+        'audit_results',
+        where: 'audit_id = ? AND checkpoint_id = ?',
+        whereArgs: [originAuditId, originCheckpointId],
+      );
+      if (resRows.isNotEmpty) {
+        final res = resRows.first['result'] as String?;
+        if (res != 'F') {
+          throw ArgumentError(
+            'Cannot create CAP for checkpoint $originCheckpointId: checkpoint did not fail in audit $originAuditId (result was $res)',
+          );
+        }
+      }
+
+      if (originResultId != null) {
+        final resById = await AppDatabase.instance.db.query(
+          'audit_results',
+          where: 'id = ?',
+          whereArgs: [originResultId],
+        );
+        if (resById.isNotEmpty) {
+          final res = resById.first['result'] as String?;
+          if (res != 'F') {
+            throw ArgumentError(
+              'Cannot create CAP for result $originResultId: result was $res (expected F)',
+            );
+          }
+        }
+      }
+    }
+
     final capId = id ?? await generateNextCapId(originDate ?? DateTime.now());
     final now = DateTime.now().toUtc().toIso8601String();
     final deviceId = await DeviceService.instance.getId();
@@ -335,22 +368,55 @@ class CapRepository {
   /// Transitions a CAP from `open`/`reopened` to `done` once all action steps are complete.
   ///
   /// Enforces:
+  /// - Only the assigned responsible user can mark CAP done (Item 6 / Client Ref F21).
   /// - Current status must be `open` or `reopened`.
+  /// - Mandatory completion note with minimum 10 characters (Item 18 / Client Ref F20).
+  /// - Mandatory evidence photo if origin checkpoint has requires_photo_on_fail == 1 (Item 18 / Client Ref F20).
   /// - Every action step in `cap_actions` must have `is_done = 1`.
-  /// - Optionally saves a completion photo with `context = 'cap_progress'`.
+  /// - Saves completion photo with `context = 'cap_progress'`.
   Future<void> markDone({
     required String capId,
     required String userId,
-    String? doneNotes,
+    required String doneNotes,
     String? photoPath,
   }) async {
     final cap = await getById(capId);
     if (cap == null) {
       throw StateError('CAP $capId not found');
     }
+    // Segregation of duties (Item 6 / Client Ref F21): Only the assigned responsible user can mark CAP done
+    if (cap.responsibleUserId != userId) {
+      throw StateError(
+        'Segregation of duties: only the assigned responsible user (${cap.responsibleUserId}) can mark this CAP done (attempted by $userId)',
+      );
+    }
     if (cap.status != 'open' && cap.status != 'reopened') {
       throw StateError(
         'Cannot mark done: CAP $capId has status ${cap.status} (expected open or reopened)',
+      );
+    }
+
+    final trimmedNotes = doneNotes.trim();
+    if (trimmedNotes.length < 10) {
+      throw ArgumentError(
+        'Completion note is mandatory and must be at least 10 characters (got ${trimmedNotes.length})',
+      );
+    }
+
+    // Check if origin checkpoint requires photo on fail (Item 18 / Client Ref F20)
+    final cpRows = await AppDatabase.instance.db.query(
+      'checkpoints',
+      columns: ['requires_photo_on_fail'],
+      where: 'id = ?',
+      whereArgs: [cap.originCheckpointId],
+      limit: 1,
+    );
+    final requiresPhoto = cpRows.isNotEmpty &&
+        (cpRows.first['requires_photo_on_fail'] as int? ?? 0) == 1;
+
+    if (requiresPhoto && (photoPath == null || photoPath.trim().isEmpty)) {
+      throw ArgumentError(
+        'Evidence photo is mandatory for checkpoint ${cap.originCheckpointId} before marking CAP done',
       );
     }
 
@@ -384,7 +450,7 @@ class CapRepository {
         'actor_user_id': userId,
         'device_id': deviceId,
         'timestamp': now,
-        'note': doneNotes,
+        'note': trimmedNotes,
       });
 
       if (photoPath != null && photoPath.trim().isNotEmpty) {
@@ -472,6 +538,22 @@ class CapRepository {
     if (cap.status != 'done') {
       throw StateError(
         'Cannot verify: CAP $capId has status ${cap.status} (expected done)',
+      );
+    }
+
+    // Segregation of duties / Four-Eyes Principle (Item 6 / Client Ref F21):
+    // Verifier cannot be the responsible user or the user who marked it done
+    if (cap.responsibleUserId == verifierId) {
+      throw StateError(
+        'Segregation of duties: verifier ($verifierId) cannot verify a CAP assigned to themselves (${cap.responsibleUserId})',
+      );
+    }
+
+    final logs = await logFor(capId);
+    final doneLogs = logs.where((l) => l.event == 'marked_done').toList();
+    if (doneLogs.isNotEmpty && doneLogs.last.actorUserId == verifierId) {
+      throw StateError(
+        'Segregation of duties (Four-Eyes Principle): verifier ($verifierId) cannot be the same user who marked the CAP done',
       );
     }
 
@@ -622,6 +704,23 @@ class CapRepository {
         'Cannot extend: CAP $capId has status ${cap.status} (expected open, done, or reopened)',
       );
     }
+
+    // Segregation of duties on extension:
+    // A responsible user cannot extend their own completed CAP (Four-Eyes Principle)
+    if (cap.status == 'done') {
+      if (cap.responsibleUserId == actorId) {
+        throw StateError(
+          'Segregation of duties: actor ($actorId) cannot extend deadline on a completed CAP assigned to themselves',
+        );
+      }
+      final logs = await logFor(capId);
+      final doneLogs = logs.where((l) => l.event == 'marked_done').toList();
+      if (doneLogs.isNotEmpty && doneLogs.last.actorUserId == actorId) {
+        throw StateError(
+          'Segregation of duties (Four-Eyes Principle): actor ($actorId) cannot extend deadline on a CAP they marked done',
+        );
+      }
+    }
     if (reason.trim().isEmpty) {
       throw ArgumentError('Extension reason must not be blank');
     }
@@ -629,10 +728,22 @@ class CapRepository {
       throw ArgumentError('New deadline must not be blank');
     }
 
+    final trimmedDeadline = newDeadline.trim();
+    final parsedNew = DateTime.tryParse(trimmedDeadline);
+    final parsedOld = DateTime.tryParse(cap.deadline);
+    if (parsedNew != null && parsedOld != null) {
+      final oldDateOnly = DateTime(parsedOld.year, parsedOld.month, parsedOld.day);
+      final newDateOnly = DateTime(parsedNew.year, parsedNew.month, parsedNew.day);
+      if (!newDateOnly.isAfter(oldDateOnly)) {
+        throw ArgumentError(
+          'New deadline must be strictly after current deadline ($trimmedDeadline <= ${cap.deadline})',
+        );
+      }
+    }
+
     final now = DateTime.now().toUtc().toIso8601String();
     final deviceId = await DeviceService.instance.getId();
     final trimmedReason = reason.trim();
-    final trimmedDeadline = newDeadline.trim();
 
     await AppDatabase.instance.db.transaction((txn) async {
       await txn.update(
@@ -681,13 +792,33 @@ class CapRepository {
         'Cannot reopen: CAP $capId has status ${cap.status} (expected done or closed)',
       );
     }
-    if (reason.trim().isEmpty) {
-      throw ArgumentError('Reopen reason must not be blank');
+
+    // Segregation of duties (Four-Eyes Principle / Item 6 · F21):
+    // If reopening from verification failure (status == 'done'), actor cannot be responsible user or who marked done
+    if (cap.status == 'done') {
+      if (cap.responsibleUserId == actorId) {
+        throw StateError(
+          'Segregation of duties: actor ($actorId) cannot reject verification on a CAP assigned to themselves',
+        );
+      }
+      final logs = await logFor(capId);
+      final doneLogs = logs.where((l) => l.event == 'marked_done').toList();
+      if (doneLogs.isNotEmpty && doneLogs.last.actorUserId == actorId) {
+        throw StateError(
+          'Segregation of duties (Four-Eyes Principle): actor ($actorId) cannot reject verification on a CAP they marked done',
+        );
+      }
+    }
+
+    final trimmedReason = reason.trim();
+    if (trimmedReason.length < 10) {
+      throw ArgumentError(
+        'Reopen reason must be at least 10 characters (got ${trimmedReason.length})',
+      );
     }
 
     final now = DateTime.now().toUtc().toIso8601String();
     final deviceId = await DeviceService.instance.getId();
-    final trimmedReason = reason.trim();
 
     await AppDatabase.instance.db.transaction((txn) async {
       await txn.update(
@@ -696,6 +827,19 @@ class CapRepository {
           'status': 'reopened',
         },
         where: 'id = ?',
+        whereArgs: [capId],
+      );
+
+      // Item 6 / Client Ref F21: Reopening resets all action steps so responsible user must redo them
+      await txn.update(
+        'cap_actions',
+        {
+          'is_done': 0,
+          'done_at': null,
+          'done_by': null,
+          'done_notes': null,
+        },
+        where: 'cap_id = ?',
         whereArgs: [capId],
       );
 

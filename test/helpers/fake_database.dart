@@ -387,6 +387,8 @@ class FakeDatabase extends Fake implements Database, Transaction {
           match = list[i]['id'] == whereArgs[0] && list[i]['status'] == 'submitted';
         } else if (where == 'id = ?') {
           match = list[i]['id'] == whereArgs[0];
+        } else if (where == 'cap_id = ?') {
+          match = list[i]['cap_id'] == whereArgs[0];
         }
       }
       if (match) {

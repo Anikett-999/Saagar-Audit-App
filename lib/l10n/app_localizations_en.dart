@@ -280,6 +280,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get s04WrongPinOneAttemptLeft => 'Wrong PIN. 1 attempt left.';
+
+  @override
   String s04TooManyAttempts(int seconds) {
     return 'Too many wrong attempts. Try again in ${seconds}s.';
   }
@@ -535,6 +538,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s07FinishReview => 'Finish & Review';
 
   @override
+  String get s07JumpListTitle => 'Audit Checkpoints';
+
+  @override
+  String get s07JumpListTooltip => 'Checkpoint jump list';
+
+  @override
+  String get s07JumpListFilterAll => 'All';
+
+  @override
+  String get s07JumpListFilterUnanswered => 'Unanswered';
+
+  @override
+  String get s07JumpListFilterPassed => 'Passed';
+
+  @override
+  String get s07JumpListFilterFailed => 'Failed';
+
+  @override
+  String get s07JumpListFilterNa => 'N/A';
+
+  @override
+  String get s07JumpListCurrentBadge => 'Current';
+
+  @override
+  String get s07JumpListPendingBadge => 'Pending';
+
+  @override
   String get s08Title => 'Fail Detail';
 
   @override
@@ -550,8 +580,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s08PhotoEvidence => 'Photo evidence';
 
   @override
-  String get s08PhotoRequiredNotice =>
-      'Photo is mandatory for this checkpoint.';
+  String get s08PhotoRequiredNotice => 'Photo required if marked FAIL';
 
   @override
   String get s08SaveFail => 'Save Finding';
@@ -642,10 +671,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s27LanguageSubtitle => 'Select English or मराठी';
 
   @override
-  String get s27BackupExportTitle => 'Backup & Export';
+  String get s27BackupExportTitle => 'Cloud Sync & Backup';
 
   @override
-  String get s27BackupExportSubtitle => 'Export database JSON and sync status';
+  String get s27BackupExportSubtitle =>
+      'Sync store data and export database JSON';
+
+  @override
+  String get s27CloudSyncTitle => 'Cloud Sync';
+
+  @override
+  String get s27CloudSyncSubtitle => 'Sync store audits and data with cloud';
 
   @override
   String get s27AboutTitle => 'About Saagar Audit';
@@ -941,35 +977,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s31LanguageUpdatedSuccess => 'Language preference saved';
 
   @override
-  String get s32Title => 'Backup & Export';
+  String get s32Title => 'Cloud Sync & Backup';
 
   @override
-  String get s32Subtitle => 'Local SQLite Database Export & Cloud Sync';
+  String get s32TitleSyncOnly => 'Cloud Sync';
 
   @override
-  String get s32ExportCardTitle => 'Export Local Database (JSON)';
+  String get s32Subtitle => 'Data Backup & Cloud Synchronization';
+
+  @override
+  String get s32SubtitleSyncOnly => 'Store Data Cloud Synchronization';
+
+  @override
+  String get s32ExportCardTitle => 'Audit Records Data Export (JSON)';
 
   @override
   String get s32ExportCardDesc =>
-      'Export all 14 SQLite tables into a timestamped JSON file in your device Downloads directory. Ideal for manual backups before app updates.';
+      'Export database table records into a timestamped JSON file. Notice: This exports table records only, not photos. For full backup and device recovery including photos, use Cloud Synchronization above.';
 
   @override
   String get s32ExportSecurityNotice =>
-      'Security Notice: Exported backup contains audit trails, findings, and bcrypt security hashes. Store and transfer this file securely.';
+      'Data Export Notice: Exported file contains audit trails and findings (without binary photos). The primary and complete recovery path for this store is Cloud Synchronization.';
 
   @override
-  String get s32ExportButton => 'Export Database JSON';
+  String get s32ExportButton => 'Export Data Records (JSON)';
 
   @override
-  String get s32Exporting => 'Exporting database...';
+  String get s32Exporting => 'Exporting records...';
 
   @override
-  String get s32ExportSuccessTitle => 'Export Successful';
+  String get s32ExportSuccessTitle => 'Data Export Successful';
 
   @override
   String s32ExportSuccessMessage(
       int records, int tables, String fileName, String path) {
-    return 'Backup saved successfully ($records records across $tables tables).\n\nFile: $fileName\nPath:\n$path';
+    return 'Audit data records exported successfully ($records records across $tables tables).\n\nNotice: Photos and full store recovery are securely maintained via Cloud Sync.\n\nFile: $fileName\nPath:\n$path';
   }
 
   @override
@@ -978,72 +1020,99 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get s32CloudSyncTitle => 'Cloud Synchronization (Firestore)';
+  String get s32CloudSyncTitle => 'Cloud Synchronization';
 
   @override
   String get s32CloudSyncDesc =>
-      'Automatic multi-device synchronization and cloud data storage via Google Cloud Firestore.';
+      'Sync your audits, photos, and corrective actions with the secure cloud.';
 
   @override
-  String get s32CloudSyncStatusLabel =>
-      'Status: Offline-First Mode (Local SQLite)';
+  String get s32CloudSyncStatusLabel => 'Status: Local Storage Active';
 
   @override
   String get s32CloudSyncPhase4Notice =>
-      'All audits, CAPs, and reports are safely preserved locally on this device.';
+      'All audits, CAPs, and reports are safely preserved on this device.';
 
   @override
   String get s32CloudSyncComingSoonBadge => 'Active Mirror';
 
   @override
-  String get s32ForceSyncButton => 'Force Cloud Sync';
+  String get s32ForceSyncButton => 'Sync Now';
 
   @override
-  String get s32CloudSyncStatusIdle => 'Status: Ready to Sync';
+  String get s32CloudSyncStatusIdle => 'Ready to Sync';
 
   @override
-  String get s32CloudSyncStatusSyncing => 'Status: Synchronizing with Cloud...';
+  String get s32CloudSyncStatusSyncing => 'Synchronizing with Cloud...';
 
   @override
-  String get s32CloudSyncStatusSuccess =>
-      'Status: All Data Mirrored (Cloud up to date)';
+  String get s32CloudSyncStatusSuccess => 'Cloud Backup is Up to Date';
 
   @override
   String s32CloudSyncStatusError(String error) {
-    return 'Status: Sync Error ($error)';
+    return 'Sync Issue ($error)';
   }
 
   @override
-  String get s32CloudSyncStatusOffline =>
-      'Status: Offline (Local SQLite Active)';
+  String get s32CloudSyncStatusOffline => 'Device is Offline (No Internet)';
+
+  @override
+  String get s32CloudSyncStatusNever => 'Initial Sync Required — Tap Sync Now';
+
+  @override
+  String get s32CloudSyncStatusPending =>
+      'Device is Online — Changes pending sync';
+
+  @override
+  String get s32CloudSyncInitialPending => 'Initial backup pending';
+
+  @override
+  String get s32CloudSyncBadgeNotSynced => 'Not Synced';
+
+  @override
+  String get s32CloudSyncBadgeUpToDate => 'Up to Date';
+
+  @override
+  String get s32CloudSyncBadgePending => 'Pending Sync';
+
+  @override
+  String get s32CloudSyncBadgeOffline => 'Offline';
+
+  @override
+  String get s32CloudSyncBadgeError => 'Sync Issue';
 
   @override
   String get s32CloudSyncStatusUnconfigured =>
-      'Status: Cloud Backend Offline / Standby';
+      'Cloud Standby (Ready to connect)';
 
   @override
   String s32CloudSyncLastSync(String time) {
-    return 'Last Synced: $time';
+    return 'Last Successful Backup: $time';
   }
 
   @override
-  String get s32CloudSyncNever => 'Never';
+  String get s32CloudSyncNever => 'Never backed up yet';
 
   @override
   String s32CloudSyncPending(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count changes pending upload',
-      one: '1 change pending upload',
-      zero: 'All local changes backed up',
+      other: '$count items waiting to upload',
+      one: '1 item waiting to upload',
+      zero: 'All items uploaded to cloud',
     );
     return '$_temp0';
   }
 
   @override
+  String s32SavedOnPhone(int count) {
+    return 'Saved on this phone: $count records';
+  }
+
+  @override
   String s32SyncSuccessNotice(int count) {
-    return 'Cloud mirror sync completed ($count records updated).';
+    return 'Cloud sync completed ($count records updated).';
   }
 
   @override
@@ -1171,6 +1240,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s15NoAuditsFound => 'No audits found. Complete an audit first.';
+
+  @override
+  String get s15NoFailsFound =>
+      'This audit has no failed checkpoints. CAPs can only be created for failed items.';
 
   @override
   String get s15SectionProblem => '2. Problem & 5-Whys Analysis';
@@ -1549,14 +1622,37 @@ class AppLocalizationsEn extends AppLocalizations {
       'Warning: Incomplete action steps remain. You must complete all action steps before marking this CAP done.';
 
   @override
-  String get s17SectionDoneNotes => 'Done Notes / Reflection (optional)';
+  String get s17SectionDoneNotes => 'Completion Notes (Mandatory)';
 
   @override
   String get s17DoneNotesHint =>
-      'Describe how the issue was resolved or notes for verification...';
+      'Describe how the issue was resolved (min 10 characters)...';
 
   @override
-  String get s17SectionEvidencePhoto => 'Completion Evidence Photo (optional)';
+  String s17NotesMinLength(int count) {
+    return 'Minimum 10 characters required ($count/10)';
+  }
+
+  @override
+  String get s17PhotoRequiredNotice =>
+      'Evidence photo is mandatory for this checkpoint before marking done.';
+
+  @override
+  String s17OnlyResponsibleCanMarkDone(String name) {
+    return 'Only the assigned responsible user ($name) can mark this CAP done.';
+  }
+
+  @override
+  String s16OnlyResponsibleCanMarkDone(String name) {
+    return 'Only the assigned responsible user ($name) can mark this CAP done.';
+  }
+
+  @override
+  String get s16SelfVerificationBlocked =>
+      'Pending verification by another manager or Owner (Segregation of Duties).';
+
+  @override
+  String get s17SectionEvidencePhoto => 'Completion Evidence Photo';
 
   @override
   String get s17TakePhoto => 'Take Photo';
@@ -1781,21 +1877,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s13ExportPdf => 'Export PDF';
 
   @override
-  String get s13ExportPdfTooltip => 'PDF export is scheduled for Phase 2';
+  String get s13ExportPdfTooltip => 'Export 1-Page Audit PDF';
 
   @override
   String get s13ShareWhatsApp => 'Share to WhatsApp';
 
   @override
-  String get s13ShareWhatsAppTooltip =>
-      'WhatsApp share is scheduled for Phase 2';
+  String get s13ShareWhatsAppTooltip => 'Share audit summary on WhatsApp';
 
   @override
   String get s13VerifyAudit => 'Verify Audit';
 
   @override
-  String get s13VerifyAuditTooltip =>
-      'Audit verification is scheduled for Phase 2';
+  String get s13VerifyAuditTooltip => 'Verify this audit as GM or Owner';
+
+  @override
+  String get s13VerifyConfirmTitle => 'Verify Audit';
+
+  @override
+  String s13VerifyConfirmMessage(String role, String name) {
+    return 'Are you sure you want to verify this audit as $role: $name?';
+  }
+
+  @override
+  String get s13VerifySuccess => 'Audit verified successfully.';
+
+  @override
+  String get s13PdfGenerating => 'Generating Audit PDF...';
+
+  @override
+  String s13PdfExportError(String error) {
+    return 'Failed to export PDF: $error';
+  }
+
+  @override
+  String get s13WhatsAppSuccess => 'Opening WhatsApp...';
+
+  @override
+  String get s13WhatsAppCopied =>
+      'WhatsApp could not be opened. Summary copied to clipboard!';
 
   @override
   String get s13NotFound => 'Audit not found';
@@ -2245,6 +2365,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s18PatternMarker => 'Pattern Issue';
 
   @override
+  String get s18SelfVerificationWarning =>
+      'Self-verification not permitted: Segregation of duties requires a different person to verify this CAP.';
+
+  @override
+  String get s18ReopenReasonMinLength =>
+      'Please provide a detailed reason (at least 10 characters).';
+
+  @override
   String get s18AccessDenied =>
       'Access Denied. Only GM and Owner may verify CAPs.';
 
@@ -2442,22 +2570,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s21CapsClosedHeader => 'Section 7: CAPs Closed This Week';
 
   @override
-  String get s21CapsClosedEmpty =>
-      'No CAPs closed this week (Verification & Close workflow active in P2-5).';
+  String get s21CapsClosedEmpty => 'No CAPs closed during this week.';
 
   @override
   String get s21CapsAgedHeader => 'Section 8: Aged / Overdue CAPs';
 
   @override
-  String get s21CapsAgedEmpty =>
-      'No aged CAPs recorded (Lifecycle tracking active in P2-5).';
+  String get s21CapsAgedEmpty => 'No aged or overdue CAPs.';
 
   @override
   String get s21EscalationsSection => 'Section 9: Escalation Log';
 
   @override
   String get s21EscalationsEmpty =>
-      'No escalations triggered (Escalation engine active in Phase 3).';
+      'No escalations triggered during this week.';
 
   @override
   String get s21SignatureSection => 'Signature of Record';
@@ -2612,6 +2738,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s33WhatsAppSentBadge => 'WhatsApp Sent';
 
   @override
+  String get s11EscalationsAlertTitle => 'Escalation Alert Required';
+
+  @override
+  String get s11ShareWhatsApp => 'Share Alert via WhatsApp';
+
+  @override
+  String get s11MarkAsSent => 'Mark as Sent';
+
+  @override
+  String get s11MessageCopied => 'Escalation message copied to clipboard!';
+
+  @override
+  String get s33ConfirmWhatsAppTitle => 'Confirm WhatsApp Delivery';
+
+  @override
+  String s33ConfirmWhatsAppPrompt(String name) {
+    return 'Did you send the escalation alert to $name on WhatsApp?';
+  }
+
+  @override
+  String get s33ConfirmWhatsAppYes => 'Yes, Sent';
+
+  @override
+  String get s33ConfirmWhatsAppNo => 'Not Sent / Later';
+
+  @override
+  String get s33WhatsAppUnconfirmedBadge => 'WhatsApp: Not Confirmed';
+
+  @override
+  String get s33MarkAsSentAction => 'Mark as Sent';
+
+  @override
   String get fieldRequired => 'This field is required';
 
   @override
@@ -2697,4 +2855,239 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s21ExportMonthlyPdfButton => 'Export Monthly PDF';
+
+  @override
+  String get cameraPermissionRequiredTitle => 'Camera Permission Required';
+
+  @override
+  String get cameraPermissionRequiredMessage =>
+      'Camera permission is required to capture evidence photos. Please open Settings and enable camera access.';
+
+  @override
+  String get btnOpenSettings => 'Open Settings';
+
+  @override
+  String get exitAuditDialogTitle => 'Exit Audit?';
+
+  @override
+  String get exitAuditDialogMessage =>
+      'Your progress has been automatically saved as a draft. You can resume at any time from the Home screen.';
+
+  @override
+  String get btnResumeAudit => 'Resume Audit';
+
+  @override
+  String get btnSaveAndExit => 'Save & Exit';
+
+  @override
+  String get s03RecoveryCodeTitle => 'Master Recovery Code';
+
+  @override
+  String get s03RecoveryCodeSubtitle =>
+      'Save this code securely. If you ever forget your Owner PIN, this is the only way to reset it without losing store data.';
+
+  @override
+  String get s03RecoveryCodeCopied => 'Recovery code copied to clipboard';
+
+  @override
+  String get btnContinueToApp => 'Continue to App';
+
+  @override
+  String get s04RecoveryTitle => 'Owner PIN Recovery';
+
+  @override
+  String get s04RecoveryPrompt =>
+      'Enter your Master Recovery Code to reset your Owner PIN:';
+
+  @override
+  String get s04RecoveryInvalid =>
+      'Invalid Recovery Code. Please check and try again.';
+
+  @override
+  String get s04ResetPinTitle => 'Set New 4-Digit PIN';
+
+  @override
+  String get s04ConfirmNewPin => 'Confirm New PIN';
+
+  @override
+  String get s04PinResetSuccess =>
+      'Owner PIN reset successfully. Please log in with your new PIN.';
+
+  @override
+  String get btnVerifyCode => 'Verify Code';
+
+  @override
+  String get btnResetPin => 'Reset PIN';
+
+  @override
+  String get s32StoreAccountTitle => 'Store Account (Tenant Shield)';
+
+  @override
+  String get s32StoreAccountConnected => 'Store Account Connected';
+
+  @override
+  String get s32StoreAccountRequired => 'Store Account Required';
+
+  @override
+  String s32StoreAccountConnectedDesc(String storeName) {
+    return 'This device is securely paired with $storeName. Cloud backup and sync are active.';
+  }
+
+  @override
+  String get s32StoreAccountRequiredDesc =>
+      'Sign in with your Saagar Traders store passcode to enable cloud synchronization and protect store data.';
+
+  @override
+  String get s32ConnectStoreBtn => 'Sign In to Store Account';
+
+  @override
+  String get s32DisconnectStoreBtn => 'Disconnect';
+
+  @override
+  String get s32StorePasscodeDialogTitle => 'Store Account Sign-In';
+
+  @override
+  String get s32StorePasscodeDialogDesc =>
+      'Enter the authorized Saagar Traders store passcode for the Latur combo store (WLMHW & HEMW):';
+
+  @override
+  String get s32StorePasscodeHint => 'e.g. ST-LATUR-2026';
+
+  @override
+  String get s32StorePasscodeInvalid =>
+      'Invalid store passcode. Please check and try again.';
+
+  @override
+  String get s32StorePasscodeSuccess =>
+      'Device successfully paired to store account.';
+
+  @override
+  String get s32DisconnectStoreConfirm =>
+      'Disconnect this device from the store account? Cloud sync will be blocked until reconnected.';
+
+  @override
+  String get s32DisconnectStoreTitle => 'Disconnect Store Account';
+
+  @override
+  String get s32Disconnect => 'Disconnect';
+
+  @override
+  String get s32Cancel => 'Cancel';
+
+  @override
+  String get s32AutoSyncTitle => 'Automatic Background Sync';
+
+  @override
+  String get s32AutoSyncSubtitle =>
+      'Sync changes automatically when connected to internet';
+
+  @override
+  String get s03StoreActivationTitle =>
+      'Store Account Activation (Tenant Shield)';
+
+  @override
+  String get s03StoreActivationSubtitle =>
+      'Enter the Saagar Traders store passcode to link this phone with the Latur cloud (WLMHW & HEMW):';
+
+  @override
+  String get s03StoreActivationSuccess =>
+      'Device linked to Saagar Traders — Latur. Cloud backup active.';
+
+  @override
+  String get s32ChangeStorePasscodeBtn => 'Change Passcode';
+
+  @override
+  String get s32ChangeStorePasscodeTitle => 'Rotate Store Passcode';
+
+  @override
+  String get s32ChangeStorePasscodeDesc =>
+      'Update the master store passcode for Latur combo store. Requires internet connection.';
+
+  @override
+  String get s32CurrentPasscode => 'Current Store Passcode';
+
+  @override
+  String get s32NewPasscode => 'New Store Passcode (min 6 chars)';
+
+  @override
+  String get s32ConfirmNewPasscode => 'Confirm New Passcode';
+
+  @override
+  String get s32PasscodeUpdatedSuccess =>
+      'Store passcode successfully rotated and protected with BCrypt.';
+
+  @override
+  String get s32PasscodeMismatch => 'New passcodes do not match.';
+
+  @override
+  String get s32PasscodeTooShort => 'Passcode must be at least 6 characters.';
+
+  @override
+  String get s32InternetRequiredForPasscode =>
+      'Internet connection is required to rotate store passcode.';
+
+  @override
+  String get s32InternetRequiredForStoreLogin =>
+      'Internet connection is required to sign in to store account. Please connect to Wi-Fi or mobile data.';
+
+  @override
+  String s32AuthorizedDevicesTitle(int count) {
+    return 'Connected Store Devices ($count)';
+  }
+
+  @override
+  String get s32RevokeDeviceBtn => 'Revoke Access';
+
+  @override
+  String get s32RevokeDeviceConfirm =>
+      'Are you sure you want to revoke access for this device? It will be disconnected from the store cloud immediately.';
+
+  @override
+  String get s32RevokeDeviceSuccess => 'Device access revoked successfully.';
+
+  @override
+  String get s32ThisDeviceLabel => '(This device)';
+
+  @override
+  String get s32RenameDeviceTitle => 'Rename Device';
+
+  @override
+  String get s32RenameDeviceDesc =>
+      'Enter a recognizable label for this device (e.g. Owner Phone, Counter Tablet, SM Rahul).';
+
+  @override
+  String get s32RenameDeviceHint => 'Device Name / Label';
+
+  @override
+  String get s32RenameDeviceBtn => 'Save Name';
+
+  @override
+  String get s32RenameDeviceSuccess => 'Device name updated successfully.';
+
+  @override
+  String s32DeviceLastUser(String role, String name) {
+    return 'Last user: $role ($name)';
+  }
+
+  @override
+  String s32DeviceLastUserRoleOnly(String role) {
+    return 'Last user: $role';
+  }
+
+  @override
+  String s32DeviceLastActive(String time) {
+    return 'Active: $time';
+  }
+
+  @override
+  String s32DeviceEnrolled(String date) {
+    return 'Enrolled: $date';
+  }
+
+  @override
+  String get s05CloudInactiveBanner =>
+      'Cloud Backup Inactive — Tap to link store account';
+
+  @override
+  String get s05LinkNowBtn => 'Link Now';
 }

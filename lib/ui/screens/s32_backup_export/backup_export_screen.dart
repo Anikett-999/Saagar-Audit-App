@@ -4,13 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:printing/printing.dart';
 
 import '../../../data/backup_service.dart';
+import '../../../data/device_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/cloud_sync_provider.dart';
 import '../../../services/cloud_sync_service.dart';
+import '../../../services/store_account_service.dart';
+import '../../../utils/app_date_format.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
 
@@ -132,6 +136,155 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
     }
   }
 
+  Future<void> _showPairStoreDialog(AppLocalizations l10n) async {
+    final hasNet = await CloudSyncService.instance.isNetworkAvailable();
+    if (!hasNet && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s32InternetRequiredForStoreLogin),
+          backgroundColor: AppColors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    if (!mounted) return;
+
+    final paired = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => _PairStoreDialog(
+        l10n: l10n,
+        onPair: (key) => ref.read(cloudSyncProvider.notifier).pairStoreAccount(key),
+      ),
+    );
+
+    if (paired == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s32StorePasscodeSuccess),
+          backgroundColor: AppColors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  Future<void> _showUnpairStoreDialog(BuildContext context, AppLocalizations l10n) async {
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          l10n.s32DisconnectStoreTitle,
+          style: const TextStyle(
+            fontFamily: 'DMSans',
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: Text(
+          l10n.s32DisconnectStoreConfirm,
+          style: const TextStyle(fontFamily: 'DMSans', height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.s32Cancel),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await ref.read(cloudSyncProvider.notifier).unpairStoreAccount();
+              if (ctx.mounted) Navigator.of(ctx).pop();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.red,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Text(
+              l10n.s32Disconnect,
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showRotatePasscodeDialog(AppLocalizations l10n) async {
+    final hasNet = await CloudSyncService.instance.isNetworkAvailable();
+    if (!mounted) return;
+    if (!hasNet) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s32InternetRequiredForPasscode),
+          backgroundColor: AppColors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    final rotated = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => _RotatePasscodeDialog(
+        l10n: l10n,
+        onRotate: (cur, next) => ref.read(cloudSyncProvider.notifier).rotateStorePasscode(
+          currentPasscode: cur,
+          newPasscode: next,
+        ),
+      ),
+    );
+
+    if (rotated == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s32PasscodeUpdatedSuccess),
+          backgroundColor: AppColors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  Future<void> _confirmRevokeDevice(
+    BuildContext context,
+    AppLocalizations l10n,
+    String deviceId,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.s32RevokeDeviceBtn),
+        content: Text(l10n.s32RevokeDeviceConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.s32Cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.red),
+            child: Text(l10n.s32RevokeDeviceBtn),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      await ref.read(cloudSyncProvider.notifier).revokeDevice(deviceId);
+      setState(() {});
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.s32RevokeDeviceSuccess),
+            backgroundColor: AppColors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
@@ -154,7 +307,7 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.s32Title),
+        title: Text(isOwner ? l10n.s32Title : l10n.s32TitleSyncOnly),
         actions: const [
           LanguageToggleButton(),
         ],
@@ -175,8 +328,8 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.cloud_download_outlined,
+                Icon(
+                  isOwner ? Icons.cloud_download_outlined : Icons.cloud_sync_outlined,
                   color: AppColors.navy,
                   size: 28,
                 ),
@@ -186,7 +339,7 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        l10n.s32Subtitle,
+                        isOwner ? l10n.s32Subtitle : l10n.s32SubtitleSyncOnly,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -196,7 +349,7 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        l10n.s32ExportCardDesc,
+                        isOwner ? l10n.s32ExportCardDesc : l10n.s32CloudSyncDesc,
                         style: const TextStyle(
                           fontSize: 13,
                           color: AppColors.gray600,
@@ -212,7 +365,293 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
           ),
           const SizedBox(height: 24),
 
-          // Local Database Export Card (All Roles)
+          // Local Database Export Card (Strictly OWNER ONLY per Item 7)
+          if (isOwner) ...[
+            Card(
+              elevation: 1,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(color: AppColors.gray200),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.navy.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.save_alt,
+                            color: AppColors.navy,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            l10n.s32ExportCardTitle,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.navy,
+                              fontFamily: 'DMSans',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      l10n.s32ExportCardDesc,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.gray600,
+                        fontFamily: 'DMSans',
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Security Notice Box
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.goldPale.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: AppColors.gold.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(
+                            Icons.security,
+                            color: AppColors.gold,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              l10n.s32ExportSecurityNotice,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.navy,
+                                fontFamily: 'DMSans',
+                                height: 1.35,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Export Button
+                    ElevatedButton.icon(
+                      onPressed: _isExporting ? null : () => _exportDatabase(l10n),
+                      icon: _isExporting
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.file_download),
+                      label: Text(
+                        _isExporting ? l10n.s32Exporting : l10n.s32ExportButton,
+                        style: const TextStyle(
+                          fontFamily: 'DMSans',
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.navy,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+
+          // Store Account / Tenant Shield Section (Client Ref: F27)
+          Consumer(
+            builder: (context, ref, _) {
+              final syncState = ref.watch(cloudSyncProvider);
+              final isPaired = syncState.isStorePaired;
+              final storeName = syncState.pairedStoreName ?? 'Saagar Traders — Latur (WLMHW & HEMW)';
+
+              return Card(
+                elevation: 1,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(
+                    color: isPaired ? AppColors.green.withValues(alpha: 0.5) : AppColors.gold.withValues(alpha: 0.5),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: isPaired
+                                  ? AppColors.green.withValues(alpha: 0.1)
+                                  : AppColors.gold.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              isPaired ? Icons.verified_user_outlined : Icons.shield_outlined,
+                              color: isPaired ? AppColors.green : AppColors.gold,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.s32StoreAccountTitle,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.navy,
+                                    fontFamily: 'DMSans',
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: isPaired
+                                        ? AppColors.green.withValues(alpha: 0.1)
+                                        : AppColors.gold.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    isPaired ? l10n.s32StoreAccountConnected : l10n.s32StoreAccountRequired,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: isPaired ? AppColors.green : AppColors.gold,
+                                      fontFamily: 'DMSans',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        isPaired
+                            ? l10n.s32StoreAccountConnectedDesc(storeName)
+                            : l10n.s32StoreAccountRequiredDesc,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.gray600,
+                          fontFamily: 'DMSans',
+                          height: 1.4,
+                        ),
+                      ),
+                      if (isPaired && isOwner) ...[
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () => _showRotatePasscodeDialog(l10n),
+                                icon: const Icon(Icons.lock_reset, size: 16),
+                                label: Text(
+                                  l10n.s32ChangeStorePasscodeBtn,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontFamily: 'DMSans',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AppColors.navy,
+                                  side: const BorderSide(color: AppColors.navy),
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            TextButton(
+                              onPressed: () => _showUnpairStoreDialog(context, l10n),
+                              style: TextButton.styleFrom(
+                                foregroundColor: AppColors.gray600,
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              ),
+                              child: Text(
+                                l10n.s32DisconnectStoreBtn,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontFamily: 'DMSans',
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        _buildAuthorizedDevicesSection(context, l10n),
+                      ],
+                      if (!isPaired) ...[
+                        const SizedBox(height: 16),
+                        OutlinedButton.icon(
+                          onPressed: () => _showPairStoreDialog(l10n),
+                          icon: const Icon(Icons.key, size: 18),
+                          label: Text(
+                            l10n.s32ConnectStoreBtn,
+                            style: const TextStyle(
+                              fontFamily: 'DMSans',
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.navy,
+                            side: const BorderSide(color: AppColors.navy),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 24),
+
+          // Cloud Sync Section (Available to ALL Roles per Item 3 & Item 7)
           Card(
             elevation: 1,
             shape: RoundedRectangleBorder(
@@ -233,28 +672,80 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(
-                          Icons.save_alt,
+                          Icons.cloud_sync,
                           color: AppColors.navy,
                           size: 24,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Text(
-                          l10n.s32ExportCardTitle,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.navy,
-                            fontFamily: 'DMSans',
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.s32CloudSyncTitle,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.navy,
+                                fontFamily: 'DMSans',
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Consumer(
+                              builder: (context, ref, _) {
+                                final syncState = ref.watch(cloudSyncProvider);
+                                final isNeverSynced = syncState.lastSyncAt == null;
+                                final isOffline = syncState.status == CloudSyncStatus.offline;
+                                final isError = syncState.status == CloudSyncStatus.error;
+                                final hasPending = syncState.pendingCount > 0;
+
+                                final Color badgeColor;
+                                final String badgeText;
+
+                                if (isOffline) {
+                                  badgeColor = AppColors.gray600;
+                                  badgeText = l10n.s32CloudSyncBadgeOffline;
+                                } else if (isError) {
+                                  badgeColor = AppColors.red;
+                                  badgeText = l10n.s32CloudSyncBadgeError;
+                                } else if (isNeverSynced) {
+                                  badgeColor = AppColors.gold;
+                                  badgeText = l10n.s32CloudSyncBadgeNotSynced;
+                                } else if (hasPending) {
+                                  badgeColor = AppColors.gold;
+                                  badgeText = l10n.s32CloudSyncBadgePending;
+                                } else {
+                                  badgeColor = AppColors.green;
+                                  badgeText = l10n.s32CloudSyncBadgeUpToDate;
+                                }
+
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: badgeColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    badgeText,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: badgeColor,
+                                      fontFamily: 'DMSans',
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   Text(
-                    l10n.s32ExportCardDesc,
+                    l10n.s32CloudSyncDesc,
                     style: const TextStyle(
                       fontSize: 13,
                       color: AppColors.gray600,
@@ -262,404 +753,352 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
                       height: 1.4,
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 12),
 
-                  // Security Notice Box
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.goldPale.withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: AppColors.gold.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.security,
-                          color: AppColors.gold,
-                          size: 18,
+                  // Auto-Sync Toggle Switch (Client Ref: F02 / F13 / S32)
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final syncState = ref.watch(cloudSyncProvider);
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: AppColors.gray100.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppColors.gray200),
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            l10n.s32ExportSecurityNotice,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.navy,
-                              fontFamily: 'DMSans',
-                              height: 1.35,
+                        child: Row(
+                          children: [
+                            const Icon(Icons.sync_alt, color: AppColors.navy, size: 20),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.s32AutoSyncTitle,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.navy,
+                                      fontFamily: 'DMSans',
+                                    ),
+                                  ),
+                                  Text(
+                                    l10n.s32AutoSyncSubtitle,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.gray600,
+                                      fontFamily: 'DMSans',
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
+                            Switch.adaptive(
+                              value: syncState.isAutoSyncEnabled,
+                              activeTrackColor: AppColors.navy,
+                              onChanged: (val) {
+                                ref.read(cloudSyncProvider.notifier).toggleAutoSync(val);
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Honest 3-Line Status Card (Per Sagar Bora Item 3)
+                  Builder(
+                    builder: (context) {
+                      final syncState = ref.watch(cloudSyncProvider);
+                      final isNeverSynced = syncState.lastSyncAt == null;
+                      final isOffline = syncState.status == CloudSyncStatus.offline;
+                      final isSyncing = syncState.status == CloudSyncStatus.syncing;
+                      final hasPending = syncState.pendingCount > 0;
+
+                      IconData statusIcon;
+                      Color statusColor;
+                      String statusText;
+
+                      if (isOffline) {
+                        statusIcon = Icons.cloud_off;
+                        statusColor = AppColors.gray600;
+                        statusText = l10n.s32CloudSyncStatusOffline;
+                      } else if (isSyncing) {
+                        statusIcon = Icons.sync;
+                        statusColor = AppColors.gold;
+                        statusText = l10n.s32CloudSyncStatusSyncing;
+                      } else if (syncState.status == CloudSyncStatus.error) {
+                        statusIcon = Icons.sync_problem;
+                        statusColor = AppColors.red;
+                        statusText = l10n.s32CloudSyncStatusError(
+                          syncState.errorMessage ?? 'Unknown',
+                        );
+                      } else if (isNeverSynced) {
+                        statusIcon = Icons.cloud_upload_outlined;
+                        statusColor = AppColors.gold;
+                        statusText = l10n.s32CloudSyncStatusNever;
+                      } else if (hasPending) {
+                        statusIcon = Icons.cloud_upload_outlined;
+                        statusColor = AppColors.gold;
+                        statusText = l10n.s32CloudSyncStatusPending;
+                      } else {
+                        statusIcon = Icons.cloud_done;
+                        statusColor = AppColors.green;
+                        statusText = l10n.s32CloudSyncStatusSuccess;
+                      }
+
+                      final lastSyncText = !isNeverSynced
+                          ? l10n.s32CloudSyncLastSync(
+                              AppDateFormat.formatSyncDateTime(syncState.lastSyncAt),
+                            )
+                          : l10n.s32CloudSyncLastSync(l10n.s32CloudSyncNever);
+
+                      final IconData line2Icon;
+                      final Color line2Color;
+                      final String line2Text;
+
+                      if (isNeverSynced) {
+                        line2Icon = Icons.cloud_upload_outlined;
+                        line2Color = AppColors.gold;
+                        line2Text = l10n.s32CloudSyncInitialPending;
+                      } else if (hasPending) {
+                        line2Icon = Icons.pending_actions;
+                        line2Color = AppColors.gold;
+                        line2Text = l10n.s32CloudSyncPending(syncState.pendingCount);
+                      } else {
+                        line2Icon = Icons.check_circle_outline;
+                        line2Color = AppColors.green;
+                        line2Text = l10n.s32CloudSyncPending(0);
+                      }
+
+                      return Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: statusColor.withValues(alpha: 0.3),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Export Button
-                  ElevatedButton.icon(
-                    onPressed: _isExporting ? null : () => _exportDatabase(l10n),
-                    icon: _isExporting
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  statusIcon,
+                                  color: statusColor,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    statusText,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                      color: statusColor,
+                                      fontFamily: 'DMSans',
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          )
-                        : const Icon(Icons.file_download),
-                    label: Text(
-                      _isExporting ? l10n.s32Exporting : l10n.s32ExportButton,
-                      style: const TextStyle(
-                        fontFamily: 'DMSans',
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.navy,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
+                            const Divider(height: 16),
+                            // Line 1: Saved on this phone
+                            Row(
+                              children: [
+                                const Icon(Icons.phone_android, size: 16, color: AppColors.navy),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: FutureBuilder<int>(
+                                    future: BackupService.instance.exportDatabaseToJson().then((d) => d['total_records'] as int? ?? 0),
+                                    builder: (context, snap) {
+                                      final count = snap.data ?? 0;
+                                      return Text(
+                                        l10n.s32SavedOnPhone(count),
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.navy,
+                                          fontFamily: 'DMSans',
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            // Line 2: Waiting to upload / Initial backup pending
+                            Row(
+                              children: [
+                                Icon(
+                                  line2Icon,
+                                  size: 16,
+                                  color: line2Color,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    line2Text,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: line2Color,
+                                      fontFamily: 'DMSans',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            // Line 3: Last successful backup
+                            Row(
+                              children: [
+                                const Icon(Icons.history, size: 16, color: AppColors.gray600),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    lastSyncText,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.gray600,
+                                      fontFamily: 'DMSans',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (syncState.status == CloudSyncStatus.syncing) ...[
+                              const SizedBox(height: 10),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: LinearProgressIndicator(
+                                  value: syncState.progress > 0
+                                      ? syncState.progress
+                                      : null,
+                                  backgroundColor: AppColors.gray200,
+                                  color: AppColors.gold,
+                                  minHeight: 4,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Active Sync Now Button (For All Roles)
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final syncState = ref.watch(cloudSyncProvider);
+                      final isSyncing = syncState.status == CloudSyncStatus.syncing;
+                      final isOffline = syncState.status == CloudSyncStatus.offline;
+
+                      return ElevatedButton.icon(
+                        onPressed: (isSyncing || isOffline)
+                            ? null
+                            : () async {
+                                if (!syncState.isStorePaired) {
+                                  await _showPairStoreDialog(l10n);
+                                  return;
+                                }
+                                final res = await ref
+                                    .read(cloudSyncProvider.notifier)
+                                    .syncNow(force: true);
+                                if (context.mounted) {
+                                  if (res.success) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          l10n.s32SyncSuccessNotice(
+                                            res.pushedRecords +
+                                                res.pulledRecords +
+                                                res.uploadedPhotos,
+                                          ),
+                                        ),
+                                        backgroundColor: AppColors.green,
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  } else if (res.status == CloudSyncStatus.unconfigured) {
+                                    showDialog<void>(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                        title: const Row(
+                                          children: [
+                                            Icon(Icons.cloud_queue, color: AppColors.navy),
+                                            SizedBox(width: 8),
+                                            Text('Cloud Sync Standby'),
+                                          ],
+                                        ),
+                                        content: const Text(
+                                          'Cloud sync is ready. Data is stored safely on this phone and will mirror to the cloud when connected.',
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.of(ctx).pop(),
+                                            child: Text(l10n.s32OkButton),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          l10n.s32CloudSyncStatusError(
+                                            res.message ?? 'Sync failed',
+                                          ),
+                                        ),
+                                        backgroundColor: AppColors.red,
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                        icon: isSyncing
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Icon(Icons.cloud_sync),
+                        label: Text(
+                          isSyncing ? l10n.s32CloudSyncStatusSyncing : l10n.s32ForceSyncButton,
+                          style: const TextStyle(
+                            fontFamily: 'DMSans',
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.navy,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 24),
-
-          // Cloud Sync Section (Owner-Only per Spec §S32)
-          if (isOwner) ...[
-            Card(
-              elevation: 1,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: const BorderSide(color: AppColors.gray200),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.gray200,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.cloud_sync,
-                            color: AppColors.gray600,
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                l10n.s32CloudSyncTitle,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.navy,
-                                  fontFamily: 'DMSans',
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Consumer(
-                                builder: (context, ref, _) {
-                                  final syncState = ref.watch(cloudSyncProvider);
-                                  final isOk = syncState.status == CloudSyncStatus.success;
-                                  final badgeColor = isOk ? AppColors.green : AppColors.navyLight;
-                                  return Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: badgeColor.withValues(alpha: 0.1),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Text(
-                                      l10n.s32CloudSyncComingSoonBadge,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                        color: badgeColor,
-                                        fontFamily: 'DMSans',
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      l10n.s32CloudSyncDesc,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppColors.gray600,
-                        fontFamily: 'DMSans',
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Live Status Indicator Card
-                    Builder(
-                      builder: (context) {
-                        final syncState = ref.watch(cloudSyncProvider);
-                        IconData statusIcon;
-                        Color statusColor;
-                        String statusText;
-
-                        switch (syncState.status) {
-                          case CloudSyncStatus.syncing:
-                            statusIcon = Icons.sync;
-                            statusColor = AppColors.gold;
-                            statusText = l10n.s32CloudSyncStatusSyncing;
-                            break;
-                          case CloudSyncStatus.success:
-                            statusIcon = Icons.cloud_done;
-                            statusColor = AppColors.green;
-                            statusText = l10n.s32CloudSyncStatusSuccess;
-                            break;
-                          case CloudSyncStatus.error:
-                            statusIcon = Icons.sync_problem;
-                            statusColor = AppColors.red;
-                            statusText = l10n.s32CloudSyncStatusError(
-                              syncState.errorMessage ?? 'Unknown',
-                            );
-                            break;
-                          case CloudSyncStatus.offline:
-                            statusIcon = Icons.cloud_off;
-                            statusColor = AppColors.gray600;
-                            statusText = l10n.s32CloudSyncStatusOffline;
-                            break;
-                          case CloudSyncStatus.unconfigured:
-                            statusIcon = Icons.cloud_queue;
-                            statusColor = AppColors.navyLight;
-                            statusText = l10n.s32CloudSyncStatusUnconfigured;
-                            break;
-                          case CloudSyncStatus.idle:
-                            statusIcon = Icons.cloud_sync;
-                            statusColor = AppColors.navy;
-                            statusText = l10n.s32CloudSyncStatusIdle;
-                            break;
-                        }
-
-                        final lastSyncText = syncState.lastSyncAt != null
-                            ? l10n.s32CloudSyncLastSync(
-                                '${syncState.lastSyncAt!.day}/${syncState.lastSyncAt!.month}/${syncState.lastSyncAt!.year} '
-                                '${syncState.lastSyncAt!.hour.toString().padLeft(2, '0')}:${syncState.lastSyncAt!.minute.toString().padLeft(2, '0')}',
-                              )
-                            : l10n.s32CloudSyncLastSync(l10n.s32CloudSyncNever);
-
-                        return Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: statusColor.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: statusColor.withValues(alpha: 0.3),
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    statusIcon,
-                                    color: statusColor,
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      statusText,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                        color: statusColor,
-                                        fontFamily: 'DMSans',
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                lastSyncText,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.gray600,
-                                  fontFamily: 'DMSans',
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                l10n.s32CloudSyncPending(syncState.pendingCount),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.navy,
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: 'DMSans',
-                                ),
-                              ),
-                              if (syncState.status == CloudSyncStatus.syncing) ...[
-                                const SizedBox(height: 8),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(4),
-                                  child: LinearProgressIndicator(
-                                    value: syncState.progress > 0
-                                        ? syncState.progress
-                                        : null,
-                                    backgroundColor: AppColors.gray200,
-                                    color: AppColors.gold,
-                                    minHeight: 4,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Active Force Sync Button
-                    Consumer(
-                      builder: (context, ref, _) {
-                        final syncState = ref.watch(cloudSyncProvider);
-                        final isSyncing =
-                            syncState.status == CloudSyncStatus.syncing;
-
-                        return ElevatedButton.icon(
-                          onPressed: isSyncing
-                              ? null
-                              : () async {
-                                  final res = await ref
-                                      .read(cloudSyncProvider.notifier)
-                                      .syncNow(force: true);
-                                  if (context.mounted) {
-                                    if (res.success) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            l10n.s32SyncSuccessNotice(
-                                              res.pushedRecords +
-                                                  res.pulledRecords +
-                                                  res.uploadedPhotos,
-                                            ),
-                                          ),
-                                          backgroundColor: AppColors.green,
-                                          behavior: SnackBarBehavior.floating,
-                                        ),
-                                      );
-                                    } else if (res.status == CloudSyncStatus.unconfigured) {
-                                      showDialog<void>(
-                                        context: context,
-                                        builder: (ctx) => AlertDialog(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(16),
-                                          ),
-                                          title: Row(
-                                            children: [
-                                              const Icon(Icons.cloud_queue, color: AppColors.navy),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                l10n.s32CloudSyncTitle,
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          content: Text(
-                                            res.message ?? l10n.s32CloudSyncPhase4Notice,
-                                            style: const TextStyle(fontSize: 14, height: 1.4),
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () => Navigator.pop(ctx),
-                                              child: const Text('OK'),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    } else if (res.status == CloudSyncStatus.offline) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(l10n.s32CloudSyncStatusOffline),
-                                          backgroundColor: AppColors.amber,
-                                          behavior: SnackBarBehavior.floating,
-                                        ),
-                                      );
-                                    } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            res.message ??
-                                                l10n.s32CloudSyncStatusError(
-                                                  'Failed',
-                                                ),
-                                          ),
-                                          backgroundColor: AppColors.red,
-                                          behavior: SnackBarBehavior.floating,
-                                        ),
-                                      );
-                                    }
-                                  }
-                                },
-                          icon: isSyncing
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Icon(Icons.sync),
-                          label: Text(
-                            isSyncing
-                                ? l10n.s32CloudSyncStatusSyncing
-                                : l10n.s32ForceSyncButton,
-                            style: const TextStyle(
-                              fontFamily: 'DMSans',
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            backgroundColor: AppColors.navy,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-          ],
 
           // About Card (All Roles per Spec §S32)
           Card(
@@ -727,6 +1166,673 @@ class _BackupExportScreenState extends ConsumerState<BackupExportScreen> {
           const SizedBox(height: 32),
         ],
       ),
+    );
+  }
+
+  Widget _buildAuthorizedDevicesSection(BuildContext context, AppLocalizations l10n) {
+    return FutureBuilder<({String currentId, List<Map<String, dynamic>> devices})>(
+      future: () async {
+        final currentId = await DeviceService.instance.getId();
+        final devices = await StoreAccountService.instance.getAuthorizedDevices();
+        return (currentId: currentId, devices: devices);
+      }(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const SizedBox.shrink();
+        }
+        final data = snapshot.data!;
+        final devices = data.devices;
+        final currentId = data.currentId;
+
+        final displayDevices = devices.isNotEmpty
+            ? devices
+            : [
+                {
+                  'device_id': currentId,
+                  'model': 'Store Device',
+                  'is_authorized': true,
+                }
+              ];
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Divider(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  l10n.s32AuthorizedDevicesTitle(displayDevices.length),
+                  style: const TextStyle(
+                    fontFamily: 'DMSans',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                    color: AppColors.navy,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.refresh, size: 16),
+                  visualDensity: VisualDensity.compact,
+                  tooltip: 'Refresh devices',
+                  onPressed: () => setState(() {}),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            for (final device in displayDevices)
+              _buildDeviceRow(
+                context,
+                l10n,
+                device,
+                isCurrent: device['device_id'] == currentId,
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  String _formatFriendlyDateTime(dynamic rawDate, AppLocalizations l10n) {
+    if (rawDate == null) return '';
+    DateTime? dt;
+    if (rawDate is DateTime) {
+      dt = rawDate;
+    } else {
+      dt = DateTime.tryParse(rawDate.toString());
+    }
+    if (dt == null) return '';
+    final local = dt.toLocal();
+    final now = DateTime.now();
+    final diff = now.difference(local);
+
+    if (diff.inMinutes < 2 && !diff.isNegative) {
+      return 'Just now';
+    } else if (diff.inHours < 1 && !diff.isNegative) {
+      return '${diff.inMinutes}m ago';
+    } else if (diff.inHours < 24 && local.day == now.day) {
+      return 'Today, ${DateFormat('h:mm a').format(local)}';
+    } else if (diff.inDays < 7) {
+      return DateFormat('EEE, h:mm a').format(local);
+    } else {
+      return DateFormat('dd MMM, h:mm a').format(local);
+    }
+  }
+
+  String _formatDateOnly(dynamic rawDate) {
+    if (rawDate == null) return '';
+    DateTime? dt;
+    if (rawDate is DateTime) {
+      dt = rawDate;
+    } else {
+      dt = DateTime.tryParse(rawDate.toString());
+    }
+    if (dt == null) return '';
+    return DateFormat('dd MMM yyyy').format(dt.toLocal());
+  }
+
+  Future<void> _showRenameDeviceDialog(
+    AppLocalizations l10n,
+    String deviceId,
+    String currentName,
+  ) async {
+    final controller = TextEditingController(text: currentName == 'Store Device' ? '' : currentName);
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.s32RenameDeviceTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.s32RenameDeviceDesc,
+              style: const TextStyle(fontSize: 13, color: AppColors.gray600),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: controller,
+              autofocus: true,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(
+                labelText: l10n.s32RenameDeviceHint,
+                border: const OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(MaterialLocalizations.of(ctx).cancelButtonLabel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.navy,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(l10n.s32RenameDeviceBtn),
+          ),
+        ],
+      ),
+    );
+
+    if (newName != null && newName.isNotEmpty) {
+      await StoreAccountService.instance.updateDeviceNickname(
+        deviceId: deviceId,
+        nickname: newName,
+      );
+      if (!mounted) return;
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.s32RenameDeviceSuccess),
+          backgroundColor: AppColors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  Widget _buildDeviceRow(
+    BuildContext context,
+    AppLocalizations l10n,
+    Map<String, dynamic> device, {
+    required bool isCurrent,
+  }) {
+    final deviceId = device['device_id']?.toString() ?? '';
+    final nickname = device['nickname']?.toString().trim();
+    final model = device['model']?.toString().trim() ?? 'Store Terminal';
+    final hasNickname = nickname != null && nickname.isNotEmpty;
+    final displayName = hasNickname ? nickname : model;
+
+    final lastUserName = device['last_user_name']?.toString();
+    final lastUserRole = device['last_user_role']?.toString();
+    final lastSeen = _formatFriendlyDateTime(device['last_seen_at'], l10n);
+    final enrolled = _formatDateOnly(device['enrolled_at']);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.cream,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: isCurrent ? AppColors.green.withValues(alpha: 0.4) : AppColors.gray200,
+          width: isCurrent ? 1.5 : 1.0,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.smartphone,
+                size: 20,
+                color: isCurrent ? AppColors.green : AppColors.navy,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        displayName,
+                        style: const TextStyle(
+                          fontFamily: 'DMSans',
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          color: AppColors.navy,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (isCurrent) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.green.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          l10n.s32ThisDeviceLabel,
+                          style: const TextStyle(
+                            fontFamily: 'DMSans',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 10,
+                            color: AppColors.green,
+                          ),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(width: 4),
+                    InkWell(
+                      onTap: () => _showRenameDeviceDialog(
+                        l10n,
+                        deviceId,
+                        displayName,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      child: const Padding(
+                        padding: EdgeInsets.all(4),
+                        child: Icon(
+                          Icons.edit_outlined,
+                          size: 15,
+                          color: AppColors.gray600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (!isCurrent)
+                TextButton(
+                  onPressed: () => _confirmRevokeDevice(context, l10n, deviceId),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.red,
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  ),
+                  child: Text(
+                    l10n.s32RevokeDeviceBtn,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'DMSans',
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          if (hasNickname) ...[
+            const SizedBox(height: 2),
+            Padding(
+              padding: const EdgeInsets.only(left: 28),
+              child: Text(
+                model,
+                style: const TextStyle(
+                  fontFamily: 'DMSans',
+                  fontSize: 11,
+                  color: AppColors.gray600,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 28),
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 4,
+              children: [
+                if (lastUserRole != null && lastUserRole.isNotEmpty)
+                  Text(
+                    lastUserName != null && lastUserName.isNotEmpty
+                        ? l10n.s32DeviceLastUser(lastUserRole, lastUserName)
+                        : l10n.s32DeviceLastUserRoleOnly(lastUserRole),
+                    style: const TextStyle(
+                      fontFamily: 'DMSans',
+                      fontSize: 11,
+                      color: AppColors.navy,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                if (lastSeen.isNotEmpty)
+                  Text(
+                    l10n.s32DeviceLastActive(lastSeen),
+                    style: const TextStyle(
+                      fontFamily: 'DMSans',
+                      fontSize: 11,
+                      color: AppColors.gray600,
+                    ),
+                  ),
+                if (enrolled.isNotEmpty)
+                  Text(
+                    l10n.s32DeviceEnrolled(enrolled),
+                    style: const TextStyle(
+                      fontFamily: 'DMSans',
+                      fontSize: 11,
+                      color: AppColors.gray600,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PairStoreDialog extends StatefulWidget {
+  const _PairStoreDialog({
+    required this.onPair,
+    required this.l10n,
+  });
+
+  final Future<bool> Function(String key) onPair;
+  final AppLocalizations l10n;
+
+  @override
+  State<_PairStoreDialog> createState() => _PairStoreDialogState();
+}
+
+class _PairStoreDialogState extends State<_PairStoreDialog> {
+  late final TextEditingController _controller;
+  String? _error;
+  bool _submitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final key = _controller.text.trim();
+    if (key.isEmpty) return;
+
+    final hasNet = await CloudSyncService.instance.isNetworkAvailable();
+    if (!hasNet) {
+      setState(() {
+        _submitting = false;
+        _error = widget.l10n.s32InternetRequiredForStoreLogin;
+      });
+      return;
+    }
+
+    setState(() {
+      _submitting = true;
+      _error = null;
+    });
+
+    try {
+      final success = await widget.onPair(key);
+      if (!mounted) return;
+
+      if (success) {
+        Navigator.of(context).pop(true);
+      } else {
+        setState(() {
+          _submitting = false;
+          _error = widget.l10n.s32StorePasscodeInvalid;
+        });
+      }
+    } on SocketException {
+      if (!mounted) return;
+      setState(() {
+        _submitting = false;
+        _error = widget.l10n.s32InternetRequiredForStoreLogin;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _submitting = false;
+        _error = e.toString();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Row(
+        children: [
+          const Icon(Icons.vpn_key_outlined, color: AppColors.navy, size: 24),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              widget.l10n.s32StorePasscodeDialogTitle,
+              style: const TextStyle(
+                fontFamily: 'DMSans',
+                fontWeight: FontWeight.w700,
+                fontSize: 17,
+              ),
+            ),
+          ),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            widget.l10n.s32StorePasscodeDialogDesc,
+            style: const TextStyle(fontFamily: 'DMSans', fontSize: 13, height: 1.4),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _controller,
+            autofocus: true,
+            enabled: !_submitting,
+            textCapitalization: TextCapitalization.characters,
+            decoration: InputDecoration(
+              hintText: widget.l10n.s32StorePasscodeHint,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              errorText: _error,
+              prefixIcon: const Icon(Icons.lock_outline),
+            ),
+            onSubmitted: (_) => _submit(),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: _submitting ? null : () => Navigator.of(context).pop(false),
+          child: Text(widget.l10n.s32Cancel),
+        ),
+        ElevatedButton(
+          onPressed: _submitting ? null : _submit,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.navy,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          child: _submitting
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                )
+              : Text(
+                  widget.l10n.s32OkButton,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RotatePasscodeDialog extends StatefulWidget {
+  const _RotatePasscodeDialog({
+    required this.onRotate,
+    required this.l10n,
+  });
+
+  final Future<bool> Function(String currentKey, String newKey) onRotate;
+  final AppLocalizations l10n;
+
+  @override
+  State<_RotatePasscodeDialog> createState() => _RotatePasscodeDialogState();
+}
+
+class _RotatePasscodeDialogState extends State<_RotatePasscodeDialog> {
+  late final TextEditingController _currentController;
+  late final TextEditingController _newController;
+  late final TextEditingController _confirmController;
+  String? _error;
+  bool _submitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentController = TextEditingController();
+    _newController = TextEditingController();
+    _confirmController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _currentController.dispose();
+    _newController.dispose();
+    _confirmController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final currentKey = _currentController.text.trim();
+    final newKey = _newController.text.trim();
+    final confirmKey = _confirmController.text.trim();
+
+    if (currentKey.isEmpty || newKey.isEmpty || confirmKey.isEmpty) return;
+
+    if (newKey != confirmKey) {
+      setState(() => _error = widget.l10n.s32PasscodeMismatch);
+      return;
+    }
+
+    if (newKey.length < 6) {
+      setState(() => _error = widget.l10n.s32PasscodeTooShort);
+      return;
+    }
+
+    setState(() {
+      _submitting = true;
+      _error = null;
+    });
+
+    try {
+      final success = await widget.onRotate(currentKey, newKey);
+      if (!mounted) return;
+
+      if (success) {
+        Navigator.of(context).pop(true);
+      } else {
+        setState(() {
+          _submitting = false;
+          _error = widget.l10n.s32StorePasscodeInvalid;
+        });
+      }
+    } on SocketException {
+      if (!mounted) return;
+      setState(() {
+        _submitting = false;
+        _error = widget.l10n.s32InternetRequiredForPasscode;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _submitting = false;
+        _error = e.toString();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Row(
+        children: [
+          const Icon(Icons.lock_reset, color: AppColors.navy, size: 24),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              widget.l10n.s32ChangeStorePasscodeTitle,
+              style: const TextStyle(
+                fontFamily: 'DMSans',
+                fontWeight: FontWeight.w700,
+                fontSize: 17,
+              ),
+            ),
+          ),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              widget.l10n.s32ChangeStorePasscodeDesc,
+              style: const TextStyle(fontFamily: 'DMSans', fontSize: 13, height: 1.4),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _currentController,
+              enabled: !_submitting,
+              textCapitalization: TextCapitalization.characters,
+              decoration: InputDecoration(
+                labelText: widget.l10n.s32CurrentPasscode,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                prefixIcon: const Icon(Icons.key),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _newController,
+              enabled: !_submitting,
+              textCapitalization: TextCapitalization.characters,
+              decoration: InputDecoration(
+                labelText: widget.l10n.s32NewPasscode,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                prefixIcon: const Icon(Icons.lock_outline),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _confirmController,
+              enabled: !_submitting,
+              textCapitalization: TextCapitalization.characters,
+              decoration: InputDecoration(
+                labelText: widget.l10n.s32ConfirmNewPasscode,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                prefixIcon: const Icon(Icons.check_circle_outline),
+                errorText: _error,
+              ),
+              onSubmitted: (_) => _submit(),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _submitting ? null : () => Navigator.of(context).pop(false),
+          child: Text(widget.l10n.s32Cancel),
+        ),
+        ElevatedButton(
+          onPressed: _submitting ? null : _submit,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.navy,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          child: _submitting
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                )
+              : Text(
+                  widget.l10n.s32OkButton,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+        ),
+      ],
     );
   }
 }

@@ -8,7 +8,9 @@ import '../../../data/models/report.dart';
 import '../../../data/repositories/report_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../utils/app_date_format.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/app_bottom_nav_bar.dart';
 import '../../widgets/language_toggle_button.dart';
 
 /// Screen S20: Weekly Reports List (Workbook Day 3 §3.6 & Spec §5 S20).
@@ -214,6 +216,7 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen> {
     final isOwner = currentUser?.isOwner ?? false;
 
     return Scaffold(
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 3),
       appBar: AppBar(
         title: Text(l10n.s20ScreenTitle),
         actions: const [
@@ -369,9 +372,7 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen> {
     final bandName = ((compTable['monthly_band'] ?? compTable['band']) as String?)?.toUpperCase() ?? 'UNKNOWN';
     final color = bandColor(pct);
 
-    final submittedDateStr = report.submittedAt != null
-        ? report.submittedAt!.split('T').first
-        : '—';
+    final submittedDateStr = AppDateFormat.formatDate(report.submittedAt);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),

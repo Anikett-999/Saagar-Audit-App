@@ -9,6 +9,7 @@ import '../../../data/repositories/checkpoint_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/draft_audit_provider.dart';
 import '../../theme/app_colors.dart';
+import 'widgets/checkpoint_jump_sheet.dart';
 
 /// S7 Checkpoint Screen — the heart of the daily audit flow.
 ///
@@ -124,10 +125,133 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
     );
   }
 
+  Future<void> _handleBackNavigation() async {
+    final state = ref.read(draftAuditProvider);
+    if (state.currentIndex > 0) {
+      setState(() => _securityConcern = false);
+      ref.read(draftAuditProvider.notifier).goBack();
+      return;
+    }
+
+    final l10n = AppLocalizations.of(context)!;
+    final shouldExit = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.exit_to_app, color: AppColors.gold, size: 24),
+            const SizedBox(width: 8),
+            Expanded(child: Text(l10n.exitAuditDialogTitle)),
+          ],
+        ),
+        content: Text(l10n.exitAuditDialogMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.btnResumeAudit),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.navy,
+              foregroundColor: AppColors.gold,
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l10n.btnSaveAndExit),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldExit == true && mounted) {
+      setState(() => _securityConcern = false);
+      context.goNamed('s05_home');
+    }
+  }
+
+  void _openJumpListSheet() {
+    final state = ref.read(draftAuditProvider);
+    if (!state.isActive || state.checkpoints.isEmpty) return;
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => CheckpointJumpSheet(
+        checkpoints: state.checkpoints,
+        results: state.results,
+        currentIndex: state.currentIndex,
+        sopNamesById: _sopNamesById,
+        onSelect: (index) {
+          setState(() => _securityConcern = false);
+          ref.read(draftAuditProvider.notifier).jumpTo(index);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(draftAuditProvider);
     final cp = state.currentCheckpoint;
+
+    if (state.isActive && state.checkpoints.isNotEmpty && cp == null) {
+      final l10n = AppLocalizations.of(context)!;
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.s07JumpListTitle),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: _handleBackNavigation,
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.format_list_bulleted_rounded),
+              tooltip: l10n.s07JumpListTooltip,
+              onPressed: _openJumpListSheet,
+            ),
+          ],
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.fact_check_outlined, size: 56, color: AppColors.navy),
+                const SizedBox(height: 16),
+                Text(
+                  'Reached end of checkpoints (${state.results.length} of ${state.checkpoints.length} answered)',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.navy),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'You can review and submit or use the jump list to revisit checkpoints.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: AppColors.gray600),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.navy,
+                    foregroundColor: AppColors.gold,
+                  ),
+                  icon: const Icon(Icons.assignment_turned_in),
+                  label: Text(l10n.s07FinishReview),
+                  onPressed: () => context.goNamed('s10_review'),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.format_list_bulleted_rounded),
+                  label: Text(l10n.s07JumpListTitle),
+                  onPressed: _openJumpListSheet,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     if (!state.isActive || cp == null) {
       return Scaffold(
@@ -168,146 +292,156 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
     final l10n = AppLocalizations.of(context)!;
     final total = state.checkpoints.length;
     final n = state.currentIndex + 1;
-    final progress = n / total;
+    // Item 27.6 (Client Ref §F): Progress strictly reflects answered checkpoints (0% on start)
+    final answeredCount = state.answeredCount;
+    final progress = total > 0 ? (answeredCount / total).clamp(0.0, 1.0) : 0.0;
+    final progressPct = (progress * 100).toInt();
     final sopName = _sopNamesById[cp.sopId] ?? cp.sopId;
     final isCritical = cp.sopId == 'SOP6' || cp.sopId == 'SOP7';
     final cpText = cp.text(locale);
     final cpEvidence = cp.evidence(locale);
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.s07CheckpointNumber(n, total)),
-        leading: state.currentIndex == 0
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  setState(() => _securityConcern = false);
-                  context.goNamed('s05_home');
-                },
-              )
-            : IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  setState(() => _securityConcern = false);
-                  ref.read(draftAuditProvider.notifier).goBack();
-                },
-              ),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Semantics(
-              label:
-                  'Progress: Checkpoint ${state.currentIndex + 1} of $total, ${(progress * 100).toInt()}% complete',
-              value: '${(progress * 100).toInt()}%',
-              child: LinearProgressIndicator(
-                value: progress,
-                backgroundColor: AppColors.gray200,
-                valueColor:
-                    const AlwaysStoppedAnimation<Color>(AppColors.gold),
-                minHeight: 4,
-              ),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleBackNavigation();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.s07CheckpointNumber(n, total)),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: _handleBackNavigation,
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.format_list_bulleted_rounded),
+              tooltip: l10n.s07JumpListTooltip,
+              onPressed: _openJumpListSheet,
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _sopChip(sopName, cp.sopId, isCritical),
-                  Text(
-                    'CP ${cp.id}',
-                    style: const TextStyle(
-                      fontFamily: 'DMSans',
-                      color: AppColors.gray600,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+          ],
+        ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              Semantics(
+                label:
+                    'Progress: $answeredCount of $total answered, $progressPct% complete',
+                value: '$progressPct%',
+                child: LinearProgressIndicator(
+                  value: progress,
+                  backgroundColor: AppColors.gray200,
+                  valueColor:
+                      const AlwaysStoppedAnimation<Color>(AppColors.gold),
+                  minHeight: 4,
+                ),
               ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              Padding(
+                padding: EdgeInsets.fromLTRB(20, isLandscape ? 8 : 16, 20, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    _sopChip(sopName, cp.sopId, isCritical),
                     Text(
-                      cpText,
+                      'CP ${cp.id}',
                       style: const TextStyle(
-                        fontFamily: 'DMSerifDisplay',
-                        fontSize: 28,
-                        color: AppColors.navy,
-                        height: 1.25,
+                        fontFamily: 'DMSans',
+                        color: AppColors.gray600,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    if (cpEvidence != null) ...[
-                      const SizedBox(height: 12),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(
-                            Icons.lightbulb_outline,
-                            size: 16,
-                            color: AppColors.gray400,
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              'Evidence: $cpEvidence',
-                              style: const TextStyle(
-                                fontFamily: 'DMSans',
-                                color: AppColors.gray600,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                        ],
+                  ],
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(20, isLandscape ? 8 : 16, 20, 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        cpText,
+                        style: TextStyle(
+                          fontFamily: 'DMSerifDisplay',
+                          fontSize: isLandscape ? 20 : 24,
+                          color: AppColors.navy,
+                          height: 1.25,
+                        ),
                       ),
-                    ],
-                    if (cp.requiresPhotoOnFail) ...[
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.redPale,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: AppColors.red),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
+                      if (cpEvidence != null) ...[
+                        const SizedBox(height: 10),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Icon(
-                              Icons.camera_alt_outlined,
-                              size: 14,
-                              color: AppColors.red,
+                              Icons.lightbulb_outline,
+                              size: 16,
+                              color: AppColors.gray400,
                             ),
                             const SizedBox(width: 6),
-                            Text(
-                              l10n.s08PhotoRequiredNotice,
-                              style: const TextStyle(
-                                color: AppColors.red,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
+                            Expanded(
+                              child: Text(
+                                'Evidence: $cpEvidence',
+                                style: const TextStyle(
+                                  fontFamily: 'DMSans',
+                                  color: AppColors.gray600,
+                                  fontSize: 13,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                      ),
+                      ],
+                      if (cp.requiresPhotoOnFail) ...[
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.redPale,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: AppColors.red),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.camera_alt_outlined,
+                                size: 14,
+                                color: AppColors.red,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                l10n.s08PhotoRequiredNotice,
+                                style: const TextStyle(
+                                  color: AppColors.red,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 12),
+                      _securityConcernCard(l10n),
                     ],
-                    const SizedBox(height: 16),
-                    _securityConcernCard(l10n),
-                  ],
+                  ),
                 ),
               ),
-            ),
-            _verdictButtons(l10n, cp),
-            _miniStats(state),
-            const SizedBox(height: 16),
-          ],
+              _verdictButtons(l10n, cp, isLandscape: isLandscape),
+              if (!isLandscape) ...[
+                _miniStats(state),
+                const SizedBox(height: 12),
+              ] else
+                const SizedBox(height: 6),
+            ],
+          ),
         ),
       ),
     );
@@ -344,14 +478,101 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
     );
   }
 
-  Widget _verdictButtons(AppLocalizations l10n, Checkpoint cp) {
+  Widget _verdictButtons(AppLocalizations l10n, Checkpoint cp, {required bool isLandscape}) {
+    if (isLandscape) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 44,
+                child: Semantics(
+                  button: true,
+                  label: '${l10n.s07Pass} checkpoint',
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.green,
+                      foregroundColor: AppColors.white,
+                      padding: EdgeInsets.zero,
+                    ),
+                    onPressed: () => _onPass(cp),
+                    child: Text(
+                      l10n.s07Pass,
+                      style: const TextStyle(
+                        fontFamily: 'DMSerifDisplay',
+                        fontSize: 18,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: SizedBox(
+                height: 44,
+                child: Semantics(
+                  button: true,
+                  label: '${l10n.s07Fail} checkpoint',
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.red,
+                      foregroundColor: AppColors.white,
+                      padding: EdgeInsets.zero,
+                    ),
+                    onPressed: () => _onFail(cp),
+                    child: Text(
+                      l10n.s07Fail,
+                      style: const TextStyle(
+                        fontFamily: 'DMSerifDisplay',
+                        fontSize: 18,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            if (cp.allowsNa) ...[
+              const SizedBox(width: 8),
+              Expanded(
+                child: SizedBox(
+                  height: 44,
+                  child: Semantics(
+                    button: true,
+                    label: '${l10n.s07Na} checkpoint',
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
+                      onPressed: () => _onNa(cp),
+                      child: Text(
+                        l10n.s07Na,
+                        style: const TextStyle(
+                          fontFamily: 'DMSans',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
             width: double.infinity,
-            height: 60,
+            height: 52,
             child: Semantics(
               button: true,
               label: '${l10n.s07Pass} checkpoint',
@@ -365,17 +586,17 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
                   l10n.s07Pass,
                   style: const TextStyle(
                     fontFamily: 'DMSerifDisplay',
-                    fontSize: 22,
+                    fontSize: 20,
                     letterSpacing: 2,
                   ),
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           SizedBox(
             width: double.infinity,
-            height: 60,
+            height: 52,
             child: Semantics(
               button: true,
               label: '${l10n.s07Fail} checkpoint',
@@ -389,18 +610,18 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
                   l10n.s07Fail,
                   style: const TextStyle(
                     fontFamily: 'DMSerifDisplay',
-                    fontSize: 22,
+                    fontSize: 20,
                     letterSpacing: 2,
                   ),
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 8),
-          if (cp.allowsNa)
+          if (cp.allowsNa) ...[
+            const SizedBox(height: 6),
             SizedBox(
               width: double.infinity,
-              height: 48,
+              height: 44,
               child: Semantics(
                 button: true,
                 label: '${l10n.s07Na} checkpoint',
@@ -410,7 +631,7 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
                     l10n.s07Na,
                     style: const TextStyle(
                       fontFamily: 'DMSans',
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 1.5,
                     ),
@@ -418,6 +639,7 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
                 ),
               ),
             ),
+          ],
         ],
       ),
     );

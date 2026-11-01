@@ -148,6 +148,17 @@ class EscalationRepository {
     return Escalation.fromMap(rows.first);
   }
 
+  /// Retrieves escalations associated with a specific audit ID.
+  Future<List<Escalation>> listForAudit(String auditId) async {
+    final rows = await AppDatabase.instance.db.query(
+      'escalations',
+      where: 'source_audit_id = ?',
+      whereArgs: [auditId],
+      orderBy: 'trigger_number ASC',
+    );
+    return rows.map(Escalation.fromMap).toList();
+  }
+
   /// Acknowledges an open escalation (Spec §7).
   Future<void> acknowledge(String id) async {
     await AppDatabase.instance.db.update(

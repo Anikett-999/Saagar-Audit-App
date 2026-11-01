@@ -276,6 +276,31 @@ void main() {
       );
     });
 
+    test('Item 17: createCap throws ArgumentError if origin checkpoint did not fail in audit', () async {
+      fakeDb.tables['audit_results']!.add({
+        'id': 'res-pass-1',
+        'audit_id': 'audit-pass',
+        'checkpoint_id': '6.5',
+        'result': 'P',
+        'created_at': '2026-09-21T18:00:00.000Z',
+      });
+
+      expect(
+        () => repo.createCap(
+          originAuditId: 'audit-pass',
+          originCheckpointId: '6.5',
+          problemStatement: 'Cash matched',
+          why1: 'None',
+          rootCause: 'None',
+          responsibleUserId: 'user-sm-1',
+          deadline: '2026-10-30',
+          verificationMethod: 'Cash check',
+          actionSteps: ['Step 1', 'Step 2', 'Step 3'],
+        ),
+        throwsArgumentError,
+      );
+    });
+
     test('createCap inserts cap, actions, and cap_log atomically', () async {
       final cap = await repo.createCap(
         originAuditId: 'audit-1',
@@ -370,7 +395,11 @@ void main() {
       );
 
       expect(
-        () => repo.markDone(capId: capId, userId: 'user-sm-1'),
+        () => repo.markDone(
+          capId: capId,
+          userId: 'user-sm-1',
+          doneNotes: 'Step 1 done only',
+        ),
         throwsStateError,
       );
     });
@@ -408,11 +437,19 @@ void main() {
       for (final id in actionIds) {
         await repo.toggleAction(actionId: id, done: true, userId: 'user-sm-1');
       }
-      await repo.markDone(capId: capId, userId: 'user-sm-1');
+      await repo.markDone(
+        capId: capId,
+        userId: 'user-sm-1',
+        doneNotes: 'All physical replacements completed.',
+      );
 
       // Attempt second markDone
       expect(
-        () => repo.markDone(capId: capId, userId: 'user-sm-1'),
+        () => repo.markDone(
+          capId: capId,
+          userId: 'user-sm-1',
+          doneNotes: 'All physical replacements completed.',
+        ),
         throwsStateError,
       );
     });

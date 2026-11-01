@@ -1,9 +1,20 @@
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+
+/// Thrown when camera access is denied by the user or operating system.
+class CameraPermissionDeniedException implements Exception {
+  CameraPermissionDeniedException([this.message = 'Camera permission was denied. Please allow camera access in Settings.']);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
 
 /// Capture + compress + persist evidence photos.
 ///
@@ -25,13 +36,27 @@ class PhotoService {
     if (captureAndStoreForTesting != null) {
       return captureAndStoreForTesting!(auditId: auditId);
     }
-    final raw = await _picker.pickImage(
-      source: ImageSource.camera,
-      // Hint to the OS picker; we still compress below in case it didn't
-      // honour the hint.
-      maxWidth: 2560,
-      imageQuality: 90,
-    );
+    XFile? raw;
+    try {
+      raw = await _picker.pickImage(
+        source: ImageSource.camera,
+        // Hint to the OS picker; we still compress below in case it didn't
+        // honour the hint.
+        maxWidth: 2560,
+        imageQuality: 90,
+      );
+    } on PlatformException catch (e) {
+      final code = e.code.toLowerCase();
+      final msg = (e.message ?? '').toLowerCase();
+      if (code == 'camera_access_denied' ||
+          code.contains('permission') ||
+          code.contains('denied') ||
+          msg.contains('denied') ||
+          msg.contains('permission')) {
+        throw CameraPermissionDeniedException(e.message ?? 'Camera permission was denied.');
+      }
+      rethrow;
+    }
     if (raw == null) return null;
 
     final docsDir = await getApplicationDocumentsDirectory();

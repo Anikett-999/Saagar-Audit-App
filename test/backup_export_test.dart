@@ -185,7 +185,8 @@ void main() {
       final users = tables['users'] as List;
       expect(users.length, 1);
       expect(users.first['name'], 'Aniket Owner');
-      expect(users.first['pin_hash'], r'$2a$10$hashedSecurityPin');
+      // Inviolable Rule: PIN hashes must NEVER be exported in backup files
+      expect(users.first.containsKey('pin_hash'), isFalse, reason: 'pin_hash must be stripped from exports');
 
       final cros = tables['cros'] as List;
       expect(cros.length, 1);
@@ -214,7 +215,7 @@ void main() {
       expect(parsed['total_records'], 3);
     });
 
-    testWidgets('Renders all core sections, security notice, and about card', (tester) async {
+    testWidgets('Renders all core sections, security notice, and about card for Owner', (tester) async {
       final localeNotifier = FakeLocaleNotifier(const Locale('en'));
       await pumpBackupExport(
         tester,
@@ -222,16 +223,16 @@ void main() {
         localeNotifier: localeNotifier,
       );
 
-      expect(find.text('Backup & Export'), findsOneWidget);
-      expect(find.text('Local SQLite Database Export & Cloud Sync'), findsOneWidget);
-      expect(find.text('Export Local Database (JSON)'), findsOneWidget);
-      expect(find.text('Security Notice: Exported backup contains audit trails, findings, and bcrypt security hashes. Store and transfer this file securely.'), findsOneWidget);
-      expect(find.text('Export Database JSON'), findsOneWidget);
+      expect(find.text('Cloud Sync & Backup'), findsOneWidget);
+      expect(find.text('Data Backup & Cloud Synchronization'), findsOneWidget);
+      expect(find.text('Audit Records Data Export (JSON)'), findsOneWidget);
+      expect(find.text('Data Export Notice: Exported file contains audit trails and findings (without binary photos). The primary and complete recovery path for this store is Cloud Synchronization.'), findsOneWidget);
+      expect(find.text('Export Data Records (JSON)'), findsOneWidget);
       expect(find.text('About Saagar Audit App'), findsOneWidget);
       expect(find.text('Version: 0.1.0+1 (Phase 1 Baseline)'), findsOneWidget);
     });
 
-    testWidgets('Owner sees Firestore Cloud Sync section with active mirror status and force sync button', (tester) async {
+    testWidgets('Owner sees Cloud Sync section with honest status and Sync Now button', (tester) async {
       final localeNotifier = FakeLocaleNotifier(const Locale('en'));
       await pumpBackupExport(
         tester,
@@ -240,12 +241,11 @@ void main() {
       );
 
       // Cloud Sync Section is visible for Owner
-      expect(find.text('Cloud Synchronization (Firestore)'), findsOneWidget);
-      expect(find.text('Active Mirror'), findsOneWidget);
-      expect(find.widgetWithText(ElevatedButton, 'Force Cloud Sync'), findsOneWidget);
+      expect(find.text('Cloud Synchronization'), findsOneWidget);
+      expect(find.widgetWithText(ElevatedButton, 'Sync Now'), findsOneWidget);
     });
 
-    testWidgets('SM user does NOT see the Owner-only Firestore Cloud Sync section', (tester) async {
+    testWidgets('SM user HIDES raw database export card but SEES Cloud Sync with Sync Now button', (tester) async {
       final localeNotifier = FakeLocaleNotifier(const Locale('en'));
       await pumpBackupExport(
         tester,
@@ -253,13 +253,16 @@ void main() {
         localeNotifier: localeNotifier,
       );
 
-      // Cloud Sync section is hidden for SM
-      expect(find.text('Cloud Synchronization (Firestore)'), findsNothing);
-      expect(find.byType(OutlinedButton), findsNothing);
+      // SM sees Cloud Sync title
+      expect(find.text('Cloud Sync'), findsOneWidget);
 
-      // Core export section remains visible
-      expect(find.text('Export Local Database (JSON)'), findsOneWidget);
-      expect(find.text('Export Database JSON'), findsOneWidget);
+      // Database Export is strictly hidden from SM (Item 7)
+      expect(find.text('Audit Records Data Export (JSON)'), findsNothing);
+      expect(find.text('Export Data Records (JSON)'), findsNothing);
+
+      // But SM has full honest Cloud Sync dashboard and Sync Now button (Item 3)
+      expect(find.text('Cloud Synchronization'), findsOneWidget);
+      expect(find.widgetWithText(ElevatedButton, 'Sync Now'), findsOneWidget);
     });
 
     testWidgets('Tapping Export Database triggers file export and displays success AlertDialog', (tester) async {
@@ -270,23 +273,17 @@ void main() {
         localeNotifier: localeNotifier,
       );
 
-      // Tap Export Database button within runAsync so real File I/O completes
+      // Tap Export Data Records button and wait for File I/O to complete inside runAsync
       await tester.runAsync(() async {
-        await tester.tap(find.text('Export Database JSON'));
-        await Future<void>.delayed(const Duration(milliseconds: 50));
-        var pollCount = 0;
-        while (find.byType(CircularProgressIndicator).evaluate().isNotEmpty && pollCount < 120) {
-          await Future<void>.delayed(const Duration(milliseconds: 50));
-          pollCount++;
-        }
+        await tester.tap(find.text('Export Data Records (JSON)'));
+        await Future<void>.delayed(const Duration(milliseconds: 800));
       });
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pumpAndSettle();
 
       // Verify success dialog is shown
       expect(find.byType(AlertDialog), findsOneWidget);
-      expect(find.text('Export Successful'), findsOneWidget);
-      expect(find.textContaining('Backup saved successfully (3 records across 14 tables).'), findsOneWidget);
+      expect(find.text('Data Export Successful'), findsOneWidget);
+      expect(find.textContaining('Audit data records exported successfully (3 records across 14 tables).'), findsOneWidget);
       expect(find.text('OK'), findsOneWidget);
 
       // Tap OK to dismiss
@@ -317,12 +314,11 @@ void main() {
         localeNotifier: localeNotifier,
       );
 
-      expect(find.text('बॅकअप व निर्यात'), findsOneWidget);
-      expect(find.text('स्थानिक SQLite डेटाबेस निर्यात आणि क्लाउड समक्रमण'), findsOneWidget);
-      expect(find.text('स्थानिक डेटाबेस निर्यात करा (JSON)'), findsOneWidget);
-      expect(find.text('डेटाबेस JSON निर्यात करा'), findsOneWidget);
-      expect(find.text('क्लाउड समक्रमण (Firestore)'), findsOneWidget);
-      expect(find.text('सक्रिय मिरर'), findsOneWidget);
+      expect(find.text('क्लाउड सिंक आणि बॅकअप'), findsOneWidget);
+      expect(find.text('डेटा बॅकअप आणि क्लाउड समक्रमण'), findsOneWidget);
+      expect(find.text('ऑडिट नोंदी डेटा निर्यात (JSON)'), findsOneWidget);
+      expect(find.text('डेटा नोंदी निर्यात करा (JSON)'), findsOneWidget);
+      expect(find.text('क्लाउड समक्रमण'), findsOneWidget);
       expect(find.text('सागर ऑडिट अॅपबद्दल'), findsOneWidget);
     });
   });

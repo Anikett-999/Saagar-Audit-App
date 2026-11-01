@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +8,7 @@ import '../../../data/models/user.dart';
 import '../../../data/repositories/user_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../providers/cloud_sync_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
 
@@ -339,6 +342,7 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
       context: context,
       barrierDismissible: false,
       builder: (dialogCtx) {
+        var autoValidateMode = AutovalidateMode.disabled;
         return StatefulBuilder(
           builder: (ctx, setDialogState) {
             return AlertDialog(
@@ -352,6 +356,7 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
               content: SingleChildScrollView(
                 child: Form(
                   key: formKey,
+                  autovalidateMode: autoValidateMode,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -461,7 +466,10 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    if (!formKey.currentState!.validate()) return;
+                    if (!formKey.currentState!.validate()) {
+                      setDialogState(() => autoValidateMode = AutovalidateMode.onUserInteraction);
+                      return;
+                    }
 
                     // bcrypt-hash the entered PIN through the same path S03/S04 use
                     final pin = pinController.text.trim();
@@ -500,6 +508,7 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
 
     if (result == true) {
       await _loadUsers();
+      unawaited(ref.read(cloudSyncProvider.notifier).syncNow());
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -523,17 +532,21 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
       context: context,
       barrierDismissible: false,
       builder: (dialogCtx) {
-        return AlertDialog(
-          title: Text(
-            l10n.s29ResetPinTitle(user.name),
-            style: const TextStyle(
-              fontFamily: 'DMSerifDisplay',
-              color: AppColors.navy,
-            ),
-          ),
-          content: Form(
-            key: formKey,
-            child: Column(
+        var autoValidateMode = AutovalidateMode.disabled;
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            return AlertDialog(
+              title: Text(
+                l10n.s29ResetPinTitle(user.name),
+                style: const TextStyle(
+                  fontFamily: 'DMSerifDisplay',
+                  color: AppColors.navy,
+                ),
+              ),
+              content: Form(
+                key: formKey,
+                autovalidateMode: autoValidateMode,
+                child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
@@ -583,7 +596,10 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                if (!formKey.currentState!.validate()) return;
+                if (!formKey.currentState!.validate()) {
+                  setDialogState(() => autoValidateMode = AutovalidateMode.onUserInteraction);
+                  return;
+                }
 
                 final newPin = newPinController.text.trim();
                 final newHash = hashPin(newPin);
@@ -610,6 +626,8 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
         );
       },
     );
+  },
+);
 
     if (result == true) {
       if (!mounted) return;
@@ -658,6 +676,7 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
       try {
         await UserRepository.instance.deactivate(user.id);
         await _loadUsers();
+        unawaited(ref.read(cloudSyncProvider.notifier).syncNow());
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -684,6 +703,7 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
   ) async {
     await UserRepository.instance.reactivate(user.id);
     await _loadUsers();
+    unawaited(ref.read(cloudSyncProvider.notifier).syncNow());
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

@@ -2,6 +2,7 @@ import '../data/models/audit.dart';
 import '../data/models/audit_result.dart';
 import '../data/models/cap.dart';
 import '../data/models/checkpoint.dart';
+import 'cash_thresholds.dart';
 
 /// Draft escalation object before database persistence (Spec §7 & Appendix A.5).
 class EscalationDraft {
@@ -76,12 +77,15 @@ class EscalationEngine {
     final cpMap = {for (final cp in checkpoints) cp.id: cp};
 
     // -------------------------------------------------------------
-    // Trigger 1: Daily Critical band (< 80%) (Spec §7.0)
+    // Trigger 1: Daily / Weekly / Monthly Critical band (< 80%) (Spec §7.0 & Workbook §5.2)
     // -------------------------------------------------------------
     final band = audit.band?.toLowerCase();
     final compliance = audit.compliancePct;
-    if (audit.auditType == 'daily' &&
-        (band == 'critical' || (compliance != null && compliance < 80.0))) {
+    final isCritical = band == 'critical' || (compliance != null && compliance < 80.0);
+    final isWeeklyPoorOrCritical = audit.auditType == 'weekly' &&
+        (isCritical || band == 'poor' || (compliance != null && compliance < 85.0));
+
+    if (isCritical || isWeeklyPoorOrCritical) {
       final failedResults = results.where((r) => r.result == 'F').toList();
 
       bool hasCashCause = false;
@@ -105,31 +109,31 @@ class EscalationEngine {
       final isCashOrInv = hasCashCause || hasInvCause;
       final failedSummary = failedCpLabels.isEmpty ? 'None' : failedCpLabels.take(4).join(', ');
 
-      // 1A. To GM (same_night; via whatsapp if cash/inv else in_app)
-      drafts.add(
-        EscalationDraft(
-          triggerNumber: 1,
-          triggerLabel: 'Daily audit Critical band',
-          sourceType: 'audit',
-          sourceAuditId: audit.id,
-          raisedByUserId: raisedByUserId,
-          targetRole: 'GM',
-          urgency: 'same_night',
-          deliveryChannel: isCashOrInv ? 'whatsapp' : 'in_app',
-          whatHappened:
-              'Daily audit score for ${audit.auditDate} dropped to ${(compliance ?? 0.0).toStringAsFixed(1)}% (Critical band)${isCashOrInv ? ' with failures on critical cash/inventory controls.' : '.'}',
-          evidence:
-              'Daily audit score sheet (${(compliance ?? 0.0).toStringAsFixed(1)}% Critical band, ${audit.failCount} fails). Failed checkpoints: $failedSummary.',
-          impact: isCashOrInv
-              ? 'Immediate closing risk at store counter; store closed without reconciled cash or inventory controls.'
-              : 'Store compliance fell below 80% critical threshold, indicating broad operational breakdowns.',
-          requestedAction:
-              'Decision needed: GM review audit tonight; approve emergency corrective actions before tomorrow 10:00 AM opening.',
-        ),
-      );
-
-      // 1B. If Cash or Inventory cause, ALSO to Owner via whatsapp (same_night)
-      if (isCashOrInv) {
+      if (audit.auditType == 'weekly' || audit.auditType == 'monthly') {
+        // Weekly or Monthly Audit: Escalate directly to OWNER via WhatsApp (Workbook §5.2)
+        final auditTypeLabel = audit.auditType == 'monthly' ? 'Monthly' : 'Weekly';
+        drafts.add(
+          EscalationDraft(
+            triggerNumber: 1,
+            triggerLabel: '$auditTypeLabel audit Critical band',
+            sourceType: 'audit',
+            sourceAuditId: audit.id,
+            raisedByUserId: raisedByUserId,
+            targetRole: 'OWNER',
+            urgency: 'same_day',
+            deliveryChannel: 'whatsapp',
+            whatHappened:
+                '$auditTypeLabel audit score for ${audit.auditDate} dropped to ${(compliance ?? 0.0).toStringAsFixed(1)}% (${isCritical ? 'Critical' : 'Poor'} band)${isCashOrInv ? ' with critical control failures.' : '.'}',
+            evidence:
+                '$auditTypeLabel audit score sheet (${(compliance ?? 0.0).toStringAsFixed(1)}%, ${audit.failCount} fails). Failed checkpoints: $failedSummary.',
+            impact:
+                'Store compliance fell significantly below standard during $auditTypeLabel audit, requiring immediate Owner review.',
+            requestedAction:
+                'Owner action needed: Review $auditTypeLabel audit findings with GM and initiate urgent corrective action plan.',
+          ),
+        );
+      } else {
+        // Daily Audit: To GM (same_night; via whatsapp if cash/inv else in_app)
         drafts.add(
           EscalationDraft(
             triggerNumber: 1,
@@ -137,19 +141,44 @@ class EscalationEngine {
             sourceType: 'audit',
             sourceAuditId: audit.id,
             raisedByUserId: raisedByUserId,
-            targetRole: 'OWNER',
+            targetRole: 'GM',
             urgency: 'same_night',
-            deliveryChannel: 'whatsapp',
+            deliveryChannel: isCashOrInv ? 'whatsapp' : 'in_app',
             whatHappened:
-                'Critical band breach (< 80%) on ${audit.auditDate} caused by critical ${hasCashCause && hasInvCause ? 'Cash and Inventory' : hasCashCause ? 'Cash Management' : 'Inventory Management'} failures.',
+                'Daily audit score for ${audit.auditDate} dropped to ${(compliance ?? 0.0).toStringAsFixed(1)}% (Critical band)${isCashOrInv ? ' with failures on critical cash/inventory controls.' : '.'}',
             evidence:
-                'Audit #${audit.id.substring(0, audit.id.length.clamp(0, 8))} scored ${(compliance ?? 0.0).toStringAsFixed(1)}%. Critical fails: $failedSummary.',
-            impact:
-                'High financial and operational exposure in cash till / inventory shrinkage at store premises.',
+                'Daily audit score sheet (${(compliance ?? 0.0).toStringAsFixed(1)}% Critical band, ${audit.failCount} fails). Failed checkpoints: $failedSummary.',
+            impact: isCashOrInv
+                ? 'Immediate closing risk at store counter; store closed without reconciled cash or inventory controls.'
+                : 'Store compliance fell below 80% critical threshold, indicating broad operational breakdowns.',
             requestedAction:
-                'Immediate review needed: Owner review critical failure and verify GM night reconciliation response.',
+                'Decision needed: GM review audit tonight; approve emergency corrective actions before tomorrow 10:00 AM opening.',
           ),
         );
+
+        // 1B. If Cash or Inventory cause, ALSO to Owner via whatsapp (same_night)
+        if (isCashOrInv) {
+          drafts.add(
+            EscalationDraft(
+              triggerNumber: 1,
+              triggerLabel: 'Daily audit Critical band',
+              sourceType: 'audit',
+              sourceAuditId: audit.id,
+              raisedByUserId: raisedByUserId,
+              targetRole: 'OWNER',
+              urgency: 'same_night',
+              deliveryChannel: 'whatsapp',
+              whatHappened:
+                  'Critical band breach (< 80%) on ${audit.auditDate} caused by critical ${hasCashCause && hasInvCause ? 'Cash and Inventory' : hasCashCause ? 'Cash Management' : 'Inventory Management'} failures.',
+              evidence:
+                  'Audit #${audit.id.substring(0, audit.id.length.clamp(0, 8))} scored ${(compliance ?? 0.0).toStringAsFixed(1)}%. Critical fails: $failedSummary.',
+              impact:
+                  'High financial and operational exposure in cash till / inventory shrinkage at store premises.',
+              requestedAction:
+                  'Immediate review needed: Owner review critical failure and verify GM night reconciliation response.',
+            ),
+          );
+        }
       }
     }
 
@@ -202,7 +231,7 @@ class EscalationEngine {
     // -------------------------------------------------------------
     if (audit.auditType == 'daily') {
       final variance = audit.cashVarianceRupees;
-      if (variance != null && variance.abs() > 500.0) {
+      if (variance != null && variance.abs() > CashThresholds.escalationTolerance) {
         final varianceAbs = variance.abs().toStringAsFixed(0);
         final direction = variance < 0 ? 'shortage' : 'excess';
 
@@ -220,7 +249,7 @@ class EscalationEngine {
             whatHappened:
                 'Closing cash variance of ₹$varianceAbs ($direction) observed during daily audit on ${audit.auditDate}.',
             evidence:
-                'Daily cash count sheet shows actual variance of ₹${variance.toStringAsFixed(0)} (exceeds ₹500 tolerance).',
+                'Daily cash count sheet shows actual variance of ₹${variance.toStringAsFixed(0)} (exceeds ₹${CashThresholds.escalationTolerance.toInt()} tolerance).',
             impact:
                 'Direct financial discrepancy in daily cash till; unaccounted variance exceeds permitted tolerance.',
             requestedAction:
@@ -230,7 +259,7 @@ class EscalationEngine {
 
         // 3B. Check yesterday — if also > ₹500, escalate to Owner (immediate, whatsapp)
         final yestVar = previousDailyAudit?.cashVarianceRupees;
-        if (yestVar != null && yestVar.abs() > 500.0) {
+        if (yestVar != null && yestVar.abs() > CashThresholds.escalationTolerance) {
           final yestAbs = yestVar.abs().toStringAsFixed(0);
           drafts.add(
             EscalationDraft(

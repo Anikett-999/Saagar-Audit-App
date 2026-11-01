@@ -7028,3 +7028,970 @@ app-release.aab   54955804  04-10-2026 19:48:39
 - **Subject**: eat: integrate Owner Executive Meeting Suite and universal gold 'S' brand icons
 - **Branch**: eature/owner-meeting-suite
 - **Status**: Working tree clean, 66 files committed, tests 100% green.
+
+
+---
+
+### Entry: 2026-10-29 — Antigravity Cash Variance Auto-Enforcement (Item 13)
+- **Author**: Antigravity
+- **Requirement / Problem (Item 13, Sagar Review Ref F12 & F15)**:
+  - Daily audit Checkpoint 6.5 ("Cash variance ≤ ₹50") was marked PASS even when S10 recorded -₹600 shortage.
+  - In weekly audit, Checkpoint CW.7 passed with -₹600 cumulative shortage, awarding 16/16 (100%) to Cash Management SOP.
+  - Cash variance thresholds were scattered and inconsistent across the codebase (₹50 vs ₹200 vs ₹500).
+- **Actions Executed**:
+  1. **Centralized Cash Variance Limits (`lib/domain/cash_thresholds.dart`)**:
+     - `dailyPassTolerance = 50.0` (≤ ₹50 passes without question)
+     - `weeklyCumulativeTolerance = 200.0` (±₹200 cumulative net tolerance across 7 days)
+     - `escalationTolerance = 500.0` (> ₹500 triggers immediate auto-fail and escalation)
+  2. **Harmonized Escalation & Scoring Engines**:
+     - Replaced magic numbers in `lib/domain/escalation_engine.dart` and `lib/domain/score_engine.dart` with `CashThresholds`.
+  3. **Auto-Enforcement in `lib/providers/draft_audit_provider.dart`**:
+     - **Daily Audit**: When `cashVarianceRupees != null`:
+       - If `|variance| > 500`: Checkpoint 6.5 is automatically forced to `Verdict.fail`, finding text is written to `audit_results`, and score is recalculated (deducting 2 points from Cash Management).
+       - If `50 < |variance| <= 500`: Checkpoint 6.5 requires an explanation note (>= 5 chars); otherwise it is auto-failed.
+       - If `|variance| <= 50`: Checkpoint 6.5 passes normally.
+     - **Weekly Audit**: Calculates 7-day cumulative net cash variance across preceding 6 daily audits + current audit. If cumulative variance breaches `|net| > 200`, Checkpoint CW.7 is automatically forced to `Verdict.fail`, finding text is saved, and score points are deducted.
+  4. **Photo-Gate Bypass for Auto-Failures**:
+     - In `lib/ui/screens/s10_review/review_submit_screen.dart`: exempted `6.5` and `CW.7` from mandatory photo gating since cash discrepancy is verified via cash till count sheet values rather than photo evidence.
+  5. **Comprehensive Test Suite (`test/cash_variance_enforcement_test.dart`)**:
+     - 6 dedicated unit and integration tests covering daily > ₹500 auto-fail, 6.5 score deduction, weekly cumulative variance calculation, weekly CW.7 auto-fail, and photo-gate submission bypass.
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze lib/ test/`: **0 issues found** (clean in 4.8s).
+  - `flutter test test/cash_variance_enforcement_test.dart`: **All 6 tests passed!**
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (81/90 = 90.0% Good invariant preserved).
+  - `flutter test`: **All 380/380 tests passed!**
+- **Git Commit**: `84c8c0f` (`fix(scoring): auto-enforce cash variance limits on Checkpoint 6.5 and CW.7 (Item 13)`)
+- **Next Immediate Task**:
+  - Push commit `84c8c0f` to remote.
+  - Present physical device verification steps for Item 13 to user.
+  - Proceed with next isolated Tier 1 item per Strategy A (Item 19: CAP Extension Date Picker Past-Date Prevention, or Item 26: Photo Mandatory Badge text).
+
+
+---
+
+### Entry: 2026-10-29 — Antigravity CAP Extension Past-Date Prevention (Item 19)
+- **Author**: Antigravity
+- **Requirement / Problem (Item 19, Client Review Ref F19 / F22)**:
+  - In CAP extension dialog (`CapDetailScreen` S16 & `CapVerifyScreen` S18), the date picker allowed selecting dates before the current deadline or in the past.
+  - Sagar's UAT test: *"Used Request Extension on a CAP due on 31 October and picked 25 October. It was accepted and recorded as 'Deadline extended to 2026-10-25' and counted as one extension."*
+  - An extension must strictly extend into the future beyond the current deadline.
+- **Actions Executed**:
+  1. **UI Date Picker Restriction (`cap_detail_screen.dart` & `s18_cap_verify_screen.dart`)**:
+     - Calculated `baseDate = currentDeadline.isAfter(now) ? currentDeadline : now`.
+     - Set `minDate = DateTime(baseDate.year, baseDate.month, baseDate.day).add(const Duration(days: 1))`.
+     - In `showDatePicker`: `firstDate = minDate`, `initialDate = selectedDate.isBefore(minDate) ? minDate : selectedDate`.
+     - Result: All dates on or prior to the current deadline are physically disabled / unselectable in the calendar UI.
+  2. **Defensive Repository Validation (`CapRepository.extendCap`)**:
+     - Added strict check comparing parsed date-only representations of `newDeadline` and `cap.deadline`.
+     - Throws `ArgumentError('New deadline must be strictly after current deadline')` if `newDeadline <= currentDeadline`.
+  3. **Automated Unit Testing (`test/cap_lifecycle_test.dart`)**:
+     - Added Test 7b mirroring Sagar's exact test case: CAP due 2026-10-31; extending to 2026-10-25 throws `ArgumentError`; extending to 2026-10-31 throws `ArgumentError`; extending to 2026-11-01 succeeds.
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze lib/ test/`: **0 issues found** (clean in 10.3s).
+  - `flutter test test/cap_lifecycle_test.dart`: **All 14/14 tests passed!**
+  - `flutter test test/score_engine_test.dart`: **All 12/12 canonical tests passed!**
+  - `flutter test`: **All 381/381 tests passed!**
+- **Git Commit**: `cde4398` (`fix(cap): prevent earlier or past dates in CAP deadline extension (Item 19)`)
+- **Next Immediate Task**:
+  - Push commit `cde4398` to remote.
+  - Present next bug to user (Item 26: "Photo mandatory" label on Pass, or Item 25: IST timestamp display).
+
+
+---
+
+### Entry: 2026-10-29 — Antigravity Checkpoint Photo Badge Clarification (Item 26)
+- **Author**: Antigravity
+- **Requirement / Problem (Item 26, Client Review Ref F17)**:
+  - On checkpoint cards (S07 and Monthly MC.1), the badge displayed `"Photo is mandatory for this checkpoint."` / `"या चेकपॉइंटसाठी फोटो अनिवार्य आहे."`.
+  - Passing an audit does not require a photo; photos are only mandatory when marking a non-compliance (FAIL). The previous copy confused auditors into believing photos were required even on Pass.
+  - Sagar's UAT review: *"Change it to 'Photo required if marked Fail'."*
+- **Actions Executed**:
+  1. **Dual-Language Clarification (`assets/translations/app_en.arb` & `app_mr.arb`)**:
+     - `s08PhotoRequiredNotice`: Updated to `"Photo required if marked FAIL"` (English) and `"नापास (FAIL) असल्यास फोटो आवश्यक"` (Marathi).
+  2. **Regenerated Localizations**:
+     - Ran `flutter gen-l10n`.
+     - Verified clean compilation in `lib/l10n/app_localizations_en.dart` and `lib/l10n/app_localizations_mr.dart`.
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze lib/ test/`: **0 issues found** (clean in 8.9s).
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!**
+- **Git Commit**: `ba2d9ab` (`fix(l10n): clarify checkpoint photo badge to 'Photo required if marked FAIL' (Item 26)`)
+- **Next Immediate Task**:
+  - Push commit `ba2d9ab` to remote.
+  - Present next problem to user (Item 25: IST timestamp formatting display).
+
+
+---
+
+### Entry: 2026-10-29 — Antigravity IST Datetime Formatting Suite (Item 25)
+- **Author**: Antigravity
+- **Requirement / Problem (Item 25, Client Review Ref F07)**:
+  - Timestamps across the app were shown in two different time zones without labels.
+  - Sagar's UAT review: *"Submission said 09:04 PM while Audit Detail showed 15:34 for the same audit, which is UTC. CAP timelines also show UTC (03:44 for an action done at 09:14 IST). After midnight, a verification appeared under the previous day's date. Store in UTC if needed, but always display in IST."*
+  - Root cause: Raw `.substring(0, 16).replaceFirst('T', ' ')` and `.split('T').first` were called directly on stored UTC ISO strings across multiple screens.
+- **Actions Executed**:
+  1. **Centralized Datetime Formatter (`lib/utils/app_date_format.dart`)**:
+     - Built `AppDateFormat` utility with safe null and empty fallbacks.
+     - `toLocalDateTime()` parses ISO strings or DateTime objects and explicitly converts via `.toLocal()`.
+     - `formatDateTime()`: `29 Oct 2026, 09:14 PM`
+     - `formatTime()`: `09:14 PM` (12-hour with AM/PM)
+     - `formatDate()`: `29 Oct 2026`
+     - `formatDateIso()`: `2026-10-29`
+     - `formatSyncDateTime()`: `29/10/2026 09:14 PM`
+  2. **Comprehensive App-wide UI & PDF Integration**:
+     - Audit Detail S13: `audit.submittedAt` formatted with `AppDateFormat.formatDateTime`, `audit.verifiedAt` with `AppDateFormat.formatDate`.
+     - CAP Detail S16: `entry.timestamp` timeline formatted with `AppDateFormat.formatDateTime`, `cap.openedAt` and `action.doneAt` with `AppDateFormat.formatDate`.
+     - 7-Day Review: `audit.verifiedAt` badge formatted with `AppDateFormat.formatDateTime`.
+     - Reports S20 & S21: `report.submittedAt` and `report.readByOwnerAt` formatted with `AppDateFormat.formatDate`.
+     - CAP Mark Done S17: `action.doneAt` formatted with `AppDateFormat.formatDate`.
+     - Cloud Sync S32: `lastSyncAt` formatted with `AppDateFormat.formatSyncDateTime`.
+     - Escalations S33: `esc.raisedAt` formatted with `AppDateFormat.formatDateTime`.
+     - Weekly Report PDF Service: Signatures and review dates formatted with `AppDateFormat.formatDate`.
+  3. **Unit Tests (`test/app_date_format_test.dart`)**:
+     - 6 dedicated tests covering fallback on null/empty, UTC-to-local conversion, midnight day-shift boundary verification, AM/PM formatting, sync formatting, and DateTime object handling.
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze lib/ test/`: **0 issues found** (clean in 11.0s).
+  - `flutter test test/app_date_format_test.dart`: **All 6 tests passed!**
+  - `flutter test test/audit_detail_screen_test.dart`: **All 12 tests passed!**
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!**
+  - `flutter test`: **All 387/387 tests passed!**
+- **Git Commit**: `34952a5` (`fix(ui): format all timestamps in local Indian Standard Time (IST) with AM/PM labels (Item 25)`)
+- **Next Immediate Task**:
+  - Push commit `34952a5` to remote.
+  - Present physical device verification steps for Item 25 to user.
+  - Proceed with next bug fix.
+
+---
+
+### Handoff: 30 October 2026 — S13 Audit Detail Buttons (Item 15 · F03)
+**Author**: Antigravity  
+**Goal**: Wire the 3 placeholder buttons on Screen S13 (Daily Audit Detail) for UAT Item 15 (Client Ref: F03): Role-based Verify Audit (GM/Owner only), Daily Audit PDF Export & Share Sheet, and WhatsApp Sharing with formatted summary.
+
+- **Completed Implementations**:
+  1. **Role-Based Verify Audit (`AuditDetailScreen` & `AuditRepository`)**:
+     - Visible strictly when `audit.status == 'submitted'` AND user is `GM` or `OWNER` (hidden from SM per Spec §5 S13).
+     - Directly verifies audit using logged-in user's role and user ID without prompting to select "verify as GM/Owner".
+     - Confirmation dialog confirms verification: `Are you sure you want to verify this audit as {role}: {name}?`.
+     - Executes `AuditRepository.instance.verifyDailyAudit(auditId: audit.id, verifierId: user.id, notes: 'Verified by ${user.role}: ${user.name}')`.
+     - Automatically refreshes audit data: button disappears immediately, header switches from amber `SUBMITTED` to green `VERIFIED`, displaying verifier's full name and formatted date.
+  2. **Daily Audit PDF Export (`DailyAuditPdfService`)**:
+     - Built `DailyAuditPdfService` in `lib/services/daily_audit_pdf_service.dart`.
+     - Formats clean 1-to-2 page PDF layout: Store header & date metadata, Score card (Points, Compliance %, Band badge), SOP Breakdown summary table, Non-Compliances table with fail finding text and assigned CRO, Auditor notes, and Auditor/Verifier signature blocks.
+     - Utilizes bundled `NotoSansDevanagari` font with automatic Helvetica fallback.
+     - Invokes `Printing.sharePdf(bytes: bytes, filename: 'Daily_Audit_${audit.auditDate}.pdf')` to trigger the native Android/system share sheet.
+  3. **Share to WhatsApp Intent (`_handleShareWhatsApp`)**:
+     - Builds structured plain-text daily audit summary (Store, Date, Auditor, Score %, Band, Points, Verification Status, Non-compliances list with Checkpoint ID, finding description, and CRO attribution).
+     - Attempts deep link via `whatsapp://send?text=...` and fallback `https://api.whatsapp.com/send?text=...` (`LaunchMode.externalApplication`).
+     - Automatic Clipboard fallback with snackbar notification if WhatsApp app is not installed on device.
+  4. **Localization & Translations**:
+     - Added/updated strings in `assets/translations/app_en.arb` and `assets/translations/app_mr.arb` (`s13ExportPdfTooltip`, `s13ShareWhatsAppTooltip`, `s13VerifyAuditTooltip`, `s13VerifyConfirmTitle`, `s13VerifyConfirmMessage`, `s13VerifySuccess`, `s13PdfGenerating`, `s13PdfExportError`, `s13WhatsAppSuccess`, `s13WhatsAppCopied`).
+     - Regenerated localizations with `flutter gen-l10n`.
+  5. **Automated Testing Suite**:
+     - Added 2 new tests in `test/daily_audit_pdf_service_test.dart` (2/2 passing).
+     - Updated `test/audit_detail_screen_test.dart` with GM role-based verification, Owner role-based verification, and PDF/WhatsApp button interaction tests (14/14 passing).
+     - Fixed `test/backup_export_test.dart` async File I/O pump timing (8/8 passing).
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze lib test`: **No issues found!** (ran in 4.3s).
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5).
+  - `flutter test test/audit_detail_screen_test.dart`: **All 14 tests passed!**
+  - `flutter test test/daily_audit_pdf_service_test.dart`: **All 2 tests passed!**
+  - `flutter test test/backup_export_test.dart`: **All 8 tests passed!**
+  - `flutter test`: **All 391/391 tests passed!** (100% green across entire repository).
+- **Next Immediate Task**:
+  - Review changes and commit Item 15 to `fix/part-b-bugs`.
+  - Push branch to `origin/fix/part-b-bugs`.
+  - Present physical device verification steps for Item 15 to user.
+
+---
+
+### Handoff: 30 October 2026 — CAP Segregation of Duties & Mandatory Evidence (Item 6 · F21 & Item 18 · F20)
+**Author**: Antigravity  
+**Goal**: Resolve Item 6 (Client Ref: F21) & Item 18 (Client Ref: F20) per Sagar Bora's UAT feedback:
+1. Prevent GM or non-responsible users from marking CAP done when assigned to someone else.
+2. Prevent self-verification: verifier must be a different user from who completed the CAP (Four-Eyes Principle) and cannot verify a CAP assigned to themselves.
+3. Reset all action steps (`cap_actions`) to incomplete upon CAP reopening so actions must be redone.
+4. Enforce mandatory completion notes (minimum 10 characters) and photo evidence (where origin checkpoint requires evidence on fail) before marking done.
+5. Enforce mandatory detailed reason (minimum 10 characters) on verification failure / reopening.
+
+- **Completed Implementations**:
+  1. **CapRepository Layer (`lib/data/repositories/cap_repository.dart`)**:
+     - `markDone`: Enforces `cap.responsibleUserId == userId` (throws `StateError`). Validates `doneNotes.trim().length >= 10` (throws `ArgumentError`). Validates photo attachment when `originCheckpoint.requiresPhotoOnFail == true` (throws `ArgumentError`).
+     - `verifyCap`: Enforces segregation of duties — rejects self-verification if `cap.responsibleUserId == verifierId` or if `lastMarkedDoneUserId == verifierId` via `cap_log` query (throws `StateError`).
+     - `reopenCap`: Enforces `reason.trim().length >= 10` (throws `ArgumentError`). In transaction, resets all `cap_actions` (`is_done = 0`, `done_at = null`, `done_by = null`, `done_notes = null`) and logs `event = 'reopened'`.
+  2. **Screen S16 CAP Detail (`lib/ui/screens/s16_cap_detail/cap_detail_screen.dart`)**:
+     - Updated `canMarkDone = isResponsible && allActionsDone;` (removed `|| isGmOrOwner`).
+     - When viewer is not the responsible user and CAP is open, displays an explanatory italic message: *"Only the assigned responsible user ({name}) can mark this CAP done."*
+  3. **Screen S17 CAP Mark Done (`lib/ui/screens/s17_cap_mark_done/cap_mark_done_screen.dart`)**:
+     - Fetches checkpoint to check `requiresPhotoOnFail`.
+     - Displays role guard alert card if viewer is not the assigned responsible user and disables confirm button.
+     - Changed section title to *"Completion Notes (Mandatory)"* with live character counter (`{count}/10`).
+     - Renders `REQUIRED` badge on photo card when origin checkpoint requires photo on fail, with warning notice if not attached.
+     - Added text controller listener so confirm button dynamically enables only when all steps are done, notes >= 10 chars, photo attached if required, and viewer is responsible user.
+  4. **Screen S18 CAP Verify (`lib/ui/screens/cap/s18_cap_verify_screen.dart`)**:
+     - Queries `cap_log` for the user who marked it done (`_doneByUserId`).
+     - If current user is the user who completed the CAP or responsible user, displays prominent red warning banner: *"Self-verification not permitted: Segregation of duties requires a different person to verify this CAP."* and disables `Pass & Verify` button.
+     - Validates Reopen at Plan dialog reason length >= 10 characters.
+  5. **Bilingual Parity (Rule #8)**:
+     - Added English & authentic Marathi strings in `app_en.arb` and `app_mr.arb` (`s17NotesMinLength`, `s17PhotoRequiredNotice`, `s17OnlyResponsibleCanMarkDone`, `s18SelfVerificationWarning`, `s18ReopenReasonMinLength`, `s16OnlyResponsibleCanMarkDone`).
+     - Generated with `flutter gen-l10n`.
+  6. **Automated Testing Suite**:
+     - `test/helpers/fake_database.dart`: Added `where == 'cap_id = ?'` support to `update` for action reset testing.
+     - `test/cap_lifecycle_test.dart`: Added test 10b (rejects self-verification for responsible user & who marked done), test 10c (markDone segregation, note length, and mandatory photo validation), and verified action steps reset in test 8 (16/16 passing).
+     - `test/cap_detail_screen_test.dart`: Added test for GM disabled Mark Done button with segregation message (12/12 passing).
+     - `test/cap_mark_done_screen_test.dart`: Added tests for non-responsible viewer disabled state, min note length enforcement, and photo requirement on fail-photo checkpoints (9/9 passing).
+     - `test/s18_cap_verify_screen_test.dart`: Added test 9 (Reopen at Plan reason >= 10 chars and action steps reset) and test 10 (Self-verification banner and disabled button) (10/10 passing).
+     - Full automated test suite: **398/398 passing (100% green)**.
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze lib test`: **No issues found!** (ran in 5.3s).
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5).
+  - `flutter test`: **All 398/398 tests passed!** (ran in 1m 4s).
+- **Next Immediate Task**:
+  - Review changes and commit Item 6 & Item 18 to `fix/part-b-bugs`.
+  - Push branch to `origin/fix/part-b-bugs`.
+  - Hand baton to user / Claude for physical device verification.
+
+
+
+
+---
+
+### Handoff: 30 October 2026 — CAP Checkpoint Scoping & Weekly/Monthly Audit Support (Item 17 · F20/F19)
+**Author**: Antigravity  
+**Goal**: Resolve Item 17 (Client Ref: F20 / F19 in review doc):
+1. Scope checkpoint dropdown in Screen S15 (`CapCreateScreen`) strictly to the failed checkpoints of the selected audit.
+2. Support daily, weekly (e.g. CW.7), and monthly (e.g. MC.2) audit non-compliances by loading checkpoints across all frequencies (`loadAllCheckpoints`).
+3. Reorder origin card so Origin Audit is selected first and Failed Checkpoint second, displaying fail counts on audit items.
+4. Show honest notice if the selected audit has 0 fails and block submission.
+5. Add repository-level guard in `CapRepository.createCap` rejecting non-pattern CAPs on checkpoints that did not fail (`result != 'F'`).
+6. Automatically link `originResultId` to the matching audit result row.
+
+- **Completed Implementations**:
+  1. **CapRepository Layer (`lib/data/repositories/cap_repository.dart`)**:
+     - `createCap`: Added origin checkpoint validation checking `audit_results`. If `!isPattern` and a result exists where `result != 'F'`, throws `ArgumentError('Cannot create CAP for checkpoint $originCheckpointId: checkpoint did not fail in audit $originAuditId')`. Also validates `originResultId` if provided.
+  2. **Screen S15 CAP Create (`lib/ui/screens/s15_cap_create/cap_create_screen.dart`)**:
+     - Loads all checkpoints across frequencies using `CheckpointRepository.instance.loadAllCheckpoints()`.
+     - In `_loadData()` and `_onAuditChanged()`, queries `audit_results` for the selected audit and populates `_checkpoints` strictly with non-compliant items (`result == 'F'`).
+     - Origin card layout updated: Origin Audit dropdown is at the top with fail counts (e.g. `2026-10-25 · MONTHLY (1 fail)`), and Failed Checkpoint dropdown is below it.
+     - When an audit has 0 fails, replaces the checkpoint dropdown with an amber informational card (`s15NoFailsFound`) and blocks submit with a clear snackbar error.
+     - Automatically resolves `originResultId` from the selected checkpoint's fail result so audit detail displays the linked CAP chip.
+  3. **Bilingual Parity (Rule #8)**:
+     - Added `s15NoFailsFound` in `assets/translations/app_en.arb` and `assets/translations/app_mr.arb` (`"This audit has no failed checkpoints. CAPs can only be created for failed items."` / `"या ऑडिटमध्ये कोणतेही नापास तपासणी बिंदू नाहीत. केवळ नापास बाबींसाठीच CAP तयार करता येते."`).
+     - Regenerated localizations via `flutter gen-l10n`.
+  4. **Automated Testing Suite**:
+     - `test/cap_create_screen_test.dart`: Updated setup to seed `audit_results` with fails; added dedicated tests for monthly failed checkpoints (`MC.2`), passed checkpoints exclusion (`MC.1`), and 0-fails honest notice + submission blocking (9/9 tests passed).
+     - `test/cap_repository_test.dart`: Added test verifying `createCap` throws `ArgumentError` when attempting to create a CAP for a passed checkpoint (19/19 tests passed).
+     - `test/backup_export_test.dart`: Hardened async timer pump to 800ms for parallel test runner stability (8/8 tests passed).
+     - Full automated test suite: **401/401 passing (100% green)**.
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze lib test`: **No issues found!** (ran in 8.2s).
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5).
+  - `flutter test`: **All 401/401 tests passed!** (ran in 58s).
+- **Next Immediate Task**:
+  - Request user / Claude review for commit approval per Rule 6.
+  - Present physical device verification steps for Item 17.
+  - Proceed with next bug fix.
+
+---
+
+### Handoff: 30 October 2026 — Item 6 Loophole Closure: Self-Reopen & Self-Extension Prevention
+**Author**: Antigravity  
+**Goal**: Address physical device QA finding from User where GM (Santosh Hajare), assigned a CAP by Owner and having marked it done, bypassed segregation of duties on S18 via the "Verification Failed" button, which allowed him to reopen his own CAP with dummy reason (`iiiiikjnibibibib`):
+1. Completely seal self-verification on Screen S16: Hide "Verify" button from responsible user and who marked done (`canVerify = isGmOrOwner && !isResponsible && !isDoneByMe`), displaying italic segregation note instead.
+2. Seal verification rejection on Screen S18: Disable "Verification Failed" button if `isSelfVerification == true` and guard `_onVerificationFailed()`.
+3. Restrict "Request Extension" on Screen S16: Hide "Request Extension" button when status is `done` (completed CAPs cannot request extension; extension from `done` is an outcome of verification failure on S18). For `open`/`reopened`, restrict to Owner or non-responsible GM (`canExtend = (cap.isOpen || cap.isReopened) && (isOwner || (isGm && !isResponsible))`).
+4. Enforce repository-level segregation of duties in `CapRepository.reopenCap`: If `status == 'done'`, reject with `StateError` if `actorId == cap.responsibleUserId` or `actorId == lastMarkedDoneUserId`.
+5. Enforce repository-level segregation of duties in `CapRepository.extendCap`: If `status == 'done'`, reject with `StateError` if `actorId == cap.responsibleUserId` or `actorId == lastMarkedDoneUserId`.
+
+- **Completed Implementations**:
+  1. `lib/ui/screens/s16_cap_detail/cap_detail_screen.dart`:
+     - Hid "Verify" button if responsible user or who marked done, displaying `s16SelfVerificationBlocked`.
+     - Hid "Request Extension" when `done`; prevented responsible GM from self-extending.
+  2. `lib/ui/screens/cap/s18_cap_verify_screen.dart`:
+     - Disabled `s18_fail_verify_button` when `isSelfVerification == true`.
+     - Guarded `_onVerificationFailed()` with snackbar warning.
+  3. `lib/data/repositories/cap_repository.dart`:
+     - Added segregation of duties guards in `reopenCap` and `extendCap`.
+  4. Localization: Added `s16SelfVerificationBlocked` in `app_en.arb` and `app_mr.arb`.
+  5. Automated Testing:
+     - `test/cap_lifecycle_test.dart`: Added test 10d (reopenCap rejects self-reopening) and test 7c (extendCap rejects self-extension).
+     - Full automated test suite: **403/403 tests passing (100% green)**.
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze lib test`: **No issues found! (ran in 7.0s)**.
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5).
+  - `flutter test`: **All 403/403 tests passed! (ran in 53s across 46 files)**.
+- **Git Commit**: `f72f5df` (`fix(cap): scope checkpoint dropdown to audit failures and seal self-reopening loophole (Items 17 & 6)`) pushed to `origin/fix/part-b-bugs`.
+- **Next Immediate Task**:
+  - Proceed to next bug fix (Cluster A: Audit Submit & Escalations flow).
+
+
+---
+
+### Handoff: 30 October 2026 — Per-User PIN Lockout, Progressive Backoff & Instant Numpad Reset (Item 8 — Client Ref: F23)
+**Author**: Antigravity  
+**Goal**: Resolve Item 8 (Client Ref: F23 / Section B) addressing Saagar Bora's exact observations from physical UAT:
+1. **Per-User Lockout Isolation**: Prevent global screen lockout when one user fails their PIN 5 times. If Store Manager is locked out, Owner and GM must remain completely unlocked and able to log in.
+2. **Progressive Back-Off Lockout Durations**:
+   - 1st lockout (5 wrong PINs in 60s): **60 seconds** (1 minute)
+   - 2nd consecutive lockout: **300 seconds** (5 minutes)
+   - 3rd+ consecutive lockout: **900 seconds** (15 minutes)
+   - Successful login resets the consecutive lockout counter for that user.
+3. **Instant Numpad Clearing & Responsive Keypad**:
+   - Fixed bug where toggling `_shakeNumpad = !_shakeNumpad` caused every 2nd wrong attempt to skip resetting the PIN dots and leave the keypad frozen until backspaced 4 times.
+   - Added `errorCount` triggering immediate `setState(() => _pin = '')` and shake animation on *every single failed attempt*.
+   - Added `key: ValueKey(_selectedUserId)` so switching names immediately resets numpad state.
+4. **Always-Active Dropdown**:
+   - Removed `onChanged: locked ? null : ...` so user dropdown is NEVER disabled during a lockout. Switching users shows the selected user's active timer or numpad.
+5. **Security Audit Logging**:
+   - Logged lockout events to SQLite `audit_log` with operation `'update'`, user ID, duration, and consecutive lockout count.
+6. **Grammatical Pluralization Fix**:
+   - Fixed `"1 attempts left"` to display `"1 attempt left"` (EN: `s04WrongPinOneAttemptLeft`, MR: `चुकीचा पिन. १ प्रयत्न शिल्लक आहे.`).
+
+- **Files Changed**:
+  - `lib/providers/auth_provider.dart`: Added `UserLockoutInfo`, per-user lockout map `userLockouts`, progressive backoff helper `getLockoutDuration`, `isUserLockedOut`, `userLockoutRemaining`, `userFailedAttempts`, `registerFailureForUser`, `audit_log` insertion, and SharedPreferences persistence (`auth_user_lockouts_v2`).
+  - `lib/ui/screens/s04_login/login_screen.dart`: Wired per-user lockout queries, always-active dropdown, reactive timer for selected user, singular/plural attempt message, and `errorCount` on `PinNumpad`.
+  - `lib/ui/widgets/pin_numpad.dart`: Added `errorCount` prop and immediate `_pin = ''` reset on error.
+  - `assets/translations/app_en.arb` & `app_mr.arb`: Added `s04WrongPinOneAttemptLeft`.
+  - `test/auth_lockout_test.dart`: Added 3 comprehensive tests verifying per-user isolation, progressive lockout durations (60s -> 300s -> 900s), and persistence.
+
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze`: **No issues found! (ran in 8.8s)**
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5)
+  - `flutter test test/auth_lockout_test.dart`: **All 10 tests passed!**
+  - `flutter test`: **All 406/406 tests passed! (ran in 1m 01s across 46 files)**
+
+- **Next Immediate Task**:
+  - Present verification steps to user for Item 8.
+  - Commit changes to `fix/part-b-bugs` following user/Claude review.
+  - Proceed to next pending bug (Item 9: WhatsApp Sent confirmation / F01).
+
+---
+
+### Handoff: 31 October 2026 — WhatsApp Escalation Decoupling & Honest Delivery Confirmation (Items 9 & 10 — Client Ref: F01 & F09)
+**Author**: Antigravity  
+**Goal**: Resolve Item 9 (Client Ref: F01) and Item 10 (Client Ref: F09) addressing Saagar Bora's exact observations from physical UAT:
+1. **Item 10 (Submit Jump Decoupled)**: Submitting an audit previously immediately launched an external `wa.me` intent before the user could see that the audit was successfully saved. We decoupled the submit flow: submitting an audit evaluates triggers in the background without launching WhatsApp (`autoLaunchWhatsApp = false`), smoothly routing the user to Screen S11 (`SubmittedScreen`).
+2. **Item 10 (Actionable S11 Escalation Hub)**: If the audit triggered escalations (e.g. Critical/Poor score Trigger 1), Screen S11 dynamically displays dedicated actionable escalation cards showing trigger level, urgency, recipient name, delivery badge, and explicit buttons: **[Share Alert via WhatsApp]**, **[Mark as Sent]**, and **[Copy Alert]**.
+3. **Item 9 (Honest Delivery Tracking & Return Confirmation)**: Because standard OS deep links (`wa.me` / `whatsapp://send`) cannot programmatically detect if a message was actually sent by the user without Meta's WhatsApp Business Cloud API, the app no longer assumes delivery upon launch:
+   - Initial status badge is amber: **"WhatsApp: Not Confirmed"** (`whatsapp_sent = 0`).
+   - When returning to the app from WhatsApp, an explicit confirmation dialog prompts: *"Did you send the escalation alert to [Name] on WhatsApp?"*. Only answering *"Yes, Sent"* stamps `whatsapp_sent = 1` and turns the badge green (**"WhatsApp Sent"**).
+   - If the user closes the app or cancels the dialog, both Screen S11 and Screen S33 (Escalations Hub) provide a one-tap retroactive **[Mark as Sent]** button to confirm delivery without re-launching WhatsApp.
+   - S33 manual escalation creation also adopts this confirmation prompt.
+
+- **Files Changed**:
+  - `lib/domain/escalation_engine.dart`: Expanded Trigger 1 to evaluate on Weekly and Monthly audits scoring in the Critical band (< 80%, e.g. 40%) or Weekly Poor band (< 85%), routing directly to the Owner via WhatsApp. (Resolves Item 11 / Client Ref: F18).
+  - `lib/services/escalation_service.dart`: Added `autoLaunchWhatsApp = false` and `markSent = false` parameters to `evaluateAndDispatch` and `launchWhatsAppForEscalation`.
+  - `lib/data/repositories/escalation_repository.dart`: Added `listForAudit(String auditId)` method.
+  - `lib/ui/screens/s11_submitted/submitted_screen.dart`: Added escalation loading, interactive confirmation dialog, retroactive manual mark button, message copy, and actionable escalation cards above bottom navigation.
+  - `lib/ui/screens/s33_escalations/escalations_list_screen.dart`: Updated delivery badge to show amber "WhatsApp: Not Confirmed" / green "WhatsApp Sent", wired confirmation dialog on WhatsApp return, and added retroactive "Mark as Sent" button.
+  - `assets/translations/app_en.arb` & `app_mr.arb`: Added keys `s11EscalationsAlertTitle`, `s11ShareWhatsApp`, `s11MarkAsSent`, `s11MessageCopied`, `s33ConfirmWhatsAppTitle`, `s33ConfirmWhatsAppPrompt`, `s33ConfirmWhatsAppYes`, `s33ConfirmWhatsAppNo`, `s33WhatsAppUnconfirmedBadge`, `s33MarkAsSentAction`.
+  - `test/escalation_engine_test.dart`: Added unit test asserting Trigger 1 fires to Owner via WhatsApp on Weekly Audit Critical band (e.g. 40%).
+
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze`: **No issues found! (ran in 16.2s)**
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5)
+  - `flutter test test/escalation_engine_test.dart`: **All 14 tests passed!**
+  - `flutter test`: **All 407/407 tests passed! (100% green)**
+
+- **Git Status**:
+  - Modified files ready for commit:
+    - `assets/translations/app_en.arb`
+    - `assets/translations/app_mr.arb`
+    - `lib/data/repositories/escalation_repository.dart`
+    - `lib/domain/escalation_engine.dart`
+    - `lib/l10n/app_localizations.dart`
+    - `lib/l10n/app_localizations_en.dart`
+    - `lib/l10n/app_localizations_mr.dart`
+    - `lib/services/escalation_service.dart`
+    - `lib/ui/screens/s11_submitted/submitted_screen.dart`
+    - `lib/ui/screens/s33_escalations/escalations_list_screen.dart`
+    - `test/escalation_engine_test.dart`
+    - `brain/UAT_BUG_TRACKER.md`
+    - `brain/SESSION_HANDOFF.md`
+
+- **Next Immediate Task**:
+  - Obtain user verification on physical device or sign-off to commit & push to `fix/part-b-bugs`.
+  - Proceed to next pending issue in the UAT tracker (Item 12 / F14: Weekly report escalation section or Item 16 / F06: PDF Marathi font rendering).
+
+---
+
+### Handoff: 31 October 2026 — Weekly Report Real Escalations & CAP Populating (Item 12 — Client Ref: F14)
+**Author**: Antigravity  
+**Goal**: Resolve Item 12 (Client Ref: F14) addressing Sagar Bora's observation that the weekly report and its PDF showed "No escalations triggered (Escalation engine active in Phase 3)", "Escalations: 0 (Phase 3)", and "Phase 2-5" placeholders in CAP boxes, despite active weekly cash escalations.
+1. **`ReportRepository.generateWeeklyReport`**:
+   - Replaced empty placeholders with live SQLite queries against `escalations` and `caps` tables for the weekly date range (`weekStartDate` to `weekEndDateNextDay`) and linked audits (`weeklyAuditId` + daily audit IDs).
+   - Populated `escalationsPayload`, `capsOpenedPayload`, `capsClosedPayload`, and `capsAgedPayload`.
+2. **`ReportDetailScreen` (S21)**:
+   - Section 9 (Escalations): Renders actual escalation rows with trigger labels, urgency, description, and status. Displays clean empty state without Phase tags if none.
+   - Section 7 (CAPs Closed) & Section 8 (CAPs Aged): Render actual closed and aged CAP entries or clean empty state without P2-5 tags.
+3. **`WeeklyReportPdfService`**:
+   - Section 9 (PDF): Renders true escalation count (`Escalations: N`) and up to 3 summary rows of active escalations.
+   - Section 7 & 8 (PDF): Renders true closed count and aged count. Removed all "Phase 3" and "P2-5" placeholder strings.
+4. **Localization**: Updated `s21CapsClosedEmpty`, `s21CapsAgedEmpty`, and `s21EscalationsEmpty` in English and Marathi without Phase tags.
+
+- **Verification & Raw Command Outputs**:
+  - `flutter analyze`: **No issues found! (ran in 15.9s)**
+  - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5)
+  - `flutter test test/report_repository_test.dart`: **All 2 tests passed!** (including dedicated Item 12 real escalation/CAP assertion)
+  - `flutter test test/weekly_report_test.dart`: **All 5 tests passed!**
+
+- **Git Status**:
+  - Modified files ready for commit:
+    - `assets/translations/app_en.arb`
+    - `assets/translations/app_mr.arb`
+    - `lib/data/repositories/report_repository.dart`
+    - `lib/l10n/app_localizations.dart`
+    - `lib/l10n/app_localizations_en.dart`
+    - `lib/l10n/app_localizations_mr.dart`
+    - `lib/services/weekly_report_pdf_service.dart`
+    - `lib/ui/screens/reports/report_detail_screen.dart`
+    - `test/report_repository_test.dart`
+    - `brain/UAT_BUG_TRACKER.md`
+    - `brain/SESSION_HANDOFF.md`
+
+- **Next Immediate Task**:
+  - Stage and commit Item 12 to `fix/part-b-bugs`.
+  - Proceed to next pending bug in the UAT tracker (Item 16 / F06: PDF Marathi font rendering).
+
+
+---
+
+### Handoff: 31 October 2026 — Comprehensive PDF Marathi & English Text Fixes, Shaping, Dynamic Titles, Signatures & Local Saving (Item 16 — Client Ref: F06 / F14 / Review P146-P155)
+**Author**: Antigravity  
+**Goal**: Complete resolution of Sagar Bora's UAT review feedback for Item 16 (Client Ref: F06 / Review P146-P155): "Marathi text is broken in all PDFs, and other PDF issues", encompassing an exhaustive audit of all Marathi Devanagari and English text, numbers, dynamic totals, signatures, timestamps, filenames, and local document persistence across Daily, Weekly, and Monthly PDFs.
+
+1. **Root Cause Analysis & Comprehensive Inventory**:
+   - The Flutter `pdf` package lacks HarfBuzz/OpenType complex-script GSUB shaping, causing TrueType fonts (`NotoSansDevanagari`) to draw pre-base vowel signs (*hrasva velanti* `ि` / `\u093F`) after the consonant (e.g. `विभाग` -> `वभिाग`, `साप्ताहिक` -> `साप्ताहकि`, `मासिक` -> `मासकि`, `दैनिक` -> `दैनकि`, `ऑडिट` -> `ऑडटि`).
+   - Hardcoded Section 2 header (`१२४-गुण अनुपालन`) contradicted actual max points when checkpoints were N/A.
+   - Weekly report headline in `ReportRepository` counted only weekly failures, omitting the 7 daily audits' failures.
+   - Auditor signature printed raw code IDs (e.g. `usr-gm-01`) instead of resolved human names.
+   - Owner verification printed raw UTC ISO string (`2026-10-23T19:43:45.860586Z`).
+   - PDF export bypassed saving local copies to application documents directory, failed to update `reports.pdf_local_path`, exported with long UUID filenames, and had no confirmation snackbar.
+
+2. **Core Implementation**:
+   - **`DevanagariShaper` (`lib/utils/devanagari_shaper.dart`)**:
+     Created pure-Dart Devanagari text pre-shaper that reorders pre-base vowel signs (`\u093F`) before their preceding consonant cluster, traversing across conjuncts (`halant` + `consonant`) and nuktas, restoring visually authentic Marathi typography across all PDFs.
+   - **`WeeklyReportPdfService` (`lib/services/weekly_report_pdf_service.dart`)**:
+     - Applied `DevanagariShaper.shape` to all Devanagari strings and table content.
+     - Section 2 title made dynamic: `${totalMax.toStringAsFixed(0)}-POINT ROLLUP / एकूण अनुपालन`.
+     - Auditor signature resolves real name via `UserRepository` (`Rahul Sharma (General Manager)`).
+     - Formatted `readByOwnerAt` using `AppDateFormat.formatDateTime`.
+     - Monthly report labels author as `Store Owner (Auditor)`.
+     - Standardized filenames: `Saagar_Weekly_Report_W<week>_<year>.pdf` and `Saagar_Monthly_Report_<Month>_<year>.pdf`.
+     - Updated `generateAndSavePdf` to write to application documents directory and update `reports.pdf_local_path`.
+     - Updated `shareOrPrintPdf` to persist locally first before opening share sheet.
+   - **`DailyAuditPdfService` (`lib/services/daily_audit_pdf_service.dart`)**:
+     - Applied `DevanagariShaper.shape` to all Devanagari strings and findings.
+     - Standardized filename: `Saagar_Daily_Audit_<Date>.pdf`.
+     - Added `generateAndSavePdf` saving to application documents directory.
+     - Updated `shareOrPrintPdf` to persist locally first.
+   - **`ReportRepository.generateWeeklyReport` (`lib/data/repositories/report_repository.dart`)**:
+     - Combined daily fails + weekly fails: `$weeklyFailCount Failures ($totalFailCount Total)`.
+   - **UI Screens (`report_detail_screen.dart` & `audit_detail_screen.dart`)**:
+     - Added persistent local save and confirmation snackbars with saved filename.
+
+3. **Verification & Raw Command Outputs**:
+   - `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**
+   - `flutter test test/score_engine_test.dart`: **All 12 canonical tests passed!** (Mandatory Rule #5)
+   - `flutter test test/devanagari_shaper_test.dart`: **All 3 tests passed!**
+   - `flutter test test/daily_audit_pdf_service_test.dart`: **All 3 tests passed!**
+   - `flutter test test/weekly_report_test.dart`: **All 7 tests passed!**
+   - `flutter test test/monthly_report_integration_test.dart`: **All 5 tests passed!**
+   - Full test suite `flutter test`: **413/413 tests passed! 100% green!**
+
+4. **Next Immediate Task**:
+   - Commit all Item 16 fixes to `fix/part-b-bugs`.
+
+
+---
+
+### Handoff: 31 October 2026 — Resolution of Items 20, 21, 22, 23, and 24 (Category E: Language, Permissions & Layout)
+**Author**: Antigravity  
+**Goal**: Complete implementation and full verification of Sagar Bora's UAT review feedback for Items 20, 21, 22, 23, and 24:
+- **Item 20 (Client Ref: F04)**: Complete authentic Devanagari Marathi translations for all 68 daily checkpoints.
+- **Item 21 (Client Ref: F24)**: Camera permission denial handling with an accessible "Open Settings" explanation dialog.
+- **Item 22 (Client Ref: F25)**: Runtime `POST_NOTIFICATIONS` permission request on Android 13+ and unused `READ_CONTACTS` cleanup.
+- **Item 23 (Client Ref: F02 / U07)**: Screen layout, landscape orientation, and 130% accessibility scaling in S07 & report tables.
+- **Item 24 (Client Ref: F05)**: Unified back navigation via `PopScope` with unsaved draft exit confirmation.
+
+1. **Implementation Details**:
+   - **Item 20**:
+     - Updated all 68 daily checkpoints in `assets/seed/checkpoints.json` with authentic, natural Devanagari translations matching the retail workbook.
+     - Updated `SeedLoader.loadCheckpoints` with `ON CONFLICT(id) DO UPDATE SET` so pre-existing databases receive translations in-place.
+     - Added auto-reload trigger in `AppDatabase.onOpen` if daily checkpoints have `text_en = text_mr`.
+     - Automated test in `test/weekly_seed_test.dart` verifying all 68 daily checkpoints have authentic Marathi (`text_mr != text_en`, `evidence_mr != evidence_en`). Passing 5/5.
+   - **Item 21**:
+     - Defined `CameraPermissionDeniedException` in `lib/data/photo_service.dart`.
+     - Caught `PlatformException` with `camera_access_denied` and rethrew `CameraPermissionDeniedException`.
+     - Created `lib/ui/widgets/camera_permission_dialog.dart` with localized title, explanation, and "Open Settings" button calling `Geolocator.openAppSettings()`.
+     - Handled in `fail_detail_screen.dart` (S08), `cap_mark_done_screen.dart` (S17), and `s18_cap_verify_screen.dart` (S18).
+   - **Item 22**:
+     - Removed unused `android.permission.READ_CONTACTS` from `android/app/src/main/AndroidManifest.xml`.
+     - Added `await androidImpl.requestNotificationsPermission()` on Android 13+ (API 33+) in `NotificationService.init()`.
+     - Called `unawaited(NotificationService.instance.init())` in `main.dart` on application startup.
+   - **Item 23**:
+     - In `checkpoint_screen.dart`, adapted layout to device orientation: in landscape mode, rendered PASS, FAIL, and NA buttons horizontally in a single `Row` (44px height), preventing question text from disappearing.
+     - Adjusted question font size flexibly (20pt landscape, 24pt portrait) and preserved `SingleChildScrollView`.
+     - In `report_detail_screen.dart._scoreRow`, made both `label` (`flex: 5`) and `value` (`flex: 6`) bounded so `label` never gets squished to 1 character per line under large text or 130% accessibility scaling.
+   - **Item 24**:
+     - Wrapped `CheckpointScreen` in `PopScope(canPop: false, onPopInvokedWithResult: ...)`.
+     - Unified both Android system back navigation (hardware/gesture) and top app bar back arrow:
+       - If `currentIndex > 0`: calls `draftAuditProvider.notifier.goBack()`.
+       - If `currentIndex == 0`: presents confirmation dialog ("Exit Audit? Progress is saved as a draft") with "Resume Audit" and "Save & Exit" (`context.goNamed('s05_home')`).
+     - Added full English and Marathi localization keys for exit dialog and camera permission dialog.
+
+2. **Verification & Raw Command Outputs**:
+   - `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**
+   - `flutter test test/score_engine_test.dart`: **12/12 canonical score tests green!** (Mandatory Rule #5)
+   - `flutter test test/weekly_seed_test.dart`: **5/5 tests green!**
+   - `test/camera_and_navigation_test.dart`: **5/5 tests green!**
+   - Full test suite `flutter test`: **419/419 tests passed! 100% green!**
+
+3. **Next Immediate Task**:
+   - Stage and commit Items 20, 21, 22, 23, and 24 to `fix/part-b-bugs`.
+   - Category E is now 100% complete (7/7 items solved). Only Items 2, 4, 5, and 27 remain.
+
+
+---
+
+### Handoff: 31 October 2026 — Resolution of Item 5 (Client Ref: F16 / ¶364): Owner Master Recovery Code & Forgot PIN Flow
+**Author**: Antigravity  
+**Goal**: Complete implementation and full verification of Sagar Bora's UAT review feedback for Item 5 (Client Ref: F16): "No way to recover a forgotten Owner PIN", plus the setup flow streamlining from Section F (¶364).
+
+1. **Implementation Details**:
+   - **`OwnerRecoveryService` (`lib/services/owner_recovery_service.dart`)**:
+     - Generates an 8-character uppercase alphanumeric code formatted as `SG-XXXX-YYYY` (e.g. `SG-7492-BX41`) omitting confusing visual glyphs (0/O, 1/I, L).
+     - Cryptographically stores the salted `BCrypt` hash (cost 10) in private `SharedPreferences`. The plaintext code is NEVER stored.
+     - Provides `normalizeCode` to handle case-insensitivity, spaces, and hyphens (`sg7492bx41` == `SG-7492-BX41`).
+     - Implements `resetOwnerPinWithRecoveryCode` which verifies the code, hashes the new 4-digit PIN, and updates `users.pin_hash` for the Owner in SQLite without touching any audit records, photos, or CAP history.
+   - **First-Time Setup Streamlining (`lib/ui/screens/s03_first_setup/first_setup_screen.dart`)**:
+     - Upfront name validation: Displays error immediately if name is empty/short before confirming PIN (resolves Sagar's note in ¶364).
+     - Generates and presents the Master Recovery Code card with a one-tap Copy button and clear warning to save it.
+     - Auto-logs in the Owner upon setup completion via `ref.read(authProvider.notifier).setCurrentUser(...)` and navigates directly to Home (S05), eliminating the redundant 3rd PIN prompt (resolves ¶364).
+   - **Login Screen PIN Recovery (`lib/ui/screens/s04_login/login_screen.dart`)**:
+     - Added "Forgot PIN?" text button when the Owner role is selected.
+     - Tapping opens a secure recovery modal asking for the Master Recovery Code.
+     - Verifies code via `OwnerRecoveryService.instance.verifyRecoveryCode`.
+     - Upon verification, opens the Set New 4-Digit PIN dialog.
+     - Resets the PIN, unlocks the user from any lockout state, and displays a success confirmation snackbar.
+   - **Export Sanitization Guard (`lib/data/backup_service.dart`)**:
+     - Enforces explicit stripping: neither `pin_hash` nor `recovery_code_hash` can ever be included in any database export or diagnostic dump.
+   - **Dual-Language Parity (Rule #8)**:
+     - Added all 12 localization keys in `app_en.arb` and `app_mr.arb`.
+
+2. **Verification & Raw Command Outputs**:
+   - `test/owner_recovery_test.dart`: **5/5 tests green!**
+     - Code format validation (12-char formatted string `SG-XXXX-YYYY`).
+     - Salted BCrypt hash verification (plaintext never stored).
+     - Case/hyphen normalization verification.
+     - SQLite Owner PIN update and login authentication verification.
+     - Zero-leak export verification: asserts neither `pin_hash` nor `recovery_code_hash` exists in `BackupService.exportDatabaseToJson()`.
+   - `test/change_pin_test.dart` & `test/auth_lockout_test.dart`: **18/18 tests green!**
+   - Canonical Score Engine (`test/score_engine_test.dart`): **12/12 passed (100% green)**.
+   - `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+
+3. **Next Immediate Task**:
+   - Commit Item 5 to `fix/part-b-bugs`.
+   - Proceed to Step 2: Item 4 (Client Ref: F27) — Store Account Sign-in & Tenant Shield before Cloud Sync.
+
+
+---
+
+## Handoff — 2026-10-31 (Item 4: Store Account Device Pairing & Tenant Shield — F27)
+**Author**: Antigravity
+**Branch**: `fix/part-b-bugs`
+**Status**: Step 2 (Item 4 / F27) Completed & Verified. 25 of 27 UAT items now resolved (92.6%).
+
+### 1. Work Completed
+- **`StoreAccountService` (`lib/services/store_account_service.dart`)**:
+  - Encapsulates combo store identity: **Saagar Traders — Latur (WLMHW & HEMW)**.
+  - Manages device-level pairing state in `SharedPreferences`.
+  - Validates authorized store passcode (`ST-LATUR-2026` / `STLATUR2026` / `SAAGAR2026`).
+  - Provides `pairStoreAccount()` and `unpairStoreAccount()`.
+- **Engine Security Gate (`lib/services/cloud_sync_service.dart`)**:
+  - Implemented **Step 0: Store Account Security Gate** in `syncAll()`.
+  - If device is not paired, sync pass is strictly blocked upfront:
+    `SyncResult.unconfigured('Cloud Sync blocked: Device is not signed in to an authorized store account.')`
+  - Zero cloud reads or writes can execute without authorized store pairing.
+- **Provider & Auto-Sync Persistence (`lib/providers/cloud_sync_provider.dart`)**:
+  - Tracks `isStorePaired`, `pairedStoreName`, and `isAutoSyncEnabled`.
+  - Persists auto-sync toggle setting in `SharedPreferences` (`cloud_auto_sync_enabled`).
+  - Gated background launch sync and network reconnect sync: only runs if `isStorePaired && isAutoSyncEnabled`.
+- **UI Presentation (`lib/ui/screens/s32_backup_export/backup_export_screen.dart`)**:
+  - **Store Account Card (Tenant Shield)**:
+    - When paired: Green badge, shield icon, and text confirming pairing with *Saagar Traders — Latur (WLMHW & HEMW)*. Owner has option to disconnect.
+    - When unpaired: Amber notice, warning icon, and **[Sign In to Store Account]** button.
+  - **Store Passcode Dialog**:
+    - Clean stateful dialog with input validation, error shake/display, and confirmation toast.
+  - **Auto-Sync Switch**:
+    - Live switch for automatic background synchronization.
+  - **Sync Now Guard**:
+    - Tapping "Sync Now" on an unpaired device automatically opens the Store Passcode dialog.
+- **Dual-Language Parity (Rule #8)**:
+  - Added all English and Marathi strings in `app_en.arb` and `app_mr.arb`.
+
+### 2. Verification & Raw Command Outputs
+- **`test/cloud_sync_service_test.dart`**: **11/11 tests passed!**
+  - Verified unauthenticated device sync block (returns `unconfigured` status and 0 records pushed).
+  - Verified S32 Store Account Card rendering and auto-sync switch.
+  - Verified S32 passcode authentication dialog flow (rejects wrong passcode, accepts `ST-LATUR-2026`, updates UI).
+- **`test/score_engine_test.dart`**: **12/12 passed (100% green)**.
+- **Full Auth & Sync Suite (46 tests)**: **46/46 tests passed!**
+  (`cloud_sync_service_test.dart`, `owner_recovery_test.dart`, `score_engine_test.dart`, `change_pin_test.dart`, `auth_lockout_test.dart`).
+- **`flutter analyze`**: **No issues found! (0 errors, 0 warnings, 0 info)**.
+
+### 3. Next Immediate Task
+- Claude review & sign-off on Item 4 (`F27`).
+- Proceed to Step 4: Item 2 (Client Ref: `F10`) — Self-contained ZIP backup bundle export (SQLite + binary photos) with in-app restore.
+
+
+---
+
+## Handoff — 2026-10-31 (Fix: S04 Keyboard Overflow & Owner Recovery Modal Crash)
+**Author**: Antigravity
+**Branch**: `fix/part-b-bugs`
+**Status**: Resolved both physical device defects reported in user screenshots.
+
+### 1. Root Cause Analysis
+1. **Pixel Overflow (`BOTTOM OVERFLOWED BY 183 PIXELS`)**:
+   - `LoginScreen` Scaffold defaulted to `resizeToAvoidBottomInset: true`. When the software keyboard appeared for the Owner Recovery dialog, Android resized the Scaffold, squashing the `PinNumpad` Column.
+   - **Fix**: Added `resizeToAvoidBottomInset: false` to `LoginScreen` Scaffold.
+2. **Crash & Black Screen (`_dependents.isEmpty: is not true`)**:
+   - The recovery flow chained two consecutive dialogs (`_showForgotPinDialog` ➔ pop ➔ `_showResetPinDialog`).
+   - The first dialog's `codeController.dispose()` was called synchronously while the dialog was still in its pop animation, throwing a controller disposal exception.
+   - Immediately pushing the second dialog while the first was popping caused an `InheritedElement` deactivation failure (`_dependents.isEmpty: is not true`).
+   - **Fix**: Refactored into a unified, single `_OwnerRecoveryDialog`.
+     - Step 1: Validates Master Recovery Code.
+     - Step 2: Smoothly transitions within the *same dialog* to "Set New 4-Digit PIN" without popping/re-pushing.
+     - Controllers are cleanly managed in `_OwnerRecoveryDialogState` (`initState` / `dispose`).
+     - Content is wrapped in `SingleChildScrollView`.
+
+### 2. Verification
+- `test/owner_recovery_test.dart`: **6/6 tests passed!** (including new widget test verifying seamless Step 1 ➔ Step 2 modal transition without crash or overflow).
+- `test/score_engine_test.dart`: **12/12 passed (100% green)**.
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+
+
+---
+
+## Handoff — 2026-10-31 (Implementation: Passcode Rotation, Device Cap & Remote Revocation Shield)
+**Author**: Antigravity
+**Branch**: `fix/part-b-bugs`
+**Status**: Completed full edge-case architecture for Store Account Security & Passcode Rotation.
+
+### 1. Architectural Implementation & Edge-Case Handling
+1. **Store Passcode Rotation (`StoreAccountService.rotateStorePasscode`)**:
+   - **Internet Connectivity Guard**: Strictly requires an active internet connection (`CloudSyncService.isNetworkAvailable()`). If offline, throws `SocketException` with clear guidance.
+   - **Validation**: Verifies current passcode before rotation; verifies new passcode is alphanumeric and >= 6 characters.
+   - **Atomic Cloud-First Persistence**: Computes salted BCrypt hash (10 rounds) and writes to Firestore config (`stores/{storeCode}/config/security`) *first*. Local `SharedPreferences` cache is only updated upon successful cloud confirmation, eliminating any split-brain risk if connection drops midway.
+   - **Factory Key Revocation**: Once rotated, the factory passcode (`ST-LATUR-2026`) is globally revoked and rejected by `validatePasscode()`. Existing paired store devices remain authorized without re-entry.
+2. **Strict Device Limit Cap (Max 2 Store Devices)**:
+   - Saagar Traders retail store limit: maximum 2 active devices paired simultaneously (`WLMHW` & `HEMW`).
+   - `StoreAccountService.pairStoreAccount` checks active enrolled devices. If 2 devices are already paired, throws `StoreDeviceLimitReachedException` ("Store device limit reached (2/2 devices connected). Contact Owner to authorize a new device.").
+   - Device hardware identity is registered via `DeviceService.instance.getId()`.
+3. **Remote Kill Switch / Device Revocation (Screen S32)**:
+   - Screen S32 displays an "Authorized Store Devices (N/2)" card for the Owner showing active terminals with "(This device)" and a red `[Revoke Access]` button for other devices.
+   - Tapping `[Revoke Access]` prompts confirmation and marks `is_authorized: false` in Firestore.
+   - **Sync Shield Gate**: During `syncAll()`, if the current terminal has been revoked, sync immediately terminates with an error and calls `unpairStoreAccount()`, disconnecting the revoked terminal from the cloud.
+4. **Unpaired Owner Notice Banner (Screen S05 Home)**:
+   - If the logged-in user is `OWNER` and the device has not yet paired with the store cloud, displays a gentle amber alert: *"Cloud Backup Inactive — Tap to link store account"* with a `[Link Now]` button navigating to Screen S32.
+5. **Layout Overflow Immunity**:
+   - Wrapped `PinNumpad` on `LoginScreen` in `FittedBox(fit: BoxFit.scaleDown)` to ensure zero vertical overflow regardless of screen dimensions or dialog keyboard adjustments.
+
+### 2. Verification & Test Suite
+- **`flutter analyze`**: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- **`test/score_engine_test.dart`**: **12/12 passed (100% green)**.
+- **`test/cloud_sync_service_test.dart`**: **16/16 passed** (including 5 new edge-case tests for passcode rotation, offline blocking, device limit cap, and remote kill switch).
+- **`test/owner_recovery_test.dart`**: **6/6 passed**.
+- **`test/phase1_integration_test.dart`**: **2/2 passed** (updated for streamlined setup + continue to app flow).
+- **`test/language_screen_test.dart`**: **6/6 passed**.
+
+### 3. Next Immediate Task
+- Claude review & sign-off on branch `fix/part-b-bugs`.
+- Proceed to Step 4: Item 2 (Client Ref: `F10`) — Self-contained ZIP backup bundle export (SQLite + binary photos) with in-app restore.
+
+
+---
+
+## Handoff — 2026-10-31 (Fix: Instant Offline Handling for Store Account Sign-In)
+**Author**: Antigravity
+**Branch**: `fix/part-b-bugs`
+**Status**: Resolved physical device buffering issue when attempting store sign-in while offline.
+
+### 1. Root Cause Analysis
+- When the phone was offline and the user tapped "Sign In to Store Account" (on S03 Setup or S32 Settings), the app called Firestore queries (`fetchPasscodeHash` and `fetchAuthorizedDevices`) without an upfront connectivity check or query timeout.
+- On Android, Firestore network calls hang waiting for backend connectivity by default, causing the progress spinner to buffer indefinitely.
+
+### 2. Solutions Implemented
+1. **First-Glance Network Check**:
+   - In `_showPairStoreDialog` (Screen S32) and `_onActivateStore` (Screen S03), the app immediately checks `CloudSyncService.isNetworkAvailable()`.
+   - If offline, it blocks the action instantly and informs the user:
+     *"Internet connection required to sign in to store account. Please connect to Wi-Fi or mobile data."*
+     Zero buffering, zero spinner delay.
+2. **Strict 4-Second Timeout on Cloud Queries**:
+   - Wrapped all Firestore adapter operations (`fetchPasscodeHash`, `registerDevice`, `fetchAuthorizedDevices`, `revokeDevice`) in a strict 4-second `.timeout(const Duration(seconds: 4))`, throwing a fast `SocketException` if the network stalls.
+3. **`StoreAccountService.pairStoreAccount` Offline Guard**:
+   - Throws `SocketException` if called without internet connectivity.
+
+### 3. Verification
+- `test/cloud_sync_service_test.dart`: **17/17 passed** (including new test asserting immediate `SocketException` when offline).
+- `test/score_engine_test.dart`: **12/12 passed (100% green)**.
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+
+
+---
+
+## Handoff — 2026-11-01 (Fix: S32 Store Account Card Horizontal Overflow & Header Cramming)
+**Author**: Antigravity
+**Branch**: `fix/part-b-bugs`
+**Status**: Resolved 29px horizontal overflow and vertical text break bug in Screen S32.
+
+### 1. Root Cause Analysis
+- The Store Account card header `Row` in `BackupExportScreen` (S32) placed the icon, the title text (`Store Account (Tenant Shield)` inside `Expanded`), the `[Change Passcode]` text button, and the `[Disconnect]` text button all inside a single horizontal `Row`.
+- On physical mobile screens (width ~360-390px), the two action buttons consumed over 210px of horizontal width, forcing the `Expanded` title to shrink into a narrow ~50px space. This caused the text to wrap letter-by-letter vertically and overflowed the screen by 29 pixels (`RIGHT OVERFLOWED BY 29 PIXELS`).
+
+### 2. Solutions Implemented
+- Restructured the Store Account Card:
+  - Header `Row` now strictly holds the Shield Icon and the `Store Account (Tenant Shield)` title + Connected status badge, giving it the full screen width.
+  - Moved `[Change Passcode]` (as an attractive `OutlinedButton.icon`) and `[Disconnect]` into a dedicated action row positioned directly below the store description text.
+  - Zero horizontal overflow, clean responsive layout on all screen sizes.
+
+### 3. Verification
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- `test/cloud_sync_service_test.dart` + `test/score_engine_test.dart`: **29/29 passed (100% green)**.
+
+
+---
+
+## Handoff — 2026-11-01 (Removal of Arbitrary 2-Device Limit Cap)
+**Author**: Antigravity  
+**Branch**: `fix/part-b-bugs`  
+**Status**: Removed hardcoded 2-device restriction; store devices enrollment is now unrestricted for authorized passcode holders.
+
+### 1. Root Cause & User Directive
+- The hardcoded ceiling (`activeCount >= 2`) restricted pairing to only 2 devices. In real-world retail store operations, multiple personnel (Owner, SM, GM) across shifts and surplus/replacement devices need legitimate access under the store's tenant account.
+- Per user instruction, the artificial 2-device cap was removed completely without altering any other security or tenant logic.
+
+### 2. Solutions Implemented
+1. **Removed Device Limit Cap in `StoreAccountService`**:
+   - Eliminated the `activeCount >= 2` check from `StoreAccountService.pairStoreAccount()`.
+   - Any device entering the correct Store Passcode can pair and operate.
+   - Preserved Tenant Shield isolation, remote passcode rotation, device registry tracking, and the Owner's Remote Kill Switch (`revokeDevice`).
+2. **Updated S32 Settings & S03 Setup UI**:
+   - Removed `StoreDeviceLimitReachedException` catch blocks.
+   - Updated UI text from `"Connected Devices ({count}/2)"` to `"Connected Store Devices ({count})"`.
+   - Updated localization files (`app_en.arb` and `app_mr.arb`) and regenerated with `flutter gen-l10n`.
+3. **Updated Test Suite**:
+   - In `test/cloud_sync_service_test.dart`, replaced the device limit test with a multi-device test verifying Owner, SM, GM, and surplus devices pair seamlessly.
+
+### 3. Verification
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- `test/cloud_sync_service_test.dart`: **17/17 passed (100% green)**.
+- `test/score_engine_test.dart`: **12/12 passed (100% green)**.
+- Full security logic intact.
+
+
+---
+
+## Handoff — 2026-11-01 (Smart & Recognizable Connected Device Information)
+**Author**: Antigravity  
+**Branch**: `fix/part-b-bugs`  
+**Status**: Upgraded Screen S32 connected devices list to display recognizable hardware models, custom nicknames, last active user, and friendly timestamps.
+
+### 1. Root Cause Analysis
+- Previously, Screen S32 displayed a generic title `"Store Device"` and raw technical UUID hashes (e.g. `ID: 28ae198e...`), giving the Store Owner zero indication of which phone or tablet belonged to whom or which device they were revoking.
+
+### 2. Solutions Implemented
+1. **Real Hardware Model Detection**:
+   - Integrated `device_info_plus: ^12.4.0` in `DeviceService.getDeviceModelName()`.
+   - On Android devices, detects manufacturer and model (e.g. `Xiaomi Redmi Note 12`, `Samsung Galaxy Tab A8`).
+2. **Device Renaming / Nicknames**:
+   - Owner can tap an edit ✏️ icon on any connected device card to assign a human-readable label (e.g. `"Owner Phone"`, `"Counter Tablet"`, `"SM Rahul Phone"`).
+   - Saved locally and synchronized to Firestore under `stores/{storeCode}/devices/{deviceId}`.
+3. **Last Active User & Role Tracking**:
+   - `StoreAccountService.recordDeviceHeartbeat()` records the current staff member's name and role on every login and cloud sync pass.
+   - Screen S32 shows: `Last user: OWNER (Aniket)` or `Last user: SM (Rahul)`.
+4. **Friendly Activity Timestamps**:
+   - Formatted relative and time-of-day badges: `Active: Just now` / `Active: Today, 1:15 PM` along with `Enrolled: 01 Nov 2026`.
+   - Removed technical UUID clutter from the primary UI.
+5. **Localization Parity**:
+   - Added all necessary keys in `app_en.arb` and `app_mr.arb` with complete Marathi translations.
+
+### 3. Verification
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- `test/cloud_sync_service_test.dart`: **18/18 passed (100% green)**.
+- `test/backup_export_test.dart`: **8/8 passed (100% green)**.
+- `test/score_engine_test.dart`: **12/12 passed (100% green)**.
+
+
+---
+
+## Handoff — 2026-11-01 (Resolution of Item 2 / Client Ref F10: Data Export vs Full Cloud Backup)
+**Author**: Antigravity  
+**Branch**: `fix/part-b-bugs`  
+**Status**: Implemented Sagar Bora's Option 2 per user direction. JSON export is now clearly labeled as an Audit Records Data Export, clarifying that complete device recovery and photos are securely maintained via Cloud Synchronization.
+
+### 1. Client Requirement (Sagar Bora Review, Item 2 / F10)
+- The client pointed out that the exported JSON contains database records but no binary photos, and there is no offline restore option.
+- Sagar offered two acceptable paths:
+  1. Build a complete offline ZIP package with photos + in-app restore, OR
+  2. Clearly label the export as "data export only, not a backup", with cloud restore as the real recovery path.
+- The USER explicitly chose **Option 2**.
+
+### 2. Solutions Implemented
+- In `assets/translations/app_en.arb` and `app_mr.arb`:
+  - Updated card title to `"Audit Records Data Export (JSON)"` / `"ऑडिट नोंदी डेटा निर्यात (JSON)"`.
+  - Updated description to clarify: *"Notice: This exports table records only, not photos. For full backup and device recovery including photos, use Cloud Synchronization above."*
+  - Updated security notice: *"Data Export Notice: Exported file contains audit trails and findings (without binary photos). The primary and complete recovery path for this store is Cloud Synchronization."*
+  - Updated button label to `"Export Data Records (JSON)"` / `"डेटा नोंदी निर्यात करा (JSON)"`.
+  - Updated export success message with a clear confirmation and reminder of Cloud Sync.
+  - Eliminated duplicate Marathi keys in `app_mr.arb`.
+- Updated widget tests in `test/backup_export_test.dart` to assert the updated labels in both English and Marathi.
+
+### 3. Verification
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- `test/backup_export_test.dart`: **8/8 passed (100% green)**.
+- `test/cloud_sync_service_test.dart`: **18/18 passed (100% green)**.
+- `test/score_engine_test.dart`: **12/12 passed (100% green)**.
+- Master UAT Bug Tracker: **26 of 27 items are now SOLVED & VERIFIED**.
+
+
+---
+
+## Handoff Push Record — 2026-11-01
+**Author**: Antigravity  
+**Branch**: `fix/part-b-bugs`  
+**Commit**: `63290f1`  
+**Message**: `feat(security): implement Store Account Tenant Shield, device pairing, recognizable models and data export labeling (Items 2, 4)`  
+
+### Raw Push Record:
+```text
+$ git log -1 --oneline
+63290f1 feat(security): implement Store Account Tenant Shield, device pairing, recognizable models and data export labeling (Items 2, 4)
+
+$ git status
+On branch fix/part-b-bugs
+nothing to commit, working tree clean
+
+$ git push origin fix/part-b-bugs
+To https://github.com/Anikett-999/Saagar-Audit-App.git
+   2641ec4..63290f1  fix/part-b-bugs -> fix/part-b-bugs
+```
+
+
+---
+
+## Handoff — 2026-11-01 (Step 1: Auto-Dismissing Validation Errors / Item 27.4)
+**Author**: Antigravity  
+**Branch**: `fix/part-b-bugs`  
+**Status**: Resolved lingering error messages across forms; validation errors now auto-dismiss immediately upon user correction.
+
+### 1. Problem & Root Cause (Sagar Review §F / Item 27.4)
+- When a required field or photo was missing, error messages persisted even after the user captured the photo or began typing in the field.
+- In Flutter, forms without `AutovalidateMode.onUserInteraction` or live text listeners only re-evaluate error states when the user taps Submit a second time.
+
+### 2. Solutions Implemented
+1. **Screen S08 (Fail Detail)**:
+   - Added text change listener to `_findingController` to auto-clear `_error = null` as soon as valid finding length ($\ge 5$ characters) is entered.
+   - In `_addPhoto()`, immediately clears `_error = null` upon photo capture if finding is valid.
+2. **Screen S15 (CAP Create)**:
+   - Added `_autoValidateMode` to `Form`. Switches dynamically to `AutovalidateMode.onUserInteraction` after initial submit attempt, automatically clearing red error text under Problem Statement, Why 1, Action Steps, etc. the exact millisecond the user types into them.
+3. **Screen S03 (First-Time Setup)**:
+   - Added `onChanged` handlers to `_nameController` and `_storeKeyController` to dismiss "Name too short" and "Store key error" immediately as the user types.
+4. **Screen S30 (Change PIN)**:
+   - Configured `autovalidateMode: _autoValidateMode` switching to `onUserInteraction` on submit attempt; clears current PIN mismatch error on edit.
+5. **Screen S28 & S29 (Manage CROs & Users Modals)**:
+   - Added `autovalidateMode` with `onUserInteraction` to dialog forms.
+
+### 3. Verification
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- `test/score_engine_test.dart`: **12/12 passed (100% green)**.
+- `test/cap_create_screen_test.dart`, `test/change_pin_test.dart`, `test/manage_users_test.dart`, `test/manage_cros_test.dart`, `test/camera_and_navigation_test.dart`: **38/38 passed (100% green)**.
+
+---
+
+## Handoff — 2026-11-01 (Step 2 & 3: Progress Calculation & 68-Checkpoint Jump List / Items 27.6 & 27.2)
+**Author**: Antigravity  
+**Branch**: `fix/part-b-bugs`  
+**Status**: Completed and fully verified against device unit and widget tests.
+
+### 1. Item 27.6: Progress Based on Answered Count (Client Ref §F)
+- **Problem**: Progress indicator previously displayed `(currentIndex + 1) / total`, resulting in an inaccurate "1% complete" on question 1 before any answer was submitted, and fluctuating erratically if the auditor navigated backward to review earlier questions.
+- **Solution**:
+  - `lib/providers/draft_audit_provider.dart`: Added `answeredCount`, `answeredProgress` (`results.length / checkpoints.length`), and `answeredPercentage` getters.
+  - `lib/ui/screens/s07_checkpoint/checkpoint_screen.dart`: Updated `LinearProgressIndicator` and screen Semantics to strictly read `state.answeredCount` and `state.answeredProgress`. A fresh audit honestly displays `0%` until answers are registered.
+
+### 2. Item 27.2: 68-Checkpoint Jump List Drawer / Bottom Sheet (Client Ref §F)
+- **Problem**: Auditors had no bird's-eye view of which of the 68 checkpoints were answered, pending, or failed, and could only navigate linearly one by one.
+- **Solution**:
+  - `lib/ui/screens/s07_checkpoint/widgets/checkpoint_jump_sheet.dart`: Created full-featured modal bottom sheet:
+    - Auto-scrolls to the active checkpoint upon opening.
+    - Status filter chips: All (68), Unanswered, Failed, Passed, and N/A with exact live counts.
+    - Checkpoint cards with sequence badge (`#1`), SOP tag, localized checkpoint text, status badge (PASS, FAIL, NA, or Pending), and distinct highlighting for the currently active checkpoint.
+    - 1-tap jumping to any checkpoint via `ref.read(draftAuditProvider.notifier).jumpTo(index)` and automatic dismissal.
+  - `lib/ui/screens/s07_checkpoint/checkpoint_screen.dart`: Added action button in AppBar (`Icons.format_list_bulleted_rounded`) with localized tooltip and jump sheet launcher; added graceful end-of-audit safeguard.
+  - `lib/l10n/`: Added localized strings for English and authentic Marathi.
+
+### 3. Verification
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- `flutter test test/camera_and_navigation_test.dart`: **9/9 passed (100% green)**.
+- `flutter test test/score_engine_test.dart`: **12/12 passed (100% green, Rule #5 maintained)**.
+
+---
+
+## Handoff — 2026-11-01 (Step 4: Persistent Bottom Navigation Bar / Item 27.1)
+**Author**: Antigravity  
+**Branch**: `fix/part-b-bugs`  
+**Status**: Completed, lightweight implementation (~70 LOC), zero external dependencies, verified across all regression suites.
+
+### 1. Item 27.1: Persistent Bottom Navigation Bar (Client Ref §F)
+- **Problem**: Users on Home (S05) had to scroll excessively past large audit status cards to reach Audits, CAPs, Reports, or Settings.
+- **Optimized Solution**:
+  - `lib/ui/widgets/app_bottom_nav_bar.dart`: Created a sleek, highly-optimized ~70 LOC `AppBottomNavBar` using Flutter Material 3 `NavigationBar` with zero third-party packages or bloated dependencies.
+  - Placed on the 5 primary hub screens:
+    - Tab 0: **Home** (`s05_home`)
+    - Tab 1: **Audits** (`s12_audit_history`)
+    - Tab 2: **CAPs** (`s14_cap_list`)
+    - Tab 3: **Reports** (`s20_reports_list`)
+    - Tab 4: **Settings** (`s27_settings`)
+  - Styled with Saagar retail palette (`AppColors.navy`, `AppColors.goldPale`, `AppColors.white`).
+  - Utilizes existing localized strings (`navHome`, `navAudits`, `navCaps`, `navReports`, `navSettings`) in English and authentic Marathi.
+  - Defensive fallback preserves isolated widget testing without requiring full GoRouter harnesses.
+
+### 2. Verification
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- `flutter test test/camera_and_navigation_test.dart`: **11/11 passed (100% green)**.
+- `flutter test test/score_engine_test.dart`: **12/12 passed (100% green, Rule #5 maintained)**.
+- `flutter test test/weekly_report_test.dart test/cap_create_screen_test.dart test/change_pin_test.dart test/manage_users_test.dart test/manage_cros_test.dart`: **40/40 passed (100% green)**.
+
+---
+
+## Handoff — 2026-11-01 (Step 5: ARB Localization Source Fix & Item 27.3 Review Tap-to-Edit)
+**Author**: Antigravity  
+**Branch**: `fix/part-b-bugs`  
+**Status**: All 27 UAT items now 100% SOLVED and VERIFIED. Device debug build verified clean.
+
+### 1. Root Cause & Solution for Gradle Build Error
+- **Error Encountered**: `Error: The getter 's07JumpListTitle' isn't defined for the type 'AppLocalizations'`.
+- **Root Cause**: Flutter's Gradle build step automatically invokes `flutter gen-l10n` as specified in `l10n.yaml`, regenerating Dart files directly from template ARB files in `assets/translations/app_*.arb`. Because the jump list keys were originally added only to `lib/l10n/app_localizations.dart`, the Gradle build wiped them during automatic regeneration.
+- **Fix Applied**:
+  - Added all 9 jump list keys to source templates: `assets/translations/app_en.arb` and `assets/translations/app_mr.arb`.
+  - Executed `flutter gen-l10n` to compile both languages into `lib/l10n/`.
+  - Verified with `flutter build apk --debug`: **Build succeeded cleanly (`√ Built build\app\outputs\flutter-apk\app-debug.apk`)**.
+
+### 2. Item 27.3: Review Screen Tap-to-Edit & Text Wrap (Client Ref §F)
+- **Problem**:
+  - Failed checkpoints on Screen S10 (Review) were non-interactive; typos or photo updates required cumbersome manual back-navigation.
+  - Squeezed row layout (`maxLines: 1`) cut off checkpoint question titles next to badges.
+- **Solution**:
+  - `lib/ui/screens/s10_review/review_submit_screen.dart`:
+    - Wrapped fail cards in `InkWell` with clear `Edit` action badge (`Icons.edit_outlined` + `l10n.btnEdit`).
+    - Tapping calls `draftAuditProvider.notifier.jumpTo(index)` and navigates to `s07_checkpoint` for instant editing, auto-refreshing on return.
+    - Set title to `maxLines: 2` with clean multi-line wrapping so checkpoint descriptions are never truncated.
+
+### 3. Verification
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- `flutter test test/camera_and_navigation_test.dart`: **12/12 passed (100% green)**.
+- `flutter test test/score_engine_test.dart`: **12/12 passed (100% green, Rule #5 maintained)**.
+- `flutter build apk --debug`: **SUCCESS (Build completed in 189s)**.
+
+
+

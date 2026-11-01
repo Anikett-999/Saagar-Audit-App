@@ -354,6 +354,7 @@ class _CroFormDialogState extends State<_CroFormDialog> {
   late String _shift;
   late bool _isActive;
   bool _saving = false;
+  AutovalidateMode _autoValidateMode = AutovalidateMode.disabled;
 
   @override
   void initState() {
@@ -372,7 +373,10 @@ class _CroFormDialogState extends State<_CroFormDialog> {
   }
 
   Future<void> _submit(AppLocalizations l10n) async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      setState(() => _autoValidateMode = AutovalidateMode.onUserInteraction);
+      return;
+    }
 
     setState(() => _saving = true);
     final name = _nameController.text.trim();
@@ -426,6 +430,7 @@ class _CroFormDialogState extends State<_CroFormDialog> {
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
+          autovalidateMode: _autoValidateMode,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,

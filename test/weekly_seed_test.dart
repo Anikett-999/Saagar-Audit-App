@@ -69,6 +69,36 @@ void main() {
       }
     });
 
+    test('All 68 daily checkpoints have authentic Marathi (Item 20 / Client Ref F04 — no English duplication)', () {
+      final dailyCheckpoints =
+          allCheckpoints.where((m) => m['frequency'] == 'daily').toList();
+      expect(dailyCheckpoints.length, 68);
+
+      for (final cp in dailyCheckpoints) {
+        final id = cp['id'] as String;
+        final textEn = cp['text_en'] as String?;
+        final textMr = cp['text_mr'] as String?;
+        final evidenceEn = cp['evidence_en'] as String?;
+        final evidenceMr = cp['evidence_mr'] as String?;
+
+        expect(textEn, isNotNull, reason: '$id text_en missing');
+        expect(textEn!.isNotEmpty, isTrue, reason: '$id text_en empty');
+
+        expect(textMr, isNotNull, reason: '$id text_mr missing');
+        expect(textMr!.isNotEmpty, isTrue, reason: '$id text_mr empty');
+        expect(textMr, isNot(contains('[MR TODO]')), reason: '$id contains placeholder');
+        expect(textMr, isNot(equals(textEn)), reason: '$id text_mr must NOT duplicate text_en');
+
+        expect(evidenceEn, isNotNull, reason: '$id evidence_en missing');
+        expect(evidenceEn!.isNotEmpty, isTrue, reason: '$id evidence_en empty');
+
+        expect(evidenceMr, isNotNull, reason: '$id evidence_mr missing');
+        expect(evidenceMr!.isNotEmpty, isTrue, reason: '$id evidence_mr empty');
+        expect(evidenceMr, isNot(contains('[MR TODO]')), reason: '$id contains placeholder');
+        expect(evidenceMr, isNot(equals(evidenceEn)), reason: '$id evidence_mr must NOT duplicate evidence_en');
+      }
+    });
+
     test('Component breakdown and weights match Appendix A.2 exact specification (56 wt total)', () {
       final ops = weeklyCheckpoints.where((c) => (c['id'] as String).startsWith('O.')).toList();
       final cash = weeklyCheckpoints.where((c) => (c['id'] as String).startsWith('CW.')).toList();

@@ -280,6 +280,9 @@ class AppLocalizationsMr extends AppLocalizations {
   }
 
   @override
+  String get s04WrongPinOneAttemptLeft => 'चुकीचा पिन. १ प्रयत्न शिल्लक आहे.';
+
+  @override
   String s04TooManyAttempts(int seconds) {
     return 'अनेक चुकीचे प्रयत्न. $seconds सेकंदात पुन्हा प्रयत्न करा.';
   }
@@ -534,6 +537,33 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s07FinishReview => 'पूर्ण करा आणि पुनरावलोकन';
 
   @override
+  String get s07JumpListTitle => 'ऑडिट चेकपॉईंट्स';
+
+  @override
+  String get s07JumpListTooltip => 'चेकपॉईंट यादी';
+
+  @override
+  String get s07JumpListFilterAll => 'सर्व';
+
+  @override
+  String get s07JumpListFilterUnanswered => 'अपूर्ण';
+
+  @override
+  String get s07JumpListFilterPassed => 'पास';
+
+  @override
+  String get s07JumpListFilterFailed => 'नापास';
+
+  @override
+  String get s07JumpListFilterNa => 'लागू नाही';
+
+  @override
+  String get s07JumpListCurrentBadge => 'चालू';
+
+  @override
+  String get s07JumpListPendingBadge => 'बाकी';
+
+  @override
   String get s08Title => 'नापास तपशील';
 
   @override
@@ -549,7 +579,7 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s08PhotoEvidence => 'फोटो पुरावा';
 
   @override
-  String get s08PhotoRequiredNotice => 'या चेकपॉइंटसाठी फोटो अनिवार्य आहे.';
+  String get s08PhotoRequiredNotice => 'नापास (FAIL) असल्यास फोटो आवश्यक';
 
   @override
   String get s08SaveFail => 'दोष जतन करा';
@@ -640,11 +670,17 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s27LanguageSubtitle => 'इंग्रजी किंवा मराठी निवडा';
 
   @override
-  String get s27BackupExportTitle => 'बॅकअप व निर्यात';
+  String get s27BackupExportTitle => 'क्लाउड सिंक आणि बॅकअप';
 
   @override
   String get s27BackupExportSubtitle =>
-      'डेटाबेस JSON निर्यात आणि समक्रमण स्थिती';
+      'डेटा सिंक करा आणि स्थानिक बॅकअप डाउनलोड करा';
+
+  @override
+  String get s27CloudSyncTitle => 'क्लाउड सिंक';
+
+  @override
+  String get s27CloudSyncSubtitle => 'ऑडिट आणि डेटा क्लाउडसह सिंक करा';
 
   @override
   String get s27AboutTitle => 'अॅपबद्दल माहिती';
@@ -940,52 +976,57 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s31LanguageUpdatedSuccess => 'भाषा पसंती जतन केली';
 
   @override
-  String get s32Title => 'बॅकअप व निर्यात';
+  String get s32Title => 'क्लाउड सिंक आणि बॅकअप';
 
   @override
-  String get s32Subtitle => 'स्थानिक SQLite डेटाबेस निर्यात आणि क्लाउड समक्रमण';
+  String get s32TitleSyncOnly => 'क्लाउड सिंक';
 
   @override
-  String get s32ExportCardTitle => 'स्थानिक डेटाबेस निर्यात करा (JSON)';
+  String get s32Subtitle => 'डेटा बॅकअप आणि क्लाउड समक्रमण';
+
+  @override
+  String get s32SubtitleSyncOnly => 'स्टोअर डेटा क्लाउड समक्रमण';
+
+  @override
+  String get s32ExportCardTitle => 'ऑडिट नोंदी डेटा निर्यात (JSON)';
 
   @override
   String get s32ExportCardDesc =>
-      'तुमच्या डिव्हाइसच्या Downloads डिरेक्टरीमध्ये सर्व १४ SQLite टेबल्स टाइमस्टॅम्प केलेल्या JSON फाईलमध्ये निर्यात करा. अॅप अपडेटपूर्वी मॅन्युअल बॅकअपसाठी उपयुक्त.';
+      'डेटाबेस टेबल्समधील नोंदी टाइमस्टॅम्प केलेल्या JSON फाईलमध्ये निर्यात करा. सूचना: यामध्ये केवळ टेबल नोंदी निर्यात होतात, फोटो नाही. फोटोंसह पूर्ण बॅकअप आणि डिव्हाइस पुनर्प्राप्तीसाठी वरील क्लाउड सिंक्रोनाइझेशनचा वापर करा.';
 
   @override
   String get s32ExportSecurityNotice =>
-      'सुरक्षा सूचना: निर्यात केलेल्या बॅकअपमध्ये ऑडिट ट्रेल, निरीक्षणे आणि bcrypt सुरक्षा हॅशेस असतात. ही फाईल सुरक्षितपणे साठवा आणि ट्रान्सफर करा.';
+      'डेटा निर्यात सूचना: निर्यात केलेल्या फाईलमध्ये ऑडिट ट्रेल आणि निष्कर्ष समाविष्ट आहेत (बायनरी फोटोंशिवाय). या स्टोअरसाठी प्राथमिक आणि परिपूर्ण पुनर्प्राप्ती मार्ग क्लाउड सिंक्रोनाइझेशन हाच आहे.';
 
   @override
-  String get s32ExportButton => 'डेटाबेस JSON निर्यात करा';
+  String get s32ExportButton => 'डेटा नोंदी निर्यात करा (JSON)';
 
   @override
-  String get s32Exporting => 'डेटाबेस निर्यात होत आहे...';
+  String get s32Exporting => 'नोंदी निर्यात होत आहेत...';
 
   @override
-  String get s32ExportSuccessTitle => 'निर्यात यशस्वी झाली';
+  String get s32ExportSuccessTitle => 'डेटा निर्यात यशस्वी';
 
   @override
   String s32ExportSuccessMessage(
       int records, int tables, String fileName, String path) {
-    return 'बॅकअप यशस्वीरित्या जतन केला ($tables टेबल्समध्ये $records नोंदी).\n\nफाईल: $fileName\nमार्ग:\n$path';
+    return 'ऑडिट डेटा नोंदी यशस्वीरित्या जतन झाल्या ($tables टेबल्समधील $records नोंदी).\n\nसूचना: फोटो आणि पूर्ण स्टोअर पुनर्प्राप्ती क्लाउड सिंकद्वारे सुरक्षितपणे सांभाळली जाते.\n\nफाईल: $fileName\nपाथ:\n$path';
   }
 
   @override
   String s32ExportFailed(String error) {
-    return 'डेटाबेस निर्यात अयशस्वी: $error';
+    return 'डेटाबेस निर्यात करण्यात अयशस्वी: $error';
   }
 
   @override
-  String get s32CloudSyncTitle => 'क्लाउड समक्रमण (Firestore)';
+  String get s32CloudSyncTitle => 'क्लाउड समक्रमण';
 
   @override
   String get s32CloudSyncDesc =>
-      'Google Cloud Firestore द्वारे स्वयंचलित मल्टी-डिव्हाइस समक्रमण आणि क्लाउड डेटा संचयन.';
+      'आपले ऑडिट, फोटो आणि सुधारात्मक कृती सुरक्षित क्लाउडसह सिंक करा.';
 
   @override
-  String get s32CloudSyncStatusLabel =>
-      'स्थिती: ऑफलाइन-फर्स्ट मोड (स्थानिक SQLite)';
+  String get s32CloudSyncStatusLabel => 'स्थिती: स्थानिक साठवण सक्रिय';
 
   @override
   String get s32CloudSyncPhase4Notice =>
@@ -995,54 +1036,83 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s32CloudSyncComingSoonBadge => 'सक्रिय मिरर';
 
   @override
-  String get s32ForceSyncButton => 'क्लाउड सिंक करा';
+  String get s32ForceSyncButton => 'आत्ताच सिंक करा';
 
   @override
-  String get s32CloudSyncStatusIdle => 'स्थिती: समक्रमणासाठी सज्ज';
+  String get s32CloudSyncStatusIdle => 'सिंक करण्यासाठी सज्ज';
 
   @override
-  String get s32CloudSyncStatusSyncing =>
-      'स्थिती: क्लाउडसह समक्रमित होत आहे...';
+  String get s32CloudSyncStatusSyncing => 'क्लाउडसह सिंक होत आहे...';
 
   @override
-  String get s32CloudSyncStatusSuccess =>
-      'स्थिती: सर्व डेटा समक्रमित (क्लाउड अद्ययावत)';
+  String get s32CloudSyncStatusSuccess => 'क्लाउड बॅकअप अद्ययावत आहे';
 
   @override
   String s32CloudSyncStatusError(String error) {
-    return 'स्थिती: समक्रमण त्रुटी ($error)';
+    return 'सिंक समस्या ($error)';
   }
 
   @override
-  String get s32CloudSyncStatusOffline => 'स्थिती: ऑफलाइन (लोकल SQLite सक्रिय)';
+  String get s32CloudSyncStatusOffline => 'डिव्हाइस ऑफलाइन आहे (इंटरनेट नाही)';
+
+  @override
+  String get s32CloudSyncStatusNever =>
+      'पहिला सिंक आवश्यक — खाली \'आता सिंक करा\' टॅप करा';
+
+  @override
+  String get s32CloudSyncStatusPending =>
+      'डिव्हाइस ऑनलाइन आहे — बदल सिंकसाठी प्रलंबित';
+
+  @override
+  String get s32CloudSyncInitialPending => 'पहिला बॅकअप प्रलंबित';
+
+  @override
+  String get s32CloudSyncBadgeNotSynced => 'सिंक नाही';
+
+  @override
+  String get s32CloudSyncBadgeUpToDate => 'समक्रमित';
+
+  @override
+  String get s32CloudSyncBadgePending => 'प्रलंबित';
+
+  @override
+  String get s32CloudSyncBadgeOffline => 'ऑफलाइन';
+
+  @override
+  String get s32CloudSyncBadgeError => 'समस्या';
 
   @override
   String get s32CloudSyncStatusUnconfigured =>
-      'स्थिती: क्लाउड बॅकएंड ऑफलाइन / स्टँडबाय';
+      'क्लाउड सज्ज (कनेक्ट करण्यास तयार)';
 
   @override
   String s32CloudSyncLastSync(String time) {
-    return 'शेवटचे समक्रमण: $time';
+    return 'शेवटचा यशस्वी बॅकअप: $time';
   }
 
   @override
-  String get s32CloudSyncNever => 'कधीही नाही';
+  String get s32CloudSyncNever => 'अद्याप कधीही बॅकअप नाही';
 
   @override
   String s32CloudSyncPending(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count बदल अपलोडसाठी प्रलंबित',
-      one: '१ बदल अपलोडसाठी प्रलंबित',
-      zero: 'सर्व स्थानिक बदल जतन झाले आहेत',
+      other: '$count नोंदी अपलोडसाठी प्रलंबित',
+      one: '१ नोंद अपलोडसाठी प्रलंबित',
+      zero: 'सर्व नोंदी क्लाउडवर सुरक्षित आहेत',
     );
     return '$_temp0';
   }
 
   @override
+  String s32SavedOnPhone(int count) {
+    return 'या फोनवर जतन: $count नोंदी';
+  }
+
+  @override
   String s32SyncSuccessNotice(int count) {
-    return 'क्लाउड मिरर समक्रमण यशस्वीरित्या पूर्ण झाले ($count नोंदी अद्यतनित).';
+    return 'क्लाउड समक्रमण यशस्वीरित्या पूर्ण झाले ($count नोंदी अद्यतनित).';
   }
 
   @override
@@ -1172,6 +1242,10 @@ class AppLocalizationsMr extends AppLocalizations {
   @override
   String get s15NoAuditsFound =>
       'कोणतेही ऑडिट सापडले नाही. प्रथम ऑडिट पूर्ण करा.';
+
+  @override
+  String get s15NoFailsFound =>
+      'या ऑडिटमध्ये कोणतेही नापास तपासणी बिंदू नाहीत. केवळ नापास बाबींसाठीच CAP तयार करता येते.';
 
   @override
   String get s15SectionProblem => '२. समस्या आणि ५-का? विश्लेषण';
@@ -1550,14 +1624,37 @@ class AppLocalizationsMr extends AppLocalizations {
       'चेतावणी: अपूर्ण कृती पावले शिल्लक आहेत. ही CAP पूर्ण चिन्हांकित करण्यापूर्वी सर्व कृती पावले पूर्ण केली पाहिजेत.';
 
   @override
-  String get s17SectionDoneNotes => 'पूर्ण नोंदी / शेरे (ऐच्छिक)';
+  String get s17SectionDoneNotes => 'पूर्णता नोंदी (अनिवार्य)';
 
   @override
   String get s17DoneNotesHint =>
-      'समस्या कशी सोडवली गेली याचे वर्णन किंवा पडताळणीसाठी नोंदी...';
+      'समस्या कशी सोडवली गेली याचे वर्णन करा (किमान १० अक्षरे)...';
 
   @override
-  String get s17SectionEvidencePhoto => 'पूर्णता पुरावा फोटो (ऐच्छिक)';
+  String s17NotesMinLength(int count) {
+    return 'किमान १० अक्षरे आवश्यक आहेत ($count/१०)';
+  }
+
+  @override
+  String get s17PhotoRequiredNotice =>
+      'हे CAP पूर्ण म्हणून चिन्हांकित करण्यापूर्वी या तपासणीसाठी पुरावा फोटो अनिवार्य आहे.';
+
+  @override
+  String s17OnlyResponsibleCanMarkDone(String name) {
+    return 'केवळ नियुक्त जबाबदार वापरकर्ता ($name) हे CAP पूर्ण म्हणून चिन्हांकित करू शकतात.';
+  }
+
+  @override
+  String s16OnlyResponsibleCanMarkDone(String name) {
+    return 'केवळ नियुक्त जबाबदार वापरकर्ता ($name) हे CAP पूर्ण म्हणून चिन्हांकित करू शकतात.';
+  }
+
+  @override
+  String get s16SelfVerificationBlocked =>
+      'दुसऱ्या व्यवस्थापकाकडून किंवा मालकाकडून पडताळणी प्रलंबित (कर्तव्य पृथक्करण नियम).';
+
+  @override
+  String get s17SectionEvidencePhoto => 'पूर्णता पुरावा फोटो';
 
   @override
   String get s17TakePhoto => 'फोटो काढा';
@@ -1783,20 +1880,45 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s13ExportPdf => 'PDF निर्यात';
 
   @override
-  String get s13ExportPdfTooltip => 'PDF निर्यात टप्पा २ साठी नियोजित आहे';
+  String get s13ExportPdfTooltip => '१-पानाचा ऑडिट PDF निर्यात करा';
 
   @override
   String get s13ShareWhatsApp => 'WhatsApp ला शेअर करा';
 
   @override
-  String get s13ShareWhatsAppTooltip =>
-      'WhatsApp शेअर टप्पा २ साठी नियोजित आहे';
+  String get s13ShareWhatsAppTooltip => 'WhatsApp वर ऑडिट सारांश शेअर करा';
 
   @override
   String get s13VerifyAudit => 'ऑडिट पडताळा';
 
   @override
-  String get s13VerifyAuditTooltip => 'ऑडिट पडताळणी टप्पा २ साठी नियोजित आहे';
+  String get s13VerifyAuditTooltip => 'GM किंवा मालक म्हणून हे ऑडिट पडताळा';
+
+  @override
+  String get s13VerifyConfirmTitle => 'ऑडिट पडताळणी';
+
+  @override
+  String s13VerifyConfirmMessage(String role, String name) {
+    return 'तुम्हाला खात्री आहे का की तुम्ही $role: $name म्हणून हे ऑडिट पडताळू इच्छिता?';
+  }
+
+  @override
+  String get s13VerifySuccess => 'ऑडिट यशस्वीरित्या पडताळले गेले.';
+
+  @override
+  String get s13PdfGenerating => 'ऑडिट PDF तयार करत आहे...';
+
+  @override
+  String s13PdfExportError(String error) {
+    return 'PDF निर्यात अयशस्वी: $error';
+  }
+
+  @override
+  String get s13WhatsAppSuccess => 'WhatsApp उघडत आहे...';
+
+  @override
+  String get s13WhatsAppCopied =>
+      'WhatsApp उघडता आले नाही. सारांश क्लिपबोर्डवर कॉपी केला!';
 
   @override
   String get s13NotFound => 'ऑडिट आढळले नाही';
@@ -2246,6 +2368,14 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s18PatternMarker => 'वारंवार आढळलेली समस्या';
 
   @override
+  String get s18SelfVerificationWarning =>
+      'स्वतः पडताळणी करण्याची परवानगी नाही: कामाचे विभाजन नियमानुसार CAP पूर्ण करणाऱ्या व्यक्तीपेक्षा पडताळणी करणारी व्यक्ती वेगळी असणे आवश्यक आहे.';
+
+  @override
+  String get s18ReopenReasonMinLength =>
+      'कृपया सविस्तर कारण द्या (किमान १० अक्षरे).';
+
+  @override
   String get s18AccessDenied =>
       'प्रवेश नाकारला. केवळ GM आणि मालकच CAP पडताळणी करू शकतात.';
 
@@ -2442,22 +2572,20 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s21CapsClosedHeader => 'विभाग ७: या आठवड्यात बंद झालेले कॅप';
 
   @override
-  String get s21CapsClosedEmpty =>
-      'या आठवड्यात कोणतेही कॅप बंद झाले नाहीत (सत्यापन आणि बंद करणे P2-5 मध्ये उपलब्ध).';
+  String get s21CapsClosedEmpty => 'या आठवड्यात कोणतेही कॅप बंद झालेले नाहीत.';
 
   @override
   String get s21CapsAgedHeader => 'विभाग ८: जुने / मुदत संपलेले कॅप';
 
   @override
-  String get s21CapsAgedEmpty =>
-      'कोणतेही जुने कॅप नोंदवले नाहीत (P2-5 मध्ये उपलब्ध).';
+  String get s21CapsAgedEmpty => 'कोणतेही जुने किंवा प्रलंबित कॅप नाहीत.';
 
   @override
   String get s21EscalationsSection => 'विभाग ९: एस्केलेशन नोंद';
 
   @override
   String get s21EscalationsEmpty =>
-      'कोणतेही एस्केलेशन ट्रिगर झाले नाही (फेज ३ मध्ये उपलब्ध).';
+      'या आठवड्यात कोणतेही एस्केलेशन ट्रिगर झालेले नाही.';
 
   @override
   String get s21SignatureSection => 'अधिकृत स्वाक्षरी';
@@ -2614,6 +2742,38 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s33WhatsAppSentBadge => 'व्हॉट्सअॅप पाठवले';
 
   @override
+  String get s11EscalationsAlertTitle => 'एस्केलेशन अलर्ट आवश्यक';
+
+  @override
+  String get s11ShareWhatsApp => 'व्हॉट्सअॅपवर अलर्ट पाठवा';
+
+  @override
+  String get s11MarkAsSent => 'पाठवले म्हणून खूण करा';
+
+  @override
+  String get s11MessageCopied => 'एस्केलेशन संदेश क्लिपबोर्डवर कॉपी केला!';
+
+  @override
+  String get s33ConfirmWhatsAppTitle => 'व्हॉट्सअॅप संदेश पुष्टी करा';
+
+  @override
+  String s33ConfirmWhatsAppPrompt(String name) {
+    return 'तुम्ही हा एस्केलेशन अलर्ट $name यांना व्हॉट्सअॅपवर पाठवला आहे का?';
+  }
+
+  @override
+  String get s33ConfirmWhatsAppYes => 'हो, पाठवला';
+
+  @override
+  String get s33ConfirmWhatsAppNo => 'नाही / नंतर';
+
+  @override
+  String get s33WhatsAppUnconfirmedBadge => 'व्हॉट्सअॅप: अपुष्ट';
+
+  @override
+  String get s33MarkAsSentAction => 'पाठवले म्हणून खूण करा';
+
+  @override
   String get fieldRequired => 'हे फील्ड आवश्यक आहे';
 
   @override
@@ -2701,4 +2861,240 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get s21ExportMonthlyPdfButton => 'मासिक PDF निर्यात करा';
+
+  @override
+  String get cameraPermissionRequiredTitle => 'कॅमेरा परवानगी आवश्यक';
+
+  @override
+  String get cameraPermissionRequiredMessage =>
+      'पुरावा फोटो घेण्यासाठी कॅमेरा परवानगी आवश्यक आहे. कृपया सेटिंग्ज उघडा आणि कॅमेरा परवानगी सुरू करा.';
+
+  @override
+  String get btnOpenSettings => 'सेटिंग्ज उघडा';
+
+  @override
+  String get exitAuditDialogTitle => 'ऑडिटमधून बाहेर पडायचे?';
+
+  @override
+  String get exitAuditDialogMessage =>
+      'तुमची प्रगती मसुदा (ड्राफ्ट) म्हणून आपोआप जतन झाली आहे. तुम्ही होम स्क्रीनवरून कधीही हे पुढे सुरू ठेवू शकता.';
+
+  @override
+  String get btnResumeAudit => 'ऑडिट सुरू ठेवा';
+
+  @override
+  String get btnSaveAndExit => 'जतन करा आणि बाहेर पडा';
+
+  @override
+  String get s03RecoveryCodeTitle => 'मास्टर रिकव्हरी कोड';
+
+  @override
+  String get s03RecoveryCodeSubtitle =>
+      'हा कोड सुरक्षितपणे जतन करा. तुम्ही तुमचा मालक पिन विसरल्यास, स्टोअर डेटा न गमावता तो रीसेट करण्याचा हा एकमेव मार्ग आहे.';
+
+  @override
+  String get s03RecoveryCodeCopied => 'रिकव्हरी कोड क्लिपबोर्डवर कॉपी केला';
+
+  @override
+  String get btnContinueToApp => 'ॲप सुरू करा';
+
+  @override
+  String get s04RecoveryTitle => 'मालक पिन पुनर्प्राप्ती';
+
+  @override
+  String get s04RecoveryPrompt =>
+      'तुमचा मालक पिन रीसेट करण्यासाठी मास्टर रिकव्हरी कोड प्रविष्ट करा:';
+
+  @override
+  String get s04RecoveryInvalid =>
+      'अवैध रिकव्हरी कोड. कृपया तपासून पुन्हा प्रयत्न करा.';
+
+  @override
+  String get s04ResetPinTitle => 'नवीन ४-अंकी पिन सेट करा';
+
+  @override
+  String get s04ConfirmNewPin => 'नवीन पिनची पुष्टी करा';
+
+  @override
+  String get s04PinResetSuccess =>
+      'मालक पिन यशस्वीरित्या रीसेट झाला. कृपया नवीन पिनने लॉगिन करा.';
+
+  @override
+  String get btnVerifyCode => 'कोड पडताळा';
+
+  @override
+  String get btnResetPin => 'पिन रीसेट करा';
+
+  @override
+  String get s32StoreAccountTitle => 'स्टोअर खाते (सुरक्षा कवच)';
+
+  @override
+  String get s32StoreAccountConnected => 'स्टोअर खाते जोडले आहे';
+
+  @override
+  String get s32StoreAccountRequired => 'स्टोअर खाते आवश्यक';
+
+  @override
+  String s32StoreAccountConnectedDesc(String storeName) {
+    return 'हे डिव्हाइस $storeName शी सुरक्षितपणे जोडलेले आहे. क्लाउड बॅकअप आणि सिंक सक्रिय आहे.';
+  }
+
+  @override
+  String get s32StoreAccountRequiredDesc =>
+      'क्लाउड सिंक्रोनाइझेशन सक्षम करण्यासाठी आणि स्टोअर डेटा सुरक्षित ठेवण्यासाठी सागर ट्रेडर्स स्टोअर पासकोडने साइन इन करा.';
+
+  @override
+  String get s32ConnectStoreBtn => 'स्टोअर खात्यात साइन इन करा';
+
+  @override
+  String get s32DisconnectStoreBtn => 'डिस्कनेक्ट करा';
+
+  @override
+  String get s32StorePasscodeDialogTitle => 'स्टोअर खाते साइन-इन';
+
+  @override
+  String get s32StorePasscodeDialogDesc =>
+      'लातूर कॉम्बो स्टोअर (WLMHW आणि HEMW) साठी अधिकृत सागर ट्रेडर्स स्टोअर पासकोड प्रविष्ट करा:';
+
+  @override
+  String get s32StorePasscodeHint => 'उदा. ST-LATUR-2026';
+
+  @override
+  String get s32StorePasscodeInvalid =>
+      'अवैध स्टोअर पासकोड. कृपया तपासा आणि पुन्हा प्रयत्न करा.';
+
+  @override
+  String get s32StorePasscodeSuccess =>
+      'डिव्हाइस स्टोअर खात्याशी यशस्वीरित्या जोडले गेले.';
+
+  @override
+  String get s32DisconnectStoreConfirm =>
+      'या डिव्हाइसवरून स्टोअर खाते डिस्कनेक्ट करायचे? पुन्हा कनेक्ट होईपर्यंत क्लाउड सिंक थांबवले जाईल.';
+
+  @override
+  String get s32DisconnectStoreTitle => 'स्टोअर खाते डिस्कनेक्ट करा';
+
+  @override
+  String get s32Disconnect => 'डिस्कनेक्ट करा';
+
+  @override
+  String get s32Cancel => 'रद्द करा';
+
+  @override
+  String get s32AutoSyncTitle => 'स्वयंचलित पार्श्वभूमी सिंक';
+
+  @override
+  String get s32AutoSyncSubtitle =>
+      'इंटरनेट कनेक्ट झाल्यावर डेटा आपोआप सिंक करा';
+
+  @override
+  String get s03StoreActivationTitle => 'स्टोअर खाते सक्रियीकरण (सुरक्षा कवच)';
+
+  @override
+  String get s03StoreActivationSubtitle =>
+      'लातूर क्लाउड (WLMHW आणि HEMW) सह हा फोन लिंक करण्यासाठी सागर ट्रेडर्स स्टोअर पासकोड प्रविष्ट करा:';
+
+  @override
+  String get s03StoreActivationSuccess =>
+      'डिव्हाइस सागर ट्रेडर्स — लातूरशी जोडले गेले. क्लाउड बॅकअप सक्रिय आहे.';
+
+  @override
+  String get s32ChangeStorePasscodeBtn => 'पासकोड बदला';
+
+  @override
+  String get s32ChangeStorePasscodeTitle => 'स्टोअर पासकोड बदला';
+
+  @override
+  String get s32ChangeStorePasscodeDesc =>
+      'लातूर कॉम्बो स्टोअरसाठी मास्टर स्टोअर पासकोड अपडेट करा. यासाठी इंटरनेट आवश्यक आहे.';
+
+  @override
+  String get s32CurrentPasscode => 'सध्याचा स्टोअर पासकोड';
+
+  @override
+  String get s32NewPasscode => 'नवीन स्टोअर पासकोड (किमान ६ अक्षरे)';
+
+  @override
+  String get s32ConfirmNewPasscode => 'नवीन पासकोडची पुष्टी करा';
+
+  @override
+  String get s32PasscodeUpdatedSuccess =>
+      'स्टोअर पासकोड यशस्वीरित्या बदलला गेला आणि सुरक्षित करण्यात आला.';
+
+  @override
+  String get s32PasscodeMismatch => 'नवीन पासकोड जुळत नाहीत.';
+
+  @override
+  String get s32PasscodeTooShort => 'पासकोड किमान ६ वर्णांचा असावा.';
+
+  @override
+  String get s32InternetRequiredForPasscode =>
+      'स्टोअर पासकोड बदलण्यासाठी इंटरनेट कनेक्शन आवश्यक आहे.';
+
+  @override
+  String get s32InternetRequiredForStoreLogin =>
+      'स्टोअर खात्यात साइन इन करण्यासाठी इंटरनेट आवश्यक आहे. कृपया वाय-फाय किंवा मोबाइल डेटा सुरू करा.';
+
+  @override
+  String s32AuthorizedDevicesTitle(int count) {
+    return 'जोडलेली स्टोअर डिव्हाइसेस ($count)';
+  }
+
+  @override
+  String get s32RevokeDeviceBtn => 'प्रवेश रद्द करा';
+
+  @override
+  String get s32RevokeDeviceConfirm =>
+      'आपण नक्की या डिव्हाइसचा प्रवेश रद्द करू इच्छिता? ते लगेच क्लाउडवरून डिस्कनेक्ट केले जाईल.';
+
+  @override
+  String get s32RevokeDeviceSuccess =>
+      'डिव्हाइसचा प्रवेश यशस्वीरित्या रद्द करण्यात आला.';
+
+  @override
+  String get s32ThisDeviceLabel => '(हे डिव्हाइस)';
+
+  @override
+  String get s32RenameDeviceTitle => 'डिव्हाइसचे नाव बदला';
+
+  @override
+  String get s32RenameDeviceDesc =>
+      'या डिव्हाइससाठी ओळखता येईल असे नाव प्रविष्ट करा (उदा. मालकाचा फोन, काउंटर टॅब्लेट, SM राहुल).';
+
+  @override
+  String get s32RenameDeviceHint => 'डिव्हाइसचे नाव / लेबल';
+
+  @override
+  String get s32RenameDeviceBtn => 'नाव सेव्ह करा';
+
+  @override
+  String get s32RenameDeviceSuccess =>
+      'डिव्हाइसचे नाव यशस्वीरित्या अपडेट केले.';
+
+  @override
+  String s32DeviceLastUser(String role, String name) {
+    return 'शेवटचा वापरकर्ता: $role ($name)';
+  }
+
+  @override
+  String s32DeviceLastUserRoleOnly(String role) {
+    return 'शेवटचा वापरकर्ता: $role';
+  }
+
+  @override
+  String s32DeviceLastActive(String time) {
+    return 'सक्रिय: $time';
+  }
+
+  @override
+  String s32DeviceEnrolled(String date) {
+    return 'नोंदणी: $date';
+  }
+
+  @override
+  String get s05CloudInactiveBanner =>
+      'क्लाउड बॅकअप निष्क्रिय आहे — स्टोअर खाते जोडण्यासाठी टॅप करा';
+
+  @override
+  String get s05LinkNowBtn => 'आता जोडा';
 }

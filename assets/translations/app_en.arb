@@ -104,6 +104,7 @@
   "@s04LockedCountdown": {"placeholders": {"seconds": {"type": "int"}}},
   "s04WrongPinAttemptsLeft": "Wrong PIN. {attempts} attempts left.",
   "@s04WrongPinAttemptsLeft": {"placeholders": {"attempts": {"type": "int"}}},
+  "s04WrongPinOneAttemptLeft": "Wrong PIN. 1 attempt left.",
   "s04TooManyAttempts": "Too many wrong attempts. Try again in {seconds}s.",
   "@s04TooManyAttempts": {"placeholders": {"seconds": {"type": "int"}}},
 
@@ -221,13 +222,22 @@
   "s07Previous": "Previous",
   "s07Next": "Next",
   "s07FinishReview": "Finish & Review",
+  "s07JumpListTitle": "Audit Checkpoints",
+  "s07JumpListTooltip": "Checkpoint jump list",
+  "s07JumpListFilterAll": "All",
+  "s07JumpListFilterUnanswered": "Unanswered",
+  "s07JumpListFilterPassed": "Passed",
+  "s07JumpListFilterFailed": "Failed",
+  "s07JumpListFilterNa": "N/A",
+  "s07JumpListCurrentBadge": "Current",
+  "s07JumpListPendingBadge": "Pending",
 
   "s08Title": "Fail Detail",
   "s08FindingLabel": "Finding description",
   "s08FindingHint": "Describe the non-compliance...",
   "s08CroInvolved": "CRO involved (optional)",
   "s08PhotoEvidence": "Photo evidence",
-  "s08PhotoRequiredNotice": "Photo is mandatory for this checkpoint.",
+  "s08PhotoRequiredNotice": "Photo required if marked FAIL",
   "s08SaveFail": "Save Finding",
 
   "s10Title": "Review & Submit",
@@ -259,8 +269,10 @@
   "s27ChangePinSubtitle": "Update your 4-digit security PIN",
   "s27LanguageTitle": "Language / भाषा",
   "s27LanguageSubtitle": "Select English or मराठी",
-  "s27BackupExportTitle": "Backup & Export",
-  "s27BackupExportSubtitle": "Export database JSON and sync status",
+  "s27BackupExportTitle": "Cloud Sync & Backup",
+  "s27BackupExportSubtitle": "Sync store data and export database JSON",
+  "s27CloudSyncTitle": "Cloud Sync",
+  "s27CloudSyncSubtitle": "Sync store audits and data with cloud",
   "s27AboutTitle": "About Saagar Audit",
   "s27AboutSubtitle": "Version, store information, and SOP specification",
   "s27AboutDialogTitle": "About Priority 1 Audit",
@@ -361,15 +373,17 @@
   "s31CurrentLanguageBadge": "Current",
   "s31LanguageUpdatedSuccess": "Language preference saved",
 
-  "s32Title": "Backup & Export",
-  "s32Subtitle": "Local SQLite Database Export & Cloud Sync",
-  "s32ExportCardTitle": "Export Local Database (JSON)",
-  "s32ExportCardDesc": "Export all 14 SQLite tables into a timestamped JSON file in your device Downloads directory. Ideal for manual backups before app updates.",
-  "s32ExportSecurityNotice": "Security Notice: Exported backup contains audit trails, findings, and bcrypt security hashes. Store and transfer this file securely.",
-  "s32ExportButton": "Export Database JSON",
-  "s32Exporting": "Exporting database...",
-  "s32ExportSuccessTitle": "Export Successful",
-  "s32ExportSuccessMessage": "Backup saved successfully ({records} records across {tables} tables).\n\nFile: {fileName}\nPath:\n{path}",
+  "s32Title": "Cloud Sync & Backup",
+  "s32TitleSyncOnly": "Cloud Sync",
+  "s32Subtitle": "Data Backup & Cloud Synchronization",
+  "s32SubtitleSyncOnly": "Store Data Cloud Synchronization",
+  "s32ExportCardTitle": "Audit Records Data Export (JSON)",
+  "s32ExportCardDesc": "Export database table records into a timestamped JSON file. Notice: This exports table records only, not photos. For full backup and device recovery including photos, use Cloud Synchronization above.",
+  "s32ExportSecurityNotice": "Data Export Notice: Exported file contains audit trails and findings (without binary photos). The primary and complete recovery path for this store is Cloud Synchronization.",
+  "s32ExportButton": "Export Data Records (JSON)",
+  "s32Exporting": "Exporting records...",
+  "s32ExportSuccessTitle": "Data Export Successful",
+  "s32ExportSuccessMessage": "Audit data records exported successfully ({records} records across {tables} tables).\n\nNotice: Photos and full store recovery are securely maintained via Cloud Sync.\n\nFile: {fileName}\nPath:\n{path}",
   "@s32ExportSuccessMessage": {
     "placeholders": {
       "records": {"type": "int"},
@@ -384,37 +398,51 @@
       "error": {"type": "String"}
     }
   },
-  "s32CloudSyncTitle": "Cloud Synchronization (Firestore)",
-  "s32CloudSyncDesc": "Automatic multi-device synchronization and cloud data storage via Google Cloud Firestore.",
-  "s32CloudSyncStatusLabel": "Status: Offline-First Mode (Local SQLite)",
-  "s32CloudSyncPhase4Notice": "All audits, CAPs, and reports are safely preserved locally on this device.",
+  "s32CloudSyncTitle": "Cloud Synchronization",
+  "s32CloudSyncDesc": "Sync your audits, photos, and corrective actions with the secure cloud.",
+  "s32CloudSyncStatusLabel": "Status: Local Storage Active",
+  "s32CloudSyncPhase4Notice": "All audits, CAPs, and reports are safely preserved on this device.",
   "s32CloudSyncComingSoonBadge": "Active Mirror",
-  "s32ForceSyncButton": "Force Cloud Sync",
-  "s32CloudSyncStatusIdle": "Status: Ready to Sync",
-  "s32CloudSyncStatusSyncing": "Status: Synchronizing with Cloud...",
-  "s32CloudSyncStatusSuccess": "Status: All Data Mirrored (Cloud up to date)",
-  "s32CloudSyncStatusError": "Status: Sync Error ({error})",
+  "s32ForceSyncButton": "Sync Now",
+  "s32CloudSyncStatusIdle": "Ready to Sync",
+  "s32CloudSyncStatusSyncing": "Synchronizing with Cloud...",
+  "s32CloudSyncStatusSuccess": "Cloud Backup is Up to Date",
+  "s32CloudSyncStatusError": "Sync Issue ({error})",
   "@s32CloudSyncStatusError": {
     "placeholders": {
       "error": {"type": "String"}
     }
   },
-  "s32CloudSyncStatusOffline": "Status: Offline (Local SQLite Active)",
-  "s32CloudSyncStatusUnconfigured": "Status: Cloud Backend Offline / Standby",
-  "s32CloudSyncLastSync": "Last Synced: {time}",
+  "s32CloudSyncStatusOffline": "Device is Offline (No Internet)",
+  "s32CloudSyncStatusNever": "Initial Sync Required — Tap Sync Now",
+  "s32CloudSyncStatusPending": "Device is Online — Changes pending sync",
+  "s32CloudSyncInitialPending": "Initial backup pending",
+  "s32CloudSyncBadgeNotSynced": "Not Synced",
+  "s32CloudSyncBadgeUpToDate": "Up to Date",
+  "s32CloudSyncBadgePending": "Pending Sync",
+  "s32CloudSyncBadgeOffline": "Offline",
+  "s32CloudSyncBadgeError": "Sync Issue",
+  "s32CloudSyncStatusUnconfigured": "Cloud Standby (Ready to connect)",
+  "s32CloudSyncLastSync": "Last Successful Backup: {time}",
   "@s32CloudSyncLastSync": {
     "placeholders": {
       "time": {"type": "String"}
     }
   },
-  "s32CloudSyncNever": "Never",
-  "s32CloudSyncPending": "{count, plural, =0{All local changes backed up} =1{1 change pending upload} other{{count} changes pending upload}}",
+  "s32CloudSyncNever": "Never backed up yet",
+  "s32CloudSyncPending": "{count, plural, =0{All items uploaded to cloud} =1{1 item waiting to upload} other{{count} items waiting to upload}}",
   "@s32CloudSyncPending": {
     "placeholders": {
       "count": {"type": "int"}
     }
   },
-  "s32SyncSuccessNotice": "Cloud mirror sync completed ({count} records updated).",
+  "s32SavedOnPhone": "Saved on this phone: {count} records",
+  "@s32SavedOnPhone": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s32SyncSuccessNotice": "Cloud sync completed ({count} records updated).",
   "@s32SyncSuccessNotice": {
     "placeholders": {
       "count": {"type": "int"}
@@ -481,6 +509,7 @@
   "s15SelectAudit": "Select Audit",
   "s15SelectCheckpoint": "Select Checkpoint",
   "s15NoAuditsFound": "No audits found. Complete an audit first.",
+  "s15NoFailsFound": "This audit has no failed checkpoints. CAPs can only be created for failed items.",
   "s15SectionProblem": "2. Problem & 5-Whys Analysis",
   "s15ProblemStatement": "Problem Statement",
   "s15ProblemStatementHint": "Describe what failed (1 sentence)",
@@ -700,9 +729,29 @@
     }
   },
   "s17IncompleteStepsWarning": "Warning: Incomplete action steps remain. You must complete all action steps before marking this CAP done.",
-  "s17SectionDoneNotes": "Done Notes / Reflection (optional)",
-  "s17DoneNotesHint": "Describe how the issue was resolved or notes for verification...",
-  "s17SectionEvidencePhoto": "Completion Evidence Photo (optional)",
+  "s17SectionDoneNotes": "Completion Notes (Mandatory)",
+  "s17DoneNotesHint": "Describe how the issue was resolved (min 10 characters)...",
+  "s17NotesMinLength": "Minimum 10 characters required ({count}/10)",
+  "@s17NotesMinLength": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "s17PhotoRequiredNotice": "Evidence photo is mandatory for this checkpoint before marking done.",
+  "s17OnlyResponsibleCanMarkDone": "Only the assigned responsible user ({name}) can mark this CAP done.",
+  "@s17OnlyResponsibleCanMarkDone": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "s16OnlyResponsibleCanMarkDone": "Only the assigned responsible user ({name}) can mark this CAP done.",
+  "@s16OnlyResponsibleCanMarkDone": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "s16SelfVerificationBlocked": "Pending verification by another manager or Owner (Segregation of Duties).",
+  "s17SectionEvidencePhoto": "Completion Evidence Photo",
   "s17TakePhoto": "Take Photo",
   "s17RetakePhoto": "Retake Photo",
   "s17RemovePhoto": "Remove Photo",
@@ -849,11 +898,35 @@
   "s13CreateCap": "+ Create CAP",
   "s13NotesTitle": "Auditor Notes",
   "s13ExportPdf": "Export PDF",
-  "s13ExportPdfTooltip": "PDF export is scheduled for Phase 2",
+  "s13ExportPdfTooltip": "Export 1-Page Audit PDF",
   "s13ShareWhatsApp": "Share to WhatsApp",
-  "s13ShareWhatsAppTooltip": "WhatsApp share is scheduled for Phase 2",
+  "s13ShareWhatsAppTooltip": "Share audit summary on WhatsApp",
   "s13VerifyAudit": "Verify Audit",
-  "s13VerifyAuditTooltip": "Audit verification is scheduled for Phase 2",
+  "s13VerifyAuditTooltip": "Verify this audit as GM or Owner",
+  "s13VerifyConfirmTitle": "Verify Audit",
+  "s13VerifyConfirmMessage": "Are you sure you want to verify this audit as {role}: {name}?",
+  "@s13VerifyConfirmMessage": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "s13VerifySuccess": "Audit verified successfully.",
+  "s13PdfGenerating": "Generating Audit PDF...",
+  "s13PdfExportError": "Failed to export PDF: {error}",
+  "@s13PdfExportError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "s13WhatsAppSuccess": "Opening WhatsApp...",
+  "s13WhatsAppCopied": "WhatsApp could not be opened. Summary copied to clipboard!",
   "s13NotFound": "Audit not found",
   "s13BackToHistory": "Back to Audit History",
   "s13RefreshTooltip": "Refresh audit detail",
@@ -1042,6 +1115,8 @@
   "s18PhotoRequiredError": "Please capture a verification photo before verifying.",
   "s18MissingReasonError": "Please provide a valid reason.",
   "s18PatternMarker": "Pattern Issue",
+  "s18SelfVerificationWarning": "Self-verification not permitted: Segregation of duties requires a different person to verify this CAP.",
+  "s18ReopenReasonMinLength": "Please provide a detailed reason (at least 10 characters).",
   "s18AccessDenied": "Access Denied. Only GM and Owner may verify CAPs.",
   "s18Back": "Back",
   "s18PhotoRequiredBadge": "REQUIRED",
@@ -1179,11 +1254,11 @@
     }
   },
   "s21CapsClosedHeader": "Section 7: CAPs Closed This Week",
-  "s21CapsClosedEmpty": "No CAPs closed this week (Verification & Close workflow active in P2-5).",
+  "s21CapsClosedEmpty": "No CAPs closed during this week.",
   "s21CapsAgedHeader": "Section 8: Aged / Overdue CAPs",
-  "s21CapsAgedEmpty": "No aged CAPs recorded (Lifecycle tracking active in P2-5).",
+  "s21CapsAgedEmpty": "No aged or overdue CAPs.",
   "s21EscalationsSection": "Section 9: Escalation Log",
-  "s21EscalationsEmpty": "No escalations triggered (Escalation engine active in Phase 3).",
+  "s21EscalationsEmpty": "No escalations triggered during this week.",
   "s21SignatureSection": "Signature of Record",
   "s21AuditorSignature": "GM / Auditor Signature: {author} · Submitted {time}",
   "@s21AuditorSignature": {
@@ -1256,6 +1331,17 @@
   "s33TargetOwner": "To: Owner",
   "s33TargetGm": "To: GM",
   "s33WhatsAppSentBadge": "WhatsApp Sent",
+  "s11EscalationsAlertTitle": "Escalation Alert Required",
+  "s11ShareWhatsApp": "Share Alert via WhatsApp",
+  "s11MarkAsSent": "Mark as Sent",
+  "s11MessageCopied": "Escalation message copied to clipboard!",
+  "s33ConfirmWhatsAppTitle": "Confirm WhatsApp Delivery",
+  "s33ConfirmWhatsAppPrompt": "Did you send the escalation alert to {name} on WhatsApp?",
+  "@s33ConfirmWhatsAppPrompt": {"placeholders": {"name": {"type": "String"}}},
+  "s33ConfirmWhatsAppYes": "Yes, Sent",
+  "s33ConfirmWhatsAppNo": "Not Sent / Later",
+  "s33WhatsAppUnconfirmedBadge": "WhatsApp: Not Confirmed",
+  "s33MarkAsSentAction": "Mark as Sent",
   "fieldRequired": "This field is required",
   "s27RunAgingTitle": "Run CAP Aging Check",
   "s27RunAgingSubtitle": "Evaluate overdue CAPs and raise escalations now",
@@ -1292,7 +1378,118 @@
   "s21MonthlyWeeklyAvgLabel": "Month Weekly Audits Average",
   "s21MonthlyNoCaps": "No CAPs opened, closed, or aged this month.",
   "s21MonthlyNoEscalations": "No escalations triggered during this month.",
-  "s21ExportMonthlyPdfButton": "Export Monthly PDF"
+  "s21ExportMonthlyPdfButton": "Export Monthly PDF",
+  "cameraPermissionRequiredTitle": "Camera Permission Required",
+  "cameraPermissionRequiredMessage": "Camera permission is required to capture evidence photos. Please open Settings and enable camera access.",
+  "btnOpenSettings": "Open Settings",
+  "exitAuditDialogTitle": "Exit Audit?",
+  "exitAuditDialogMessage": "Your progress has been automatically saved as a draft. You can resume at any time from the Home screen.",
+  "btnResumeAudit": "Resume Audit",
+  "btnSaveAndExit": "Save & Exit",
+  "s03RecoveryCodeTitle": "Master Recovery Code",
+  "s03RecoveryCodeSubtitle": "Save this code securely. If you ever forget your Owner PIN, this is the only way to reset it without losing store data.",
+  "s03RecoveryCodeCopied": "Recovery code copied to clipboard",
+  "btnContinueToApp": "Continue to App",
+  "s04ForgotPin": "Forgot PIN?",
+  "s04RecoveryTitle": "Owner PIN Recovery",
+  "s04RecoveryPrompt": "Enter your Master Recovery Code to reset your Owner PIN:",
+  "s04RecoveryInvalid": "Invalid Recovery Code. Please check and try again.",
+  "s04ResetPinTitle": "Set New 4-Digit PIN",
+  "s04ConfirmNewPin": "Confirm New PIN",
+  "s04PinResetSuccess": "Owner PIN reset successfully. Please log in with your new PIN.",
+  "btnVerifyCode": "Verify Code",
+  "btnResetPin": "Reset PIN",
+  "s32StoreAccountTitle": "Store Account (Tenant Shield)",
+  "s32StoreAccountConnected": "Store Account Connected",
+  "s32StoreAccountRequired": "Store Account Required",
+  "s32StoreAccountConnectedDesc": "This device is securely paired with {storeName}. Cloud backup and sync are active.",
+  "@s32StoreAccountConnectedDesc": {
+    "placeholders": {
+      "storeName": {"type": "String"}
+    }
+  },
+  "s32StoreAccountRequiredDesc": "Sign in with your Saagar Traders store passcode to enable cloud synchronization and protect store data.",
+  "s32ConnectStoreBtn": "Sign In to Store Account",
+  "s32DisconnectStoreBtn": "Disconnect",
+  "s32StorePasscodeDialogTitle": "Store Account Sign-In",
+  "s32StorePasscodeDialogDesc": "Enter the authorized Saagar Traders store passcode for the Latur combo store (WLMHW & HEMW):",
+  "s32StorePasscodeHint": "e.g. ST-LATUR-2026",
+  "s32StorePasscodeInvalid": "Invalid store passcode. Please check and try again.",
+  "s32StorePasscodeSuccess": "Device successfully paired to store account.",
+  "s32DisconnectStoreConfirm": "Disconnect this device from the store account? Cloud sync will be blocked until reconnected.",
+  "s32DisconnectStoreTitle": "Disconnect Store Account",
+  "s32Disconnect": "Disconnect",
+  "s32Cancel": "Cancel",
+  "s32AutoSyncTitle": "Automatic Background Sync",
+  "s32AutoSyncSubtitle": "Sync changes automatically when connected to internet",
+  "s03StoreActivationTitle": "Store Account Activation (Tenant Shield)",
+  "s03StoreActivationSubtitle": "Enter the Saagar Traders store passcode to link this phone with the Latur cloud (WLMHW & HEMW):",
+  "s03StoreActivationSuccess": "Device linked to Saagar Traders — Latur. Cloud backup active.",
+  "s32ChangeStorePasscodeBtn": "Change Passcode",
+  "s32ChangeStorePasscodeTitle": "Rotate Store Passcode",
+  "s32ChangeStorePasscodeDesc": "Update the master store passcode for Latur combo store. Requires internet connection.",
+  "s32CurrentPasscode": "Current Store Passcode",
+  "s32NewPasscode": "New Store Passcode (min 6 chars)",
+  "s32ConfirmNewPasscode": "Confirm New Passcode",
+  "s32PasscodeUpdatedSuccess": "Store passcode successfully rotated and protected with BCrypt.",
+  "s32PasscodeMismatch": "New passcodes do not match.",
+  "s32PasscodeTooShort": "Passcode must be at least 6 characters.",
+  "s32InternetRequiredForPasscode": "Internet connection is required to rotate store passcode.",
+  "s32InternetRequiredForStoreLogin": "Internet connection is required to sign in to store account. Please connect to Wi-Fi or mobile data.",
+  "s32AuthorizedDevicesTitle": "Connected Store Devices ({count})",
+  "@s32AuthorizedDevicesTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "s32RevokeDeviceBtn": "Revoke Access",
+  "s32RevokeDeviceConfirm": "Are you sure you want to revoke access for this device? It will be disconnected from the store cloud immediately.",
+  "s32RevokeDeviceSuccess": "Device access revoked successfully.",
+  "s32ThisDeviceLabel": "(This device)",
+  "s32RenameDeviceTitle": "Rename Device",
+  "s32RenameDeviceDesc": "Enter a recognizable label for this device (e.g. Owner Phone, Counter Tablet, SM Rahul).",
+  "s32RenameDeviceHint": "Device Name / Label",
+  "s32RenameDeviceBtn": "Save Name",
+  "s32RenameDeviceSuccess": "Device name updated successfully.",
+  "s32DeviceLastUser": "Last user: {role} ({name})",
+  "@s32DeviceLastUser": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "s32DeviceLastUserRoleOnly": "Last user: {role}",
+  "@s32DeviceLastUserRoleOnly": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "s32DeviceLastActive": "Active: {time}",
+  "@s32DeviceLastActive": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "s32DeviceEnrolled": "Enrolled: {date}",
+  "@s32DeviceEnrolled": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "s05CloudInactiveBanner": "Cloud Backup Inactive — Tap to link store account",
+  "s05LinkNowBtn": "Link Now"
 }
 
 

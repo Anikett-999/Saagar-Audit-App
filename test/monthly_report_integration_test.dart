@@ -89,8 +89,8 @@ void main() {
 
       // Seed checkpoints
       await fakeDb.insert('sops', {
-        'id': 'SOP2',
-        'number': 2,
+        'id': 'SOP6',
+        'number': 6,
         'name_en': 'Cash Counter & Safe',
         'name_mr': 'कॅश काउंटर आणि तिजोरी',
         'weight': 2,
@@ -118,7 +118,7 @@ void main() {
 
       await fakeDb.insert('checkpoints', {
         'id': 'MC.1',
-        'sop_id': 'SOP2',
+        'sop_id': 'SOP6',
         'sequence': 1,
         'weight': 2,
         'allows_na': 0,

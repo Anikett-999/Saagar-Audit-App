@@ -147,6 +147,13 @@ void main() {
     languagePref: 'en',
   );
 
+  const testOwner = AuthUser(
+    id: 'user-owner-1',
+    name: 'Sagar Bora',
+    role: 'OWNER',
+    languagePref: 'en',
+  );
+
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     fakeDb = FakeDatabase();
@@ -169,6 +176,16 @@ void main() {
         'name': 'Priya Patel',
         'role': 'gm',
         'pin_hash': 'h2',
+        'language_pref': 'en',
+        'is_active': 1,
+        'created_at': '2026-09-01T00:00:00Z',
+      },
+      {
+        'id': 'user-owner-1',
+        'store_id': 'WLMHW',
+        'name': 'Sagar Bora',
+        'role': 'owner',
+        'pin_hash': 'h3',
         'language_pref': 'en',
         'is_active': 1,
         'created_at': '2026-09-01T00:00:00Z',
@@ -528,13 +545,89 @@ void main() {
       expect(find.text('Verify Audit'), findsNothing);
     });
 
-    testWidgets('GM sees Verify Audit action stub', (tester) async {
+    testWidgets('GM sees and executes role-based verification (no role prompt)', (tester) async {
       await pumpAuditDetail(
         tester,
         auditId: 'audit-101',
         authState: const AuthState(user: testGm),
       );
-      expect(find.text('Verify Audit'), findsOneWidget);
+
+      // Verify Audit button is visible to GM
+      final verifyButton = find.widgetWithText(OutlinedButton, 'Verify Audit');
+      expect(verifyButton, findsOneWidget);
+
+      // Tap Verify Audit
+      await tester.tap(verifyButton);
+      await tester.pumpAndSettle();
+
+      // Confirmation dialog appears with role and name pre-stamped
+      expect(find.text('Verify Audit'), findsWidgets);
+      expect(find.text('Are you sure you want to verify this audit as GM: Priya Patel?'), findsOneWidget);
+
+      // Confirm verification
+      final confirmBtn = find.widgetWithText(ElevatedButton, 'Verify Audit');
+      expect(confirmBtn, findsOneWidget);
+      await tester.tap(confirmBtn);
+      await tester.pumpAndSettle();
+
+      // Database should be updated to status 'verified'
+      final auditRow = fakeDb.tables['audits']!.firstWhere((a) => a['id'] == 'audit-101');
+      expect(auditRow['status'], 'verified');
+      expect(auditRow['verifier_id'], 'user-gm-1');
+
+      // UI should reflect VERIFIED state and hide verify button
+      expect(find.widgetWithText(OutlinedButton, 'Verify Audit'), findsNothing);
+      expect(find.text('VERIFIED'), findsOneWidget);
+      expect(find.textContaining('Verified: Priya Patel'), findsOneWidget);
+    });
+
+    testWidgets('Owner sees and executes role-based verification directly', (tester) async {
+      await pumpAuditDetail(
+        tester,
+        auditId: 'audit-101',
+        authState: const AuthState(user: testOwner),
+      );
+
+      // Verify Audit button is visible to Owner
+      final verifyButton = find.widgetWithText(OutlinedButton, 'Verify Audit');
+      expect(verifyButton, findsOneWidget);
+
+      // Tap Verify Audit
+      await tester.tap(verifyButton);
+      await tester.pumpAndSettle();
+
+      // Confirmation dialog specifies OWNER role and name
+      expect(find.text('Are you sure you want to verify this audit as OWNER: Sagar Bora?'), findsOneWidget);
+
+      // Confirm verification
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Verify Audit'));
+      await tester.pumpAndSettle();
+
+      // Database should be updated
+      final auditRow = fakeDb.tables['audits']!.firstWhere((a) => a['id'] == 'audit-101');
+      expect(auditRow['status'], 'verified');
+      expect(auditRow['verifier_id'], 'user-owner-1');
+    });
+
+    testWidgets('Export PDF and Share to WhatsApp buttons are present and interactive', (tester) async {
+      await pumpAuditDetail(
+        tester,
+        auditId: 'audit-101',
+        authState: const AuthState(user: testAuditor),
+      );
+
+      expect(find.widgetWithText(OutlinedButton, 'Export PDF'), findsOneWidget);
+      expect(find.widgetWithText(OutlinedButton, 'Share to WhatsApp'), findsOneWidget);
+
+      // Tap Export PDF
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Export PDF'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      // Tap Share to WhatsApp
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Share to WhatsApp'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
     });
 
     testWidgets('Rule #8 Dual-Language Parity (मराठी) renders authentic Devanagari labels', (tester) async {

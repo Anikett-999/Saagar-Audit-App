@@ -6,6 +6,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/cap_aging_service.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/app_bottom_nav_bar.dart';
 import '../../widgets/language_toggle_button.dart';
 
 /// Screen S27 — Settings Hub.
@@ -43,6 +44,7 @@ class SettingsScreen extends ConsumerWidget {
     };
 
     return Scaffold(
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 4),
       appBar: AppBar(
         title: Text(l10n.s27Title),
         actions: const [
@@ -89,11 +91,12 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: l10n.s27LanguageSubtitle,
             onTap: () => context.pushNamed('s31_language'),
           ),
+          // Cloud Sync & Backup: SM/GM see "Cloud Sync", Owner sees "Cloud Sync & Backup" (Item 3 & Item 7)
           _buildTile(
             context: context,
-            icon: Icons.cloud_download_outlined,
-            title: l10n.s27BackupExportTitle,
-            subtitle: l10n.s27BackupExportSubtitle,
+            icon: isOwner ? Icons.cloud_download_outlined : Icons.cloud_sync_outlined,
+            title: isOwner ? l10n.s27BackupExportTitle : l10n.s27CloudSyncTitle,
+            subtitle: isOwner ? l10n.s27BackupExportSubtitle : l10n.s27CloudSyncSubtitle,
             onTap: () => context.pushNamed('s32_backup_export'),
           ),
           // Manual CAP aging trigger for QA / store testing (Spec §9.1)

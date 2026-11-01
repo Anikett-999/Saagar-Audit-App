@@ -119,6 +119,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
     // Every Fail with requires_photo_on_fail=1 MUST have at least 1 photo.
     final offendingCheckpoints = <Checkpoint>[];
     for (final cp in state.checkpoints) {
+      if (cp.id == '6.5' || cp.id == 'CW.7') continue;
       final verdict = state.results[cp.id];
       if (verdict == Verdict.fail && cp.requiresPhotoOnFail) {
         final photos = _failPhotos[cp.id] ?? const [];
@@ -860,70 +861,111 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
     );
   }
 
+  void _editCheckpoint(Checkpoint cp) {
+    final state = ref.read(draftAuditProvider);
+    final idx = state.checkpoints.indexWhere((c) => c.id == cp.id);
+    if (idx != -1) {
+      ref.read(draftAuditProvider.notifier).jumpTo(idx);
+      context.pushNamed('s07_checkpoint').then((_) {
+        if (mounted) _loadData();
+      });
+    }
+  }
+
   Widget _buildFailCard(AppLocalizations l10n, String locale, Checkpoint cp) {
     final result = _failResults[cp.id];
     final photos = _failPhotos[cp.id] ?? const [];
     final finding = result?.findingText ?? 'No finding text recorded';
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.gray200),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.redPale,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  'CP ${cp.id}',
-                  style: const TextStyle(
-                    color: AppColors.red,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
+    return InkWell(
+      key: Key('review_fail_card_${cp.id}'),
+      onTap: () => _editCheckpoint(cp),
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.gray200),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.redPale,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'CP ${cp.id}',
+                    style: const TextStyle(
+                      color: AppColors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  cp.text(locale),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    cp.text(locale),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      height: 1.25,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.gray100,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.gray300),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.edit_outlined, size: 12, color: AppColors.navy),
+                      const SizedBox(width: 3),
+                      Text(
+                        l10n.btnEdit,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.navy,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.gray100,
+                borderRadius: BorderRadius.circular(6),
               ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.gray100,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  'CAP Deferred',
-                  style: TextStyle(fontSize: 11, color: AppColors.gray600),
-                ),
+              child: const Text(
+                'CAP Deferred',
+                style: TextStyle(fontSize: 11, color: AppColors.gray600),
               ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Finding: $finding',
-            style: const TextStyle(fontSize: 13, color: AppColors.gray800),
-          ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Finding: $finding',
+              style: const TextStyle(fontSize: 13, color: AppColors.gray800),
+            ),
           if (photos.isNotEmpty) ...[
             const SizedBox(height: 10),
             SizedBox(
@@ -964,7 +1006,8 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
           ],
         ],
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildNotesSection(AppLocalizations l10n) {

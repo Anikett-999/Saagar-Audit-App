@@ -14,6 +14,7 @@ import '../../../data/repositories/checkpoint_repository.dart';
 import '../../../data/repositories/user_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../utils/app_date_format.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
 
@@ -706,9 +707,7 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
         ? '${responsibleUser.name} (${responsibleUser.role})'
         : cap.responsibleUserId;
 
-    final openedDate = cap.openedAt.length >= 10
-        ? cap.openedAt.substring(0, 10)
-        : cap.openedAt;
+    final openedDate = AppDateFormat.formatDate(cap.openedAt);
 
     return Card(
       elevation: 1,
@@ -835,8 +834,8 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
 
   Widget _buildActionItem(AppLocalizations l10n, CapAction action, bool canToggle) {
     final doneUserName = action.doneBy != null ? (_userMap[action.doneBy!]?.name ?? action.doneBy!) : '';
-    final doneDate = action.doneAt != null && action.doneAt!.length >= 10
-        ? action.doneAt!.substring(0, 10)
+    final doneDate = action.doneAt != null
+        ? AppDateFormat.formatDate(action.doneAt)
         : '';
 
     return Container(
@@ -940,7 +939,11 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
 
   void _showExtensionDialog(AppLocalizations l10n, Cap cap) {
     final reasonController = TextEditingController();
-    DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
+    final currentDeadline = DateTime.tryParse(cap.deadline) ?? DateTime.now();
+    final now = DateTime.now();
+    final baseDate = currentDeadline.isAfter(now) ? currentDeadline : now;
+    final minDate = DateTime(baseDate.year, baseDate.month, baseDate.day).add(const Duration(days: 1));
+    DateTime selectedDate = minDate.add(const Duration(days: 6));
 
     showDialog<void>(
       context: context,
@@ -963,9 +966,9 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
                     onTap: () async {
                       final picked = await showDatePicker(
                         context: context,
-                        initialDate: selectedDate,
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(const Duration(days: 365)),
+                        initialDate: selectedDate.isBefore(minDate) ? minDate : selectedDate,
+                        firstDate: minDate,
+                        lastDate: now.add(const Duration(days: 365)),
                       );
                       if (picked != null) {
                         setDialogState(() => selectedDate = picked);
@@ -1154,7 +1157,19 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
     final isResponsible = currentUser != null && currentUser.id == cap.responsibleUserId;
     final isGmOrOwner = currentUser != null && (currentUser.isGm || currentUser.isOwner);
     final isOwner = currentUser != null && currentUser.isOwner;
-    final canMarkDone = (isResponsible || isGmOrOwner) && allActionsDone;
+    final isGm = currentUser != null && currentUser.isGm;
+    final canMarkDone = isResponsible && allActionsDone;
+
+    final doneLogs = _logs.where((l) => l.event == 'marked_done').toList();
+    final doneByUserId = doneLogs.isNotEmpty ? doneLogs.last.actorUserId : null;
+    final isDoneByMe = currentUser != null && doneByUserId != null && currentUser.id == doneByUserId;
+    final canVerify = isGmOrOwner && !isResponsible && !isDoneByMe;
+    final canExtend = (cap.isOpen || cap.isReopened) && (isOwner || (isGm && !isResponsible));
+
+    final responsibleUser = _userMap[cap.responsibleUserId];
+    final responsibleName = responsibleUser != null
+        ? '${responsibleUser.name} (${responsibleUser.role})'
+        : cap.responsibleUserId;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1178,7 +1193,16 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
-          if (!allActionsDone)
+          if (!isResponsible)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                l10n.s16OnlyResponsibleCanMarkDone(responsibleName.isEmpty ? cap.responsibleUserId : responsibleName),
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 11, color: AppColors.gray600, fontStyle: FontStyle.italic),
+              ),
+            )
+          else if (!allActionsDone)
             Padding(
               padding: const EdgeInsets.only(top: 6),
               child: Text(
@@ -1190,8 +1214,8 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
           const SizedBox(height: 8),
         ],
 
-        // 2. Request Extension (for open/done/reopened status, GM/Owner)
-        if ((cap.isOpen || cap.isDone) && isGmOrOwner) ...[
+        // 2. Request Extension (for open/reopened status, Owner or non-responsible GM)
+        if (canExtend) ...[
           OutlinedButton.icon(
             key: const ValueKey('s16_request_extension_button'),
             onPressed: () => _showExtensionDialog(l10n, cap),
@@ -1208,26 +1232,36 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
 
         // 3. Verify button (for done status, GM/Owner)
         if (cap.isDone && isGmOrOwner) ...[
-          ElevatedButton.icon(
-            key: const ValueKey('s16_verify_button'),
-            onPressed: () async {
-              final res = await context.push<bool>('/caps/${cap.id}/verify');
-              if (res == true) {
-                _loadData();
-              }
-            },
-            icon: const Icon(Icons.verified),
-            label: Text(
-              l10n.s16VerifyButton,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          if (canVerify)
+            ElevatedButton.icon(
+              key: const ValueKey('s16_verify_button'),
+              onPressed: () async {
+                final res = await context.push<bool>('/caps/${cap.id}/verify');
+                if (res == true) {
+                  _loadData();
+                }
+              },
+              icon: const Icon(Icons.verified),
+              label: Text(
+                l10n.s16VerifyButton,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.navy,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Text(
+                l10n.s16SelfVerificationBlocked,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 11, color: AppColors.gray600, fontStyle: FontStyle.italic),
+              ),
             ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.navy,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-          ),
           const SizedBox(height: 8),
         ],
 
@@ -1329,9 +1363,7 @@ class _CapDetailScreenState extends ConsumerState<CapDetailScreen> {
         ? '${actorUser.name} (${actorUser.role})'
         : entry.actorUserId ?? l10n.s16ActorSystem;
 
-    final dateStr = entry.timestamp.length >= 16
-        ? entry.timestamp.substring(0, 16).replaceFirst('T', ' ')
-        : entry.timestamp;
+    final dateStr = AppDateFormat.formatDateTime(entry.timestamp);
 
     IconData icon;
     Color iconColor;

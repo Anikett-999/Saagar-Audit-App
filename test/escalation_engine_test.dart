@@ -196,6 +196,25 @@ void main() {
 
         expect(drafts.where((d) => d.triggerNumber == 1).isEmpty, isTrue);
       });
+
+      test('Fires Trigger 1 to OWNER via WhatsApp on Weekly Audit Critical band (e.g. 40%)', () {
+        final audit = makeWeeklyAudit(compliancePct: 40.0, band: 'critical');
+        final cps = [makeCp(id: 'CW.1', sopId: 'SOP6', titleEn: 'Weekly cash audit')];
+        final results = [makeResult(auditId: audit.id, checkpointId: 'CW.1', result: 'F')];
+
+        final drafts = EscalationEngine.evaluateAfterAudit(
+          audit: audit,
+          results: results,
+          checkpoints: cps,
+        );
+
+        final trigger1Drafts = drafts.where((d) => d.triggerNumber == 1).toList();
+        expect(trigger1Drafts.length, 1);
+        final esc = trigger1Drafts.first;
+        expect(esc.targetRole, 'OWNER');
+        expect(esc.deliveryChannel, 'whatsapp');
+        expect(esc.whatHappened, contains('40.0%'));
+      });
     });
 
     // =========================================================================

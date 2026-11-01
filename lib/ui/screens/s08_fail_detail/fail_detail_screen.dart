@@ -8,6 +8,7 @@ import '../../../data/repositories/audit_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/draft_audit_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/camera_permission_dialog.dart';
 
 /// S8 Fail Detail — capture finding text, CRO involved, and evidence photos
 /// for the current FAIL mark. S9 photo capture is collapsed into this screen
@@ -44,13 +45,25 @@ class _FailDetailScreenState extends ConsumerState<FailDetailScreen> {
   void initState() {
     super.initState();
     _flagSecurityConcern = widget.initialSecurityConcern;
+    _findingController.addListener(_onFindingChanged);
     _bootstrap();
   }
 
   @override
   void dispose() {
+    _findingController.removeListener(_onFindingChanged);
     _findingController.dispose();
     super.dispose();
+  }
+
+  void _onFindingChanged() {
+    if (_error != null && _findingController.text.trim().length >= 5) {
+      final cp = ref.read(draftAuditProvider).currentCheckpoint;
+      final photoRequired = cp?.requiresPhotoOnFail == true;
+      if (!photoRequired || _pendingPhotoPaths.isNotEmpty) {
+        setState(() => _error = null);
+      }
+    }
   }
 
   Future<void> _bootstrap() async {
@@ -81,11 +94,32 @@ class _FailDetailScreenState extends ConsumerState<FailDetailScreen> {
     if (audit == null) return;
     if (_pendingPhotoPaths.length >= _maxPhotos) return;
 
-    final path = await PhotoService.instance.captureAndStore(
-      auditId: audit.id,
-    );
-    if (path == null || !mounted) return;
-    setState(() => _pendingPhotoPaths = [..._pendingPhotoPaths, path]);
+    try {
+      final path = await PhotoService.instance.captureAndStore(
+        auditId: audit.id,
+      );
+      if (path == null || !mounted) return;
+      setState(() {
+        _pendingPhotoPaths = [..._pendingPhotoPaths, path];
+        // Auto-dismiss photo error immediately once a photo is attached
+        if (_error != null) {
+          final findingLen = _findingController.text.trim().length;
+          if (findingLen >= 5 && findingLen <= 200) {
+            _error = null;
+          }
+        }
+      });
+    } on CameraPermissionDeniedException {
+      if (mounted) {
+        await showCameraPermissionDeniedDialog(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to capture photo: $e')),
+        );
+      }
+    }
   }
 
   Future<void> _save() async {

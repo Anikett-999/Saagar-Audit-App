@@ -206,8 +206,29 @@ void main() {
         'week_number': 38,
         'year': 2026,
         'device_id': 'dev-1',
+        'fail_count': 2,
         'submitted_at': '2026-09-21T18:00:00.000Z',
       });
+
+      // Seed audit_results table for audit-101 (both 1.1 and 1.2 failed)
+      fakeDb.tables['audit_results']!.addAll([
+        {
+          'id': 'res-101-1',
+          'audit_id': 'audit-101',
+          'checkpoint_id': '1.1',
+          'result': 'F',
+          'finding_text': 'Store entrance glass has dirty smudges',
+          'created_at': '2026-09-21T18:00:00.000Z',
+        },
+        {
+          'id': 'res-101-2',
+          'audit_id': 'audit-101',
+          'checkpoint_id': '1.2',
+          'result': 'F',
+          'finding_text': 'Floor dirty with dust and footprints',
+          'created_at': '2026-09-21T18:00:00.000Z',
+        },
+      ]);
     });
 
     tearDown(() {
@@ -429,6 +450,131 @@ void main() {
       expect(find.text('मूळ कारण'), findsOneWidget);
       expect(find.text('CAP तयार करा'), findsOneWidget);
       expect(find.text('पाऊल जोडा'), findsOneWidget);
+    });
+
+    testWidgets('Item 17 (F20): Monthly audit failed checkpoints (MC.2) appear in dropdown, while passed items are excluded', (tester) async {
+      // Seed monthly checkpoint MC.1 (pass) and MC.2 (fail)
+      fakeDb.tables['checkpoints']!.addAll([
+        {
+          'id': 'MC.1',
+          'sop_id': 'sop-6',
+          'frequency': 'monthly',
+          'sequence': 1,
+          'text_en': 'Safe cash count matches register',
+          'text_mr': 'सेफ कॅश मोजणी जुळते',
+          'weight': 1,
+          'allows_na': 0,
+          'requires_photo_on_fail': 1,
+          'display_order': 101,
+        },
+        {
+          'id': 'MC.2',
+          'sop_id': 'sop-7',
+          'frequency': 'monthly',
+          'sequence': 2,
+          'text_en': 'Quarterly battery stock verified',
+          'text_mr': 'त्रैमासिक बॅटरी स्टॉक पडताळणी',
+          'weight': 1,
+          'allows_na': 0,
+          'requires_photo_on_fail': 1,
+          'display_order': 102,
+        },
+      ]);
+
+      // Seed monthly audit
+      fakeDb.tables['audits']!.add({
+        'id': 'audit-monthly-1',
+        'audit_type': 'monthly',
+        'store_id': 'WLMHW',
+        'auditor_id': 'user-sm',
+        'status': 'submitted',
+        'audit_date': '2026-10-25',
+        'week_number': 43,
+        'month_number': 10,
+        'year': 2026,
+        'device_id': 'dev-1',
+        'fail_count': 1,
+        'submitted_at': '2026-10-25T18:00:00.000Z',
+      });
+
+      // MC.1 passed, MC.2 failed
+      fakeDb.tables['audit_results']!.addAll([
+        {
+          'id': 'res-m-1',
+          'audit_id': 'audit-monthly-1',
+          'checkpoint_id': 'MC.1',
+          'result': 'P',
+          'created_at': '2026-10-25T18:00:00.000Z',
+        },
+        {
+          'id': 'res-m-2',
+          'audit_id': 'audit-monthly-1',
+          'checkpoint_id': 'MC.2',
+          'result': 'F',
+          'finding_text': 'Battery stock short by 14 units',
+          'created_at': '2026-10-25T18:00:00.000Z',
+        },
+      ]);
+
+      await pumpCapCreate(
+        tester,
+        authState: const AuthState(user: smUser),
+        originAuditId: 'audit-monthly-1',
+        originCheckpointId: 'MC.2',
+        initialProblemStatement: 'Battery stock short by 14 units',
+      );
+
+      // Verify dropdown shows MC.2
+      expect(find.byKey(const ValueKey('s15_checkpoint_dropdown')), findsOneWidget);
+      expect(find.textContaining('MC.2 — Quarterly battery stock verified'), findsOneWidget);
+
+      // Verify problem statement auto-populated from finding_text
+      final problemField = tester.widget<TextFormField>(
+        find.byKey(const ValueKey('s15_problem_field')),
+      );
+      expect(problemField.controller?.text, 'Battery stock short by 14 units');
+    });
+
+    testWidgets('Item 17 (F20): Audit with 0 fails displays honest notice and blocks submission', (tester) async {
+      // Seed audit with 0 fails
+      fakeDb.tables['audits']!.add({
+        'id': 'audit-perfect',
+        'audit_type': 'daily',
+        'store_id': 'WLMHW',
+        'auditor_id': 'user-sm',
+        'status': 'submitted',
+        'audit_date': '2026-10-26',
+        'week_number': 43,
+        'year': 2026,
+        'device_id': 'dev-1',
+        'fail_count': 0,
+        'submitted_at': '2026-10-26T18:00:00.000Z',
+      });
+
+      fakeDb.tables['audit_results']!.add({
+        'id': 'res-perf-1',
+        'audit_id': 'audit-perfect',
+        'checkpoint_id': '1.1',
+        'result': 'P',
+        'created_at': '2026-10-26T18:00:00.000Z',
+      });
+
+      await pumpCapCreate(
+        tester,
+        authState: const AuthState(user: smUser),
+        originAuditId: 'audit-perfect',
+      );
+
+      // Notice should be displayed
+      expect(find.byKey(const ValueKey('s15_no_fails_notice')), findsOneWidget);
+      expect(find.text('This audit has no failed checkpoints. CAPs can only be created for failed items.'), findsOneWidget);
+      expect(find.byKey(const ValueKey('s15_checkpoint_dropdown')), findsNothing);
+
+      // Submitting should show snackbar error
+      await tester.tap(find.byKey(const ValueKey('s15_create_button')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('This audit has no failed checkpoints. CAPs can only be created for failed items.'), findsWidgets);
     });
   });
 }

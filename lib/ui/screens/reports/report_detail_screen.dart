@@ -7,6 +7,7 @@ import '../../../domain/trend_analytics.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/weekly_report_pdf_service.dart';
+import '../../../utils/app_date_format.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
 import '../../widgets/trend_chart.dart';
@@ -88,9 +89,29 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _exportingPdf = true);
     try {
-      await WeeklyReportPdfService.instance.shareOrPrintPdf(report);
-      if (!mounted) return;
-      setState(() => _exportingPdf = false);
+      final savedPath = await WeeklyReportPdfService.instance.shareOrPrintPdf(report);
+      final updated = await ReportRepository.instance.getById(report.id);
+      if (mounted) {
+        if (updated != null) {
+          setState(() {
+            _report = updated;
+            _exportingPdf = false;
+          });
+        } else {
+          setState(() => _exportingPdf = false);
+        }
+        final fileName = savedPath.split(RegExp(r'[/\\]')).last;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              report.reportType == 'monthly'
+                  ? 'Monthly report PDF saved ($fileName) and ready to share.'
+                  : 'Weekly report PDF saved ($fileName) and ready to share.',
+            ),
+            backgroundColor: AppColors.green,
+          ),
+        );
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _exportingPdf = false);
@@ -152,6 +173,9 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
     final findings = report.findings;
     final patterns = report.patterns;
     final capsOpened = report.capsOpened;
+    final capsClosed = report.capsClosed;
+    final capsAged = report.capsAged;
+    final escalations = report.escalations;
 
     return Scaffold(
       appBar: AppBar(
@@ -450,41 +474,96 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
                   ),
                 const Divider(height: 16),
 
-                // Section 7: CAPs Closed (P2-5 honest empty state)
+                // Section 7: CAPs Closed
                 Text(
                   l10n.s21CapsClosedHeader,
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  l10n.s21CapsClosedEmpty,
-                  style: const TextStyle(color: AppColors.gray600, fontSize: 12, fontStyle: FontStyle.italic),
-                ),
+                if (capsClosed.isEmpty)
+                  Text(
+                    isMr ? 'या आठवड्यात कोणतीही कॅप बंद केलेली नाही.' : 'No CAPs were closed during this week.',
+                    style: const TextStyle(color: AppColors.gray600, fontSize: 12, fontStyle: FontStyle.italic),
+                  )
+                else
+                  for (final c in capsClosed)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        '• ${c['problem_statement'] ?? ''} [${c['status'] ?? 'closed'}]',
+                        style: const TextStyle(fontSize: 12, color: AppColors.green),
+                      ),
+                    ),
                 const Divider(height: 16),
 
-                // Section 8: Aged CAPs (P2-5 honest empty state)
+                // Section 8: Aged CAPs
                 Text(
                   l10n.s21CapsAgedHeader,
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  l10n.s21CapsAgedEmpty,
-                  style: const TextStyle(color: AppColors.gray600, fontSize: 12, fontStyle: FontStyle.italic),
-                ),
+                if (capsAged.isEmpty)
+                  Text(
+                    isMr ? 'कोणतीही प्रलंबित किंवा जुनी कॅप नाही.' : 'No aged or overdue CAPs.',
+                    style: const TextStyle(color: AppColors.gray600, fontSize: 12, fontStyle: FontStyle.italic),
+                  )
+                else
+                  for (final c in capsAged)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        '• ${c['problem_statement'] ?? ''} (Aged count: ${c['aged_count'] ?? 1}, Deadline: ${c['deadline'] ?? ''})',
+                        style: const TextStyle(fontSize: 12, color: AppColors.amber),
+                      ),
+                    ),
               ],
             ),
           ),
           const SizedBox(height: 12),
 
-          // --- Section 9: Escalations (Phase 3 honest empty state) ---
+          // --- Section 9: Escalations ---
           _sectionCard(
             title: l10n.s21EscalationsSection,
             icon: Icons.campaign_outlined,
-            child: Text(
-              l10n.s21EscalationsEmpty,
-              style: const TextStyle(color: AppColors.gray600, fontStyle: FontStyle.italic),
-            ),
+            child: escalations.isEmpty
+                ? Text(
+                    l10n.s21EscalationsEmpty,
+                    style: const TextStyle(color: AppColors.gray600, fontStyle: FontStyle.italic),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (final esc in escalations)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(Icons.warning, color: AppColors.amber, size: 18),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${esc['trigger_label'] ?? 'Trigger'} · ${esc['urgency'] ?? ''}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    Text(
+                                      esc['what_happened']?.toString() ?? '',
+                                      style: const TextStyle(fontSize: 12, color: AppColors.gray800),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
           ),
           const SizedBox(height: 12),
 
@@ -498,14 +577,14 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
                 Text(
                   l10n.s21AuditorSignature(
                     report.authorUserId ?? 'GM Auditor',
-                    report.submittedAt != null ? report.submittedAt!.split('T').first : 'Submitted',
+                    report.submittedAt != null ? AppDateFormat.formatDate(report.submittedAt) : 'Submitted',
                   ),
                   style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   report.isReadByOwner
-                      ? l10n.s21OwnerSignature(report.readByOwnerAt?.split('T').first ?? '')
+                      ? l10n.s21OwnerSignature(report.readByOwnerAt != null ? AppDateFormat.formatDate(report.readByOwnerAt) : '')
                       : l10n.s21OwnerSignaturePending,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
@@ -591,27 +670,36 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
   }
 
   Widget _scoreRow(String label, String value, {bool isBold = false, Color? valueColor}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 5,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
           ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-            color: valueColor,
+          const SizedBox(width: 8),
+          Flexible(
+            flex: 6,
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
+                color: valueColor,
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -1002,14 +1090,14 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
               Text(
                 l10n.s21AuditorSignature(
                   report.authorUserId ?? 'Owner Auditor',
-                  report.submittedAt != null ? report.submittedAt!.split('T').first : 'Submitted',
+                  report.submittedAt != null ? AppDateFormat.formatDate(report.submittedAt) : 'Submitted',
                 ),
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
               ),
               const SizedBox(height: 6),
               Text(
                 report.isReadByOwner
-                    ? l10n.s21OwnerSignature(report.readByOwnerAt?.split('T').first ?? '')
+                    ? l10n.s21OwnerSignature(report.readByOwnerAt != null ? AppDateFormat.formatDate(report.readByOwnerAt) : '')
                     : l10n.s21OwnerSignaturePending,
                 style: TextStyle(
                   fontWeight: FontWeight.w600,

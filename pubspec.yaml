@@ -63,6 +63,7 @@ dependencies:
   drift: 2.19.2
   sagar_meeting_app:
     path: ../sagar_meeting_app
+  device_info_plus: ^12.4.0
 
 dev_dependencies:
   flutter_test:

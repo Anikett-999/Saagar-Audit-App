@@ -10,8 +10,10 @@ import '../../../data/repositories/report_repository.dart';
 import '../../../domain/iso_week.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../providers/cloud_sync_provider.dart';
 import '../../../providers/draft_audit_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/app_bottom_nav_bar.dart';
 import '../../widgets/language_toggle_button.dart';
 
 /// S5 Home / Dashboard — role-aware landing after login.
@@ -76,12 +78,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     final l10n = AppLocalizations.of(context)!;
+    final syncState = ref.watch(cloudSyncProvider);
     final canStartDaily = user.role == 'SM' || user.role == 'OWNER';
     final canStartWeekly = user.role == 'GM' || user.role == 'OWNER';
     final canStartMonthly = user.role == 'OWNER';
     final today = DateFormat('EEEE, d MMMM').format(DateTime.now());
 
     return Scaffold(
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 0),
       appBar: AppBar(
         title: Text(l10n.appTitle),
         actions: [
@@ -123,6 +127,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       fontSize: 14,
                     ),
                   ),
+                  if (user.role == 'OWNER' && !syncState.isStorePaired) ...[
+                    const SizedBox(height: 16),
+                    _unpairedWarningCard(context, l10n),
+                  ],
                   const SizedBox(height: 24),
                   _todayCard(context, l10n, canStartDaily),
                   if (canStartWeekly) ...[
@@ -164,6 +172,48 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _unpairedWarningCard(BuildContext context, AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.amber.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.amber.withValues(alpha: 0.6)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.cloud_off, color: AppColors.amber, size: 24),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              l10n.s05CloudInactiveBanner,
+              style: const TextStyle(
+                fontFamily: 'DMSans',
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+                color: AppColors.navy,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          ElevatedButton(
+            onPressed: () => context.pushNamed('s32_backup_export'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.navy,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              visualDensity: VisualDensity.compact,
+            ),
+            child: Text(
+              l10n.s05LinkNowBtn,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

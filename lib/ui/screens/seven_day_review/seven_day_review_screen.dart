@@ -13,6 +13,7 @@ import '../../../data/repositories/user_repository.dart';
 import '../../../domain/iso_week.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../utils/app_date_format.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/language_toggle_button.dart';
 
@@ -489,9 +490,7 @@ class _SevenDayReviewScreenState extends ConsumerState<SevenDayReviewScreen> {
             Text(
               l10n.weeklyReviewVerifiedBadge(
                 verifierName,
-                audit.verifiedAt != null && audit.verifiedAt!.length >= 16
-                    ? audit.verifiedAt!.substring(0, 16).replaceFirst('T', ' ')
-                    : '—',
+                AppDateFormat.formatDateTime(audit.verifiedAt),
               ),
               style: const TextStyle(
                 fontSize: 12,

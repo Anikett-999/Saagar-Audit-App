@@ -620,6 +620,12 @@ abstract class AppLocalizations {
   /// **'Wrong PIN. {attempts} attempts left.'**
   String s04WrongPinAttemptsLeft(int attempts);
 
+  /// No description provided for @s04WrongPinOneAttemptLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong PIN. 1 attempt left.'**
+  String get s04WrongPinOneAttemptLeft;
+
   /// No description provided for @s04TooManyAttempts.
   ///
   /// In en, this message translates to:
@@ -1058,6 +1064,60 @@ abstract class AppLocalizations {
   /// **'Finish & Review'**
   String get s07FinishReview;
 
+  /// No description provided for @s07JumpListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit Checkpoints'**
+  String get s07JumpListTitle;
+
+  /// No description provided for @s07JumpListTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkpoint jump list'**
+  String get s07JumpListTooltip;
+
+  /// No description provided for @s07JumpListFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get s07JumpListFilterAll;
+
+  /// No description provided for @s07JumpListFilterUnanswered.
+  ///
+  /// In en, this message translates to:
+  /// **'Unanswered'**
+  String get s07JumpListFilterUnanswered;
+
+  /// No description provided for @s07JumpListFilterPassed.
+  ///
+  /// In en, this message translates to:
+  /// **'Passed'**
+  String get s07JumpListFilterPassed;
+
+  /// No description provided for @s07JumpListFilterFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get s07JumpListFilterFailed;
+
+  /// No description provided for @s07JumpListFilterNa.
+  ///
+  /// In en, this message translates to:
+  /// **'N/A'**
+  String get s07JumpListFilterNa;
+
+  /// No description provided for @s07JumpListCurrentBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get s07JumpListCurrentBadge;
+
+  /// No description provided for @s07JumpListPendingBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get s07JumpListPendingBadge;
+
   /// No description provided for @s08Title.
   ///
   /// In en, this message translates to:
@@ -1091,7 +1151,7 @@ abstract class AppLocalizations {
   /// No description provided for @s08PhotoRequiredNotice.
   ///
   /// In en, this message translates to:
-  /// **'Photo is mandatory for this checkpoint.'**
+  /// **'Photo required if marked FAIL'**
   String get s08PhotoRequiredNotice;
 
   /// No description provided for @s08SaveFail.
@@ -1259,14 +1319,26 @@ abstract class AppLocalizations {
   /// No description provided for @s27BackupExportTitle.
   ///
   /// In en, this message translates to:
-  /// **'Backup & Export'**
+  /// **'Cloud Sync & Backup'**
   String get s27BackupExportTitle;
 
   /// No description provided for @s27BackupExportSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Export database JSON and sync status'**
+  /// **'Sync store data and export database JSON'**
   String get s27BackupExportSubtitle;
+
+  /// No description provided for @s27CloudSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Sync'**
+  String get s27CloudSyncTitle;
+
+  /// No description provided for @s27CloudSyncSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync store audits and data with cloud'**
+  String get s27CloudSyncSubtitle;
 
   /// No description provided for @s27AboutTitle.
   ///
@@ -1835,55 +1907,67 @@ abstract class AppLocalizations {
   /// No description provided for @s32Title.
   ///
   /// In en, this message translates to:
-  /// **'Backup & Export'**
+  /// **'Cloud Sync & Backup'**
   String get s32Title;
+
+  /// No description provided for @s32TitleSyncOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Sync'**
+  String get s32TitleSyncOnly;
 
   /// No description provided for @s32Subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Local SQLite Database Export & Cloud Sync'**
+  /// **'Data Backup & Cloud Synchronization'**
   String get s32Subtitle;
+
+  /// No description provided for @s32SubtitleSyncOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Store Data Cloud Synchronization'**
+  String get s32SubtitleSyncOnly;
 
   /// No description provided for @s32ExportCardTitle.
   ///
   /// In en, this message translates to:
-  /// **'Export Local Database (JSON)'**
+  /// **'Audit Records Data Export (JSON)'**
   String get s32ExportCardTitle;
 
   /// No description provided for @s32ExportCardDesc.
   ///
   /// In en, this message translates to:
-  /// **'Export all 14 SQLite tables into a timestamped JSON file in your device Downloads directory. Ideal for manual backups before app updates.'**
+  /// **'Export database table records into a timestamped JSON file. Notice: This exports table records only, not photos. For full backup and device recovery including photos, use Cloud Synchronization above.'**
   String get s32ExportCardDesc;
 
   /// No description provided for @s32ExportSecurityNotice.
   ///
   /// In en, this message translates to:
-  /// **'Security Notice: Exported backup contains audit trails, findings, and bcrypt security hashes. Store and transfer this file securely.'**
+  /// **'Data Export Notice: Exported file contains audit trails and findings (without binary photos). The primary and complete recovery path for this store is Cloud Synchronization.'**
   String get s32ExportSecurityNotice;
 
   /// No description provided for @s32ExportButton.
   ///
   /// In en, this message translates to:
-  /// **'Export Database JSON'**
+  /// **'Export Data Records (JSON)'**
   String get s32ExportButton;
 
   /// No description provided for @s32Exporting.
   ///
   /// In en, this message translates to:
-  /// **'Exporting database...'**
+  /// **'Exporting records...'**
   String get s32Exporting;
 
   /// No description provided for @s32ExportSuccessTitle.
   ///
   /// In en, this message translates to:
-  /// **'Export Successful'**
+  /// **'Data Export Successful'**
   String get s32ExportSuccessTitle;
 
   /// No description provided for @s32ExportSuccessMessage.
   ///
   /// In en, this message translates to:
-  /// **'Backup saved successfully ({records} records across {tables} tables).\n\nFile: {fileName}\nPath:\n{path}'**
+  /// **'Audit data records exported successfully ({records} records across {tables} tables).\n\nNotice: Photos and full store recovery are securely maintained via Cloud Sync.\n\nFile: {fileName}\nPath:\n{path}'**
   String s32ExportSuccessMessage(
       int records, int tables, String fileName, String path);
 
@@ -1896,25 +1980,25 @@ abstract class AppLocalizations {
   /// No description provided for @s32CloudSyncTitle.
   ///
   /// In en, this message translates to:
-  /// **'Cloud Synchronization (Firestore)'**
+  /// **'Cloud Synchronization'**
   String get s32CloudSyncTitle;
 
   /// No description provided for @s32CloudSyncDesc.
   ///
   /// In en, this message translates to:
-  /// **'Automatic multi-device synchronization and cloud data storage via Google Cloud Firestore.'**
+  /// **'Sync your audits, photos, and corrective actions with the secure cloud.'**
   String get s32CloudSyncDesc;
 
   /// No description provided for @s32CloudSyncStatusLabel.
   ///
   /// In en, this message translates to:
-  /// **'Status: Offline-First Mode (Local SQLite)'**
+  /// **'Status: Local Storage Active'**
   String get s32CloudSyncStatusLabel;
 
   /// No description provided for @s32CloudSyncPhase4Notice.
   ///
   /// In en, this message translates to:
-  /// **'All audits, CAPs, and reports are safely preserved locally on this device.'**
+  /// **'All audits, CAPs, and reports are safely preserved on this device.'**
   String get s32CloudSyncPhase4Notice;
 
   /// No description provided for @s32CloudSyncComingSoonBadge.
@@ -1926,67 +2010,121 @@ abstract class AppLocalizations {
   /// No description provided for @s32ForceSyncButton.
   ///
   /// In en, this message translates to:
-  /// **'Force Cloud Sync'**
+  /// **'Sync Now'**
   String get s32ForceSyncButton;
 
   /// No description provided for @s32CloudSyncStatusIdle.
   ///
   /// In en, this message translates to:
-  /// **'Status: Ready to Sync'**
+  /// **'Ready to Sync'**
   String get s32CloudSyncStatusIdle;
 
   /// No description provided for @s32CloudSyncStatusSyncing.
   ///
   /// In en, this message translates to:
-  /// **'Status: Synchronizing with Cloud...'**
+  /// **'Synchronizing with Cloud...'**
   String get s32CloudSyncStatusSyncing;
 
   /// No description provided for @s32CloudSyncStatusSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Status: All Data Mirrored (Cloud up to date)'**
+  /// **'Cloud Backup is Up to Date'**
   String get s32CloudSyncStatusSuccess;
 
   /// No description provided for @s32CloudSyncStatusError.
   ///
   /// In en, this message translates to:
-  /// **'Status: Sync Error ({error})'**
+  /// **'Sync Issue ({error})'**
   String s32CloudSyncStatusError(String error);
 
   /// No description provided for @s32CloudSyncStatusOffline.
   ///
   /// In en, this message translates to:
-  /// **'Status: Offline (Local SQLite Active)'**
+  /// **'Device is Offline (No Internet)'**
   String get s32CloudSyncStatusOffline;
+
+  /// No description provided for @s32CloudSyncStatusNever.
+  ///
+  /// In en, this message translates to:
+  /// **'Initial Sync Required — Tap Sync Now'**
+  String get s32CloudSyncStatusNever;
+
+  /// No description provided for @s32CloudSyncStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Device is Online — Changes pending sync'**
+  String get s32CloudSyncStatusPending;
+
+  /// No description provided for @s32CloudSyncInitialPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Initial backup pending'**
+  String get s32CloudSyncInitialPending;
+
+  /// No description provided for @s32CloudSyncBadgeNotSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Synced'**
+  String get s32CloudSyncBadgeNotSynced;
+
+  /// No description provided for @s32CloudSyncBadgeUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to Date'**
+  String get s32CloudSyncBadgeUpToDate;
+
+  /// No description provided for @s32CloudSyncBadgePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Sync'**
+  String get s32CloudSyncBadgePending;
+
+  /// No description provided for @s32CloudSyncBadgeOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get s32CloudSyncBadgeOffline;
+
+  /// No description provided for @s32CloudSyncBadgeError.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Issue'**
+  String get s32CloudSyncBadgeError;
 
   /// No description provided for @s32CloudSyncStatusUnconfigured.
   ///
   /// In en, this message translates to:
-  /// **'Status: Cloud Backend Offline / Standby'**
+  /// **'Cloud Standby (Ready to connect)'**
   String get s32CloudSyncStatusUnconfigured;
 
   /// No description provided for @s32CloudSyncLastSync.
   ///
   /// In en, this message translates to:
-  /// **'Last Synced: {time}'**
+  /// **'Last Successful Backup: {time}'**
   String s32CloudSyncLastSync(String time);
 
   /// No description provided for @s32CloudSyncNever.
   ///
   /// In en, this message translates to:
-  /// **'Never'**
+  /// **'Never backed up yet'**
   String get s32CloudSyncNever;
 
   /// No description provided for @s32CloudSyncPending.
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =0{All local changes backed up} =1{1 change pending upload} other{{count} changes pending upload}}'**
+  /// **'{count, plural, =0{All items uploaded to cloud} =1{1 item waiting to upload} other{{count} items waiting to upload}}'**
   String s32CloudSyncPending(int count);
+
+  /// No description provided for @s32SavedOnPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved on this phone: {count} records'**
+  String s32SavedOnPhone(int count);
 
   /// No description provided for @s32SyncSuccessNotice.
   ///
   /// In en, this message translates to:
-  /// **'Cloud mirror sync completed ({count} records updated).'**
+  /// **'Cloud sync completed ({count} records updated).'**
   String s32SyncSuccessNotice(int count);
 
   /// No description provided for @s32AboutCardTitle.
@@ -2222,6 +2360,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No audits found. Complete an audit first.'**
   String get s15NoAuditsFound;
+
+  /// No description provided for @s15NoFailsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This audit has no failed checkpoints. CAPs can only be created for failed items.'**
+  String get s15NoFailsFound;
 
   /// No description provided for @s15SectionProblem.
   ///
@@ -2886,19 +3030,49 @@ abstract class AppLocalizations {
   /// No description provided for @s17SectionDoneNotes.
   ///
   /// In en, this message translates to:
-  /// **'Done Notes / Reflection (optional)'**
+  /// **'Completion Notes (Mandatory)'**
   String get s17SectionDoneNotes;
 
   /// No description provided for @s17DoneNotesHint.
   ///
   /// In en, this message translates to:
-  /// **'Describe how the issue was resolved or notes for verification...'**
+  /// **'Describe how the issue was resolved (min 10 characters)...'**
   String get s17DoneNotesHint;
+
+  /// No description provided for @s17NotesMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum 10 characters required ({count}/10)'**
+  String s17NotesMinLength(int count);
+
+  /// No description provided for @s17PhotoRequiredNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Evidence photo is mandatory for this checkpoint before marking done.'**
+  String get s17PhotoRequiredNotice;
+
+  /// No description provided for @s17OnlyResponsibleCanMarkDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the assigned responsible user ({name}) can mark this CAP done.'**
+  String s17OnlyResponsibleCanMarkDone(String name);
+
+  /// No description provided for @s16OnlyResponsibleCanMarkDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the assigned responsible user ({name}) can mark this CAP done.'**
+  String s16OnlyResponsibleCanMarkDone(String name);
+
+  /// No description provided for @s16SelfVerificationBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending verification by another manager or Owner (Segregation of Duties).'**
+  String get s16SelfVerificationBlocked;
 
   /// No description provided for @s17SectionEvidencePhoto.
   ///
   /// In en, this message translates to:
-  /// **'Completion Evidence Photo (optional)'**
+  /// **'Completion Evidence Photo'**
   String get s17SectionEvidencePhoto;
 
   /// No description provided for @s17TakePhoto.
@@ -3270,7 +3444,7 @@ abstract class AppLocalizations {
   /// No description provided for @s13ExportPdfTooltip.
   ///
   /// In en, this message translates to:
-  /// **'PDF export is scheduled for Phase 2'**
+  /// **'Export 1-Page Audit PDF'**
   String get s13ExportPdfTooltip;
 
   /// No description provided for @s13ShareWhatsApp.
@@ -3282,7 +3456,7 @@ abstract class AppLocalizations {
   /// No description provided for @s13ShareWhatsAppTooltip.
   ///
   /// In en, this message translates to:
-  /// **'WhatsApp share is scheduled for Phase 2'**
+  /// **'Share audit summary on WhatsApp'**
   String get s13ShareWhatsAppTooltip;
 
   /// No description provided for @s13VerifyAudit.
@@ -3294,8 +3468,50 @@ abstract class AppLocalizations {
   /// No description provided for @s13VerifyAuditTooltip.
   ///
   /// In en, this message translates to:
-  /// **'Audit verification is scheduled for Phase 2'**
+  /// **'Verify this audit as GM or Owner'**
   String get s13VerifyAuditTooltip;
+
+  /// No description provided for @s13VerifyConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Audit'**
+  String get s13VerifyConfirmTitle;
+
+  /// No description provided for @s13VerifyConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to verify this audit as {role}: {name}?'**
+  String s13VerifyConfirmMessage(String role, String name);
+
+  /// No description provided for @s13VerifySuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit verified successfully.'**
+  String get s13VerifySuccess;
+
+  /// No description provided for @s13PdfGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating Audit PDF...'**
+  String get s13PdfGenerating;
+
+  /// No description provided for @s13PdfExportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to export PDF: {error}'**
+  String s13PdfExportError(String error);
+
+  /// No description provided for @s13WhatsAppSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening WhatsApp...'**
+  String get s13WhatsAppSuccess;
+
+  /// No description provided for @s13WhatsAppCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp could not be opened. Summary copied to clipboard!'**
+  String get s13WhatsAppCopied;
 
   /// No description provided for @s13NotFound.
   ///
@@ -4101,6 +4317,18 @@ abstract class AppLocalizations {
   /// **'Pattern Issue'**
   String get s18PatternMarker;
 
+  /// No description provided for @s18SelfVerificationWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Self-verification not permitted: Segregation of duties requires a different person to verify this CAP.'**
+  String get s18SelfVerificationWarning;
+
+  /// No description provided for @s18ReopenReasonMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide a detailed reason (at least 10 characters).'**
+  String get s18ReopenReasonMinLength;
+
   /// No description provided for @s18AccessDenied.
   ///
   /// In en, this message translates to:
@@ -4428,7 +4656,7 @@ abstract class AppLocalizations {
   /// No description provided for @s21CapsClosedEmpty.
   ///
   /// In en, this message translates to:
-  /// **'No CAPs closed this week (Verification & Close workflow active in P2-5).'**
+  /// **'No CAPs closed during this week.'**
   String get s21CapsClosedEmpty;
 
   /// No description provided for @s21CapsAgedHeader.
@@ -4440,7 +4668,7 @@ abstract class AppLocalizations {
   /// No description provided for @s21CapsAgedEmpty.
   ///
   /// In en, this message translates to:
-  /// **'No aged CAPs recorded (Lifecycle tracking active in P2-5).'**
+  /// **'No aged or overdue CAPs.'**
   String get s21CapsAgedEmpty;
 
   /// No description provided for @s21EscalationsSection.
@@ -4452,7 +4680,7 @@ abstract class AppLocalizations {
   /// No description provided for @s21EscalationsEmpty.
   ///
   /// In en, this message translates to:
-  /// **'No escalations triggered (Escalation engine active in Phase 3).'**
+  /// **'No escalations triggered during this week.'**
   String get s21EscalationsEmpty;
 
   /// No description provided for @s21SignatureSection.
@@ -4731,6 +4959,66 @@ abstract class AppLocalizations {
   /// **'WhatsApp Sent'**
   String get s33WhatsAppSentBadge;
 
+  /// No description provided for @s11EscalationsAlertTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalation Alert Required'**
+  String get s11EscalationsAlertTitle;
+
+  /// No description provided for @s11ShareWhatsApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Alert via WhatsApp'**
+  String get s11ShareWhatsApp;
+
+  /// No description provided for @s11MarkAsSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Sent'**
+  String get s11MarkAsSent;
+
+  /// No description provided for @s11MessageCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalation message copied to clipboard!'**
+  String get s11MessageCopied;
+
+  /// No description provided for @s33ConfirmWhatsAppTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm WhatsApp Delivery'**
+  String get s33ConfirmWhatsAppTitle;
+
+  /// No description provided for @s33ConfirmWhatsAppPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Did you send the escalation alert to {name} on WhatsApp?'**
+  String s33ConfirmWhatsAppPrompt(String name);
+
+  /// No description provided for @s33ConfirmWhatsAppYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, Sent'**
+  String get s33ConfirmWhatsAppYes;
+
+  /// No description provided for @s33ConfirmWhatsAppNo.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Sent / Later'**
+  String get s33ConfirmWhatsAppNo;
+
+  /// No description provided for @s33WhatsAppUnconfirmedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp: Not Confirmed'**
+  String get s33WhatsAppUnconfirmedBadge;
+
+  /// No description provided for @s33MarkAsSentAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Sent'**
+  String get s33MarkAsSentAction;
+
   /// No description provided for @fieldRequired.
   ///
   /// In en, this message translates to:
@@ -4880,6 +5168,408 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Export Monthly PDF'**
   String get s21ExportMonthlyPdfButton;
+
+  /// No description provided for @cameraPermissionRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera Permission Required'**
+  String get cameraPermissionRequiredTitle;
+
+  /// No description provided for @cameraPermissionRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera permission is required to capture evidence photos. Please open Settings and enable camera access.'**
+  String get cameraPermissionRequiredMessage;
+
+  /// No description provided for @btnOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get btnOpenSettings;
+
+  /// No description provided for @exitAuditDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Audit?'**
+  String get exitAuditDialogTitle;
+
+  /// No description provided for @exitAuditDialogMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your progress has been automatically saved as a draft. You can resume at any time from the Home screen.'**
+  String get exitAuditDialogMessage;
+
+  /// No description provided for @btnResumeAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume Audit'**
+  String get btnResumeAudit;
+
+  /// No description provided for @btnSaveAndExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Save & Exit'**
+  String get btnSaveAndExit;
+
+  /// No description provided for @s03RecoveryCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Master Recovery Code'**
+  String get s03RecoveryCodeTitle;
+
+  /// No description provided for @s03RecoveryCodeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save this code securely. If you ever forget your Owner PIN, this is the only way to reset it without losing store data.'**
+  String get s03RecoveryCodeSubtitle;
+
+  /// No description provided for @s03RecoveryCodeCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery code copied to clipboard'**
+  String get s03RecoveryCodeCopied;
+
+  /// No description provided for @btnContinueToApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to App'**
+  String get btnContinueToApp;
+
+  /// No description provided for @s04RecoveryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner PIN Recovery'**
+  String get s04RecoveryTitle;
+
+  /// No description provided for @s04RecoveryPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your Master Recovery Code to reset your Owner PIN:'**
+  String get s04RecoveryPrompt;
+
+  /// No description provided for @s04RecoveryInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid Recovery Code. Please check and try again.'**
+  String get s04RecoveryInvalid;
+
+  /// No description provided for @s04ResetPinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set New 4-Digit PIN'**
+  String get s04ResetPinTitle;
+
+  /// No description provided for @s04ConfirmNewPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm New PIN'**
+  String get s04ConfirmNewPin;
+
+  /// No description provided for @s04PinResetSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner PIN reset successfully. Please log in with your new PIN.'**
+  String get s04PinResetSuccess;
+
+  /// No description provided for @btnVerifyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Code'**
+  String get btnVerifyCode;
+
+  /// No description provided for @btnResetPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset PIN'**
+  String get btnResetPin;
+
+  /// No description provided for @s32StoreAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Store Account (Tenant Shield)'**
+  String get s32StoreAccountTitle;
+
+  /// No description provided for @s32StoreAccountConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Store Account Connected'**
+  String get s32StoreAccountConnected;
+
+  /// No description provided for @s32StoreAccountRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Store Account Required'**
+  String get s32StoreAccountRequired;
+
+  /// No description provided for @s32StoreAccountConnectedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This device is securely paired with {storeName}. Cloud backup and sync are active.'**
+  String s32StoreAccountConnectedDesc(String storeName);
+
+  /// No description provided for @s32StoreAccountRequiredDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with your Saagar Traders store passcode to enable cloud synchronization and protect store data.'**
+  String get s32StoreAccountRequiredDesc;
+
+  /// No description provided for @s32ConnectStoreBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In to Store Account'**
+  String get s32ConnectStoreBtn;
+
+  /// No description provided for @s32DisconnectStoreBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get s32DisconnectStoreBtn;
+
+  /// No description provided for @s32StorePasscodeDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Store Account Sign-In'**
+  String get s32StorePasscodeDialogTitle;
+
+  /// No description provided for @s32StorePasscodeDialogDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the authorized Saagar Traders store passcode for the Latur combo store (WLMHW & HEMW):'**
+  String get s32StorePasscodeDialogDesc;
+
+  /// No description provided for @s32StorePasscodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. ST-LATUR-2026'**
+  String get s32StorePasscodeHint;
+
+  /// No description provided for @s32StorePasscodeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid store passcode. Please check and try again.'**
+  String get s32StorePasscodeInvalid;
+
+  /// No description provided for @s32StorePasscodeSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Device successfully paired to store account.'**
+  String get s32StorePasscodeSuccess;
+
+  /// No description provided for @s32DisconnectStoreConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect this device from the store account? Cloud sync will be blocked until reconnected.'**
+  String get s32DisconnectStoreConfirm;
+
+  /// No description provided for @s32DisconnectStoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect Store Account'**
+  String get s32DisconnectStoreTitle;
+
+  /// No description provided for @s32Disconnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get s32Disconnect;
+
+  /// No description provided for @s32Cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get s32Cancel;
+
+  /// No description provided for @s32AutoSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic Background Sync'**
+  String get s32AutoSyncTitle;
+
+  /// No description provided for @s32AutoSyncSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync changes automatically when connected to internet'**
+  String get s32AutoSyncSubtitle;
+
+  /// No description provided for @s03StoreActivationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Store Account Activation (Tenant Shield)'**
+  String get s03StoreActivationTitle;
+
+  /// No description provided for @s03StoreActivationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the Saagar Traders store passcode to link this phone with the Latur cloud (WLMHW & HEMW):'**
+  String get s03StoreActivationSubtitle;
+
+  /// No description provided for @s03StoreActivationSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Device linked to Saagar Traders — Latur. Cloud backup active.'**
+  String get s03StoreActivationSuccess;
+
+  /// No description provided for @s32ChangeStorePasscodeBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Passcode'**
+  String get s32ChangeStorePasscodeBtn;
+
+  /// No description provided for @s32ChangeStorePasscodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate Store Passcode'**
+  String get s32ChangeStorePasscodeTitle;
+
+  /// No description provided for @s32ChangeStorePasscodeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Update the master store passcode for Latur combo store. Requires internet connection.'**
+  String get s32ChangeStorePasscodeDesc;
+
+  /// No description provided for @s32CurrentPasscode.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Store Passcode'**
+  String get s32CurrentPasscode;
+
+  /// No description provided for @s32NewPasscode.
+  ///
+  /// In en, this message translates to:
+  /// **'New Store Passcode (min 6 chars)'**
+  String get s32NewPasscode;
+
+  /// No description provided for @s32ConfirmNewPasscode.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm New Passcode'**
+  String get s32ConfirmNewPasscode;
+
+  /// No description provided for @s32PasscodeUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Store passcode successfully rotated and protected with BCrypt.'**
+  String get s32PasscodeUpdatedSuccess;
+
+  /// No description provided for @s32PasscodeMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'New passcodes do not match.'**
+  String get s32PasscodeMismatch;
+
+  /// No description provided for @s32PasscodeTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Passcode must be at least 6 characters.'**
+  String get s32PasscodeTooShort;
+
+  /// No description provided for @s32InternetRequiredForPasscode.
+  ///
+  /// In en, this message translates to:
+  /// **'Internet connection is required to rotate store passcode.'**
+  String get s32InternetRequiredForPasscode;
+
+  /// No description provided for @s32InternetRequiredForStoreLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Internet connection is required to sign in to store account. Please connect to Wi-Fi or mobile data.'**
+  String get s32InternetRequiredForStoreLogin;
+
+  /// No description provided for @s32AuthorizedDevicesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected Store Devices ({count})'**
+  String s32AuthorizedDevicesTitle(int count);
+
+  /// No description provided for @s32RevokeDeviceBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke Access'**
+  String get s32RevokeDeviceBtn;
+
+  /// No description provided for @s32RevokeDeviceConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to revoke access for this device? It will be disconnected from the store cloud immediately.'**
+  String get s32RevokeDeviceConfirm;
+
+  /// No description provided for @s32RevokeDeviceSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Device access revoked successfully.'**
+  String get s32RevokeDeviceSuccess;
+
+  /// No description provided for @s32ThisDeviceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'(This device)'**
+  String get s32ThisDeviceLabel;
+
+  /// No description provided for @s32RenameDeviceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename Device'**
+  String get s32RenameDeviceTitle;
+
+  /// No description provided for @s32RenameDeviceDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a recognizable label for this device (e.g. Owner Phone, Counter Tablet, SM Rahul).'**
+  String get s32RenameDeviceDesc;
+
+  /// No description provided for @s32RenameDeviceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Device Name / Label'**
+  String get s32RenameDeviceHint;
+
+  /// No description provided for @s32RenameDeviceBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Name'**
+  String get s32RenameDeviceBtn;
+
+  /// No description provided for @s32RenameDeviceSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Device name updated successfully.'**
+  String get s32RenameDeviceSuccess;
+
+  /// No description provided for @s32DeviceLastUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Last user: {role} ({name})'**
+  String s32DeviceLastUser(String role, String name);
+
+  /// No description provided for @s32DeviceLastUserRoleOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Last user: {role}'**
+  String s32DeviceLastUserRoleOnly(String role);
+
+  /// No description provided for @s32DeviceLastActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active: {time}'**
+  String s32DeviceLastActive(String time);
+
+  /// No description provided for @s32DeviceEnrolled.
+  ///
+  /// In en, this message translates to:
+  /// **'Enrolled: {date}'**
+  String s32DeviceEnrolled(String date);
+
+  /// No description provided for @s05CloudInactiveBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Backup Inactive — Tap to link store account'**
+  String get s05CloudInactiveBanner;
+
+  /// No description provided for @s05LinkNowBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Now'**
+  String get s05LinkNowBtn;
 }
 
 class _AppLocalizationsDelegate
