@@ -59,6 +59,10 @@ class DraftAuditState {
   int get failCount =>
       results.values.where((v) => v == Verdict.fail).length;
   int get naCount => results.values.where((v) => v == Verdict.na).length;
+  int get answeredCount => results.length;
+  double get answeredProgress =>
+      checkpoints.isEmpty ? 0.0 : (results.length / checkpoints.length).clamp(0.0, 1.0);
+  int get answeredPercentage => (answeredProgress * 100).toInt();
 
   DraftAuditState copyWith({
     Audit? audit,

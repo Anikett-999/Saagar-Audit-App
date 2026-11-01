@@ -48,6 +48,7 @@ class CapCreateScreen extends ConsumerStatefulWidget {
 
 class _CapCreateScreenState extends ConsumerState<CapCreateScreen> {
   final _formKey = GlobalKey<FormState>();
+  AutovalidateMode _autoValidateMode = AutovalidateMode.disabled;
 
   final _problemController = TextEditingController();
   final _why1Controller = TextEditingController();
@@ -310,6 +311,7 @@ class _CapCreateScreenState extends ConsumerState<CapCreateScreen> {
     if (auth.user == null) return;
 
     if (!_formKey.currentState!.validate()) {
+      setState(() => _autoValidateMode = AutovalidateMode.onUserInteraction);
       return;
     }
 
@@ -437,6 +439,7 @@ class _CapCreateScreenState extends ConsumerState<CapCreateScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Form(
               key: _formKey,
+              autovalidateMode: _autoValidateMode,
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
                 child: Column(

@@ -6,6 +6,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../services/cap_aging_service.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/app_bottom_nav_bar.dart';
 import '../../widgets/language_toggle_button.dart';
 
 /// Screen S27 — Settings Hub.
@@ -43,6 +44,7 @@ class SettingsScreen extends ConsumerWidget {
     };
 
     return Scaffold(
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 4),
       appBar: AppBar(
         title: Text(l10n.s27Title),
         actions: const [

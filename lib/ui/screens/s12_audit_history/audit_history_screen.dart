@@ -9,6 +9,7 @@ import '../../../data/repositories/user_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/app_bottom_nav_bar.dart';
 import '../../widgets/language_toggle_button.dart';
 
 /// Screen S12 — Audit History (Own / All).
@@ -189,6 +190,7 @@ class _AuditHistoryScreenState extends ConsumerState<AuditHistoryScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.cream,
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 1),
       appBar: AppBar(
         title: Text(l10n.s12Title),
         actions: [

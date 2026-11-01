@@ -15,8 +15,8 @@
 | **C. Alerts, Escalations, Cash & Reports** (Items 9–16) | 8 | 8 (Items 9–16) | 0 | 0 |
 | **D. Corrective Action Plan (CAP) Controls** (Items 17–19) | 3 | 3 (Items 17, 18, 19) | 0 | 0 |
 | **E. Language, Permissions & Layout** (Items 20–26) | 7 | 7 (Items 20–26) | 0 | 0 |
-| **F. General Ease of Use** (Item 27 UX Points) | 1 | 0 | 0 | 1 (Item 27) |
-| **TOTAL** | **27** | **26 Solved** | **0 In Progress** | **1 Pending** |
+| **F. General Ease of Use** (Item 27 UX Points) | 1 | 1 (Item 27) | 0 | 0 |
+| **TOTAL** | **27** | **27 Solved (100%)** | **0 In Progress** | **0 Pending** |
 
 ---
 
@@ -371,13 +371,13 @@
 #### Item 27: UX & Workflow Improvements
 - **Priority:** Low | **Client Ref:** Section F
 - **Items Included:**
-  - **27.1:** Bottom navigation menu (Home, Audits, CAPs, Reports, Settings) to reduce excessive scrolling.
-  - **27.2:** 68-checkpoint jump list drawer (showing answered, unanswered, failed).
-  - **27.3:** Review screen tap finding to open for editing.
-  - **27.4:** Auto-dismiss validation errors as soon as user attaches photo or fills field.
-  - **27.5:** Simplify first-time setup PIN flow and eliminate technical jargon across all user screens.
-  - **27.6:** Progress calculation based on count of answered checkpoints rather than cursor index.
-  - **27.7:** Human names on report signatures instead of raw user IDs.
-- **Status:** ⏳ **PENDING (Tier 3)**
+  - **27.1:** Bottom navigation menu (Home, Audits, CAPs, Reports, Settings) to reduce excessive scrolling. (✅ **SOLVED & VERIFIED**)
+  - **27.2:** 68-checkpoint jump list drawer (showing answered, unanswered, failed). (✅ **SOLVED & VERIFIED**)
+  - **27.3:** Review screen tap finding to open for editing and text wrap fix. (✅ **SOLVED & VERIFIED**)
+  - **27.4:** Auto-dismiss validation errors as soon as user attaches photo or fills field. (✅ **SOLVED & VERIFIED**)
+  - **27.5:** Simplify first-time setup PIN flow and eliminate technical jargon across all user screens. (✅ **SOLVED & VERIFIED** - Implemented in Item 5 / ¶364: upfront name validation, auto-login eliminating 3rd PIN entry, no crypto/DB jargon)
+  - **27.6:** Progress calculation based on count of answered checkpoints rather than cursor index. (✅ **SOLVED & VERIFIED**)
+  - **27.7:** Human names on report signatures instead of raw user IDs. (✅ **SOLVED & VERIFIED** - Implemented via UserRepository resolution across S13, S20/S21, and Daily/Weekly PDF exports)
+- **Status:** ✅ **SOLVED & VERIFIED (Tier 3 - All 7 sub-items completed & tested)**
 - **Commit:** —
 - **Files Changed:** —

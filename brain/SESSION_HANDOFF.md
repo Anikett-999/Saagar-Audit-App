@@ -7875,3 +7875,123 @@ $ git push origin fix/part-b-bugs
 To https://github.com/Anikett-999/Saagar-Audit-App.git
    2641ec4..63290f1  fix/part-b-bugs -> fix/part-b-bugs
 ```
+
+
+---
+
+## Handoff — 2026-11-01 (Step 1: Auto-Dismissing Validation Errors / Item 27.4)
+**Author**: Antigravity  
+**Branch**: `fix/part-b-bugs`  
+**Status**: Resolved lingering error messages across forms; validation errors now auto-dismiss immediately upon user correction.
+
+### 1. Problem & Root Cause (Sagar Review §F / Item 27.4)
+- When a required field or photo was missing, error messages persisted even after the user captured the photo or began typing in the field.
+- In Flutter, forms without `AutovalidateMode.onUserInteraction` or live text listeners only re-evaluate error states when the user taps Submit a second time.
+
+### 2. Solutions Implemented
+1. **Screen S08 (Fail Detail)**:
+   - Added text change listener to `_findingController` to auto-clear `_error = null` as soon as valid finding length ($\ge 5$ characters) is entered.
+   - In `_addPhoto()`, immediately clears `_error = null` upon photo capture if finding is valid.
+2. **Screen S15 (CAP Create)**:
+   - Added `_autoValidateMode` to `Form`. Switches dynamically to `AutovalidateMode.onUserInteraction` after initial submit attempt, automatically clearing red error text under Problem Statement, Why 1, Action Steps, etc. the exact millisecond the user types into them.
+3. **Screen S03 (First-Time Setup)**:
+   - Added `onChanged` handlers to `_nameController` and `_storeKeyController` to dismiss "Name too short" and "Store key error" immediately as the user types.
+4. **Screen S30 (Change PIN)**:
+   - Configured `autovalidateMode: _autoValidateMode` switching to `onUserInteraction` on submit attempt; clears current PIN mismatch error on edit.
+5. **Screen S28 & S29 (Manage CROs & Users Modals)**:
+   - Added `autovalidateMode` with `onUserInteraction` to dialog forms.
+
+### 3. Verification
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- `test/score_engine_test.dart`: **12/12 passed (100% green)**.
+- `test/cap_create_screen_test.dart`, `test/change_pin_test.dart`, `test/manage_users_test.dart`, `test/manage_cros_test.dart`, `test/camera_and_navigation_test.dart`: **38/38 passed (100% green)**.
+
+---
+
+## Handoff — 2026-11-01 (Step 2 & 3: Progress Calculation & 68-Checkpoint Jump List / Items 27.6 & 27.2)
+**Author**: Antigravity  
+**Branch**: `fix/part-b-bugs`  
+**Status**: Completed and fully verified against device unit and widget tests.
+
+### 1. Item 27.6: Progress Based on Answered Count (Client Ref §F)
+- **Problem**: Progress indicator previously displayed `(currentIndex + 1) / total`, resulting in an inaccurate "1% complete" on question 1 before any answer was submitted, and fluctuating erratically if the auditor navigated backward to review earlier questions.
+- **Solution**:
+  - `lib/providers/draft_audit_provider.dart`: Added `answeredCount`, `answeredProgress` (`results.length / checkpoints.length`), and `answeredPercentage` getters.
+  - `lib/ui/screens/s07_checkpoint/checkpoint_screen.dart`: Updated `LinearProgressIndicator` and screen Semantics to strictly read `state.answeredCount` and `state.answeredProgress`. A fresh audit honestly displays `0%` until answers are registered.
+
+### 2. Item 27.2: 68-Checkpoint Jump List Drawer / Bottom Sheet (Client Ref §F)
+- **Problem**: Auditors had no bird's-eye view of which of the 68 checkpoints were answered, pending, or failed, and could only navigate linearly one by one.
+- **Solution**:
+  - `lib/ui/screens/s07_checkpoint/widgets/checkpoint_jump_sheet.dart`: Created full-featured modal bottom sheet:
+    - Auto-scrolls to the active checkpoint upon opening.
+    - Status filter chips: All (68), Unanswered, Failed, Passed, and N/A with exact live counts.
+    - Checkpoint cards with sequence badge (`#1`), SOP tag, localized checkpoint text, status badge (PASS, FAIL, NA, or Pending), and distinct highlighting for the currently active checkpoint.
+    - 1-tap jumping to any checkpoint via `ref.read(draftAuditProvider.notifier).jumpTo(index)` and automatic dismissal.
+  - `lib/ui/screens/s07_checkpoint/checkpoint_screen.dart`: Added action button in AppBar (`Icons.format_list_bulleted_rounded`) with localized tooltip and jump sheet launcher; added graceful end-of-audit safeguard.
+  - `lib/l10n/`: Added localized strings for English and authentic Marathi.
+
+### 3. Verification
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- `flutter test test/camera_and_navigation_test.dart`: **9/9 passed (100% green)**.
+- `flutter test test/score_engine_test.dart`: **12/12 passed (100% green, Rule #5 maintained)**.
+
+---
+
+## Handoff — 2026-11-01 (Step 4: Persistent Bottom Navigation Bar / Item 27.1)
+**Author**: Antigravity  
+**Branch**: `fix/part-b-bugs`  
+**Status**: Completed, lightweight implementation (~70 LOC), zero external dependencies, verified across all regression suites.
+
+### 1. Item 27.1: Persistent Bottom Navigation Bar (Client Ref §F)
+- **Problem**: Users on Home (S05) had to scroll excessively past large audit status cards to reach Audits, CAPs, Reports, or Settings.
+- **Optimized Solution**:
+  - `lib/ui/widgets/app_bottom_nav_bar.dart`: Created a sleek, highly-optimized ~70 LOC `AppBottomNavBar` using Flutter Material 3 `NavigationBar` with zero third-party packages or bloated dependencies.
+  - Placed on the 5 primary hub screens:
+    - Tab 0: **Home** (`s05_home`)
+    - Tab 1: **Audits** (`s12_audit_history`)
+    - Tab 2: **CAPs** (`s14_cap_list`)
+    - Tab 3: **Reports** (`s20_reports_list`)
+    - Tab 4: **Settings** (`s27_settings`)
+  - Styled with Saagar retail palette (`AppColors.navy`, `AppColors.goldPale`, `AppColors.white`).
+  - Utilizes existing localized strings (`navHome`, `navAudits`, `navCaps`, `navReports`, `navSettings`) in English and authentic Marathi.
+  - Defensive fallback preserves isolated widget testing without requiring full GoRouter harnesses.
+
+### 2. Verification
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- `flutter test test/camera_and_navigation_test.dart`: **11/11 passed (100% green)**.
+- `flutter test test/score_engine_test.dart`: **12/12 passed (100% green, Rule #5 maintained)**.
+- `flutter test test/weekly_report_test.dart test/cap_create_screen_test.dart test/change_pin_test.dart test/manage_users_test.dart test/manage_cros_test.dart`: **40/40 passed (100% green)**.
+
+---
+
+## Handoff — 2026-11-01 (Step 5: ARB Localization Source Fix & Item 27.3 Review Tap-to-Edit)
+**Author**: Antigravity  
+**Branch**: `fix/part-b-bugs`  
+**Status**: All 27 UAT items now 100% SOLVED and VERIFIED. Device debug build verified clean.
+
+### 1. Root Cause & Solution for Gradle Build Error
+- **Error Encountered**: `Error: The getter 's07JumpListTitle' isn't defined for the type 'AppLocalizations'`.
+- **Root Cause**: Flutter's Gradle build step automatically invokes `flutter gen-l10n` as specified in `l10n.yaml`, regenerating Dart files directly from template ARB files in `assets/translations/app_*.arb`. Because the jump list keys were originally added only to `lib/l10n/app_localizations.dart`, the Gradle build wiped them during automatic regeneration.
+- **Fix Applied**:
+  - Added all 9 jump list keys to source templates: `assets/translations/app_en.arb` and `assets/translations/app_mr.arb`.
+  - Executed `flutter gen-l10n` to compile both languages into `lib/l10n/`.
+  - Verified with `flutter build apk --debug`: **Build succeeded cleanly (`√ Built build\app\outputs\flutter-apk\app-debug.apk`)**.
+
+### 2. Item 27.3: Review Screen Tap-to-Edit & Text Wrap (Client Ref §F)
+- **Problem**:
+  - Failed checkpoints on Screen S10 (Review) were non-interactive; typos or photo updates required cumbersome manual back-navigation.
+  - Squeezed row layout (`maxLines: 1`) cut off checkpoint question titles next to badges.
+- **Solution**:
+  - `lib/ui/screens/s10_review/review_submit_screen.dart`:
+    - Wrapped fail cards in `InkWell` with clear `Edit` action badge (`Icons.edit_outlined` + `l10n.btnEdit`).
+    - Tapping calls `draftAuditProvider.notifier.jumpTo(index)` and navigates to `s07_checkpoint` for instant editing, auto-refreshing on return.
+    - Set title to `maxLines: 2` with clean multi-line wrapping so checkpoint descriptions are never truncated.
+
+### 3. Verification
+- `flutter analyze`: **No issues found! (0 errors, 0 warnings, 0 info)**.
+- `flutter test test/camera_and_navigation_test.dart`: **12/12 passed (100% green)**.
+- `flutter test test/score_engine_test.dart`: **12/12 passed (100% green, Rule #5 maintained)**.
+- `flutter build apk --debug`: **SUCCESS (Build completed in 189s)**.
+
+
+

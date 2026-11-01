@@ -45,13 +45,25 @@ class _FailDetailScreenState extends ConsumerState<FailDetailScreen> {
   void initState() {
     super.initState();
     _flagSecurityConcern = widget.initialSecurityConcern;
+    _findingController.addListener(_onFindingChanged);
     _bootstrap();
   }
 
   @override
   void dispose() {
+    _findingController.removeListener(_onFindingChanged);
     _findingController.dispose();
     super.dispose();
+  }
+
+  void _onFindingChanged() {
+    if (_error != null && _findingController.text.trim().length >= 5) {
+      final cp = ref.read(draftAuditProvider).currentCheckpoint;
+      final photoRequired = cp?.requiresPhotoOnFail == true;
+      if (!photoRequired || _pendingPhotoPaths.isNotEmpty) {
+        setState(() => _error = null);
+      }
+    }
   }
 
   Future<void> _bootstrap() async {
@@ -87,7 +99,16 @@ class _FailDetailScreenState extends ConsumerState<FailDetailScreen> {
         auditId: audit.id,
       );
       if (path == null || !mounted) return;
-      setState(() => _pendingPhotoPaths = [..._pendingPhotoPaths, path]);
+      setState(() {
+        _pendingPhotoPaths = [..._pendingPhotoPaths, path];
+        // Auto-dismiss photo error immediately once a photo is attached
+        if (_error != null) {
+          final findingLen = _findingController.text.trim().length;
+          if (findingLen >= 5 && findingLen <= 200) {
+            _error = null;
+          }
+        }
+      });
     } on CameraPermissionDeniedException {
       if (mounted) {
         await showCameraPermissionDeniedDialog(context);

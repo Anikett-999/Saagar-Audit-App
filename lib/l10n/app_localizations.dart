@@ -1064,6 +1064,60 @@ abstract class AppLocalizations {
   /// **'Finish & Review'**
   String get s07FinishReview;
 
+  /// No description provided for @s07JumpListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit Checkpoints'**
+  String get s07JumpListTitle;
+
+  /// No description provided for @s07JumpListTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkpoint jump list'**
+  String get s07JumpListTooltip;
+
+  /// No description provided for @s07JumpListFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get s07JumpListFilterAll;
+
+  /// No description provided for @s07JumpListFilterUnanswered.
+  ///
+  /// In en, this message translates to:
+  /// **'Unanswered'**
+  String get s07JumpListFilterUnanswered;
+
+  /// No description provided for @s07JumpListFilterPassed.
+  ///
+  /// In en, this message translates to:
+  /// **'Passed'**
+  String get s07JumpListFilterPassed;
+
+  /// No description provided for @s07JumpListFilterFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get s07JumpListFilterFailed;
+
+  /// No description provided for @s07JumpListFilterNa.
+  ///
+  /// In en, this message translates to:
+  /// **'N/A'**
+  String get s07JumpListFilterNa;
+
+  /// No description provided for @s07JumpListCurrentBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get s07JumpListCurrentBadge;
+
+  /// No description provided for @s07JumpListPendingBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get s07JumpListPendingBadge;
+
   /// No description provided for @s08Title.
   ///
   /// In en, this message translates to:

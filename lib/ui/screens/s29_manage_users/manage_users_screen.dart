@@ -342,6 +342,7 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
       context: context,
       barrierDismissible: false,
       builder: (dialogCtx) {
+        var autoValidateMode = AutovalidateMode.disabled;
         return StatefulBuilder(
           builder: (ctx, setDialogState) {
             return AlertDialog(
@@ -355,6 +356,7 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
               content: SingleChildScrollView(
                 child: Form(
                   key: formKey,
+                  autovalidateMode: autoValidateMode,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -464,7 +466,10 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    if (!formKey.currentState!.validate()) return;
+                    if (!formKey.currentState!.validate()) {
+                      setDialogState(() => autoValidateMode = AutovalidateMode.onUserInteraction);
+                      return;
+                    }
 
                     // bcrypt-hash the entered PIN through the same path S03/S04 use
                     final pin = pinController.text.trim();
@@ -527,17 +532,21 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
       context: context,
       barrierDismissible: false,
       builder: (dialogCtx) {
-        return AlertDialog(
-          title: Text(
-            l10n.s29ResetPinTitle(user.name),
-            style: const TextStyle(
-              fontFamily: 'DMSerifDisplay',
-              color: AppColors.navy,
-            ),
-          ),
-          content: Form(
-            key: formKey,
-            child: Column(
+        var autoValidateMode = AutovalidateMode.disabled;
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            return AlertDialog(
+              title: Text(
+                l10n.s29ResetPinTitle(user.name),
+                style: const TextStyle(
+                  fontFamily: 'DMSerifDisplay',
+                  color: AppColors.navy,
+                ),
+              ),
+              content: Form(
+                key: formKey,
+                autovalidateMode: autoValidateMode,
+                child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
@@ -587,7 +596,10 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                if (!formKey.currentState!.validate()) return;
+                if (!formKey.currentState!.validate()) {
+                  setDialogState(() => autoValidateMode = AutovalidateMode.onUserInteraction);
+                  return;
+                }
 
                 final newPin = newPinController.text.trim();
                 final newHash = hashPin(newPin);
@@ -614,6 +626,8 @@ class _ManageUsersScreenState extends ConsumerState<ManageUsersScreen> {
         );
       },
     );
+  },
+);
 
     if (result == true) {
       if (!mounted) return;

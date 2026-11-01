@@ -538,6 +538,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get s07FinishReview => 'Finish & Review';
 
   @override
+  String get s07JumpListTitle => 'Audit Checkpoints';
+
+  @override
+  String get s07JumpListTooltip => 'Checkpoint jump list';
+
+  @override
+  String get s07JumpListFilterAll => 'All';
+
+  @override
+  String get s07JumpListFilterUnanswered => 'Unanswered';
+
+  @override
+  String get s07JumpListFilterPassed => 'Passed';
+
+  @override
+  String get s07JumpListFilterFailed => 'Failed';
+
+  @override
+  String get s07JumpListFilterNa => 'N/A';
+
+  @override
+  String get s07JumpListCurrentBadge => 'Current';
+
+  @override
+  String get s07JumpListPendingBadge => 'Pending';
+
+  @override
   String get s08Title => 'Fail Detail';
 
   @override

@@ -9,6 +9,7 @@ import '../../../data/repositories/user_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/app_bottom_nav_bar.dart';
 import '../../widgets/language_toggle_button.dart';
 
 /// Screen S14 — Corrective Action Plans (CAP) List.
@@ -103,6 +104,7 @@ class _CapListScreenState extends ConsumerState<CapListScreen> {
     }
 
     return Scaffold(
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 2),
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

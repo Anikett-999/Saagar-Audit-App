@@ -302,6 +302,11 @@ class _FirstSetupScreenState extends ConsumerState<FirstSetupScreen> {
                               child: TextField(
                                 controller: _storeKeyController,
                                 textCapitalization: TextCapitalization.characters,
+                                onChanged: (val) {
+                                  if (_storeKeyError != null && val.trim().isNotEmpty) {
+                                    setState(() => _storeKeyError = null);
+                                  }
+                                },
                                 decoration: InputDecoration(
                                   hintText: 'e.g. ST-LATUR-2026',
                                   errorText: _storeKeyError,
@@ -389,6 +394,11 @@ class _FirstSetupScreenState extends ConsumerState<FirstSetupScreen> {
                   controller: _nameController,
                   enabled: !_confirming,
                   textInputAction: TextInputAction.done,
+                  onChanged: (val) {
+                    if (_error != null && val.trim().length >= 2) {
+                      setState(() => _error = null);
+                    }
+                  },
                   onEditingComplete: () => FocusScope.of(context).unfocus(),
                   onTapOutside: (_) => FocusScope.of(context).unfocus(),
                   decoration: InputDecoration(

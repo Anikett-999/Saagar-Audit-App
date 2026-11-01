@@ -13,6 +13,7 @@ import '../../../providers/auth_provider.dart';
 import '../../../providers/cloud_sync_provider.dart';
 import '../../../providers/draft_audit_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/app_bottom_nav_bar.dart';
 import '../../widgets/language_toggle_button.dart';
 
 /// S5 Home / Dashboard — role-aware landing after login.
@@ -84,6 +85,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final today = DateFormat('EEEE, d MMMM').format(DateTime.now());
 
     return Scaffold(
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 0),
       appBar: AppBar(
         title: Text(l10n.appTitle),
         actions: [

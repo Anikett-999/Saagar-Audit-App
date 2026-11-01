@@ -9,6 +9,7 @@ import '../../../data/repositories/checkpoint_repository.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/draft_audit_provider.dart';
 import '../../theme/app_colors.dart';
+import 'widgets/checkpoint_jump_sheet.dart';
 
 /// S7 Checkpoint Screen — the heart of the daily audit flow.
 ///
@@ -167,10 +168,90 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
     }
   }
 
+  void _openJumpListSheet() {
+    final state = ref.read(draftAuditProvider);
+    if (!state.isActive || state.checkpoints.isEmpty) return;
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => CheckpointJumpSheet(
+        checkpoints: state.checkpoints,
+        results: state.results,
+        currentIndex: state.currentIndex,
+        sopNamesById: _sopNamesById,
+        onSelect: (index) {
+          setState(() => _securityConcern = false);
+          ref.read(draftAuditProvider.notifier).jumpTo(index);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(draftAuditProvider);
     final cp = state.currentCheckpoint;
+
+    if (state.isActive && state.checkpoints.isNotEmpty && cp == null) {
+      final l10n = AppLocalizations.of(context)!;
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.s07JumpListTitle),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: _handleBackNavigation,
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.format_list_bulleted_rounded),
+              tooltip: l10n.s07JumpListTooltip,
+              onPressed: _openJumpListSheet,
+            ),
+          ],
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.fact_check_outlined, size: 56, color: AppColors.navy),
+                const SizedBox(height: 16),
+                Text(
+                  'Reached end of checkpoints (${state.results.length} of ${state.checkpoints.length} answered)',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.navy),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'You can review and submit or use the jump list to revisit checkpoints.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: AppColors.gray600),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.navy,
+                    foregroundColor: AppColors.gold,
+                  ),
+                  icon: const Icon(Icons.assignment_turned_in),
+                  label: Text(l10n.s07FinishReview),
+                  onPressed: () => context.goNamed('s10_review'),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.format_list_bulleted_rounded),
+                  label: Text(l10n.s07JumpListTitle),
+                  onPressed: _openJumpListSheet,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     if (!state.isActive || cp == null) {
       return Scaffold(
@@ -211,7 +292,10 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
     final l10n = AppLocalizations.of(context)!;
     final total = state.checkpoints.length;
     final n = state.currentIndex + 1;
-    final progress = n / total;
+    // Item 27.6 (Client Ref §F): Progress strictly reflects answered checkpoints (0% on start)
+    final answeredCount = state.answeredCount;
+    final progress = total > 0 ? (answeredCount / total).clamp(0.0, 1.0) : 0.0;
+    final progressPct = (progress * 100).toInt();
     final sopName = _sopNamesById[cp.sopId] ?? cp.sopId;
     final isCritical = cp.sopId == 'SOP6' || cp.sopId == 'SOP7';
     final cpText = cp.text(locale);
@@ -231,14 +315,21 @@ class _CheckpointScreenState extends ConsumerState<CheckpointScreen> {
             icon: const Icon(Icons.arrow_back),
             onPressed: _handleBackNavigation,
           ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.format_list_bulleted_rounded),
+              tooltip: l10n.s07JumpListTooltip,
+              onPressed: _openJumpListSheet,
+            ),
+          ],
         ),
         body: SafeArea(
           child: Column(
             children: [
               Semantics(
                 label:
-                    'Progress: Checkpoint ${state.currentIndex + 1} of $total, ${(progress * 100).toInt()}% complete',
-                value: '${(progress * 100).toInt()}%',
+                    'Progress: $answeredCount of $total answered, $progressPct% complete',
+                value: '$progressPct%',
                 child: LinearProgressIndicator(
                   value: progress,
                   backgroundColor: AppColors.gray200,

@@ -36,6 +36,7 @@ class _ChangePinScreenState extends ConsumerState<ChangePinScreen> {
   bool _obscureConfirm = true;
   bool _submitting = false;
   String? _currentPinError;
+  AutovalidateMode _autoValidateMode = AutovalidateMode.disabled;
 
   @override
   void dispose() {
@@ -47,7 +48,10 @@ class _ChangePinScreenState extends ConsumerState<ChangePinScreen> {
 
   Future<void> _submit(AppLocalizations l10n, String userId) async {
     setState(() => _currentPinError = null);
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      setState(() => _autoValidateMode = AutovalidateMode.onUserInteraction);
+      return;
+    }
 
     final currentPin = _currentPinController.text.trim();
     final newPin = _newPinController.text.trim();
@@ -145,6 +149,7 @@ class _ChangePinScreenState extends ConsumerState<ChangePinScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: Form(
           key: _formKey,
+          autovalidateMode: _autoValidateMode,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [

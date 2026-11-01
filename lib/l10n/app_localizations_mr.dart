@@ -537,6 +537,33 @@ class AppLocalizationsMr extends AppLocalizations {
   String get s07FinishReview => 'पूर्ण करा आणि पुनरावलोकन';
 
   @override
+  String get s07JumpListTitle => 'ऑडिट चेकपॉईंट्स';
+
+  @override
+  String get s07JumpListTooltip => 'चेकपॉईंट यादी';
+
+  @override
+  String get s07JumpListFilterAll => 'सर्व';
+
+  @override
+  String get s07JumpListFilterUnanswered => 'अपूर्ण';
+
+  @override
+  String get s07JumpListFilterPassed => 'पास';
+
+  @override
+  String get s07JumpListFilterFailed => 'नापास';
+
+  @override
+  String get s07JumpListFilterNa => 'लागू नाही';
+
+  @override
+  String get s07JumpListCurrentBadge => 'चालू';
+
+  @override
+  String get s07JumpListPendingBadge => 'बाकी';
+
+  @override
   String get s08Title => 'नापास तपशील';
 
   @override
