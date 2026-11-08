@@ -203,9 +203,12 @@ Each implementation chunk should be independently reviewable and produce one com
 - Keep production Firebase changes and merge to `main` as separate explicit go/no-go decisions.
 - Preserve unrelated pre-existing working tree changes; never stage them with this work.
 
-## Immediate next step
+## Implementation progress and next step
 
-Confirm the device model: shared store devices or one dedicated device per person. Until this is known, do not implement the cloud session/local PIN binding or user-switch experience. After confirmation, complete Chunk 0 and return its architecture and security contract for review before changing application code.
+- **Owner decisions recorded:** shared and dedicated devices are both supported; WLMHW and HEMW are one tenant; offline local work remains available while cloud access is blocked until membership is active.
+- **Sync reliability foundation completed:** commit `3deda85c82fdf67869aeadfd138bfca7ee901596` makes table/photo/pull failures visible to the caller, prevents the sync checkpoint from advancing after failed stages, and removes the 400-record early-stop. Per the code test run, sync tests passed 20/20, score-engine tests passed 12/12, and `flutter analyze` reported no issues.
+- **Chunk 0 remains incomplete:** the Firebase CLI credentials need reauthentication, so deployed project state and production rules are still unverified. First-Owner bootstrap, invitation details/staff email availability, exact cloud role matrix, and billing/operations ownership also need confirmation.
+- **Next:** finalize those remaining decisions and produce the collection/operation access matrix. Then implement the Auth/membership foundation and emulator authorization tests on this branch. Do not change production rules or remove the legacy passcode flow until the new activation path and rollback have been reviewed and verified.
 
 
 
