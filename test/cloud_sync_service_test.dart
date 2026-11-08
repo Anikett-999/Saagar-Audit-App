@@ -20,15 +20,23 @@ class TestCloudSyncAdapter implements CloudSyncAdapter {
   final Map<String, List<Map<String, dynamic>>> pushedData = {};
   final Map<String, List<Map<String, dynamic>>> mockRemoteData = {};
   int uploadedPhotosCount = 0;
+  String? failPushCollection;
+  String? failPullCollection;
 
   @override
   Future<int> pushRecords(String collection, List<Map<String, dynamic>> records) async {
+    if (collection == failPushCollection) {
+      throw StateError('push failed for $collection');
+    }
     pushedData.putIfAbsent(collection, () => []).addAll(records);
     return records.length;
   }
 
   @override
   Future<List<Map<String, dynamic>>> pullRecords(String collection, DateTime? since) async {
+    if (collection == failPullCollection) {
+      throw StateError('pull failed for $collection');
+    }
     return mockRemoteData[collection] ?? [];
   }
 
@@ -171,6 +179,35 @@ void main() {
       expect(result.success, isFalse);
       expect(result.status, equals(CloudSyncStatus.offline));
       expect(testAdapter.pushedData.isEmpty, isTrue);
+    });
+
+    test('A failed table push returns an error and does not advance the sync checkpoint', () async {
+      fakeDb.tables['audits']!.add({
+        'id': 'audit_retry',
+        'status': 'submitted',
+        'created_at': DateTime.now().toIso8601String(),
+      });
+      testAdapter.failPushCollection = 'audits';
+
+      final result = await CloudSyncService.instance.syncAll(force: true);
+      final prefs = await SharedPreferences.getInstance();
+
+      expect(result.success, isFalse);
+      expect(result.status, equals(CloudSyncStatus.error));
+      expect(result.message, contains('Failed to push audits'));
+      expect(prefs.getString(CloudSyncService.prefKeyLastSync), isNull);
+    });
+
+    test('A failed table pull returns an error and does not advance the sync checkpoint', () async {
+      testAdapter.failPullCollection = 'cros';
+
+      final result = await CloudSyncService.instance.syncAll(force: true);
+      final prefs = await SharedPreferences.getInstance();
+
+      expect(result.success, isFalse);
+      expect(result.status, equals(CloudSyncStatus.error));
+      expect(result.message, contains('Failed to pull cros'));
+      expect(prefs.getString(CloudSyncService.prefKeyLastSync), isNull);
     });
 
     test('Pending count calculation works for photos and audits', () async {
@@ -674,3 +711,4 @@ void main() {
     });
   });
 }
+

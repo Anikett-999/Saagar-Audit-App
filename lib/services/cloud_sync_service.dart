@@ -136,6 +136,16 @@ abstract class CloudSyncAdapter {
   Future<String?> uploadPhoto(String localPath, String storagePath);
 }
 
+class _CloudSyncStageFailure implements Exception {
+  const _CloudSyncStageFailure(this.message, [this.cause]);
+
+  final String message;
+  final Object? cause;
+
+  @override
+  String toString() => cause == null ? message : '$message: $cause';
+}
+
 /// Production Cloud Synchronization Engine.
 ///
 /// Implements Spec §1, §4.14, §11.5, §16.4 & Rule 3 (Offline-First):
@@ -207,20 +217,22 @@ class CloudSyncService {
 
   /// Sets the last recorded sync timestamp.
   Future<void> setLastSyncTime(DateTime time) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(prefKeyLastSync, time.toIso8601String());
+    final prefs = await SharedPreferences.getInstance();
+    final saved = await prefs.setString(prefKeyLastSync, time.toIso8601String());
+    if (!saved) {
+      throw const _CloudSyncStageFailure('Failed to save the sync checkpoint');
+    }
 
-      // Also record in devices table if available
-      try {
-        await _db.update(
-          'devices',
-          {
-            'last_sync_at': time.toIso8601String(),
-            'sync_state': 'synced',
-          },
-        );
-      } catch (_) {}
+    // Preferences hold the authoritative cursor. Device metadata is only a
+    // local convenience and must not invalidate a completed sync.
+    try {
+      await _db.update(
+        'devices',
+        {
+          'last_sync_at': time.toIso8601String(),
+          'sync_state': 'synced',
+        },
+      );
     } catch (_) {}
   }
 
@@ -360,14 +372,12 @@ class CloudSyncService {
       onProgress?.call(0.7, 'Pulling updates from cloud...');
       totalPulled += await _pullScopedData(userRole: userRole, since: lastSync);
 
-      // Step 6: Mark Audit Log as Synced
-      try {
-        await _db.update(
-          'audit_log',
-          {'sync_state': 'synced'},
-          where: "sync_state = 'pending'",
-        );
-      } catch (_) {}
+      // Step 6: Mark Audit Log as Synced only after every cloud stage succeeds.
+      await _db.update(
+        'audit_log',
+        {'sync_state': 'synced'},
+        where: "sync_state = 'pending'",
+      );
 
       // Step 7: Record Completion
       final now = DateTime.now();
@@ -403,10 +413,14 @@ class CloudSyncService {
       for (final row in rows) {
         final id = row['id'] as String;
         final localPath = row['local_path'] as String?;
-        if (localPath == null) continue;
+        if (localPath == null || localPath.isEmpty) {
+          throw _CloudSyncStageFailure('Photo $id is missing its local file path');
+        }
 
         final file = File(localPath);
-        if (!file.existsSync()) continue;
+        if (!file.existsSync()) {
+          throw _CloudSyncStageFailure('Photo $id is missing from local storage');
+        }
 
         String? cloudUrl;
         final storagePath = 'photos/$id.jpg';
@@ -424,25 +438,30 @@ class CloudSyncService {
             cloudUrl = await ref.getDownloadURL();
           } catch (e) {
             debugPrint('Failed to upload photo $id: $e');
-            continue;
+            throw _CloudSyncStageFailure('Photo upload failed for $id', e);
           }
         }
 
-        if (cloudUrl != null) {
-          await _db.update(
-            'photos',
-            {
-              'cloud_url': cloudUrl,
-              'upload_status': 'uploaded',
-            },
-            where: 'id = ?',
-            whereArgs: [id],
-          );
-          uploaded++;
+        if (cloudUrl == null || cloudUrl.isEmpty) {
+          throw _CloudSyncStageFailure('Photo upload returned no cloud URL for $id');
         }
+
+        await _db.update(
+          'photos',
+          {
+            'cloud_url': cloudUrl,
+            'upload_status': 'uploaded',
+          },
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+        uploaded++;
       }
+    } on _CloudSyncStageFailure {
+      rethrow;
     } catch (e) {
       debugPrint('CloudSyncService._syncPendingPhotos error: $e');
+      throw _CloudSyncStageFailure('Photo synchronization failed', e);
     }
     return uploaded;
   }
@@ -470,41 +489,52 @@ class CloudSyncService {
       if (records.isEmpty) return 0;
 
       if (_testAdapter != null) {
-        return await _testAdapter!.pushRecords(tableName, records);
+        final validRecords = records.where((record) => record['id'] != null).toList();
+        final expectedCount = validRecords.length;
+        final pushedCount = await _testAdapter!.pushRecords(tableName, validRecords);
+        if (pushedCount != expectedCount) {
+          throw _CloudSyncStageFailure(
+            'Incomplete push for $tableName ($pushedCount/$expectedCount records)',
+          );
+        }
+        return pushedCount;
       }
 
-      // Firestore Batch Write
+      // Commit bounded batches and continue through the complete table.
       final firestore = FirebaseFirestore.instance;
       final collection = firestore.collection(tableName);
-      final batch = firestore.batch();
       int count = 0;
+      WriteBatch? batch;
+      int batchCount = 0;
 
       for (final record in records) {
         final id = record['id']?.toString();
         if (id == null) continue;
 
+        batch ??= firestore.batch();
         final docRef = collection.doc(id);
         final data = Map<String, dynamic>.from(record);
         data['_synced_at'] = FieldValue.serverTimestamp();
 
         batch.set(docRef, data, SetOptions(merge: true));
         count++;
+        batchCount++;
 
-        if (count >= 400) {
-          // Commit batch before 500 limit
+        if (batchCount == 400) {
           await batch.commit();
-          break;
+          batch = null;
+          batchCount = 0;
         }
       }
 
-      if (count > 0 && count < 400) {
+      if (batch != null && batchCount > 0) {
         await batch.commit();
       }
 
       return count;
     } catch (e) {
       debugPrint('CloudSyncService._pushTableData($tableName) error: $e');
-      return 0;
+      throw _CloudSyncStageFailure('Failed to push $tableName', e);
     }
   }
 
@@ -540,7 +570,7 @@ class CloudSyncService {
       return sanitized.length;
     } catch (e) {
       debugPrint('CloudSyncService._pushUsers error: $e');
-      return 0;
+      throw _CloudSyncStageFailure('Failed to push users', e);
     }
   }
 
@@ -684,7 +714,7 @@ class CloudSyncService {
       return upserted;
     } catch (e) {
       debugPrint('CloudSyncService._pullTableData($tableName) error: $e');
-      return 0;
+      throw _CloudSyncStageFailure('Failed to pull $tableName', e);
     }
   }
 
@@ -730,3 +760,4 @@ class CloudSyncService {
     return null;
   }
 }
+
