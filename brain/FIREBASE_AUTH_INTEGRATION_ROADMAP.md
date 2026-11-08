@@ -207,3 +207,48 @@ Each implementation chunk should be independently reviewable and produce one com
 
 Confirm the device model: shared store devices or one dedicated device per person. Until this is known, do not implement the cloud session/local PIN binding or user-switch experience. After confirmation, complete Chunk 0 and return its architecture and security contract for review before changing application code.
 
+
+
+## Code-level integration findings (2026-11-08)
+
+These findings come from inspecting the current Flutter and SQLite implementation. They are an engineering inventory, not a claim about the deployed Firebase project's current state.
+
+| Surface | Current behavior | Integration consequence |
+|---|---|---|
+| Startup (`main.dart`, S01) | SQLite and background WorkManager setup happen before `runApp`; Firebase initialization is unawaited. S01 chooses S03/S04 from whether local users exist. | Keep startup local and bounded. First-time cloud activation must be a resumable state in onboarding; never make every launch wait on Auth/network. Check whether background work can run before a cloud principal is restored. |
+| First setup (S03) | Owner is created locally with bcrypt PIN and auto-authenticated; store pairing currently uses a shared activation key. | Make bootstrap atomic and server-issued. An interrupted online claim must resume without creating a second Owner, and local Owner creation must not imply cloud Owner authorization. |
+| Daily login (S04) | Selects a local SQLite user and unlocks with local PIN. | This remains the offline unlock. Cloud identity mapping must be explicit; switching the selected local user cannot inherit another Firebase session for sync. |
+| User admin (S29) | Owner locally creates SM/GM with name, role, phone and a PIN; then triggers sync. No email or invitation state. | Replace cloud provisioning with an invitation workflow; preserve local PIN policy only if the approved device model requires a local credential. Do not collect staff cloud passwords in the Owner form. |
+| Store account service | Shared passcode values are embedded in client code. Missing Firebase initialization, missing device document and read exceptions can authorize a device. | Remove shared-secret bootstrap from the client after a trusted replacement is ready. Network/error state must not be represented as positive authorization; local offline work and cloud authorization need separate result states. |
+| Sync push | Pushes flat root collections for audits, results, CAPs, reports, escalations, users and CROs. Generic table serialization sends all fields except `users.pin_hash`. | Require per-collection DTO allowlists and authoritative tenant scope. Privacy review must include phone, metadata, location and references, not only PIN hashes. A failed table push currently returns 0 and the overall sync can still advance `lastSync`; fix partial-sync acknowledgement before relying on delta sync. |
+| Sync pull | Role filters are client-side; child records (results, photos, CAPs/actions/log) are queried broadly. Pull limit is 100 with no pagination. | Server rules must scope queries by tenant and authorized membership; role-specific access belongs in rules/backend too. Add pagination/checkpointing and validate query shapes against the emulator. Prevent advancing the global sync cursor when pages or collection writes fail. |
+| Photo storage | Upload path is `photos/{id}.jpg`; successful upload persists `getDownloadURL()` in SQLite. Storage rules currently allow all reads/writes. | Move to private tenant-scoped paths and authenticated reads. Treat Firebase download URLs as bearer credentials; migrate/expire old URLs and ensure exports/logs don’t leak them. |
+| Local schema | Schema v3 stores `users.pin_hash` as NOT NULL, audit has no store code, and photo metadata contains cloud URL. | Use additive migrations. Model PIN setup state explicitly; never store a sentinel in `pin_hash`. Add tenant ownership to parent records and derive/validate child ownership; preserve local UUIDs and historical actor references. |
+| WorkManager/background jobs | Background sync and CAP aging are registered before UI; sync APIs accept role but no Firebase principal parameter. | Background cloud sync must only run with a restored, validated principal and must not borrow stale UI role state. Keep local CAP aging independent from cloud authentication. |
+
+### Failure modes that need explicit treatment
+
+1. **Wrong-person sync:** local user B unlocks while Firebase user A remains signed in. Gate every cloud operation on an explicit local-user-to-UID mapping and server membership, and invalidate the in-memory cloud authorization on local user switch.
+2. **Fail-open authorization:** timeout or missing device record returns authorized. Represent `authorized`, `revoked`, and `unknown/offline` distinctly. `unknown` may permit local work under the offline policy but must never authorize cloud reads/writes.
+3. **Data leakage via flat queries:** client role filters can be bypassed, and broad child pulls violate least privilege. Move to tenant-scoped document paths/query constraints and test actual query patterns in Firebase Emulator.
+4. **Lost delta updates:** table-level errors are swallowed as zero rows while the shared last-sync timestamp can still advance. Use per-collection/page cursors and only acknowledge a cursor after durable local application and all required uploads succeed.
+5. **Partial user provisioning:** local user creation, cloud Auth account, membership and invitation email are separate operations. Implement idempotent server operations and explicit pending/error states; never infer success from a local row alone.
+6. **Stale roles/revocation:** cached role and long-lived sessions can outlive Owner deactivation. Authorize membership from server-controlled state on sensitive operations and document the online revocation bound separately from offline local access.
+7. **Cloud URL leakage:** a download URL can grant access to anyone who obtains it even if Firestore rules are later tightened. Prefer authenticated Storage references and audit existing URL persistence/export behavior.
+8. **Multi-store ambiguity:** current default store code is WLMHW while the product combines WLMHW and HEMW; this is not equivalent to a defined tenant boundary. Confirm whether these are one tenant with two counters or separate tenants, then encode that model explicitly.
+9. **First-install/update split:** a new online-only setup requirement must not strand existing installations or erase their local PIN/data. Define versioned migration states and a rollback that retains local SQLite usability.
+10. **Build/config drift:** Functions, Auth provider settings, App Check, emulator configuration and deployed rules are not evidenced by repository files. Treat cloud project inspection as a pre-production gate, not an assumption.
+
+### Recommended user-facing model (pending Owner decisions)
+
+- **First activation:** online-only, short, guided Owner/device enrollment with clear recovery if interrupted.
+- **Normal daily use:** local user selection + PIN, available offline on already enrolled devices.
+- **Cloud activity:** separately indicated as connected, needs sign-in, revoked, or offline/pending; no ambiguous single “login” button serving both purposes.
+- **Adding staff:** Owner enters name, role, email and store membership; the staff member claims an expiring invitation and sets their own cloud credential. The Owner does not set or see that password.
+- **Offline:** never let a locally unlocked session imply cloud permission. Keep unsynced audit work available and show pending sync until cloud authorization returns.
+
+This model is contingent on decisions about shared devices, device transfer, staff email availability, offline revocation grace, store/counter tenancy, Owner bootstrap, and operating cost.
+
+### Chunk ordering adjustment
+
+Before rules are drafted, complete the data/operation inventory above and choose the tenant path model. Before sync changes, add per-collection error reporting and durable cursor semantics; otherwise tightened rules can silently cause data loss. Keep the first code chunk limited to an independently testable security foundation, and do not deploy rules until the emulator suite proves every current and target operation.
