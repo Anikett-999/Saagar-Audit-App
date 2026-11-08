@@ -252,3 +252,29 @@ This model is contingent on decisions about shared devices, device transfer, sta
 ### Chunk ordering adjustment
 
 Before rules are drafted, complete the data/operation inventory above and choose the tenant path model. Before sync changes, add per-collection error reporting and durable cursor semantics; otherwise tightened rules can silently cause data loss. Keep the first code chunk limited to an independently testable security foundation, and do not deploy rules until the emulator suite proves every current and target operation.
+
+
+## Owner decisions recorded (2026-11-08)
+
+The Owner has confirmed the following product constraints:
+
+1. **Device model: both shared and dedicated devices.** A staff member may use a shared store device with multiple local PIN profiles or a dedicated device. Each staff member still has an individual cloud identity. On shared devices, switching the local PIN user must not inherit another user's Firebase session; cloud sync requires the selected local user's verified cloud identity.
+2. **Offline revocation: preserve local work; revoke cloud access.** An offline device cannot receive a remote disable command, so the app must not promise immediate local lockout or deletion. Keep local PIN access and unsynced SQLite changes available. When online, server-side disabled membership must prevent sync and other cloud operations. Re-enabling membership restores cloud access after validation; queued local changes remain eligible to sync.
+3. **Tenant: WLMHW and HEMW are one business tenant.** The codes are counter/naming conventions within one building, not separate tenant boundaries. Record-level counter attribution may still be useful for reporting, but authorization is against the single Saagar Traders tenant.
+
+### Consequences for the design
+
+- Separate local unlock state from cloud authorization state. Offline local access is not evidence of cloud permission.
+- Check current server-controlled membership for cloud operations; disabling Firebase Auth alone may leave already-issued tokens usable temporarily. Rules or a trusted backend must check active membership state on each protected request.
+- A disabled user on an offline device may still use the local profile and create local changes. Those changes stay queued locally and are not uploaded until the user's cloud membership is active again.
+- Support both shared and dedicated device flows through the same identity mapping and device enrollment model; do not fork the authorization model by device type.
+- Use one tenant identifier for records, with optional counter/store labels retained as business data. Do not use WLMHW versus HEMW as tenant isolation.
+
+### Decisions still open before full Auth/user provisioning
+
+- One-time first-Owner bootstrap and recovery process.
+- Exact role permissions for every cloud collection and storage object.
+- Whether every staff member has an individual email address and the chosen invitation channel.
+- Offline behavior for an account that was never enrolled locally (recommended: first activation requires internet).
+- Billing owner, budget alerts and operational ownership for Functions or other trusted backend services.
+- Deployed Firebase project state and production containment/cutover plan; Firebase CLI login currently needs reauthentication.
