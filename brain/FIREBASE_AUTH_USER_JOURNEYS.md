@@ -31,6 +31,20 @@ That mismatch can cause:
 
 The existing sync service must be treated as a store-level data mirror, not as an already-secure per-user sync pipeline. Before identity-gated sync, its push/pull scope, actor metadata, and record ownership need explicit rules.
 
+### Code-level findings from the current working tree
+
+- `pubspec.yaml` includes Firebase Core, Firestore, and Storage, but explicitly describes authentication as local PIN/bcrypt and does not include Firebase Auth. The locked-stack instruction therefore needs an explicit product/spec update before an Auth dependency is introduced.
+- S03 (`lib/ui/screens/s03_first_setup/first_setup_screen.dart`) asks for an online store pairing key, then creates the local Owner/PIN. The store-pairing step is not Firebase identity enrollment. The revised flow must make clear whether this is retained as an additional business activation check or replaced by/combined with trusted Owner invitation acceptance.
+- S04 and `auth_provider.dart` authenticate against the local `users` table and bcrypt PIN. This is a valuable offline path to preserve, but it currently has no cloud UID binding.
+- S29 (`manage_users_screen.dart`) creates local SM/GM records and PINs. Email, invitation status, cloud UID, and per-user store membership are not represented in the user creation journey.
+- `CloudSyncService.initialize()` only initializes Firebase Core. `syncAll()` has no required authenticated UID or active-membership precondition, and it pushes all queued records from the device database. That database may contain work by several local profiles.
+- WorkManager registers periodic sync and invokes `syncAll()` in a background isolate without a selected local profile. This is a direct identity ambiguity for shared devices; profile binding in foreground UI alone will not solve it.
+- The sync service writes sanitized local user records to the remote `users` collection, stripping `pin_hash`, but pulls remote users with the placeholder `PENDING_SETUP` when there is no local PIN hash. This placeholder should become an explicit local enrollment/PIN-setup state before remote users are introduced through invitations.
+- Firestore and Storage rules in the current working tree allow broad public reads/writes. The Firestore wildcard grants access beyond the `users` match; the `pin_hash` condition is not a meaningful authorization boundary. These rules must not be mistaken for cloud access control. A rules cutover requires a data-path inventory and Emulator Suite tests; it is not safe to deploy a guessed restrictive ruleset because the existing sync paths and queries may be blocked.
+- Photo sync currently uses a flat `photos/{id}.jpg` Storage path and persists a download URL. The future private access design must define tenant/store scope and avoid relying on publicly usable download URLs for sensitive evidence.
+
+These findings are from source inspection, not a live Firebase production audit. The Firebase CLI session was previously observed as expired, so the deployed production rules and bucket access still need an authenticated console/CLI review before a security posture claim is made.
+
 ## 3. Proposed end-to-end journeys
 
 ### A. First Owner activation (one time for the business)
