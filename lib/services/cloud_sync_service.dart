@@ -632,90 +632,126 @@ class CloudSyncService {
     bool isUserTable = false,
   }) async {
     try {
-      List<Map<String, dynamic>> remoteDocs = [];
-
       if (_testAdapter != null) {
-        remoteDocs = await _testAdapter!.pullRecords(tableName, since);
+        var remoteDocs = await _testAdapter!.pullRecords(tableName, since);
         if (queryFilter != null && queryFilter.isNotEmpty) {
           remoteDocs = remoteDocs.where((doc) {
             return queryFilter.entries.every((entry) => doc[entry.key] == entry.value);
           }).toList();
         }
+        var upserted = 0;
+        for (var offset = 0; offset < remoteDocs.length; offset += 100) {
+          final end = (offset + 100).clamp(0, remoteDocs.length);
+          upserted += await _upsertRemoteDocs(
+            tableName,
+            remoteDocs.sublist(offset, end),
+            isUserTable: isUserTable,
+          );
+        }
+        return upserted;
+      }
+
+      final firestore = FirebaseFirestore.instance;
+      Query<Map<String, dynamic>> query = firestore.collection(tableName);
+
+      if (since != null) {
+        query = query
+            .where('_synced_at', isGreaterThan: Timestamp.fromDate(since))
+            .orderBy('_synced_at');
       } else {
-        final firestore = FirebaseFirestore.instance;
-        Query query = firestore.collection(tableName);
+        query = query.orderBy(FieldPath.documentId);
+      }
 
-        if (since != null) {
-          query = query.where('_synced_at', isGreaterThan: Timestamp.fromDate(since));
+      if (queryFilter != null && queryFilter.isNotEmpty) {
+        for (final entry in queryFilter.entries) {
+          query = query.where(entry.key, isEqualTo: entry.value);
         }
+      }
 
-        if (queryFilter != null && queryFilter.isNotEmpty) {
-          for (final entry in queryFilter.entries) {
-            query = query.where(entry.key, isEqualTo: entry.value);
-          }
+      Query<Map<String, dynamic>> pageQuery = query.limit(100);
+      QueryDocumentSnapshot<Map<String, dynamic>>? lastDocument;
+      var totalUpserted = 0;
+
+      while (true) {
+        if (lastDocument != null) {
+          pageQuery = query.startAfterDocument(lastDocument).limit(100);
         }
-
-        final snapshot = await query.limit(100).get();
-        remoteDocs = snapshot.docs.map((d) {
-          final data = d.data() as Map<String, dynamic>;
-          data['id'] = d.id;
+        final snapshot = await pageQuery.get();
+        final remoteDocs = snapshot.docs.map((document) {
+          final data = Map<String, dynamic>.from(document.data());
+          data['id'] = document.id;
           data.remove('_synced_at');
           return data;
         }).toList();
+
+        totalUpserted += await _upsertRemoteDocs(
+          tableName,
+          remoteDocs,
+          isUserTable: isUserTable,
+        );
+        if (snapshot.docs.length < 100) break;
+        lastDocument = snapshot.docs.last;
       }
 
-      if (remoteDocs.isEmpty) return 0;
-
-      int upserted = 0;
-      await _db.transaction((txn) async {
-        for (final doc in remoteDocs) {
-          final id = doc['id']?.toString();
-          if (id == null) continue;
-
-          // Check if exists locally
-          final existing = await txn.query(
-            tableName,
-            where: 'id = ?',
-            whereArgs: [id],
-            limit: 1,
-          );
-
-          if (existing.isEmpty) {
-            // Filter to only columns that exist in SQLite schema
-            final filtered = await _filterColumns(tableName, doc, txn);
-            if (isUserTable) {
-              // Remote user documents never contain pin_hash. Provide fallback for new cloud users.
-              filtered['pin_hash'] ??= 'PENDING_SETUP';
-            }
-            await txn.insert(tableName, filtered);
-            upserted++;
-          } else {
-            // Last write wins comparison
-            final localDoc = existing.first;
-            final shouldUpdate = _isRemoteNewer(localDoc, doc);
-            if (shouldUpdate) {
-              final filtered = await _filterColumns(tableName, doc, txn);
-              if (isUserTable) {
-                // Inviolable Security Rule: Preserve existing local pin_hash!
-                filtered['pin_hash'] = localDoc['pin_hash'];
-              }
-              await txn.update(
-                tableName,
-                filtered,
-                where: 'id = ?',
-                whereArgs: [id],
-              );
-              upserted++;
-            }
-          }
-        }
-      });
-
-      return upserted;
+      return totalUpserted;
     } catch (e) {
       debugPrint('CloudSyncService._pullTableData($tableName) error: $e');
       throw _CloudSyncStageFailure('Failed to pull $tableName', e);
     }
+  }
+
+  Future<int> _upsertRemoteDocs(
+    String tableName,
+    List<Map<String, dynamic>> remoteDocs, {
+    required bool isUserTable,
+  }) async {
+    if (remoteDocs.isEmpty) return 0;
+    int upserted = 0;
+    await _db.transaction((txn) async {
+      for (final doc in remoteDocs) {
+        final id = doc['id']?.toString();
+        if (id == null) continue;
+
+        // Check if exists locally
+        final existing = await txn.query(
+          tableName,
+          where: 'id = ?',
+          whereArgs: [id],
+          limit: 1,
+        );
+
+        if (existing.isEmpty) {
+          // Filter to only columns that exist in SQLite schema
+          final filtered = await _filterColumns(tableName, doc, txn);
+          if (isUserTable) {
+            // Remote user documents never contain pin_hash. Provide fallback for new cloud users.
+            filtered['pin_hash'] ??= 'PENDING_SETUP';
+          }
+          await txn.insert(tableName, filtered);
+          upserted++;
+        } else {
+          // Last write wins comparison
+          final localDoc = existing.first;
+          final shouldUpdate = _isRemoteNewer(localDoc, doc);
+          if (shouldUpdate) {
+            final filtered = await _filterColumns(tableName, doc, txn);
+            if (isUserTable) {
+              // Inviolable Security Rule: Preserve existing local pin_hash!
+              filtered['pin_hash'] = localDoc['pin_hash'];
+            }
+            await txn.update(
+              tableName,
+              filtered,
+              where: 'id = ?',
+              whereArgs: [id],
+            );
+            upserted++;
+          }
+        }
+      }
+    });
+
+    return upserted;
   }
 
   bool _isRemoteNewer(Map<String, dynamic> local, Map<String, dynamic> remote) {
@@ -760,4 +796,3 @@ class CloudSyncService {
     return null;
   }
 }
-

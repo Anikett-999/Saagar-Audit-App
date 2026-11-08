@@ -324,6 +324,26 @@ void main() {
       expect(localCaps.any((c) => c['id'] == 'cap_remote_1'), isTrue);
     });
 
+    test('Inbound sync applies every pull page beyond Firestore page size', () async {
+      testAdapter.mockRemoteData['cros'] = List.generate(
+        225,
+        (index) => {
+          'id': 'cro_page_$index',
+          'name': 'CRO $index',
+          'counter': 'Titan',
+          'shift': 'morning',
+          'is_active': 1,
+          'joined_at': '2026-10-02T10:00:00Z',
+        },
+      );
+
+      final result = await CloudSyncService.instance.syncAll();
+
+      expect(result.success, isTrue);
+      expect(result.pulledRecords, equals(225));
+      expect(fakeDb.tables['cros']!.length, equals(225));
+    });
+
     test('Role-Based Inbound Scoping: SM cannot pull users, reports, or escalations', () async {
       testAdapter.mockRemoteData['users'] = [
         {'id': 'u_gm_1', 'name': 'GM User', 'role': 'GM'},
@@ -711,4 +731,3 @@ void main() {
     });
   });
 }
-

@@ -318,3 +318,15 @@ This draft maps current app behavior into cloud-enforced permissions. It is not 
 2. Confirm precise audit-type create permissions and whether SM may read another SM's daily audit.
 3. Confirm CAP action and escalation state transitions that should be available to each role.
 4. Approve the role matrix and evidence-file visibility before emulator tests lock the policy.
+
+
+### Completed sync paging chunk (2026-11-08)
+
+- Firestore pull queries now retrieve every result in 100-document pages before the global sync checkpoint advances. Each page is applied to SQLite transactionally; if a later page fails, the checkpoint remains unchanged and previously applied rows are safe to upsert again.
+- The test adapter exercises the same bounded application path. A regression test verifies that 225 remote records are all applied.
+- Added the composite index for the existing SM daily-audit delta query: `audit_type ASC, _synced_at ASC`. `firebase.json` now points to `firestore.indexes.json`.
+- Verification on the local checkout: sync tests 21/21 passed; score-engine tests 12/12 passed; `flutter analyze` reported no issues; both Firebase JSON config files parse successfully. Emulator query behavior and production index deployment remain unverified and are not deployed.
+
+This remains a reliability foundation. The pull queries still use the legacy flat collection layout and client-side role filter; they are not a substitute for tenant-scoped Auth rules.
+
+**Next implementation boundary:** after the remaining Owner decisions, add the Firebase Auth/membership model and Emulator authorization tests. Then migrate query paths and Storage access under the approved single-tenant and per-user identity contract.

@@ -1,0 +1,19 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "audits",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "audit_type",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "_synced_at",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
