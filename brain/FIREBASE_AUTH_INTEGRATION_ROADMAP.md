@@ -281,3 +281,40 @@ The Owner has confirmed the following product constraints:
 - Offline behavior for an account that was never enrolled locally (recommended: first activation requires internet).
 - Billing owner, budget alerts and operational ownership for Functions or other trusted backend services.
 - Deployed Firebase project state and production containment/cutover plan; Firebase CLI login currently needs reauthentication.
+
+
+## Authorization matrix — draft for Owner approval
+
+This draft maps current app behavior into cloud-enforced permissions. It is not final until the Owner approves the permissions and edge cases. Every request must have a valid Firebase Auth UID, active membership in the single Saagar Traders tenant, and an authorized device where device enrollment applies. Tenant membership and role come from server-controlled records, never client-supplied fields or local PIN state.
+
+| Data / operation | Owner | GM | SM | Enforcement / notes |
+|---|---|---|---|---|
+| Member directory and invitations | Manage tenant members; read all | No management; own profile only | No management; own profile only | Client cannot assign roles or activate members. Invite, accept, deactivate and role change go through trusted backend. |
+| Device enrollment and revocation | View/manage tenant devices | Own/enrolled device only | Own/enrolled device only | A shared device can be used by different users, but cloud operations bind to the selected member UID. Disable/revoke blocks cloud activity when online. |
+| Store configuration | Read/write | Read operational settings | Read operational settings | Bootstrap secrets and passcode hashes are never client-readable. |
+| CRO directory | Current app exposes S28 to all roles | Current app exposes S28 to all roles | Current app exposes S28 to all roles | Draft preserves the existing UI policy. Confirm whether all roles may mutate or only Owner/GM before rules are finalized. |
+| Audits | Read all; verify/hide per existing Owner controls | Read all; verify where allowed | Read only own daily audits | Create/edit only while draft and by its author. Submitted records are immutable except explicit allowed verification/hide transitions. Query shapes must include tenant + role scope. |
+| Audit results and evidence metadata | Read authorized audits | Read authorized audits | Read only results for own daily audits | Inherit access from parent audit; no child document may broaden parent access. Writes only by draft author while parent audit is draft. |
+| Evidence files in Storage | Read authorized audit/CAP evidence | Read authorized audit/CAP evidence | Read evidence for own/assigned work | Private tenant-scoped paths; no public download URLs. Enforce parent-resource membership and content type/size constraints. |
+| CAPs | Read/manage all | Read/manage all; oversee/verify | Read CAPs assigned to user or originating from own audit | Current list logic scopes SM by assignment/origin. Enforce allowed state transitions and actor assignment on server. |
+| CAP actions and event log | Read/manage all | Read/manage all | Read assigned CAP; update own assigned action | Event log should be append-only; never accept client-chosen actor UID/role. |
+| Reports | Read/manage all | Read/manage all | No access | Existing cloud pull and S20/S21 guards restrict reports to GM/Owner. Consider server-generated snapshots to avoid client role spoofing. |
+| Escalations | Read/acknowledge/resolve all | Read/acknowledge/resolve all | No list access; may submit an escalation from authorized audit workflow | Existing S33 is GM/Owner-only. Create requests must validate source audit, target and severity server-side. |
+| Static SOP/checkpoint reference data | Read tenant-approved versions | Read tenant-approved versions | Read tenant-approved versions | Prefer app-bundled/versioned reference data until the product formally supports remote edits. |
+
+### Identity and offline invariants
+
+- Local user UUIDs remain stable for SQLite history; add an explicit verified UID link rather than replacing IDs.
+- On a shared device, changing local user clears the prior cloud authorization context. Cloud sync must wait until Firebase UID equals the selected member's verified UID.
+- On a dedicated device, the same identity check applies; device transfer must remove the old local binding before a new user enrolls.
+- An offline PIN unlock may continue local work. It cannot authorize Firestore/Storage. Queued changes remain local until the server confirms active membership and the matching user identity.
+- A local role, route guard, device pairing preference, cached claim or unverified invitation status is never a server authorization decision.
+- Deactivation changes membership to inactive and disables/revokes Firebase Auth through trusted server code. Rules check live membership so a previously issued token cannot continue cloud access.
+- Existing root collections and photos/{id}.jpg are legacy paths. They stay readable only during a controlled migration window approved by the Owner; do not leave public rules in place as compatibility.
+
+### Items that must be answered before rules are considered final
+
+1. Confirm whether all roles may create/edit/deactivate CROs, as the current S28 UI allows.
+2. Confirm precise audit-type create permissions and whether SM may read another SM's daily audit.
+3. Confirm CAP action and escalation state transitions that should be available to each role.
+4. Approve the role matrix and evidence-file visibility before emulator tests lock the policy.
