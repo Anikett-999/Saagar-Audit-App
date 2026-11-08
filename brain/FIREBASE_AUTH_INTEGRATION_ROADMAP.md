@@ -1,0 +1,209 @@
+# Firebase Identity and Cloud Access Integration Roadmap
+
+**Status:** Draft roadmap for Owner review  
+**Prepared:** 2026-11-08  
+**Scope:** Introduce secure cloud identity and authorization while preserving SQLite-first operation and local PIN access for offline work.
+
+## Objective
+
+Replace the current shared store passcode as the cloud access gate with individually accountable, server-enforced authorization. Keep SQLite as the operational source of truth. Keep the local bcrypt PIN for routine device unlock and offline work, with an explicit relationship between the selected local user and the cloud identity used for sync.
+
+This roadmap is a proposal, not a final architecture contract. Firebase Auth changes the existing documented decision that cloud authentication is not used. Confirm the product decisions in Chunk 0 before implementation. Do not deploy production Firebase changes from this draft.
+
+## Current repository evidence
+
+- `firestore.rules` currently allows broad public reads and writes. `storage.rules` also allows broad public reads and writes.
+- Local users have SQLite UUIDs and bcrypt PIN hashes. The current login is local; Firebase Auth is not present in `pubspec.yaml` or app code.
+- S03 has a store activation passcode flow; S32 also manages pairing. `StoreAccountService` includes built-in passcode values and a device check that treats a missing device record or a read error as authorized.
+- The sync service writes and reads flat root collections. Some pull paths are role-filtered in app code, but related collections are pulled broadly. Client-side filtering is not a security boundary.
+- Audit IDs are text primary keys, not SQLite auto-increment IDs. The current audit schema does not identify an individual store code, so per-store cloud rules require an explicit data model decision and likely an additive migration.
+- `firebase.json` currently configures Firestore and Storage only; Functions are not configured.
+- `brain/CURRENT_STATE.md` reports Phase 4 complete while `brain/OVERVIEW.md` still reports Phase 4 as next. Reconcile project status before adopting any phase label.
+- The local checkout is on `main` with pre-existing uncommitted changes. Do not mix those files into this integration's commits.
+
+## Product and architecture decisions required
+
+1. **Device model:** shared store devices or one dedicated device per person. If shared, local PIN user switching must also switch or reauthenticate the cloud identity before sync. A Firebase session for one person must never authorize another selected local user.
+2. **Identity model:** confirm Firebase Auth per person. If the product chooses a device identity instead, record that the cloud rules authorize by device/store and cannot claim per-person server authorization from a local PIN alone.
+3. **Owner bootstrap:** choose how the first Owner is issued and how a one-time bootstrap is claimed. No public self-registration or client-created Owner.
+4. **Staff provisioning:** recommended flow is Owner enters name, role, email and store membership; server sends an invitation; the staff member sets their own cloud credential. Do not collect a staff password in S29.
+5. **Store and role scope:** define which accounts can access WLMHW and HEMW and which records each role can read or change.
+6. **Offline policy:** confirm local access after activation, cloud sync behavior when a token expires, and the maximum acceptable delay before a disconnected device learns of account revocation.
+7. **Operating cost and ownership:** Cloud Functions deployment requires a Firebase Blaze billing account. Confirm billing owner, budget alerts, and who maintains the backend.
+8. **Production response:** verify deployed Firestore and Storage rules and review existing exposure before choosing production containment and cutover timing.
+
+## Execution chunks
+
+Each implementation chunk should be independently reviewable and produce one commit on a feature branch. Do not commit the unrelated dirty workspace files. Push the feature branch after each reviewed chunk; do not merge to `main` or deploy production services without a separate go/no-go approval.
+
+### Chunk 0 — Product contract and baseline
+
+**Work**
+
+- Resolve the decisions above, especially shared versus dedicated devices.
+- Inspect the actual Firebase project configuration, deployed Firestore and Storage rules, collections, Storage paths, indexes, enabled sign-in methods, and current records. Repo files alone do not prove what is deployed.
+- Inventory every client and WorkManager cloud operation and identify data fields used for store scoping.
+- Reconcile `OVERVIEW.md`, `CURRENT_STATE.md`, `TECH_STACK_AND_RULES.md`, and `SPEC_APP.md` so Firebase identity and local PIN responsibilities are consistent.
+- Define a threat model, tenant/store membership contract, login state diagram, migration plan, offline/revocation policy and release rollback plan.
+
+**Acceptance**
+
+- Approved identity and device model is written down.
+- Every cloud collection, file path, operation, principal and scope has an owner in the access matrix.
+- The security rule draft and data migration strategy are reviewable before application changes begin.
+
+### Chunk 1 — Rules and authorization test foundation
+
+**Work**
+
+- Create restrictive Firestore and Storage rules for the chosen membership and store model. Deny by default.
+- Add Firebase Emulator tests for unauthenticated access, wrong tenant/store, wrong role, inactive member, invalid fields, path traversal, unauthorized uploads and unauthorized deletes.
+- Test actual query shapes. Firestore rules are not filters; a collection query that could return unauthorized documents will fail as a whole.
+- Do not deploy the production rules yet. Define a separately approved containment action if live data is currently exposed.
+
+**Acceptance**
+
+- Emulator allow/deny tests demonstrate least privilege for every operation in the inventory.
+- No broad wildcard grant or `request.auth != null`-only grant remains in the target rules.
+- Storage access is authenticated and scoped; evidence files are not made public by download URLs or unrestricted paths.
+
+### Chunk 2 — Membership backend and invitations
+
+**Work**
+
+- Configure the backend codebase and required billing/operations settings only after cost approval.
+- Implement Owner bootstrap, invite, accept, deactivate, reactivate, role/store change and idempotent retry operations using a trusted server environment.
+- Verify the caller's active Owner membership on the server. Admin SDK calls bypass Firebase Security Rules, so server-side checks are mandatory.
+- Use a verified invitation/password setup process. Never send or log a plaintext temporary password. Add rate limiting, App Check where appropriate, audit events and safe duplicate handling.
+- Keep dynamic membership in an authoritative server-side membership record. Do not depend exclusively on stale client role state or long-lived custom claims.
+
+**Acceptance**
+
+- Only an authorized Owner can manage users for the authorized tenant.
+- Replaying a request cannot create duplicate memberships or accounts.
+- Invitation, expiry, acceptance, failure and retry states are auditable and bilingual UI messages can be added in the client chunk.
+
+### Chunk 3 — Local schema and legacy identity migration
+
+**Work**
+
+- Add additive SQLite migrations for Firebase UID mapping, invitation/account status, membership version and explicit PIN-setup state.
+- Preserve local UUIDs and all historical audit/CAP actor references. Do not replace them with Firebase UIDs.
+- Do not place a magic string such as `PENDING_SETUP` in `pin_hash`; represent PIN setup separately and prevent login until a valid bcrypt hash exists.
+- Define record-level tenant/store ownership. Add the appropriate store identifier to audits and derive scope for related records, or document a different approved data model before rules implementation.
+- Create a verified account-linking tool/path. Do not auto-link solely by name or email.
+
+**Acceptance**
+
+- Existing database upgrades retain every row and relation; fresh database creation also works.
+- Existing PIN login remains available for enrolled users and never accepts a missing or setup-pending PIN.
+- Migration tests cover duplicate email, mismatched tenant, retry after partial failure and preservation of audit attribution.
+
+### Chunk 4 — Firebase Auth service and boot/onboarding states
+
+**Work**
+
+- Add an injectable Riverpod Firebase Auth service and explicit app states: first Owner bootstrap, invitation acceptance, enrolled user, local PIN unlock, cloud reauthentication needed, and enrollment error.
+- Preserve fast local boot. Firebase initialization or network failure must not prevent an already enrolled user from opening local data offline.
+- Require internet for first Owner/device activation as approved. Keep the activation resumable; do not create a partly trusted Owner before the server has atomically granted the bootstrap.
+- Ensure Firebase session restoration has a bounded, recoverable path. Avoid blocking `runApp()` indefinitely on cloud readiness.
+- Retire the shared factory passcode only when the new activation path is ready.
+
+**Acceptance**
+
+- First install online can activate and enroll; first install offline gives a clear recoverable message.
+- Existing enrolled installation opens offline without waiting for Firebase.
+- Interrupted activation resumes safely and cannot claim a second Owner or tenant.
+
+### Chunk 5 — Local PIN and cloud identity binding
+
+**Work**
+
+- Bind each local user session to its verified Firebase UID before any cloud operation.
+- For shared devices, define and implement what happens on switching local users: matching Firebase identity, reauthentication, or a user-approved alternative. Never sync as the previous user after a PIN switch.
+- For dedicated devices, enforce the one-person binding and provide safe device transfer/reset.
+- Keep local PIN, bcrypt hash and lockout data out of Firestore, Storage, logs, crash reports and exports.
+- Keep route guards for user experience, but treat server rules and backend authorization as authoritative.
+
+**Acceptance**
+
+- Mismatched local user/Firebase UID cannot sync or perform privileged cloud operations.
+- A successful local PIN continues to support offline audit workflows.
+- Lockout and PIN reset semantics are explicit for multiple devices; Owner reset on one device is not described as remotely changing another device's local PIN.
+
+### Chunk 6 — Tenant-scoped sync and private Storage
+
+**Work**
+
+- Update every read/write query to include the approved tenant/store scope and satisfy rule constraints.
+- Replace broad pulls of user, audit, result, photo, CAP, report and escalation collections with scoped queries that preserve foreign-key order.
+- Use explicit cloud serialization allowlists. Do not only strip `pin_hash` while sending all other user columns.
+- Put photos under a scoped private path and use authorized retrieval. Inventory and revoke or migrate any public bearer download URLs as needed.
+- Resolve migration from flat root collections to the approved path/data model. Preserve document IDs and references and make the migration restartable.
+- Bind WorkManager/background sync to a validated account/device identity and fail closed for cloud operations when that principal is unavailable.
+
+**Acceptance**
+
+- Every Firestore and Storage operation passes emulator authorization tests under its real query/path.
+- Cross-store reads/writes and unscoped background jobs are denied.
+- Sync retry, partial failure and conflict resolution do not lose local records or mutate submitted immutable audits.
+
+### Chunk 7 — S03, S29, S32 and account lifecycle UX
+
+**Work**
+
+- Replace S03’s shared passcode interaction with the approved Owner/device bootstrap and PIN creation journey.
+- Add S29 invitation/email/store membership status and server-backed deactivation/reactivation. Do not add a password entry field.
+- Update S32 device/account state and sync error explanations; remove passcode rotation controls only after replacement flows work.
+- Update the existing StoreAccountService, provider, localization, help text and tests, not just the screen widgets.
+- Add recovery flows for cloud password and local PIN as distinct functions.
+
+**Acceptance**
+
+- English and Marathi copy clearly distinguishes cloud account setup, local PIN unlock, offline access and pending sync.
+- Owner can see pending, active and deactivated users and understand what each state means on an offline device.
+- No password or PIN is visible in an Owner form, synced record or log.
+
+### Chunk 8 — Revocation, device recovery and operational controls
+
+**Work**
+
+- Implement server-side account disable/revocation and device unlinking; define how active ID tokens and offline local sessions are handled.
+- Add a last-verified membership timestamp/version and a clear offline grace policy if needed. Do not claim immediate remote lockout while offline.
+- Add account recovery, lost-device, user transfer and local-data retention procedures.
+- Add monitoring for rule denials, invite failures, auth mismatch and sync backlog, plus budget alerts for paid backend services.
+
+**Acceptance**
+
+- Online revocation blocks subsequent cloud access within the approved bound.
+- Offline behavior matches the documented grace policy and preserves unsynced local work.
+- Support procedures exist for lost devices, forgotten PIN, forgotten cloud password and failed account provisioning.
+
+### Chunk 9 — Pilot and production cutover
+
+**Work**
+
+- Back up and rehearse migration on a copy of production data.
+- Pilot with approved Owner, GM and SM accounts on the actual device model (shared or dedicated).
+- Verify fresh install, upgraded install, account switching, offline audit, reconnect, large photo sync, permission denials, deactivation and rollback.
+- Confirm production rules and Storage permissions before switching clients. Do not keep public rules open until every device has upgraded; use a controlled cutover with a deliberate sync-outage/rollback decision.
+- Release only after code review, test evidence and Owner go/no-go.
+
+**Acceptance**
+
+- Existing history and authorship are preserved, no secrets are uploaded, and the canonical score engine remains unchanged.
+- Emulator security tests, full app test suite, `flutter analyze`, release build and physical-device acceptance pass.
+- Production cutover and rollback are documented and explicitly approved.
+
+## Commit and review policy
+
+- Use one feature branch for the integration, based on the current remote `main` after verifying it is current.
+- One commit per accepted chunk, with only that chunk’s files. Push the branch after each chunk so the work is backed up and reviewable.
+- Attach verification output and a short handoff to each chunk. Do not claim test/device verification unless it was actually run.
+- Keep production Firebase changes and merge to `main` as separate explicit go/no-go decisions.
+- Preserve unrelated pre-existing working tree changes; never stage them with this work.
+
+## Immediate next step
+
+Confirm the device model: shared store devices or one dedicated device per person. Until this is known, do not implement the cloud session/local PIN binding or user-switch experience. After confirmation, complete Chunk 0 and return its architecture and security contract for review before changing application code.
+
