@@ -268,8 +268,8 @@ The Owner separately requires review of the full invitation and signing process 
 ### POC changes in the working tree
 
 - Added `firebase_auth` while preserving local bcrypt PIN authentication.
-- Added `FirebaseProfileSessionRegistry`, which gives each local profile a deterministic opaque named Firebase app/Auth session and exposes Firestore/Storage clients created from that same app. It is not wired into cloud sync and must not be treated as authorization by itself.
-- Added unit and Auth Emulator integration tests, plus a local Auth Emulator port in `firebase.json` using the demo project ID.
+- Added `FirebaseProfileSessionRegistry`, which gives each local profile a deterministic named Firebase app/Auth session using its random local UUID (the name is not a secret) and exposes Firestore/Storage clients created from that same app. It is not wired into cloud sync and must not be treated as authorization by itself.
+- Added unit and Auth Emulator integration tests, plus a local Auth Emulator port in `firebase.json` using the demo project ID. The Android integration test uses USB port forwarding and disables emulator-host rewriting so a physical phone reaches only the local emulator. Debug builds permit cleartext only to loopback for the local emulator; release manifest/network policy remains unchanged.
 
 ### Verification evidence
 
@@ -277,10 +277,12 @@ The Owner separately requires review of the full invitation and signing process 
 - New registry unit tests: 3/3 passed.
 - Canonical score-engine plus cloud-sync suites: 33/33 passed; the `81/90 = 90.0%` invariant passed.
 - Full current test suite: 446 passed, 2 failed. Both failures are in `settings_hub_test.dart` at lines 107 and 195: each expects one `Settings`/`सेटिंग्ज` label, but the current UI renders two matching widgets. No Settings Hub code was changed for this POC; this run alone cannot establish whether those failures predate the branch.
-- Firebase Auth Emulator started successfully on `127.0.0.1:9099` under `demo-saagar-auth`. The integration test did not complete: there is no Android device or Android virtual device attached/available; the Windows runner stalled during native Firebase C++ SDK build/download; Flutter's integration-test runner does not support web targets, and the separate Chrome test stalled before starting. Therefore named-session behavior is **not yet verified on a running platform**.
+- Android device `9b010059305330363400301a2363ac` was detected. The Auth Emulator could not be started: port 9099 was reported occupied; a temporary alternate Auth port (19099) also failed because the emulator hub timed out on ports 4401 and 14400. Temporary config files were removed and repository Firebase config was not altered during these attempts. Therefore the Android process-restart phase remains **unverified**. Earlier same-process Android isolation evidence recorded in session history should not be represented as restart persistence proof.
+- The cloud-sync suite most recently passed 23/23 tests, including partial user-push checkpoint behavior and skipping remote-only cloud user records rather than inserting a placeholder into local `pin_hash`. `flutter analyze` reported no issues. The focused profile registry, score, and cloud sync run previously passed 36/36; the full suite had 446 passes and 2 Settings Hub failures, with no claim that those failures are pre-existing.
 
 No code has been committed to GitHub for this POC yet. Repository instructions require explicit Claude review approval before a code commit/push. The precise reviewable chunk is in `pubspec.yaml`, `pubspec.lock`, `firebase.json`, the profile-session registry, its tests, and generated desktop plugin registrants. Existing unrelated workspace changes remain unstaged.
 
 ## 14. Next immediate task
 
-Run the Auth Emulator integration test on a supported Android device/emulator and review the exact code diff. Then obtain the repository-required explicit Claude review approval before committing the POC. After the session proof is accepted, design and present the full Owner/staff invitation signing, verification, expiry, delivery, and recovery process for Owner approval. Do not change production rules or wire the POC into sync until the tenant/store/collection contract and authorization rules are approved and emulator-tested.
+Resolve local Firebase Emulator Hub startup and run the Android session process-restart test. Obtain the repository-required explicit Claude review approval before committing any code chunk. After the session proof is accepted, design and present the full Owner/staff invitation signing, verification, expiry, delivery, and recovery process for Owner approval. Do not change production rules or wire the POC into sync until the tenant/store/collection contract and authorization rules are approved and emulator-tested.
+
