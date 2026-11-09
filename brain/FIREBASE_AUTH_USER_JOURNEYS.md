@@ -276,7 +276,7 @@ The Owner separately requires review of the full invitation and signing process 
 - Full `flutter analyze`: no issues.
 - New registry unit tests: 3/3 passed.
 - Canonical score-engine plus cloud-sync suites: 33/33 passed; the `81/90 = 90.0%` invariant passed.
-- Full current test suite: 446 passed, 2 failed. Both failures are pre-existing `settings_hub_test.dart` finder expectations at lines 107 and 195: each expects one `Settings`/`सेटिंग्ज` label, but the current UI renders two matching widgets. No Settings Hub code was changed for this POC.
+- Full current test suite: 446 passed, 2 failed. Both failures are in `settings_hub_test.dart` at lines 107 and 195: each expects one `Settings`/`सेटिंग्ज` label, but the current UI renders two matching widgets. No Settings Hub code was changed for this POC; this run alone cannot establish whether those failures predate the branch.
 - Firebase Auth Emulator started successfully on `127.0.0.1:9099` under `demo-saagar-auth`. The integration test did not complete: there is no Android device or Android virtual device attached/available; the Windows runner stalled during native Firebase C++ SDK build/download; Flutter's integration-test runner does not support web targets, and the separate Chrome test stalled before starting. Therefore named-session behavior is **not yet verified on a running platform**.
 
 No code has been committed to GitHub for this POC yet. Repository instructions require explicit Claude review approval before a code commit/push. The precise reviewable chunk is in `pubspec.yaml`, `pubspec.lock`, `firebase.json`, the profile-session registry, its tests, and generated desktop plugin registrants. Existing unrelated workspace changes remain unstaged.
