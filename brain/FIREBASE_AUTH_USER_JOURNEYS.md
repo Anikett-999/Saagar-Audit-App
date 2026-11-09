@@ -1,6 +1,6 @@
 # Firebase Identity, Invitations, Shared Devices, and Offline Access
 
-**Status:** Architecture proposal for Owner review — no authentication or invitation implementation is authorized by this document.  
+**Status:** Architecture proposal; named-session proof of concept approved, invitation implementation still requires review.  
 **Date:** 2026-11-08  
 **Scope:** Explain the user journeys and identify the decisions and engineering gates needed before implementation.
 
@@ -40,6 +40,8 @@ The existing sync service must be treated as a store-level data mirror, not as a
 - `CloudSyncService.initialize()` only initializes Firebase Core. `syncAll()` has no required authenticated UID or active-membership precondition, and it pushes all queued records from the device database. That database may contain work by several local profiles.
 - WorkManager registers periodic sync and invokes `syncAll()` in a background isolate without a selected local profile. This is a direct identity ambiguity for shared devices; profile binding in foreground UI alone will not solve it.
 - The sync service writes sanitized local user records to the remote `users` collection, stripping `pin_hash`, but pulls remote users with the placeholder `PENDING_SETUP` when there is no local PIN hash. This placeholder should become an explicit local enrollment/PIN-setup state before remote users are introduced through invitations.
+- The existing device kill switch is fail-open in `FirestoreStoreAccountAdapter.isDeviceAuthorized`: missing device documents and Firestore errors return `true`. It also returns `true` when Firebase is uninitialized. `syncAll()` checks this before its offline check. This is a device-level control, not staff account revocation; its result must be separated into authorized, revoked, and unknown/offline states, and unknown must never authorize cloud operations.
+- `StoreAccountService` contains accepted factory passcodes in the client and may fall back to them when no remote hash is available. This is not a trusted account bootstrap secret; APK extraction or code inspection can reveal it. Replace/retire it only as part of the approved migration so existing store activation is not silently broken.
 - Firestore and Storage rules in the current working tree allow broad public reads/writes. The Firestore wildcard grants access beyond the `users` match; the `pin_hash` condition is not a meaningful authorization boundary. These rules must not be mistaken for cloud access control. A rules cutover requires a data-path inventory and Emulator Suite tests; it is not safe to deploy a guessed restrictive ruleset because the existing sync paths and queries may be blocked.
 - Photo sync currently uses a flat `photos/{id}.jpg` Storage path and persists a download URL. The future private access design must define tenant/store scope and avoid relying on publicly usable download URLs for sensitive evidence.
 
@@ -165,17 +167,20 @@ Current sync code is broad push/pull over a shared local database. Before enabli
 
 ## 8. Decisions still required from Owner
 
-These are the remaining product/operations approvals; this document does not decide them on your behalf:
+The Owner has approved the following direction in conversation on 2026-11-08:
+
+- Launch first-Owner activation with a manually issued, one-time invitation. Exact token/signing, verification, expiry, delivery, recovery, and operator procedure still need to be designed and reviewed before implementation.
+- Prototype isolated Firebase Auth sessions per local profile on shared devices. If the prototype cannot prove correct session isolation and safe integration, require sign-in on profile switch as the fallback.
+- Keep offline work authored by a disabled user queued until that same user is re-enabled. Do not upload it under another person's identity.
+
+The following product/operations approvals remain open; this document does not decide them on the Owner's behalf:
 
 1. Who is the trusted operator for issuing the first Owner invitation, and how do they verify the Owner's identity?
-2. Do you prefer a manual one-time Firebase Console/backend-issued Owner link for launch, or a protected automated operator tool?
-3. Should staff use a unique email each? Recommendation: yes, one person's email per Firebase identity.
-4. Should staff local PINs be independently chosen on each device? Recommendation: yes; never synchronize them.
-5. On a shared device, is it acceptable to require a cloud sign-in again when a person's profile has no isolated cloud session? Recommendation for security is yes until a named-session prototype passes tests.
-6. Should Owner/GM be allowed to import a disabled user's queued offline work with original author preserved and importer recorded, or must the original user be re-enabled first? Recommendation: re-enable original user first for routine sync.
-7. What store scopes should GM and SM hold, and which tables are shared across stores?
-8. What device removal/lost-device process is expected, given offline data cannot be remotely erased?
-9. Should new install require online activation, while already-installed legacy devices retain local-only access until explicitly enrolled? Recommendation: yes, avoid a forced migration that blocks existing offline work.
+2. Should staff use a unique email each? Recommendation: yes, one person's email per Firebase identity.
+3. Should staff local PINs be independently chosen on each device? Recommendation: yes; never synchronize them.
+4. What store scopes should GM and SM hold, and which tables are shared across stores?
+5. What device removal/lost-device process is expected, given offline data cannot be remotely erased?
+6. Should new install require online activation, while already-installed legacy devices retain local-only access until explicitly enrolled? Recommendation: yes, avoid a forced migration that blocks existing offline work.
 
 ## 9. Implementation gates and roadmap
 
@@ -250,4 +255,32 @@ These official references support the design constraints; they do not by themsel
 
 ## 12. Next immediate task
 
-Owner reviews this proposal and answers the open decisions in Section 8, especially the first Owner invitation operator, shared-device session prompt policy, and handling of offline work authored by a disabled user. After that approval, update the authoritative product contract and begin Gate 0/1. Do not implement invitation Functions, change production rules, or alter user-facing auth flows before those approvals.
+## 13. Approved decisions and POC status (2026-11-09)
+
+The Owner approved these decisions:
+
+- Use a manually issued, expiring, single-use invitation to bootstrap the first Owner at launch.
+- Prototype isolated Firebase Auth sessions per local profile; if safe isolation cannot be demonstrated, require cloud sign-in on profile switch.
+- Keep offline changes authored by a disabled user queued until that same user is re-enabled. Never upload another person's work under the current user's identity.
+
+The Owner separately requires review of the full invitation and signing process before invitation/backend implementation. That remains a hard gate; this POC does not implement email delivery, signing, account provisioning, S03/S29 changes, or production sync authorization.
+
+### POC changes in the working tree
+
+- Added `firebase_auth` while preserving local bcrypt PIN authentication.
+- Added `FirebaseProfileSessionRegistry`, which gives each local profile a deterministic opaque named Firebase app/Auth session and exposes Firestore/Storage clients created from that same app. It is not wired into cloud sync and must not be treated as authorization by itself.
+- Added unit and Auth Emulator integration tests, plus a local Auth Emulator port in `firebase.json` using the demo project ID.
+
+### Verification evidence
+
+- Full `flutter analyze`: no issues.
+- New registry unit tests: 3/3 passed.
+- Canonical score-engine plus cloud-sync suites: 33/33 passed; the `81/90 = 90.0%` invariant passed.
+- Full current test suite: 446 passed, 2 failed. Both failures are pre-existing `settings_hub_test.dart` finder expectations at lines 107 and 195: each expects one `Settings`/`सेटिंग्ज` label, but the current UI renders two matching widgets. No Settings Hub code was changed for this POC.
+- Firebase Auth Emulator started successfully on `127.0.0.1:9099` under `demo-saagar-auth`. The integration test did not complete: there is no Android device or Android virtual device attached/available; the Windows runner stalled during native Firebase C++ SDK build/download; Flutter's integration-test runner does not support web targets, and the separate Chrome test stalled before starting. Therefore named-session behavior is **not yet verified on a running platform**.
+
+No code has been committed to GitHub for this POC yet. Repository instructions require explicit Claude review approval before a code commit/push. The precise reviewable chunk is in `pubspec.yaml`, `pubspec.lock`, `firebase.json`, the profile-session registry, its tests, and generated desktop plugin registrants. Existing unrelated workspace changes remain unstaged.
+
+## 14. Next immediate task
+
+Run the Auth Emulator integration test on a supported Android device/emulator and review the exact code diff. Then obtain the repository-required explicit Claude review approval before committing the POC. After the session proof is accepted, design and present the full Owner/staff invitation signing, verification, expiry, delivery, and recovery process for Owner approval. Do not change production rules or wire the POC into sync until the tenant/store/collection contract and authorization rules are approved and emulator-tested.
